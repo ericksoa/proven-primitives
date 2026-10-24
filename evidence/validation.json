@@ -1,0 +1,2062 @@
+{
+  "report_generated_utc": "2026-10-24T14:18:47.098128+00:00",
+  "claim": "Source-level proof-preserving nonfinal Base64 validation batching, finite compatibility evidence and host measurements.",
+  "baseline": {
+    "source_tree_sha256": "26c0a6952104230920df21800e689575a85bb2f679cad00283649bb88d6b650b",
+    "source_sha256": {
+      "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+      "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+      "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+      "src/base64.rs": "fc58956d3b62af9eb82a650e9f92c37dc1509a75623fa4d8e8d5b2c80fe3741a",
+      "src/lib.rs": "1bbf2d0f60ed141abebaf8af0cf92c0907b981732a97c7138e0ecfa84e07e660",
+      "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "src/percent.rs": "55aa3a2e21fe1629cbdf7a87180e1f0c2cab1b7573a577b8db8aaec08d92ba37",
+      "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+      "tests/proof_rejection.rs": "e1ab1b861b0b367ad454b47f117ec395f38cce6eea4f236623c507fd09431754",
+      "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+      "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf",
+      "tests/upstream_comparison.rs": "3e9b7dd9e254067ab204d93d7a89593868c68f1d6d12aebd3f2a63ad6f9712ed"
+    },
+    "verification_checks": 79,
+    "binary": "target/release/deps/primitives-35d398134f8f8ebe",
+    "binary_sha256": "94f53821bd442f743374735b0507197a2c367f4b5f034956f61f857e4dc08c2b",
+    "snapshot": "pre-G baseline"
+  },
+  "candidate": {
+    "verification_results": {
+      "encountered-error": false,
+      "encountered-vir-error": false,
+      "success": true,
+      "verified": 83,
+      "errors": 0,
+      "is-verifying-entire-crate": true
+    },
+    "source_sha256": {
+      "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+      "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+      "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+      "src/base64.rs": "5cfeffa4e86e4f2032e3170c06590fa08c43cb964d863781359687522f8cb55a",
+      "src/lib.rs": "1bbf2d0f60ed141abebaf8af0cf92c0907b981732a97c7138e0ecfa84e07e660",
+      "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "src/percent.rs": "55aa3a2e21fe1629cbdf7a87180e1f0c2cab1b7573a577b8db8aaec08d92ba37",
+      "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+      "tests/proof_rejection.rs": "2a603077e5185c4aca4ef31f4cc0ed9b11784f32af23aedde56b5030f59bba95",
+      "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+      "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf",
+      "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39"
+    },
+    "binary": "target/release/deps/primitives-35d398134f8f8ebe",
+    "binary_sha256": "b5783a1fc0159effca621ec5254369f08193d7bf19e74f52e560f861b5addfaf",
+    "comparison_invocations": 154498,
+    "mutations_rejected": 11
+  },
+  "host": {
+    "cpu": "Apple M2 Pro",
+    "os": "macOS",
+    "os_version": "26.7.1",
+    "architecture": "aarch64-apple-darwin"
+  },
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: aarch64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.1",
+  "references": [
+    {
+      "name": "base64",
+      "version": "0.23.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5",
+      "git_commit": "069bf7067b949f5c0a92b6ceb82492920502f2c2",
+      "resolved_features": [
+        "alloc",
+        "default",
+        "simd-unsafe",
+        "std"
+      ],
+      "role": "current compatibility and performance reference"
+    },
+    {
+      "name": "lz4_flex",
+      "version": "0.12.0",
+      "source": "git+https://github.com/PSeitz/lz4_flex?rev=975bfa7ac9583da879b5d7578b423232d84f69fe#975bfa7ac9583da879b5d7578b423232d84f69fe",
+      "git_commit": "975bfa7ac9583da879b5d7578b423232d84f69fe",
+      "resolved_features": [
+        "checked-decode",
+        "safe-decode",
+        "safe-encode",
+        "std"
+      ],
+      "role": "historical regression only"
+    },
+    {
+      "name": "lz4_flex",
+      "version": "0.14.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ecbdfe44b1bd960b68170b417450a628c43f7cf56bb3c5317e61cb230ee7f226",
+      "git_commit": "1bffdcbbf906a234b913937cb2f57c0245915038",
+      "resolved_features": [
+        "alloc",
+        "checked-decode",
+        "safe-decode",
+        "safe-encode",
+        "std"
+      ],
+      "role": "current compatibility and performance reference"
+    }
+  ],
+  "method": {
+    "process_runs": 3,
+    "batches_per_process_per_configuration": 9,
+    "batch_samples_per_configuration": 27,
+    "iterations": "clamp(2 MiB / max(input_bytes, logical_bytes, 1), 4, 50000)",
+    "ordering": "rotate first implementation each batch",
+    "warmup_calls": 10,
+    "timed_allocations": false,
+    "output_reset": "before each batch, outside timing",
+    "input_generation": "outside timing; periodic bytes (i*73+19) mod 256, literal-only LZ4, overlapping offset-one LZ4, and current-upstream compression",
+    "validation": "returned results and successful prefixes compared before timing",
+    "latency_statistic": "median of repeated batch-average nanoseconds per call; min/max retained",
+    "not_measured": [
+      "application p95/p99 latency",
+      "cold-cache latency",
+      "other machines",
+      "universal upstream equivalence"
+    ]
+  },
+  "corpus": [
+    {
+      "path": "evidence/corpus/base64_decode-262144.bin",
+      "bytes": 349528,
+      "sha256": "8dedce3821e9ca243661d05938804d371eecafb4c3fe5df98da0b6d685a0dc77"
+    },
+    {
+      "path": "evidence/corpus/base64_decode-4096.bin",
+      "bytes": 5464,
+      "sha256": "d3bed93b67b4c62ab54a2354d97edac44181012391a9cce0e780f3ae03c38243"
+    },
+    {
+      "path": "evidence/corpus/base64_decode-64.bin",
+      "bytes": 88,
+      "sha256": "b6c1d4fa7ec1b34127c1fa91ad7dc4432f8a2c6e0e021051b1e539eeac2d34af"
+    },
+    {
+      "path": "evidence/corpus/base64_decode-8.bin",
+      "bytes": 12,
+      "sha256": "3528e132e948f04ced1b0999906cc588d5a2bc9e3971be395cd42d90ce0d6140"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_late_invalid-262144.bin",
+      "bytes": 349528,
+      "sha256": "66ed17322a35d9c3feac42bd41b2d61f480b8a6428f918587381de3861b10e6e"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_late_invalid-4096.bin",
+      "bytes": 5464,
+      "sha256": "22eb69fc7bda3132e97820a276e27c3cd31df6d58276fa52bc615bf767e8e275"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_late_invalid-64.bin",
+      "bytes": 88,
+      "sha256": "36c348ea33c68e1243fdd5d85fa3dfc06e83635b1e0db86414687ab586b08779"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_late_invalid-8.bin",
+      "bytes": 12,
+      "sha256": "0480b78707f702a3936145eda7869b678485fbca00d5b0f08c3172838562dca1"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_small_output-262144.bin",
+      "bytes": 349528,
+      "sha256": "8dedce3821e9ca243661d05938804d371eecafb4c3fe5df98da0b6d685a0dc77"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_small_output-4096.bin",
+      "bytes": 5464,
+      "sha256": "d3bed93b67b4c62ab54a2354d97edac44181012391a9cce0e780f3ae03c38243"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_small_output-64.bin",
+      "bytes": 88,
+      "sha256": "b6c1d4fa7ec1b34127c1fa91ad7dc4432f8a2c6e0e021051b1e539eeac2d34af"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_small_output-8.bin",
+      "bytes": 12,
+      "sha256": "3528e132e948f04ced1b0999906cc588d5a2bc9e3971be395cd42d90ce0d6140"
+    },
+    {
+      "path": "evidence/corpus/base64_encode-262144.bin",
+      "bytes": 262144,
+      "sha256": "1b688a83ba854905616a168d0dc22e62d6dc868aa585f4412657a602fa64d6d3"
+    },
+    {
+      "path": "evidence/corpus/base64_encode-4096.bin",
+      "bytes": 4096,
+      "sha256": "f965b526538d757ca2d6114af6517c57cbcb3650b71d8cfb92046a04ef2f566b"
+    },
+    {
+      "path": "evidence/corpus/base64_encode-64.bin",
+      "bytes": 64,
+      "sha256": "cb6862268ca7c02e7b6af558f0e3d236ce9ec7ff41cc746b2848c04c582da94e"
+    },
+    {
+      "path": "evidence/corpus/base64_encode-8.bin",
+      "bytes": 8,
+      "sha256": "97b657fc33074744891f9d38e551dbb24af09f9f33e951d66cff70240cea2c0d"
+    },
+    {
+      "path": "evidence/corpus/lz4_literals-262144.bin",
+      "bytes": 263173,
+      "sha256": "970764797a7fbfa6630454e8155895a3b40de78bd565bbe93cc62f9b2685c057"
+    },
+    {
+      "path": "evidence/corpus/lz4_literals-4096.bin",
+      "bytes": 4114,
+      "sha256": "0dd80f6785a0bd16089285f3db9c6ef66e5c6994b60cf504d9fd0bfa0c60a970"
+    },
+    {
+      "path": "evidence/corpus/lz4_literals-64.bin",
+      "bytes": 66,
+      "sha256": "97281ac62049a4858409711b6731196d487fe4fed687bfc9ecf868563ea26db8"
+    },
+    {
+      "path": "evidence/corpus/lz4_literals-8.bin",
+      "bytes": 9,
+      "sha256": "d21f1dbf71fb034e3062d8d760f48d13a775d6dd3533078b0d1e693ca3464799"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap-262144.bin",
+      "bytes": 1038,
+      "sha256": "28b6676dde062c8aac91fb9997910033216141e387d56e8c2a06fc06e3bc689e"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap-4096.bin",
+      "bytes": 26,
+      "sha256": "176e7297e3abd053ced082d6ba3f67ab65b7cbe689b2749216056246a34d26e1"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap-64.bin",
+      "bytes": 11,
+      "sha256": "ee773a9b131ceed19035cccc42972387ad0742a5a8874f54c947276d1c84520b"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap_small_output-262144.bin",
+      "bytes": 1038,
+      "sha256": "28b6676dde062c8aac91fb9997910033216141e387d56e8c2a06fc06e3bc689e"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap_small_output-4096.bin",
+      "bytes": 26,
+      "sha256": "176e7297e3abd053ced082d6ba3f67ab65b7cbe689b2749216056246a34d26e1"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap_small_output-64.bin",
+      "bytes": 11,
+      "sha256": "ee773a9b131ceed19035cccc42972387ad0742a5a8874f54c947276d1c84520b"
+    },
+    {
+      "path": "evidence/corpus/lz4_upstream_compressed-262144.bin",
+      "bytes": 1294,
+      "sha256": "46abaf62a8ca6bc1c37a26538dcf15dd11af6e31604ea576e877eda9a2d9761c"
+    },
+    {
+      "path": "evidence/corpus/lz4_upstream_compressed-4096.bin",
+      "bytes": 282,
+      "sha256": "d845bccc0f4205615e15cf59a37142b6ea6c3eddf67071d4a2ddda2b3658fd2b"
+    },
+    {
+      "path": "evidence/corpus/lz4_upstream_compressed-64.bin",
+      "bytes": 66,
+      "sha256": "97281ac62049a4858409711b6731196d487fe4fed687bfc9ecf868563ea26db8"
+    },
+    {
+      "path": "evidence/corpus/lz4_upstream_compressed-8.bin",
+      "bytes": 9,
+      "sha256": "d21f1dbf71fb034e3062d8d760f48d13a775d6dd3533078b0d1e693ca3464799"
+    },
+    {
+      "path": "evidence/corpus/lz4_zero_offset-0.bin",
+      "bytes": 11,
+      "sha256": "c52a1681ec9c66f665bb3d5ccafd304c0a40537012a9ac90a92e3d47fb6ed170"
+    }
+  ],
+  "raw_runs": {
+    "baseline": [
+      {
+        "path": "evidence/validation-baseline-run-1.csv",
+        "sha256": "d80ea4b86a1dce49a9841844f3ddf169df3bba3bff96881f43909f42e6d57695",
+        "samples": 702,
+        "completed_utc": "2026-10-24T13:59:20.249024+00:00"
+      },
+      {
+        "path": "evidence/validation-baseline-run-2.csv",
+        "sha256": "5346e2f48b0719162d90c9094a077534216ad88fede903bce42b59c37e581279",
+        "samples": 702,
+        "completed_utc": "2026-10-24T13:59:20.845233+00:00"
+      },
+      {
+        "path": "evidence/validation-baseline-run-3.csv",
+        "sha256": "8679e525eee0caa2b100285252f6d8671a36ac132057c810caf02b3c690653d4",
+        "samples": 702,
+        "completed_utc": "2026-10-24T13:59:21.436421+00:00"
+      }
+    ],
+    "candidate": [
+      {
+        "path": "evidence/validation-run-1.csv",
+        "sha256": "9b1d1fca47f4cedf71b16456b3a525988a17c7d9aa547a54e48bddeef1743d6f",
+        "samples": 702,
+        "completed_utc": "2026-10-24T14:07:11.978850+00:00"
+      },
+      {
+        "path": "evidence/validation-run-2.csv",
+        "sha256": "909f7eaef75422428613e8e3a1f120504b202d7808e4b7cd233bb7d323945995",
+        "samples": 702,
+        "completed_utc": "2026-10-24T14:07:12.428061+00:00"
+      },
+      {
+        "path": "evidence/validation-run-3.csv",
+        "sha256": "74a07297f32c4301a692c62ec47cf453c1bd47ae4611bdc12ef5efe78ff6ee26",
+        "samples": 702,
+        "completed_utc": "2026-10-24T14:07:12.906088+00:00"
+      }
+    ]
+  },
+  "configurations": [
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 8,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 26.66334,
+          "min_ns_per_call": 19.99834,
+          "max_ns_per_call": 27.9175
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 24.11416,
+          "min_ns_per_call": 21.6475,
+          "max_ns_per_call": 29.085
+        }
+      },
+      "speedup": 1.105712991868678
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 8,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 19.23668,
+          "min_ns_per_call": 18.35416,
+          "max_ns_per_call": 22.89834
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 20.8025,
+          "min_ns_per_call": 19.09582,
+          "max_ns_per_call": 22.23332
+        }
+      },
+      "speedup": 0.9247292392741258
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 23.515,
+          "min_ns_per_call": 23.1775,
+          "max_ns_per_call": 25.60084
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 18.56668,
+          "min_ns_per_call": 18.24834,
+          "max_ns_per_call": 19.3825
+        }
+      },
+      "speedup": 1.2665161461284407,
+      "final_over_reference_latency": {
+        "base64_scalar": 0.7699492746170716,
+        "base64_simd": 0.8925215719264513
+      }
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 64,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 37.839369,
+          "min_ns_per_call": 37.13474,
+          "max_ns_per_call": 39.178633
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 37.650539,
+          "min_ns_per_call": 37.195921,
+          "max_ns_per_call": 42.703453
+        }
+      },
+      "speedup": 1.0050153332466236
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 64,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 24.810121,
+          "min_ns_per_call": 24.236625,
+          "max_ns_per_call": 28.481809
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 24.519869,
+          "min_ns_per_call": 24.254123,
+          "max_ns_per_call": 26.266544
+        }
+      },
+      "speedup": 1.0118374205017164
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 151.117956,
+          "min_ns_per_call": 147.456758,
+          "max_ns_per_call": 157.711258
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 90.129453,
+          "min_ns_per_call": 89.201041,
+          "max_ns_per_call": 93.218917
+        }
+      },
+      "speedup": 1.6766767240892941,
+      "final_over_reference_latency": {
+        "base64_scalar": 2.3938423032934533,
+        "base64_simd": 3.6757722074290036
+      }
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 4096,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1558.746736,
+          "min_ns_per_call": 1540.469974,
+          "max_ns_per_call": 2630.657963
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 1544.932115,
+          "min_ns_per_call": 1539.164491,
+          "max_ns_per_call": 1621.736292
+        }
+      },
+      "speedup": 1.008941895158934
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 4096,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 721.932115,
+          "min_ns_per_call": 714.099217,
+          "max_ns_per_call": 927.981723
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 716.057441,
+          "min_ns_per_call": 713.556136,
+          "max_ns_per_call": 793.953003
+        }
+      },
+      "speedup": 1.0082041937750075
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 8465.185379,
+          "min_ns_per_call": 8304.830287,
+          "max_ns_per_call": 8794.060052
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 4808.093995,
+          "min_ns_per_call": 4768.276762,
+          "max_ns_per_call": 5169.929504
+        }
+      },
+      "speedup": 1.7606114580544925,
+      "final_over_reference_latency": {
+        "base64_scalar": 3.112171692411223,
+        "base64_simd": 6.714676392839831
+      }
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 262144,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 101041.6,
+          "min_ns_per_call": 98483.4,
+          "max_ns_per_call": 140333.4
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 98866.6,
+          "min_ns_per_call": 97950.0,
+          "max_ns_per_call": 102141.8
+        }
+      },
+      "speedup": 1.021999340525516
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 262144,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 46316.8,
+          "min_ns_per_call": 44916.6,
+          "max_ns_per_call": 86550.0
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 45366.6,
+          "min_ns_per_call": 44791.8,
+          "max_ns_per_call": 49558.4
+        }
+      },
+      "speedup": 1.0209449242394186
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 541658.4,
+          "min_ns_per_call": 529950.0,
+          "max_ns_per_call": 719608.4
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 305500.0,
+          "min_ns_per_call": 303183.4,
+          "max_ns_per_call": 318241.6
+        }
+      },
+      "speedup": 1.7730225859247137,
+      "final_over_reference_latency": {
+        "base64_scalar": 3.0900223128943445,
+        "base64_simd": 6.734028999307861
+      }
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 8,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 18.71416,
+          "min_ns_per_call": 17.1175,
+          "max_ns_per_call": 22.17416
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 19.46582,
+          "min_ns_per_call": 17.24082,
+          "max_ns_per_call": 22.91084
+        }
+      },
+      "speedup": 0.9613856493073499
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 8,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 17.09832,
+          "min_ns_per_call": 16.46418,
+          "max_ns_per_call": 18.725
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 19.05418,
+          "min_ns_per_call": 17.34166,
+          "max_ns_per_call": 20.63916
+        }
+      },
+      "speedup": 0.8973527068601221
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 15.00416,
+          "min_ns_per_call": 14.72166,
+          "max_ns_per_call": 15.69168
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 8.8375,
+          "min_ns_per_call": 8.76084,
+          "max_ns_per_call": 9.72084
+        }
+      },
+      "speedup": 1.6977833097595474,
+      "final_over_reference_latency": {
+        "base64_scalar": 0.454000910313565,
+        "base64_simd": 0.4638089909930525
+      }
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 64,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 36.895221,
+          "min_ns_per_call": 36.021023,
+          "max_ns_per_call": 46.623432
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 36.358441,
+          "min_ns_per_call": 36.019261,
+          "max_ns_per_call": 37.507155
+        }
+      },
+      "speedup": 1.014763559306627
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 64,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 23.584491,
+          "min_ns_per_call": 23.178843,
+          "max_ns_per_call": 26.4414
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 23.309974,
+          "min_ns_per_call": 23.133398,
+          "max_ns_per_call": 23.762788
+        }
+      },
+      "speedup": 1.0117768042126516
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 100.184633,
+          "min_ns_per_call": 98.240401,
+          "max_ns_per_call": 124.755235
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 39.297554,
+          "min_ns_per_call": 38.921657,
+          "max_ns_per_call": 40.147287
+        }
+      },
+      "speedup": 2.5493859745061997,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.0808371569067001,
+        "base64_simd": 1.6858686328865058
+      }
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 4096,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1557.221932,
+          "min_ns_per_call": 1537.968668,
+          "max_ns_per_call": 1694.843342
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 1557.114883,
+          "min_ns_per_call": 1539.057441,
+          "max_ns_per_call": 1958.224543
+        }
+      },
+      "speedup": 1.0000687482992865
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 4096,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 718.234987,
+          "min_ns_per_call": 712.577023,
+          "max_ns_per_call": 756.201044
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 715.947781,
+          "min_ns_per_call": 712.467363,
+          "max_ns_per_call": 968.449086
+        }
+      },
+      "speedup": 1.00319465477888
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 5609.334204,
+          "min_ns_per_call": 5530.678851,
+          "max_ns_per_call": 6576.370757
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 2043.843342,
+          "min_ns_per_call": 2021.976501,
+          "max_ns_per_call": 2744.015666
+        }
+      },
+      "speedup": 2.7445030099572083,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.3125835250269071,
+        "base64_simd": 2.8547380077709885
+      }
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 262144,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 99733.4,
+          "min_ns_per_call": 98125.0,
+          "max_ns_per_call": 103075.0
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 98825.0,
+          "min_ns_per_call": 97925.0,
+          "max_ns_per_call": 100450.0
+        }
+      },
+      "speedup": 1.0091920060713382
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 262144,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 46341.8,
+          "min_ns_per_call": 44833.2,
+          "max_ns_per_call": 52025.0
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 45600.0,
+          "min_ns_per_call": 44808.4,
+          "max_ns_per_call": 47725.0
+        }
+      },
+      "speedup": 1.0162675438596491
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 359358.4,
+          "min_ns_per_call": 353416.6,
+          "max_ns_per_call": 373458.4
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 129075.0,
+          "min_ns_per_call": 128450.0,
+          "max_ns_per_call": 138133.2
+        }
+      },
+      "speedup": 2.7841053650978114,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.306096635466734,
+        "base64_simd": 2.830592105263158
+      }
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 8,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 24.04,
+          "min_ns_per_call": 17.95666,
+          "max_ns_per_call": 25.36084
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 19.56,
+          "min_ns_per_call": 18.73084,
+          "max_ns_per_call": 24.21584
+        }
+      },
+      "speedup": 1.229038854805726
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 8,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 18.455,
+          "min_ns_per_call": 17.89166,
+          "max_ns_per_call": 25.25084
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 20.05666,
+          "min_ns_per_call": 18.86834,
+          "max_ns_per_call": 21.55416
+        }
+      },
+      "speedup": 0.9201432342174618
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 15.24082,
+          "min_ns_per_call": 15.08582,
+          "max_ns_per_call": 17.16082
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 9.83332,
+          "min_ns_per_call": 9.7575,
+          "max_ns_per_call": 10.03
+        }
+      },
+      "speedup": 1.5499159998861014,
+      "final_over_reference_latency": {
+        "base64_scalar": 0.5027259713701432,
+        "base64_simd": 0.49027704513114345
+      }
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 64,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 37.758969,
+          "min_ns_per_call": 37.13302,
+          "max_ns_per_call": 39.336033
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 37.559607,
+          "min_ns_per_call": 37.152239,
+          "max_ns_per_call": 43.551467
+        }
+      },
+      "speedup": 1.005307883013792
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 64,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 24.518149,
+          "min_ns_per_call": 24.236625,
+          "max_ns_per_call": 30.92258
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 24.387017,
+          "min_ns_per_call": 24.243632,
+          "max_ns_per_call": 25.941337
+        }
+      },
+      "speedup": 1.0053771234095585
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 100.238849,
+          "min_ns_per_call": 98.679241,
+          "max_ns_per_call": 103.480383
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 40.304645,
+          "min_ns_per_call": 40.070371,
+          "max_ns_per_call": 42.671982
+        }
+      },
+      "speedup": 2.4870296959568803,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.0730848435128728,
+        "base64_simd": 1.6527091033725034
+      }
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 4096,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1557.550914,
+          "min_ns_per_call": 1543.18799,
+          "max_ns_per_call": 2473.020888
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 1558.420366,
+          "min_ns_per_call": 1538.83812,
+          "max_ns_per_call": 1619.015666
+        }
+      },
+      "speedup": 0.9994420940466584
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 4096,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 720.409922,
+          "min_ns_per_call": 714.751958,
+          "max_ns_per_call": 3663.292428
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 719.211488,
+          "min_ns_per_call": 713.989556,
+          "max_ns_per_call": 738.577023
+        }
+      },
+      "speedup": 1.0016663165424855
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 5647.953003,
+          "min_ns_per_call": 5542.428198,
+          "max_ns_per_call": 9603.569191
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 2041.339426,
+          "min_ns_per_call": 2022.193211,
+          "max_ns_per_call": 2130.767624
+        }
+      },
+      "speedup": 2.7667877919093304,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.3098772773609915,
+        "base64_simd": 2.8383020294581276
+      }
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 262144,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 100266.6,
+          "min_ns_per_call": 98266.6,
+          "max_ns_per_call": 118766.6
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 98766.6,
+          "min_ns_per_call": 98233.2,
+          "max_ns_per_call": 102675.0
+        }
+      },
+      "speedup": 1.0151873204099362
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 262144,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 45983.2,
+          "min_ns_per_call": 44800.0,
+          "max_ns_per_call": 69916.8
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 45283.4,
+          "min_ns_per_call": 44800.0,
+          "max_ns_per_call": 48258.2
+        }
+      },
+      "speedup": 1.0154537865972961
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 360958.4,
+          "min_ns_per_call": 353141.8,
+          "max_ns_per_call": 417600.0
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 129391.8,
+          "min_ns_per_call": 128425.0,
+          "max_ns_per_call": 132591.6
+        }
+      },
+      "speedup": 2.789654367587436,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.3100764833455845,
+        "base64_simd": 2.8573782004001465
+      }
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 8,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 9.21418,
+          "min_ns_per_call": 9.11166,
+          "max_ns_per_call": 11.31418
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 9.3625,
+          "min_ns_per_call": 9.125,
+          "max_ns_per_call": 9.9675
+        }
+      },
+      "speedup": 0.9841580774365821
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 8,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 9.49584,
+          "min_ns_per_call": 9.37166,
+          "max_ns_per_call": 10.42418
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 9.57668,
+          "min_ns_per_call": 9.42668,
+          "max_ns_per_call": 10.03084
+        }
+      },
+      "speedup": 0.9915586612479481
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 9.70584,
+          "min_ns_per_call": 9.60832,
+          "max_ns_per_call": 37.34082
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 9.78,
+          "min_ns_per_call": 9.60084,
+          "max_ns_per_call": 10.63166
+        }
+      },
+      "speedup": 0.9924171779141105,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.0445927903871828,
+        "base64_simd": 1.0212307396717861
+      }
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 64,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 29.660522,
+          "min_ns_per_call": 29.116302,
+          "max_ns_per_call": 30.523956
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 29.452026,
+          "min_ns_per_call": 29.253632,
+          "max_ns_per_call": 31.517029
+        }
+      },
+      "speedup": 1.0070791734327547
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 64,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 29.825836,
+          "min_ns_per_call": 29.074371,
+          "max_ns_per_call": 31.140625
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 29.184967,
+          "min_ns_per_call": 29.022217,
+          "max_ns_per_call": 30.157715
+        }
+      },
+      "speedup": 1.0219588735529492
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 48.631042,
+          "min_ns_per_call": 47.409058,
+          "max_ns_per_call": 49.6203
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 47.545105,
+          "min_ns_per_call": 47.101349,
+          "max_ns_per_call": 53.609222
+        }
+      },
+      "speedup": 1.0228401430599428,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.6143237480504737,
+        "base64_simd": 1.629095725892032
+      }
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 4096,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1421.46875,
+          "min_ns_per_call": 1408.041016,
+          "max_ns_per_call": 1537.759766
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 1413.330078,
+          "min_ns_per_call": 1406.25,
+          "max_ns_per_call": 1514.730469
+        }
+      },
+      "speedup": 1.005758507603204
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 4096,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 486.896484,
+          "min_ns_per_call": 484.292969,
+          "max_ns_per_call": 496.173828
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 486.896484,
+          "min_ns_per_call": 484.050781,
+          "max_ns_per_call": 545.978516
+        }
+      },
+      "speedup": 1.0
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 2718.585938,
+          "min_ns_per_call": 2679.037109,
+          "max_ns_per_call": 2955.972656
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 2693.603516,
+          "min_ns_per_call": 2676.919922,
+          "max_ns_per_call": 2829.183594
+        }
+      },
+      "speedup": 1.0092747213357884,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.9058559341011918,
+        "base64_simd": 5.532189293854092
+      }
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 262144,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 92281.25,
+          "min_ns_per_call": 87442.625,
+          "max_ns_per_call": 98630.25
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 91708.375,
+          "min_ns_per_call": 88911.5,
+          "max_ns_per_call": 95807.375
+        }
+      },
+      "speedup": 1.0062467032045874
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 262144,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 31177.0,
+          "min_ns_per_call": 30468.75,
+          "max_ns_per_call": 40729.25
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 31192.625,
+          "min_ns_per_call": 30515.625,
+          "max_ns_per_call": 35427.125
+        }
+      },
+      "speedup": 0.9994990803114518
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 172343.75,
+          "min_ns_per_call": 170604.25,
+          "max_ns_per_call": 238161.375
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 173354.125,
+          "min_ns_per_call": 170854.125,
+          "max_ns_per_call": 184036.5
+        }
+      },
+      "speedup": 0.9941716125878169,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.8902758335866272,
+        "base64_simd": 5.557535635426643
+      }
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 8,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 4.8225,
+          "min_ns_per_call": 4.775,
+          "max_ns_per_call": 5.46418
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 4.82918,
+          "min_ns_per_call": 4.77916,
+          "max_ns_per_call": 4.92
+        }
+      },
+      "speedup": 0.9986167423869062
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 12.53834,
+          "min_ns_per_call": 12.4875,
+          "max_ns_per_call": 13.39166
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 12.64584,
+          "min_ns_per_call": 12.52,
+          "max_ns_per_call": 13.07082
+        }
+      },
+      "speedup": 0.9914991807582573,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.6186309062822257
+      }
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 64,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 8.552321,
+          "min_ns_per_call": 8.457907,
+          "max_ns_per_call": 12.492777
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 8.505114,
+          "min_ns_per_call": 8.446105,
+          "max_ns_per_call": 9.177813
+        }
+      },
+      "speedup": 1.0055504253088199
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 17.38395,
+          "min_ns_per_call": 17.11251,
+          "max_ns_per_call": 18.391031
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 17.197734,
+          "min_ns_per_call": 17.094162,
+          "max_ns_per_call": 17.749803
+        }
+      },
+      "speedup": 1.0108279381458045,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.0220462653410642
+      }
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 4096,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 73.59332,
+          "min_ns_per_call": 70.318271,
+          "max_ns_per_call": 81.612967
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 70.318271,
+          "min_ns_per_call": 68.679764,
+          "max_ns_per_call": 93.97446
+        }
+      },
+      "speedup": 1.0465746519848307
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 148.165029,
+          "min_ns_per_call": 143.255403,
+          "max_ns_per_call": 155.288802
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 144.72888,
+          "min_ns_per_call": 143.500982,
+          "max_ns_per_call": 168.141454
+        }
+      },
+      "speedup": 1.0237419718856389,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.058197363811747
+      }
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 262144,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 5470.142857,
+          "min_ns_per_call": 4976.142857,
+          "max_ns_per_call": 6238.142857
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 5315.571429,
+          "min_ns_per_call": 5154.714286,
+          "max_ns_per_call": 5684.571429
+        }
+      },
+      "speedup": 1.029078986156918
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 7958.285714,
+          "min_ns_per_call": 7428.571429,
+          "max_ns_per_call": 9440.428571
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 7547.571429,
+          "min_ns_per_call": 7375.0,
+          "max_ns_per_call": 9523.857143
+        }
+      },
+      "speedup": 1.0544167470110868,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.4198984116407403
+      }
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 64,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 13.768524,
+          "min_ns_per_call": 13.589233,
+          "max_ns_per_call": 14.953613
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 13.670624,
+          "min_ns_per_call": 13.587952,
+          "max_ns_per_call": 14.181793
+        }
+      },
+      "speedup": 1.0071613409892628
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 45.978546,
+          "min_ns_per_call": 45.274109,
+          "max_ns_per_call": 49.809784
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 45.544952,
+          "min_ns_per_call": 45.205414,
+          "max_ns_per_call": 47.622681
+        }
+      },
+      "speedup": 1.009520132988613,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 3.3315927641635086
+      }
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 4096,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 63.800781,
+          "min_ns_per_call": 63.394531,
+          "max_ns_per_call": 72.916016
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 63.882812,
+          "min_ns_per_call": 63.314453,
+          "max_ns_per_call": 88.623047
+        }
+      },
+      "speedup": 0.9987159143839817
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 123.699219,
+          "min_ns_per_call": 118.734375,
+          "max_ns_per_call": 134.765625
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 119.628906,
+          "min_ns_per_call": 118.408203,
+          "max_ns_per_call": 140.216797
+        }
+      },
+      "speedup": 1.0340244940466143,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.8726305598444852
+      }
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 262144,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 4239.625,
+          "min_ns_per_call": 4093.75,
+          "max_ns_per_call": 6458.375
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 4307.25,
+          "min_ns_per_call": 4182.25,
+          "max_ns_per_call": 4890.625
+        }
+      },
+      "speedup": 0.9842997272041326
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 6729.125,
+          "min_ns_per_call": 5984.375,
+          "max_ns_per_call": 7036.375
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 7005.25,
+          "min_ns_per_call": 6328.125,
+          "max_ns_per_call": 9088.5
+        }
+      },
+      "speedup": 0.9605831340780129,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.6263857449648849
+      }
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 64,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 11.583984,
+          "min_ns_per_call": 11.389435,
+          "max_ns_per_call": 12.20575
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 11.464447,
+          "min_ns_per_call": 11.395782,
+          "max_ns_per_call": 11.726379
+        }
+      },
+      "speedup": 1.0104267567375904
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 10.072083,
+          "min_ns_per_call": 9.974152,
+          "max_ns_per_call": 11.880249
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 9.9729,
+          "min_ns_per_call": 9.916931,
+          "max_ns_per_call": 10.403961
+        }
+      },
+      "speedup": 1.0099452516319225,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 0.8698980421820607
+      }
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 4096,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 62.988281,
+          "min_ns_per_call": 61.685547,
+          "max_ns_per_call": 97.412109
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 62.826172,
+          "min_ns_per_call": 61.361328,
+          "max_ns_per_call": 114.664062
+        }
+      },
+      "speedup": 1.0025802781681494
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 18.228516,
+          "min_ns_per_call": 18.066406,
+          "max_ns_per_call": 34.179688
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 18.310547,
+          "min_ns_per_call": 18.066406,
+          "max_ns_per_call": 18.798828
+        }
+      },
+      "speedup": 0.9955200136839166,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 0.29144775842780934
+      }
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 262144,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 5557.375,
+          "min_ns_per_call": 5015.625,
+          "max_ns_per_call": 6796.875
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 5609.375,
+          "min_ns_per_call": 4911.375,
+          "max_ns_per_call": 5770.875
+        }
+      },
+      "speedup": 0.9907298050139276
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 541.75,
+          "min_ns_per_call": 526.125,
+          "max_ns_per_call": 572.875
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 546.875,
+          "min_ns_per_call": 526.125,
+          "max_ns_per_call": 562.5
+        }
+      },
+      "speedup": 0.9906285714285714,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 0.09749303621169916
+      }
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 8,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 4.79168,
+          "min_ns_per_call": 4.775,
+          "max_ns_per_call": 5.0775
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 4.82082,
+          "min_ns_per_call": 4.775,
+          "max_ns_per_call": 5.02
+        }
+      },
+      "speedup": 0.9939553851834335
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 12.56416,
+          "min_ns_per_call": 12.49916,
+          "max_ns_per_call": 13.19584
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 12.61,
+          "min_ns_per_call": 12.48916,
+          "max_ns_per_call": 12.965
+        }
+      },
+      "speedup": 0.996364789849326,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.615737571616447
+      }
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 64,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 8.526105,
+          "min_ns_per_call": 8.452651,
+          "max_ns_per_call": 10.565161
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 8.522172,
+          "min_ns_per_call": 8.448749,
+          "max_ns_per_call": 9.362707
+        }
+      },
+      "speedup": 1.0004615020677827
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 17.261998,
+          "min_ns_per_call": 17.086294,
+          "max_ns_per_call": 18.427726
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 17.256774,
+          "min_ns_per_call": 17.10332,
+          "max_ns_per_call": 19.287962
+        }
+      },
+      "speedup": 1.0003027217022138,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.024926744027227
+      }
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 4096,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 133.21875,
+          "min_ns_per_call": 131.185547,
+          "max_ns_per_call": 150.390625
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 133.789062,
+          "min_ns_per_call": 131.185547,
+          "max_ns_per_call": 172.445312
+        }
+      },
+      "speedup": 0.9957372299986677
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 165.771484,
+          "min_ns_per_call": 164.0625,
+          "max_ns_per_call": 178.955078
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 168.783203,
+          "min_ns_per_call": 165.121094,
+          "max_ns_per_call": 194.904297
+        }
+      },
+      "speedup": 0.9821562871987919,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.2615620475760565
+      }
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 262144,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 7937.5,
+          "min_ns_per_call": 7744.875,
+          "max_ns_per_call": 8791.625
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 7864.5,
+          "min_ns_per_call": 7708.375,
+          "max_ns_per_call": 8203.125
+        }
+      },
+      "speedup": 1.0092822175599212
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 8468.75,
+          "min_ns_per_call": 8244.75,
+          "max_ns_per_call": 8765.625
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 8473.875,
+          "min_ns_per_call": 8317.625,
+          "max_ns_per_call": 53203.125
+        }
+      },
+      "speedup": 0.9993951999527961,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.0774842647339309
+      }
+    },
+    {
+      "workload": "lz4_zero_offset",
+      "logical_bytes": 0,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 3.54582,
+          "min_ns_per_call": 3.48916,
+          "max_ns_per_call": 3.735
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 3.49334,
+          "min_ns_per_call": 3.49,
+          "max_ns_per_call": 3.525
+        }
+      },
+      "speedup": 1.0150228720937555
+    },
+    {
+      "workload": "lz4_zero_offset",
+      "logical_bytes": 0,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 5.07584,
+          "min_ns_per_call": 5.02,
+          "max_ns_per_call": 5.33918
+        },
+        "candidate": {
+          "samples": 27,
+          "median_ns_per_call": 5.02418,
+          "min_ns_per_call": 5.01916,
+          "max_ns_per_call": 5.275
+        }
+      },
+      "speedup": 1.010282274918494,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.4382167209604564
+      }
+    }
+  ],
+  "protected_configurations": 31,
+  "protected_regressions_over_five_percent": [],
+  "confirmation_required": false,
+  "performance_goal": {
+    "maximum_scalar_latency_ratio": 2,
+    "logical_sizes": [
+      4096,
+      262144
+    ],
+    "achieved": {
+      "encode": true,
+      "decode": false
+    }
+  },
+  "unchanged_contract_manifest": {
+    "src/base64.rs": {
+      "public_specifications": [
+        "symbol",
+        "value",
+        "quantum",
+        "encoded",
+        "unquantum",
+        "first",
+        "decoded"
+      ],
+      "public_executable_contracts": [
+        "encode_into",
+        "decode_into"
+      ],
+      "exact_text_sha256": "0fc1cd581f93e2af5516a1987624be804c79a806a0aa6405420b48b0b2da3334"
+    },
+    "src/lz4.rs": {
+      "public_specifications": [
+        "add_length",
+        "extension",
+        "length_field",
+        "segment",
+        "matched",
+        "block_state",
+        "decoded"
+      ],
+      "public_executable_contracts": [
+        "decompress_block_into"
+      ],
+      "exact_text_sha256": "962819b33908017440a80baeeb92b8ff6fb01c55f5341001187cdab41e080053"
+    }
+  },
+  "unchanged_executable_functions": {
+    "encode_into": "4ecbb851155e98d0dbe791e91bb692110e1ab14bd357f2f55982289f201019fb",
+    "decode_into": "6e420064a69f27c3f3131cc607cf2f1197c4d552a2596a965f95b480af1c1e85",
+    "make_batch": "de466ceeb49e3f7a11432c512d115868c04366eceeb464d84a47610409a44172",
+    "read_batch": "332269fced5c92adba6b6acbb00e7b8b8433c0f8556637fa1399a2d72f02bcee",
+    "read_quantum": "ea240689437570eece6a6af708c64f42007d6420e830386613f615453b923347",
+    "to_symbol": "65b35a319c966521aa5e59d7e78a77d395e8d7e861856547d0b859d5e7f6668d",
+    "from_symbol": "df7fe231d0545b24a75f36bad3d813fe9aa20d2cbc9bbf3a6488cbf7ae288c0c"
+  },
+  "decoded_length_contract_sha256": "cad0f5328432308c2b9bb7977c0872c21a27dae6812227fbb629cf38ef4ebe65",
+  "compatibility_report": {
+    "path": "evidence/validation-upstream-comparison.json",
+    "sha256": "266734aa4ef618aad72b0b69332dff27c87fb022ca475aaa38947e25ddec7579",
+    "comparison_invocations": 154498,
+    "added_malformed_tail_small_buffer_calls": 14
+  },
+  "limits": [
+    "Source-level Rust/Verus contracts with the existing compiler, modeled operations, verifier/solver, OS and hardware trust boundary.",
+    "Three process runs and 27 warm batch-average samples per configuration on one host; no tail-latency or cross-machine guarantee.",
+    "Small-output/late-invalid API paths are not an exact phase profile.",
+    "Finite upstream comparisons do not prove universal equivalence; no Brotli implementation is included."
+  ]
+}

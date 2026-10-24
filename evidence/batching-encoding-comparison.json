@@ -1,0 +1,173 @@
+{
+  "claim": "tested compatibility, not universal upstream equivalence",
+  "base64_encode": {
+    "cases": 6723,
+    "both_ok": 3219,
+    "both_error": 3504,
+    "strict_rejections": 0,
+    "error_priority_differences": 0,
+    "upstream_changed_buffer_on_error": 0,
+    "upstream_changed_success_suffix": 0,
+    "unexpected_differences": 0,
+    "difference_examples": []
+  },
+  "base64_decode": {
+    "cases": 73681,
+    "both_ok": 3378,
+    "both_error": 70303,
+    "strict_rejections": 0,
+    "error_priority_differences": 192,
+    "upstream_changed_buffer_on_error": 1923,
+    "upstream_changed_success_suffix": 0,
+    "unexpected_differences": 0,
+    "difference_examples": [
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "4141414141413d21",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "5932397462513d21",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "557a584e6a673d21",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "4141414141414121",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "5932397462573821",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "557a584e6a705521",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "4141414141414121",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "5932397462573921",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "557a584e6a705521",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "414141414141414141413d21",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "59323974625739754c513d21",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "557a584e6a70554372413d21",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "414141414141414141414121",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "59323974625739754c577721",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "557a584e6a705543724a6b21",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      },
+      {
+        "case": "batch_malformed_suffix",
+        "input_hex": "414141414141414141414121",
+        "capacity": 0,
+        "ours": "Invalid",
+        "upstream": "TooSmall"
+      }
+    ]
+  },
+  "lz4_decode": {
+    "cases": 72032,
+    "both_ok": 7233,
+    "both_error": 64797,
+    "strict_rejections": 2,
+    "error_priority_differences": 0,
+    "upstream_changed_buffer_on_error": 993,
+    "upstream_changed_success_suffix": 7,
+    "unexpected_differences": 0,
+    "difference_examples": [
+      {
+        "case": "fewer_than_five_final_literals",
+        "input_hex": "106101004061616161",
+        "capacity": 256,
+        "ours": "Invalid",
+        "upstream": "Ok(9)"
+      },
+      {
+        "case": "last_match_too_close_to_end",
+        "input_hex": "10610100506161616161",
+        "capacity": 256,
+        "ours": "Invalid",
+        "upstream": "Ok(10)"
+      }
+    ]
+  },
+  "historical_lz4": {
+    "version": "0.12.0",
+    "commit": "975bfa7ac9583da879b5d7578b423232d84f69fe",
+    "safe_decode": true,
+    "returned_bytes": 25,
+    "stale_bytes_disclosed": 18,
+    "current_reference_rejects": true,
+    "proven_primitive_rejects_and_preserves_buffer": true
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "generated_utc": "2026-10-24T16:02:05.532247+00:00",
+  "component": "private Brotli B1 streaming input/window-header core",
+  "claim": "The checked private component maintains its eight-byte pending-bit invariant, reads widths 0 through 56 without losing or inventing bits, parses the RFC 7932 normal window header for every byte, distinguishes retryable empty input from final truncation and permanent invalid headers, retains payload bits, and preserves terminal results across all calls admitted by its private constructor/reset state model.",
+  "not_a_complete_decoder": true,
+  "proposal": {
+    "path": "BROTLI_PROPOSAL.md",
+    "sha256": "f6814e1dc9b738d501c67282619e5e86b908dcc5ccd92f1574a2dcc47abb5977",
+    "approved_on": "2026-10-24"
+  },
+  "report": {
+    "path": "BROTLI_B1.md",
+    "sha256": "cb7d83aaab428f5d74b482fd211da4ba65c43f34c52ad93e8b759c32547f8fbe"
+  },
+  "source_tree_sha256": "41fe3248b0ce0f9646cb27d4706a53a3dba30a806a232f0d7df5a851dbb050ac",
+  "source_sha256": {
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/lib.rs": "f268ca6c8bfd9acdb7c363b9ed5f548f8401fa3038e4f73dabd21c09a229bd69",
+    "src/base64.rs": "7fd186ce77ccd72cc67826dcb3c0b62bb00b6ac4ca2b832ef24f02900230d4e3",
+    "src/percent.rs": "13ee9a952dbf8a845096194e3b8899f45ed02919a98fa3443c60f9754b2ecfc2",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/brotli_input.rs": "01a6b2756e36cfdd476756ad235fade1cacfd4225c96b8732b2dbf6548760990"
+  },
+  "validation_source_sha256": {
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "6d6ddb871bff60fd04dfcfe95e519792b62951fb540f8dffd2221a57d549d7b7",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf"
+  },
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 122,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_evidence": {
+    "path": "evidence/brotli-b1-verification.json",
+    "sha256": "e7b1aab31e764cf9f8f922dbe6b33f4e792b373f177e2c774945204577ad4b74"
+  },
+  "verification_options": [
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "60",
+    "--time",
+    "--output-json"
+  ],
+  "function_specific_proof_budget": {
+    "function": "brotli_input::HeaderDecoder::advance_header",
+    "rlimit_attribute": 500,
+    "note": "Source-level solver budget annotation; no trust bypass or changed verifier."
+  },
+  "verifier": {
+    "profile": "release",
+    "version": "0.2026.10.18.7d82994",
+    "platform": {
+      "os": "macos",
+      "arch": "aarch64"
+    },
+    "toolchain": "1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "commit": "7d829946231d6413a398f6e4160cdfe951261dad"
+  },
+  "execution_environment": {
+    "RUSTUP_TOOLCHAIN": "1.99.1",
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+    "target": "aarch64-apple-darwin",
+    "cargo_profile": "release"
+  },
+  "compiled_artifact": {
+    "path": "target/release/libproven_primitives.rlib",
+    "sha256": "260a35171996e4d9128c4df52b7c818ecab7227ba841291b147f7dd5513cf091",
+    "note": "Ordinary Cargo release library from the same annotated source; compiler remains trusted."
+  },
+  "checked_roots": [
+    "lib::brotli_input::BitQueue::append_byte",
+    "lib::brotli_input::BitQueue::compact_after",
+    "lib::brotli_input::BitQueue::read_bits",
+    "lib::brotli_input::HeaderDecoder::new",
+    "lib::brotli_input::HeaderDecoder::reset",
+    "lib::brotli_input::HeaderDecoder::advance_header",
+    "lib::brotli_input::valid_bits_ignore_unused_storage"
+  ],
+  "existing_public_source_identity": {
+    "src/lib.rs": {
+      "unchanged_executable_functions": [
+        "copy_bytes"
+      ],
+      "unchanged_public_specifications": [
+        "written",
+        "prepend"
+      ]
+    },
+    "src/base64.rs": {
+      "unchanged_executable_functions": [
+        "to_symbol",
+        "from_symbol",
+        "make_quantum",
+        "make_batch",
+        "read_quantum",
+        "read_batch",
+        "encoded_length",
+        "encode_into",
+        "valid_batch",
+        "decoded_length",
+        "decode_into"
+      ],
+      "unchanged_public_specifications": [
+        "symbol",
+        "value",
+        "quantum",
+        "encoded",
+        "unquantum",
+        "first",
+        "decoded"
+      ]
+    },
+    "src/percent.rs": {
+      "unchanged_executable_functions": [
+        "is_unreserved",
+        "hex_digit",
+        "from_hex",
+        "read_token",
+        "encoded_length",
+        "encode_into",
+        "decoded_length",
+        "decode_into"
+      ],
+      "unchanged_public_specifications": [
+        "unreserved",
+        "hex",
+        "hex_value",
+        "escaped",
+        "encoded",
+        "first",
+        "decoded"
+      ]
+    },
+    "src/lz4.rs": {
+      "unchanged_executable_functions": [
+        "read_length",
+        "read_step",
+        "decoded_length",
+        "decompress_block_into"
+      ],
+      "unchanged_public_specifications": [
+        "add_length",
+        "extension",
+        "length_field",
+        "segment",
+        "matched",
+        "block_state",
+        "decoded"
+      ]
+    }
+  },
+  "runtime_tests": {
+    "brotli_b1_test_groups_passed": 4,
+    "all_first_bytes": 256,
+    "width_domain": "0..=56",
+    "existing_release_regressions_passed": true,
+    "upstream_comparison_regression_passed": true
+  },
+  "proof_controls": {
+    "rejected": 16,
+    "new_brotli_defects_rejected": 5,
+    "unchanged_positive_control_verified": 122,
+    "evidence": {
+      "path": "evidence/brotli-b1-controls.json",
+      "sha256": "1f05c70b4ec74ea77a1fd081e577cf0995f2eee2b64961bf3e2b8bab0b0d0466"
+    }
+  },
+  "properties": {
+    "representation": "constructor/reset and every transition preserve pending length <= 8 and offset invariants",
+    "bit_conservation": "minimal accepted input bits are retained exactly; successful fields consume exactly their width",
+    "statuses": "NeedInput only for empty nonfinal initial input; final incompleteness is Truncated; reserved header is InvalidHeader",
+    "call_sequences": "empty retries preserve the initial abstract state; Complete/Failed calls consume zero and preserve terminal state; reset returns to First",
+    "confidentiality": "results and valid retained bits are independent of unused pending-array bytes",
+    "resources": "per field: <=7 appended bytes, <=56 extracted bits, <=8 compacted bytes; header is straight-line at <=3 field reads"
+  },
+  "limitations": [
+    "No meta-block, prefix-code, context-map, block-switch, LZ77, dictionary, output or complete-stream decoding is implemented.",
+    "The actual CVE-2026-111497 block-switch path is not implemented, replayed or proved by B1.",
+    "No public Brotli API or supported-Brotli claim is added.",
+    "No native comparison dependency, C build, benchmark or historical exploit fixture is included.",
+    "Work units are source-level operations, not cycles or a practical service-availability theorem.",
+    "Timing/cache behavior, compiler correctness, OS/hardware and independent specification review remain outside the checked result."
+  ]
+}

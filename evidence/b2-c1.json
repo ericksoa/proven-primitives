@@ -1,0 +1,161 @@
+{
+  "generated_utc": "2026-10-24T19:49:13.986339+00:00",
+  "components": [
+    "private C1 Base64-to-percent caller",
+    "private Brotli B2 canonical prefix/block-length and block-switch core",
+    "local P1 evidence pipeline"
+  ],
+  "claim": "The checked C1 caller satisfies its exact staged functional, frame, publication, confidentiality and source-work contracts for every admitted call. The checked B2 component validates bounded successful canonical tables and RFC block lengths and preserves literal/command/distance switch invariants, including permanent zero-field rejection of a switch with one declared type.",
+  "not_a_complete_brotli_decoder": true,
+  "approved_on": "2026-10-24",
+  "reports": {
+    "composition": {
+      "path": "COMPOSITION_C1.md",
+      "sha256": "5bc35240a80d4335b4593349afe6fb90a7298d2df52202fd3e1f4cb2a6c794ca"
+    },
+    "brotli_b2": {
+      "path": "BROTLI_B2.md",
+      "sha256": "6604a9393262a1805d4d19c46c197850cf4a30f648bfc8df8c4d69c8bd293f5f"
+    },
+    "pipeline": {
+      "path": "PIPELINE.md",
+      "sha256": "a31503be7190ed360699546a44c4da7ef3d4875f0b1e4b6baaeea28191fbdee8"
+    }
+  },
+  "source_tree_sha256": "b96376da08d98b7433ee47414eadba64ed12feac0d515f1e80bd948b4121b771",
+  "source_sha256": {
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/lib.rs": "12dd8d0e05b5282f85d4ad2566e78949a4dddb3383e47cd3b7a1153fe2d6f471",
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/brotli_input.rs": "6528bb6a4bb95d88db37fbf3b8505e6c9d45a09bd3e83b083e0979e9ca917cfe",
+    "src/brotli_prefix.rs": "e7fff6dc2e274a027958c975241c25eb3bbd4e054210f461fb9b6228e5d84be6",
+    "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
+  },
+  "validation_source_sha256": {
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "bce64e3fb5fa1a3087f3637b205c9fe946fa9635bf7ffc19a40f05d94cc80e6c",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf"
+  },
+  "tooling_sha256": {
+    "tools/pipeline.py": "1de66816ac438979791d1f5fa047508277b44e4afeddfcb5835cfbfa1d9b15ce"
+  },
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 177,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_evidence": {
+    "path": "evidence/b2-c1-verification.json",
+    "sha256": "8edaee492f9f3a53d6b959437af63015438f1ef3011d612a4d89d5eac198fd0a"
+  },
+  "verification_options": [
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "60",
+    "--time",
+    "--output-json"
+  ],
+  "verifier": {
+    "profile": "release",
+    "version": "0.2026.10.18.7d82994",
+    "platform": {
+      "os": "macos",
+      "arch": "aarch64"
+    },
+    "toolchain": "1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "commit": "7d829946231d6413a398f6e4160cdfe951261dad"
+  },
+  "execution_environment": {
+    "RUSTUP_TOOLCHAIN": "1.99.1",
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+    "target": "aarch64-apple-darwin",
+    "cargo_profile": "release",
+    "python": "3.14.6"
+  },
+  "compiled_artifact": {
+    "path": "target/release/libproven_primitives.rlib",
+    "sha256": "260a35171996e4d9128c4df52b7c818ecab7227ba841291b147f7dd5513cf091",
+    "note": "Ordinary Cargo release library from the same annotated source; compiler remains trusted."
+  },
+  "checked_roots": [
+    "lib::composition_demo::DecodeCaller::decode",
+    "lib::composition_demo::handoff_is_current_prefix",
+    "lib::composition_demo::composed_prefix_is_independent_of_previous_storage",
+    "lib::composition_demo::successful_work_bound",
+    "lib::brotli_prefix::validate_lengths",
+    "lib::brotli_prefix::PrefixCode::from_lengths",
+    "lib::brotli_prefix::PrefixCode::decode_exact",
+    "lib::brotli_prefix::decode_block_length",
+    "lib::brotli_block::BlockSwitchCore::advance",
+    "lib::brotli_block::BlockSwitchCore::advance_from_prefixes",
+    "lib::brotli_block::BlockSwitchCore::advance_literal",
+    "lib::brotli_block::BlockSwitchCore::advance_command",
+    "lib::brotli_block::BlockSwitchCore::advance_distance",
+    "lib::brotli_block::BlockSwitchCore::reset"
+  ],
+  "runtime_tests": {
+    "private_rust_groups_passed": 16,
+    "public_primitive_groups_passed": 9,
+    "upstream_comparison_group_passed": 1,
+    "pipeline_gate_groups_passed": 15
+  },
+  "proof_controls": {
+    "rejected": 25,
+    "new_c1_b2_defects_rejected": 9,
+    "unchanged_positive_control_verified": 177,
+    "evidence": {
+      "path": "evidence/b2-c1-controls.json",
+      "sha256": "9350492c1e74ea8c1363e62232dcbb8bad7ba1d041d234b9772584738b91997e"
+    }
+  },
+  "native_r1": {
+    "path": "evidence/brotli-r1.json",
+    "sha256": "317997d761cbda400008323a98bfe9e3ebaae14536d71b23ab8d1a51512d29d8"
+  },
+  "properties": {
+    "c1": [
+      "exact stage-specific result priority and buffer effects",
+      "current successful Base64 prefix is the only percent-decoder input",
+      "all errors invalidate publication length; success publishes only the current final prefix",
+      "final prefix is independent of unrelated old scratch/output storage",
+      "successful abstract source work <= 21 * input length + 56"
+    ],
+    "brotli_b2": [
+      "successful prefix tables implement exact canonical codes within fixed storage",
+      "exact code/width matching and RFC block-length ranges",
+      "literal, command and distance switch state remains bounded across suspension and reset",
+      "a switch with one declared type is permanent, sticky and consumes zero decoded fields",
+      "prefix and block-length results connect to the shared switch transition"
+    ],
+    "pipeline_p1": [
+      "strict schemas and frozen closure identities",
+      "fail-closed coverage/gate with externally supplied expected approval/profile digests",
+      "three proof outcomes remain distinct from process/applicability states"
+    ]
+  },
+  "limitations": [
+    "B2 does not parse a complete Brotli byte stream, emit output, implement contexts, LZ77, dictionaries or manage a window.",
+    "The native R1 replay is finite compiled-behavior evidence, not a proof or Rust equivalence result.",
+    "No comprehensive security profile is adopted; independent specification review remains missing.",
+    "C1 verifies one exact caller, not arbitrary applications, transports, authorization policies or retry loops.",
+    "Source-observation traces, compiler correctness, machine timing/cache behavior, OS and hardware remain outside the checked result."
+  ]
+}

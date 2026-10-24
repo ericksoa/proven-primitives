@@ -1,0 +1,1292 @@
+{
+  "measured_utc": "2026-10-23T21:57:39.823514+00:00",
+  "claim": "Finite tested compatibility and host performance measurements; no universal equivalence proof.",
+  "source_tree_sha256": "e33eddceeabb24f3e97ad31d6c2cd28de96eb41decb77f5b00917bd96636ed59",
+  "source_sha256": {
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/base64.rs": "e4e80dcb5e29e1cd18c3a94dc78eba0cf3ea8c9261b9ba51b1cdf8cd12085986",
+    "src/lib.rs": "1bbf2d0f60ed141abebaf8af0cf92c0907b981732a97c7138e0ecfa84e07e660",
+    "src/lz4.rs": "66c5b1bea3dfb0b46c2b1b0d6978dee335f34a02ab27fbbdb51b00edb2d6b400",
+    "src/percent.rs": "55aa3a2e21fe1629cbdf7a87180e1f0c2cab1b7573a577b8db8aaec08d92ba37",
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "9ddcaaaac722beb0a3bbf862f979a48624df294ef304e646e5a4ff0b75bd712c",
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf",
+    "tests/upstream_comparison.rs": "b71ad9ad49be2599e6ac2fdf8de177b54374f832e02c067515d7032631ee676f"
+  },
+  "host": {
+    "cpu": "Apple M2 Pro",
+    "os": "macOS",
+    "os_version": "26.7.1",
+    "architecture": "aarch64-apple-darwin"
+  },
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: aarch64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.1",
+  "build": {
+    "profile": "Cargo default bench profile, opt-level 3",
+    "RUSTFLAGS": "",
+    "CARGO_ENCODED_RUSTFLAGS": "",
+    "binary": "target/release/deps/primitives-35d398134f8f8ebe",
+    "binary_sha256": "73e5eabf2f0f7e637b70edd87dfaf32edf18b4f9297aac24f5cb5cb681832f5d"
+  },
+  "references": [
+    {
+      "name": "base64",
+      "version": "0.23.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5",
+      "git_commit": "069bf7067b949f5c0a92b6ceb82492920502f2c2",
+      "resolved_features": [
+        "alloc",
+        "default",
+        "simd-unsafe",
+        "std"
+      ],
+      "role": "current compatibility and performance reference"
+    },
+    {
+      "name": "lz4_flex",
+      "version": "0.12.0",
+      "source": "git+https://github.com/PSeitz/lz4_flex?rev=975bfa7ac9583da879b5d7578b423232d84f69fe#975bfa7ac9583da879b5d7578b423232d84f69fe",
+      "git_commit": "975bfa7ac9583da879b5d7578b423232d84f69fe",
+      "resolved_features": [
+        "checked-decode",
+        "safe-decode",
+        "safe-encode",
+        "std"
+      ],
+      "role": "historical regression only"
+    },
+    {
+      "name": "lz4_flex",
+      "version": "0.14.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ecbdfe44b1bd960b68170b417450a628c43f7cf56bb3c5317e61cb230ee7f226",
+      "git_commit": "1bffdcbbf906a234b913937cb2f57c0245915038",
+      "resolved_features": [
+        "alloc",
+        "checked-decode",
+        "safe-decode",
+        "safe-encode",
+        "std"
+      ],
+      "role": "current compatibility and performance reference"
+    }
+  ],
+  "method": {
+    "process_runs": 3,
+    "batches_per_process_per_configuration": 9,
+    "batch_samples_per_configuration": 27,
+    "iterations": "clamp(2 MiB / max(input_bytes, logical_bytes, 1), 4, 50000)",
+    "ordering": "rotate first implementation each batch",
+    "warmup_calls": 10,
+    "timed_allocations": false,
+    "output_reset": "before each batch, outside timing",
+    "input_generation": "outside timing; periodic bytes (i*73+19) mod 256, literal-only LZ4, overlapping offset-one LZ4, and current-upstream compression",
+    "validation": "returned results and successful prefixes compared before timing",
+    "latency_statistic": "median of repeated batch-average nanoseconds per call; min/max retained",
+    "not_measured": [
+      "application p95/p99 latency",
+      "cold-cache latency",
+      "other machines",
+      "universal upstream equivalence"
+    ]
+  },
+  "raw_runs": [
+    {
+      "path": "evidence/comparison-run-1.csv",
+      "sha256": "cefd7e815dbfc11b730b2970decedaa8a3861c8f4381341ce1f728110ec31b03",
+      "samples": 702
+    },
+    {
+      "path": "evidence/comparison-run-2.csv",
+      "sha256": "158581af9adc72632c9ee2c82bd988614ea34812f93aeedae3788a5837cf76c6",
+      "samples": 702
+    },
+    {
+      "path": "evidence/comparison-run-3.csv",
+      "sha256": "9a994c42f10b73dbeb28d70e8b9a88686bba854402b92b14a4ac013af3cab026",
+      "samples": 702
+    }
+  ],
+  "corpus": [
+    {
+      "path": "evidence/corpus/base64_decode-262144.bin",
+      "bytes": 349528,
+      "sha256": "8dedce3821e9ca243661d05938804d371eecafb4c3fe5df98da0b6d685a0dc77"
+    },
+    {
+      "path": "evidence/corpus/base64_decode-4096.bin",
+      "bytes": 5464,
+      "sha256": "d3bed93b67b4c62ab54a2354d97edac44181012391a9cce0e780f3ae03c38243"
+    },
+    {
+      "path": "evidence/corpus/base64_decode-64.bin",
+      "bytes": 88,
+      "sha256": "b6c1d4fa7ec1b34127c1fa91ad7dc4432f8a2c6e0e021051b1e539eeac2d34af"
+    },
+    {
+      "path": "evidence/corpus/base64_decode-8.bin",
+      "bytes": 12,
+      "sha256": "3528e132e948f04ced1b0999906cc588d5a2bc9e3971be395cd42d90ce0d6140"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_late_invalid-262144.bin",
+      "bytes": 349528,
+      "sha256": "66ed17322a35d9c3feac42bd41b2d61f480b8a6428f918587381de3861b10e6e"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_late_invalid-4096.bin",
+      "bytes": 5464,
+      "sha256": "22eb69fc7bda3132e97820a276e27c3cd31df6d58276fa52bc615bf767e8e275"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_late_invalid-64.bin",
+      "bytes": 88,
+      "sha256": "36c348ea33c68e1243fdd5d85fa3dfc06e83635b1e0db86414687ab586b08779"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_late_invalid-8.bin",
+      "bytes": 12,
+      "sha256": "0480b78707f702a3936145eda7869b678485fbca00d5b0f08c3172838562dca1"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_small_output-262144.bin",
+      "bytes": 349528,
+      "sha256": "8dedce3821e9ca243661d05938804d371eecafb4c3fe5df98da0b6d685a0dc77"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_small_output-4096.bin",
+      "bytes": 5464,
+      "sha256": "d3bed93b67b4c62ab54a2354d97edac44181012391a9cce0e780f3ae03c38243"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_small_output-64.bin",
+      "bytes": 88,
+      "sha256": "b6c1d4fa7ec1b34127c1fa91ad7dc4432f8a2c6e0e021051b1e539eeac2d34af"
+    },
+    {
+      "path": "evidence/corpus/base64_decode_small_output-8.bin",
+      "bytes": 12,
+      "sha256": "3528e132e948f04ced1b0999906cc588d5a2bc9e3971be395cd42d90ce0d6140"
+    },
+    {
+      "path": "evidence/corpus/base64_encode-262144.bin",
+      "bytes": 262144,
+      "sha256": "1b688a83ba854905616a168d0dc22e62d6dc868aa585f4412657a602fa64d6d3"
+    },
+    {
+      "path": "evidence/corpus/base64_encode-4096.bin",
+      "bytes": 4096,
+      "sha256": "f965b526538d757ca2d6114af6517c57cbcb3650b71d8cfb92046a04ef2f566b"
+    },
+    {
+      "path": "evidence/corpus/base64_encode-64.bin",
+      "bytes": 64,
+      "sha256": "cb6862268ca7c02e7b6af558f0e3d236ce9ec7ff41cc746b2848c04c582da94e"
+    },
+    {
+      "path": "evidence/corpus/base64_encode-8.bin",
+      "bytes": 8,
+      "sha256": "97b657fc33074744891f9d38e551dbb24af09f9f33e951d66cff70240cea2c0d"
+    },
+    {
+      "path": "evidence/corpus/lz4_literals-262144.bin",
+      "bytes": 263173,
+      "sha256": "970764797a7fbfa6630454e8155895a3b40de78bd565bbe93cc62f9b2685c057"
+    },
+    {
+      "path": "evidence/corpus/lz4_literals-4096.bin",
+      "bytes": 4114,
+      "sha256": "0dd80f6785a0bd16089285f3db9c6ef66e5c6994b60cf504d9fd0bfa0c60a970"
+    },
+    {
+      "path": "evidence/corpus/lz4_literals-64.bin",
+      "bytes": 66,
+      "sha256": "97281ac62049a4858409711b6731196d487fe4fed687bfc9ecf868563ea26db8"
+    },
+    {
+      "path": "evidence/corpus/lz4_literals-8.bin",
+      "bytes": 9,
+      "sha256": "d21f1dbf71fb034e3062d8d760f48d13a775d6dd3533078b0d1e693ca3464799"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap-262144.bin",
+      "bytes": 1038,
+      "sha256": "28b6676dde062c8aac91fb9997910033216141e387d56e8c2a06fc06e3bc689e"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap-4096.bin",
+      "bytes": 26,
+      "sha256": "176e7297e3abd053ced082d6ba3f67ab65b7cbe689b2749216056246a34d26e1"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap-64.bin",
+      "bytes": 11,
+      "sha256": "ee773a9b131ceed19035cccc42972387ad0742a5a8874f54c947276d1c84520b"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap_small_output-262144.bin",
+      "bytes": 1038,
+      "sha256": "28b6676dde062c8aac91fb9997910033216141e387d56e8c2a06fc06e3bc689e"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap_small_output-4096.bin",
+      "bytes": 26,
+      "sha256": "176e7297e3abd053ced082d6ba3f67ab65b7cbe689b2749216056246a34d26e1"
+    },
+    {
+      "path": "evidence/corpus/lz4_overlap_small_output-64.bin",
+      "bytes": 11,
+      "sha256": "ee773a9b131ceed19035cccc42972387ad0742a5a8874f54c947276d1c84520b"
+    },
+    {
+      "path": "evidence/corpus/lz4_upstream_compressed-262144.bin",
+      "bytes": 1294,
+      "sha256": "46abaf62a8ca6bc1c37a26538dcf15dd11af6e31604ea576e877eda9a2d9761c"
+    },
+    {
+      "path": "evidence/corpus/lz4_upstream_compressed-4096.bin",
+      "bytes": 282,
+      "sha256": "d845bccc0f4205615e15cf59a37142b6ea6c3eddf67071d4a2ddda2b3658fd2b"
+    },
+    {
+      "path": "evidence/corpus/lz4_upstream_compressed-64.bin",
+      "bytes": 66,
+      "sha256": "97281ac62049a4858409711b6731196d487fe4fed687bfc9ecf868563ea26db8"
+    },
+    {
+      "path": "evidence/corpus/lz4_upstream_compressed-8.bin",
+      "bytes": 9,
+      "sha256": "d21f1dbf71fb034e3062d8d760f48d13a775d6dd3533078b0d1e693ca3464799"
+    },
+    {
+      "path": "evidence/corpus/lz4_zero_offset-0.bin",
+      "bytes": 11,
+      "sha256": "c52a1681ec9c66f665bb3d5ccafd304c0a40537012a9ac90a92e3d47fb6ed170"
+    }
+  ],
+  "compatibility_report": {
+    "path": "evidence/upstream-comparison.json",
+    "sha256": "9905318169b00f0a2aeafca7aa0935ac77cde0efe857cccf584d66fba9a6c0e6",
+    "comparison_invocations": 150836
+  },
+  "performance_summary": [
+    {
+      "workload": "base64_decode",
+      "implementation": "base64_scalar",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 20.80582,
+      "min_ns_per_call": 18.33416,
+      "max_ns_per_call": 31.2225,
+      "logical_mib_per_second": 366.6952098619521,
+      "proven_over_reference_latency": 2.2743636155652602
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "base64_simd",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 20.905,
+      "min_ns_per_call": 19.84834,
+      "max_ns_per_call": 27.2575,
+      "logical_mib_per_second": 364.9554906122937,
+      "proven_over_reference_latency": 2.2635733078210953
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "proven",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 47.32,
+      "min_ns_per_call": 46.0425,
+      "max_ns_per_call": 57.34416,
+      "logical_mib_per_second": 161.22980835270496,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "base64_scalar",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 37.970501,
+      "min_ns_per_call": 37.316604,
+      "max_ns_per_call": 40.353615,
+      "logical_mib_per_second": 1607.4361581376027,
+      "proven_over_reference_latency": 8.82690971077785
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "base64_simd",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 24.680752,
+      "min_ns_per_call": 24.315346,
+      "max_ns_per_call": 28.413621,
+      "logical_mib_per_second": 2472.9860844596633,
+      "proven_over_reference_latency": 13.579901617260287
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "proven",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 335.162184,
+      "min_ns_per_call": 332.605975,
+      "max_ns_per_call": 340.131216,
+      "logical_mib_per_second": 182.1063328850966,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "base64_scalar",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 1565.381201,
+      "min_ns_per_call": 1548.193211,
+      "max_ns_per_call": 1621.083551,
+      "logical_mib_per_second": 2495.3985633049647,
+      "proven_over_reference_latency": 13.631331302157372
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "base64_simd",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 728.45953,
+      "min_ns_per_call": 715.29765,
+      "max_ns_per_call": 744.887728,
+      "logical_mib_per_second": 5362.343190156357,
+      "proven_over_reference_latency": 29.29226523400689
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "proven",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 21338.229765,
+      "min_ns_per_call": 21201.263708,
+      "max_ns_per_call": 21620.32376,
+      "logical_mib_per_second": 183.06345198359523,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "base64_scalar",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 99825.0,
+      "min_ns_per_call": 98700.0,
+      "max_ns_per_call": 114975.0,
+      "logical_mib_per_second": 2504.3826696719257,
+      "proven_over_reference_latency": 13.661657901327322
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "base64_simd",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 46650.0,
+      "min_ns_per_call": 45083.2,
+      "max_ns_per_call": 49825.0,
+      "logical_mib_per_second": 5359.056806002143,
+      "proven_over_reference_latency": 29.234190782422292
+    },
+    {
+      "workload": "base64_decode",
+      "implementation": "proven",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 1363775.0,
+      "min_ns_per_call": 1350858.2,
+      "max_ns_per_call": 1395350.0,
+      "logical_mib_per_second": 183.3146963392055,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "base64_scalar",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 20.30084,
+      "min_ns_per_call": 17.35334,
+      "max_ns_per_call": 22.72166,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.2081598593949807
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "base64_simd",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 17.70584,
+      "min_ns_per_call": 17.1,
+      "max_ns_per_call": 19.51834,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.3852299580251488
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "proven",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 24.52666,
+      "min_ns_per_call": 24.29334,
+      "max_ns_per_call": 25.34916,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "base64_scalar",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 36.709874,
+      "min_ns_per_call": 36.15912,
+      "max_ns_per_call": 37.783433,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 4.4136994858658465
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "base64_simd",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 23.547774,
+      "min_ns_per_call": 23.282028,
+      "max_ns_per_call": 27.023625,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 6.880750256903264
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "proven",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 162.026352,
+      "min_ns_per_call": 160.730771,
+      "max_ns_per_call": 164.266082,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "base64_scalar",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 1561.467363,
+      "min_ns_per_call": 1538.72846,
+      "max_ns_per_call": 1624.780679,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 6.670656910169438
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "base64_simd",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 725.302872,
+      "min_ns_per_call": 718.015666,
+      "max_ns_per_call": 758.266319,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 14.36091522191022
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "proven",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 10416.013055,
+      "min_ns_per_call": 10329.527415,
+      "max_ns_per_call": 10630.112272,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "base64_scalar",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 98933.4,
+      "min_ns_per_call": 98200.0,
+      "max_ns_per_call": 101858.4,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 6.703667315588063
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "base64_simd",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 45725.0,
+      "min_ns_per_call": 44800.0,
+      "max_ns_per_call": 49058.2,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 14.504463641334063
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "implementation": "proven",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 663216.6,
+      "min_ns_per_call": 658408.4,
+      "max_ns_per_call": 684675.0,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "base64_scalar",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 7,
+      "batch_samples": 27,
+      "median_ns_per_call": 23.24666,
+      "min_ns_per_call": 21.3175,
+      "max_ns_per_call": 24.755,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0034774888091451
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "base64_simd",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 7,
+      "batch_samples": 27,
+      "median_ns_per_call": 19.19916,
+      "min_ns_per_call": 18.51416,
+      "max_ns_per_call": 19.915,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.2150271157696484
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "proven",
+      "logical_bytes": 8,
+      "input_bytes": 12,
+      "output_capacity": 7,
+      "batch_samples": 27,
+      "median_ns_per_call": 23.3275,
+      "min_ns_per_call": 22.8075,
+      "max_ns_per_call": 25.1025,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "base64_scalar",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 63,
+      "batch_samples": 27,
+      "median_ns_per_call": 37.947757,
+      "min_ns_per_call": 37.239688,
+      "max_ns_per_call": 39.245101,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 4.290593196325148
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "base64_simd",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 63,
+      "batch_samples": 27,
+      "median_ns_per_call": 24.635265,
+      "min_ns_per_call": 24.325794,
+      "max_ns_per_call": 25.053124,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 6.609159187043452
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "proven",
+      "logical_bytes": 64,
+      "input_bytes": 88,
+      "output_capacity": 63,
+      "batch_samples": 27,
+      "median_ns_per_call": 162.818388,
+      "min_ns_per_call": 161.374218,
+      "max_ns_per_call": 167.194704,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "base64_scalar",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4095,
+      "batch_samples": 27,
+      "median_ns_per_call": 1575.281984,
+      "min_ns_per_call": 1548.522193,
+      "max_ns_per_call": 1643.603133,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 6.611191499540441
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "base64_simd",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4095,
+      "batch_samples": 27,
+      "median_ns_per_call": 729.655352,
+      "min_ns_per_call": 721.062663,
+      "max_ns_per_call": 773.715405,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 14.273164492597322
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "proven",
+      "logical_bytes": 4096,
+      "input_bytes": 5464,
+      "output_capacity": 4095,
+      "batch_samples": 27,
+      "median_ns_per_call": 10414.490862,
+      "min_ns_per_call": 10354.002611,
+      "max_ns_per_call": 10610.966057,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "base64_scalar",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262143,
+      "batch_samples": 27,
+      "median_ns_per_call": 100133.4,
+      "min_ns_per_call": 98616.6,
+      "max_ns_per_call": 104558.4,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 6.622499585552873
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "base64_simd",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262143,
+      "batch_samples": 27,
+      "median_ns_per_call": 46191.6,
+      "min_ns_per_call": 45033.4,
+      "max_ns_per_call": 52416.6,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 14.356147005083177
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "implementation": "proven",
+      "logical_bytes": 262144,
+      "input_bytes": 349528,
+      "output_capacity": 262143,
+      "batch_samples": 27,
+      "median_ns_per_call": 663133.4,
+      "min_ns_per_call": 658608.4,
+      "max_ns_per_call": 673550.0,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "base64_scalar",
+      "logical_bytes": 8,
+      "input_bytes": 8,
+      "output_capacity": 12,
+      "batch_samples": 27,
+      "median_ns_per_call": 9.68916,
+      "min_ns_per_call": 9.12334,
+      "max_ns_per_call": 15.35584,
+      "logical_mib_per_second": 787.4154757739577,
+      "proven_over_reference_latency": 1.9974218611314087
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "base64_simd",
+      "logical_bytes": 8,
+      "input_bytes": 8,
+      "output_capacity": 12,
+      "batch_samples": 27,
+      "median_ns_per_call": 10.0025,
+      "min_ns_per_call": 9.38084,
+      "max_ns_per_call": 15.62334,
+      "logical_mib_per_second": 762.7487659335167,
+      "proven_over_reference_latency": 1.934850287428143
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "proven",
+      "logical_bytes": 8,
+      "input_bytes": 8,
+      "output_capacity": 12,
+      "batch_samples": 27,
+      "median_ns_per_call": 19.35334,
+      "min_ns_per_call": 18.06,
+      "max_ns_per_call": 30.97166,
+      "logical_mib_per_second": 394.2159095665141,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "base64_scalar",
+      "logical_bytes": 64,
+      "input_bytes": 64,
+      "output_capacity": 88,
+      "batch_samples": 27,
+      "median_ns_per_call": 29.268921,
+      "min_ns_per_call": 29.070526,
+      "max_ns_per_call": 30.741394,
+      "logical_mib_per_second": 2085.3230718686214,
+      "proven_over_reference_latency": 4.618078268071447
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "base64_simd",
+      "logical_bytes": 64,
+      "input_bytes": 64,
+      "output_capacity": 88,
+      "batch_samples": 27,
+      "median_ns_per_call": 29.513062,
+      "min_ns_per_call": 29.280334,
+      "max_ns_per_call": 30.565887,
+      "logical_mib_per_second": 2068.0726469520514,
+      "proven_over_reference_latency": 4.579876124002315
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "proven",
+      "logical_bytes": 64,
+      "input_bytes": 64,
+      "output_capacity": 88,
+      "batch_samples": 27,
+      "median_ns_per_call": 135.166168,
+      "min_ns_per_call": 134.310394,
+      "max_ns_per_call": 137.687683,
+      "logical_mib_per_second": 451.55645937968734,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "base64_scalar",
+      "logical_bytes": 4096,
+      "input_bytes": 4096,
+      "output_capacity": 5464,
+      "batch_samples": 27,
+      "median_ns_per_call": 1432.128906,
+      "min_ns_per_call": 1413.330078,
+      "max_ns_per_call": 1632.080078,
+      "logical_mib_per_second": 2727.5826803261243,
+      "proven_over_reference_latency": 6.881350154802337
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "base64_simd",
+      "logical_bytes": 4096,
+      "input_bytes": 4096,
+      "output_capacity": 5464,
+      "batch_samples": 27,
+      "median_ns_per_call": 494.384766,
+      "min_ns_per_call": 486.246094,
+      "max_ns_per_call": 520.181641,
+      "logical_mib_per_second": 7901.234561908002,
+      "proven_over_reference_latency": 19.933827145879327
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "proven",
+      "logical_bytes": 4096,
+      "input_bytes": 4096,
+      "output_capacity": 5464,
+      "batch_samples": 27,
+      "median_ns_per_call": 9854.980469,
+      "min_ns_per_call": 9784.830078,
+      "max_ns_per_call": 10152.587891,
+      "logical_mib_per_second": 396.37318534395564,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "base64_scalar",
+      "logical_bytes": 262144,
+      "input_bytes": 262144,
+      "output_capacity": 349528,
+      "batch_samples": 27,
+      "median_ns_per_call": 92026.0,
+      "min_ns_per_call": 88770.875,
+      "max_ns_per_call": 95557.375,
+      "logical_mib_per_second": 2716.6235629061352,
+      "proven_over_reference_latency": 6.868925629713342
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "base64_simd",
+      "logical_bytes": 262144,
+      "input_bytes": 262144,
+      "output_capacity": 349528,
+      "batch_samples": 27,
+      "median_ns_per_call": 31932.25,
+      "min_ns_per_call": 30698.0,
+      "max_ns_per_call": 35369.75,
+      "logical_mib_per_second": 7829.075621041423,
+      "proven_over_reference_latency": 19.795653297215196
+    },
+    {
+      "workload": "base64_encode",
+      "implementation": "proven",
+      "logical_bytes": 262144,
+      "input_bytes": 262144,
+      "output_capacity": 349528,
+      "batch_samples": 27,
+      "median_ns_per_call": 632119.75,
+      "min_ns_per_call": 626765.625,
+      "max_ns_per_call": 642041.625,
+      "logical_mib_per_second": 395.4946827717375,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_literals",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 8,
+      "input_bytes": 9,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 4.82582,
+      "min_ns_per_call": 4.77416,
+      "max_ns_per_call": 5.02832,
+      "logical_mib_per_second": 1580.9529844150838,
+      "proven_over_reference_latency": 2.610093206957574
+    },
+    {
+      "workload": "lz4_literals",
+      "implementation": "proven",
+      "logical_bytes": 8,
+      "input_bytes": 9,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 12.59584,
+      "min_ns_per_call": 12.50082,
+      "max_ns_per_call": 13.08584,
+      "logical_mib_per_second": 605.7074820932943,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_literals",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 64,
+      "input_bytes": 66,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 8.595594,
+      "min_ns_per_call": 8.473643,
+      "max_ns_per_call": 11.1369,
+      "logical_mib_per_second": 7100.74908726494,
+      "proven_over_reference_latency": 2.0079304583255095
+    },
+    {
+      "workload": "lz4_literals",
+      "implementation": "proven",
+      "logical_bytes": 64,
+      "input_bytes": 66,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 17.259355,
+      "min_ns_per_call": 17.01284,
+      "max_ns_per_call": 17.749803,
+      "logical_mib_per_second": 3536.3520971670146,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_literals",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 4096,
+      "input_bytes": 4114,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 77.931238,
+      "min_ns_per_call": 73.019646,
+      "max_ns_per_call": 82.35167,
+      "logical_mib_per_second": 50124.316002781845,
+      "proven_over_reference_latency": 1.917009094607223
+    },
+    {
+      "workload": "lz4_literals",
+      "implementation": "proven",
+      "logical_bytes": 4096,
+      "input_bytes": 4114,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 149.394892,
+      "min_ns_per_call": 144.80943,
+      "max_ns_per_call": 162.24558,
+      "logical_mib_per_second": 26147.145646719968,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_literals",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 262144,
+      "input_bytes": 263173,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 5291.571429,
+      "min_ns_per_call": 5190.428571,
+      "max_ns_per_call": 5696.428571,
+      "logical_mib_per_second": 47244.944787080945,
+      "proven_over_reference_latency": 1.5050889553058702
+    },
+    {
+      "workload": "lz4_literals",
+      "implementation": "proven",
+      "logical_bytes": 262144,
+      "input_bytes": 263173,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 7964.285714,
+      "min_ns_per_call": 7571.428571,
+      "max_ns_per_call": 8315.428571,
+      "logical_mib_per_second": 31390.13453027409,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_overlap",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 64,
+      "input_bytes": 11,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 13.786316,
+      "min_ns_per_call": 13.633728,
+      "max_ns_per_call": 14.354706,
+      "logical_mib_per_second": 4427.227422467322,
+      "proven_over_reference_latency": 6.856577710825721
+    },
+    {
+      "workload": "lz4_overlap",
+      "implementation": "proven",
+      "logical_bytes": 64,
+      "input_bytes": 11,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 94.526947,
+      "min_ns_per_call": 93.260437,
+      "max_ns_per_call": 96.154541,
+      "logical_mib_per_second": 645.6905484316551,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_overlap",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 4096,
+      "input_bytes": 26,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 68.115234,
+      "min_ns_per_call": 63.396484,
+      "max_ns_per_call": 122.070312,
+      "logical_mib_per_second": 57347.670566616565,
+      "proven_over_reference_latency": 105.52805792313654
+    },
+    {
+      "workload": "lz4_overlap",
+      "implementation": "proven",
+      "logical_bytes": 4096,
+      "input_bytes": 26,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 7188.068359,
+      "min_ns_per_call": 7089.517578,
+      "max_ns_per_call": 7307.048828,
+      "logical_mib_per_second": 543.4352881618164,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_overlap",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 262144,
+      "input_bytes": 1038,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 3739.625,
+      "min_ns_per_call": 3552.0,
+      "max_ns_per_call": 5770.75,
+      "logical_mib_per_second": 66851.62282314403,
+      "proven_over_reference_latency": 123.3440184510479
+    },
+    {
+      "workload": "lz4_overlap",
+      "implementation": "proven",
+      "logical_bytes": 262144,
+      "input_bytes": 1038,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 461260.375,
+      "min_ns_per_call": 455317.625,
+      "max_ns_per_call": 471541.75,
+      "logical_mib_per_second": 541.9932288785916,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 64,
+      "input_bytes": 11,
+      "output_capacity": 63,
+      "batch_samples": 27,
+      "median_ns_per_call": 11.622101,
+      "min_ns_per_call": 11.470795,
+      "max_ns_per_call": 12.002319,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 0.8728654999642491
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "implementation": "proven",
+      "logical_bytes": 64,
+      "input_bytes": 11,
+      "output_capacity": 63,
+      "batch_samples": 27,
+      "median_ns_per_call": 10.144531,
+      "min_ns_per_call": 10.033936,
+      "max_ns_per_call": 10.316223,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 4096,
+      "input_bytes": 26,
+      "output_capacity": 4095,
+      "batch_samples": 27,
+      "median_ns_per_call": 69.580078,
+      "min_ns_per_call": 63.068359,
+      "max_ns_per_call": 76.416016,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 0.2982456127743921
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "implementation": "proven",
+      "logical_bytes": 4096,
+      "input_bytes": 26,
+      "output_capacity": 4095,
+      "batch_samples": 27,
+      "median_ns_per_call": 20.751953,
+      "min_ns_per_call": 17.496094,
+      "max_ns_per_call": 21.972656,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 262144,
+      "input_bytes": 1038,
+      "output_capacity": 262143,
+      "batch_samples": 27,
+      "median_ns_per_call": 5567.75,
+      "min_ns_per_call": 5333.375,
+      "max_ns_per_call": 6593.75,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 0.1057204436262404
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "implementation": "proven",
+      "logical_bytes": 262144,
+      "input_bytes": 1038,
+      "output_capacity": 262143,
+      "batch_samples": 27,
+      "median_ns_per_call": 588.625,
+      "min_ns_per_call": 562.5,
+      "max_ns_per_call": 750.0,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 8,
+      "input_bytes": 9,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 4.81666,
+      "min_ns_per_call": 4.77418,
+      "max_ns_per_call": 5.01166,
+      "logical_mib_per_second": 1583.9595344595634,
+      "proven_over_reference_latency": 2.6015620782866136
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "implementation": "proven",
+      "logical_bytes": 8,
+      "input_bytes": 9,
+      "output_capacity": 8,
+      "batch_samples": 27,
+      "median_ns_per_call": 12.53084,
+      "min_ns_per_call": 12.48416,
+      "max_ns_per_call": 12.875,
+      "logical_mib_per_second": 608.8494092375291,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 64,
+      "input_bytes": 66,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 8.575924,
+      "min_ns_per_call": 8.461841,
+      "max_ns_per_call": 8.676884,
+      "logical_mib_per_second": 7117.035581238825,
+      "proven_over_reference_latency": 1.9934239156037297
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "implementation": "proven",
+      "logical_bytes": 64,
+      "input_bytes": 66,
+      "output_capacity": 64,
+      "batch_samples": 27,
+      "median_ns_per_call": 17.095452,
+      "min_ns_per_call": 16.894823,
+      "max_ns_per_call": 17.330165,
+      "logical_mib_per_second": 3570.256946116429,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 4096,
+      "input_bytes": 282,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 145.425781,
+      "min_ns_per_call": 131.673828,
+      "max_ns_per_call": 150.472656,
+      "logical_mib_per_second": 26860.780620459587,
+      "proven_over_reference_latency": 1.2204867168634974
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "implementation": "proven",
+      "logical_bytes": 4096,
+      "input_bytes": 282,
+      "output_capacity": 4096,
+      "batch_samples": 27,
+      "median_ns_per_call": 177.490234,
+      "min_ns_per_call": 166.015625,
+      "max_ns_per_call": 204.345703,
+      "logical_mib_per_second": 22008.253141409463,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 262144,
+      "input_bytes": 1294,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 8041.75,
+      "min_ns_per_call": 7786.5,
+      "max_ns_per_call": 8406.25,
+      "logical_mib_per_second": 31087.76074859328,
+      "proven_over_reference_latency": 1.0692946187086143
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "implementation": "proven",
+      "logical_bytes": 262144,
+      "input_bytes": 1294,
+      "output_capacity": 262144,
+      "batch_samples": 27,
+      "median_ns_per_call": 8599.0,
+      "min_ns_per_call": 8349.0,
+      "max_ns_per_call": 8828.125,
+      "logical_mib_per_second": 29073.148040469823,
+      "proven_over_reference_latency": 1.0
+    },
+    {
+      "workload": "lz4_zero_offset",
+      "implementation": "lz4_flex_safe",
+      "logical_bytes": 0,
+      "input_bytes": 11,
+      "output_capacity": 256,
+      "batch_samples": 27,
+      "median_ns_per_call": 3.49334,
+      "min_ns_per_call": 3.48916,
+      "max_ns_per_call": 3.6825,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.4060125839454505
+    },
+    {
+      "workload": "lz4_zero_offset",
+      "implementation": "proven",
+      "logical_bytes": 0,
+      "input_bytes": 11,
+      "output_capacity": 256,
+      "batch_samples": 27,
+      "median_ns_per_call": 4.91168,
+      "min_ns_per_call": 4.89584,
+      "max_ns_per_call": 5.25918,
+      "logical_mib_per_second": null,
+      "proven_over_reference_latency": 1.0
+    }
+  ],
+  "report_generated_utc": "2026-10-23T22:03:10.516552+00:00"
+}

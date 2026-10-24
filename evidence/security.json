@@ -1,0 +1,230 @@
+{
+  "generated_utc": "2026-10-24T14:53:47.237499+00:00",
+  "claim": "Proven secure against the specified per-call bounds, output-integrity and prior-destination-disclosure threats for every admitted input and modeled execution under the published contracts and trusted base.",
+  "assessment": {
+    "path": "SECURITY_CONTRACTS.md",
+    "sha256": "fe6a7eec1b4bddaf3d98c9f7233dc9a14b375c90b81c7d19f057089b7f77914a"
+  },
+  "source_tree_sha256": "fd2948623242719d88c347dcb0ff80a4e43fd94d2e1e8cf7085190640b1615d8",
+  "source_sha256": {
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/base64.rs": "7fd186ce77ccd72cc67826dcb3c0b62bb00b6ac4ca2b832ef24f02900230d4e3",
+    "src/lib.rs": "1bbf2d0f60ed141abebaf8af0cf92c0907b981732a97c7138e0ecfa84e07e660",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "13ee9a952dbf8a845096194e3b8899f45ed02919a98fa3443c60f9754b2ecfc2"
+  },
+  "validation_source_sha256": {
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "2a603077e5185c4aca4ef31f4cc0ed9b11784f32af23aedde56b5030f59bba95",
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39"
+  },
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 90,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_options": [
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "60",
+    "--time",
+    "--output-json"
+  ],
+  "verifier": {
+    "profile": "release",
+    "version": "0.2026.10.18.7d82994",
+    "platform": {
+      "os": "macos",
+      "arch": "aarch64"
+    },
+    "toolchain": "1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "commit": "7d829946231d6413a398f6e4160cdfe951261dad"
+  },
+  "named_security_lemmas": {
+    "src/base64.rs": [
+      "encoded_prefix_is_independent_of_previous_output",
+      "decoded_prefix_is_independent_of_previous_output",
+      "decoded_length_bound"
+    ],
+    "src/percent.rs": [
+      "encoded_prefix_is_independent_of_previous_output",
+      "decoded_prefix_is_independent_of_previous_output",
+      "encoded_length_bounds",
+      "decoded_length_bound"
+    ],
+    "src/lz4.rs": [
+      "decoded_prefix_is_independent_of_previous_output"
+    ]
+  },
+  "executable_and_specification_identity_to_g": {
+    "src/lib.rs": {
+      "unchanged_executable_functions": [
+        "copy_bytes"
+      ],
+      "unchanged_public_specifications": [
+        "written",
+        "prepend"
+      ]
+    },
+    "src/base64.rs": {
+      "unchanged_executable_functions": [
+        "to_symbol",
+        "from_symbol",
+        "make_quantum",
+        "make_batch",
+        "read_quantum",
+        "read_batch",
+        "encoded_length",
+        "encode_into",
+        "valid_batch",
+        "decoded_length",
+        "decode_into"
+      ],
+      "unchanged_public_specifications": [
+        "symbol",
+        "value",
+        "quantum",
+        "encoded",
+        "unquantum",
+        "first",
+        "decoded"
+      ]
+    },
+    "src/percent.rs": {
+      "unchanged_executable_functions": [
+        "is_unreserved",
+        "hex_digit",
+        "from_hex",
+        "read_token",
+        "encoded_length",
+        "encode_into",
+        "decoded_length",
+        "decode_into"
+      ],
+      "unchanged_public_specifications": [
+        "unreserved",
+        "hex",
+        "hex_value",
+        "escaped",
+        "encoded",
+        "first",
+        "decoded"
+      ]
+    },
+    "src/lz4.rs": {
+      "unchanged_executable_functions": [
+        "read_length",
+        "read_step",
+        "decoded_length",
+        "decompress_block_into"
+      ],
+      "unchanged_public_specifications": [
+        "add_length",
+        "extension",
+        "length_field",
+        "segment",
+        "matched",
+        "block_state",
+        "decoded"
+      ]
+    }
+  },
+  "compiled_artifact": {
+    "binary": "target/release/deps/primitives-35d398134f8f8ebe",
+    "binary_sha256": "b5783a1fc0159effca621ec5254369f08193d7bf19e74f52e560f861b5addfaf",
+    "g_benchmark_binary_sha256": "b5783a1fc0159effca621ec5254369f08193d7bf19e74f52e560f861b5addfaf",
+    "binary_identical_to_measured_g": true
+  },
+  "runtime_regressions": "passed on current source",
+  "proof_corruption_controls": {
+    "rejected": 11,
+    "unchanged_positive_control_verified": 90,
+    "source_identity": "current source manifest above",
+    "note": "Real proof rejection after a passing unchanged positive control, not compiler/tool failures.",
+    "evidence": {
+      "path": "evidence/security-controls.json",
+      "sha256": "61b84cc9e70a667e65b9973416724c2fd4ed2306833e39a11c4ba314a40d592f"
+    }
+  },
+  "property_status": {
+    "confidentiality": {
+      "returned_prefix_independence": "proved, conditional on checked successful written postconditions",
+      "error_result_and_buffer_effects": "proved per-call functional contracts",
+      "timing_cache_and_other_side_channels": "unproved",
+      "general_secret_state_information_flow_model": "not introduced; unproved"
+    },
+    "state_across_calls": {
+      "per_call_frames_for_arbitrary_initial_destinations": "proved",
+      "mathematical_encoding_concatenation": "proved with Base64 alignment precondition; unrestricted byte boundaries for percent encoding",
+      "streaming_sessions_and_caller_trace_protocols": "unproved; new models/APIs require approval"
+    },
+    "resources": {
+      "base64_exact_encoded_and_upper_decoded_lengths": "proved",
+      "percent_encoded_and_decoded_length_bounds": "proved",
+      "lz4_counter_and_abstract_byte_work_bounds": "proved in the existing stated accounting model",
+      "constant_local_storage_and_no_library_heap_allocation": "source-audit facts; concrete stack/process memory unproved",
+      "practical_denial_of_service_resistance_and_cycle_limits": "unproved"
+    },
+    "composition_and_deployment": {
+      "source_routine_refinement": "proved under existing model",
+      "current_measured_executable_binding": "observed byte identity after proof-only additions; not compiler verification",
+      "caller_observation_and_authorization_wrappers": "unproved",
+      "independent_specification_review": "pending; author self-review only",
+      "universal_upstream_or_machine_binary_equivalence": "unproved"
+    },
+    "brotli": {
+      "implementation_and_streaming_obligations": "proposed only; no replay or checked proof in this repository"
+    }
+  },
+  "required_caller_observation": "Only the current Ok(n) prefix; no whole-buffer serialization or previous success length after error.",
+  "trusted_base": [
+    "published specifications and their interpretation of external standards",
+    "Verus and bundled Z3",
+    "Verus proof/erasure macros and modeled Rust/library operations",
+    "Rust compiler",
+    "operating system and hardware execution"
+  ],
+  "pending_decisions": "SECURITY_PROOF_PROPOSALS.md",
+  "verification_evidence": {
+    "path": "evidence/security-verification.json",
+    "sha256": "98c1d5f7aee4c25865b5a32f64cf55e6ca94ad68de853051f26e40375d98dd04",
+    "note": "Unmodified checker JSON, including per-function results and tool metadata."
+  },
+  "verification_command_template": [
+    "<VERUS_ROOT>/verus",
+    "src/lib.rs",
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "60",
+    "--time",
+    "--output-json"
+  ],
+  "runtime_evidence_local_logs": {
+    "evidence/security-build.log": "8574121dfcabf3ecbe32216217633369c74982d0a4312ff580a5261b1a9cfb1c",
+    "evidence/security-runtime.log": "d079f0fe5a4588f0055168e1af4d6c602a29e6078ad70009b4694ab694024a16",
+    "evidence/security-mutations.log": "59219192de4d83916ea01c10fa0cf91608af5330a2c584f7797e3259b48d2ad5"
+  },
+  "execution_environment": {
+    "RUSTUP_TOOLCHAIN": "1.99.1",
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools"
+  }
+}

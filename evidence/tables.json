@@ -1,0 +1,2670 @@
+{
+  "report_generated_utc": "2026-10-23T23:06:44.705129+00:00",
+  "claim": "Proof-preserving source-level table optimizations, finite upstream compatibility evidence, and measured host performance; no cryptographic constant-time or universal upstream-equivalence claim.",
+  "baseline": {
+    "source_tree_sha256": "6dc706ff89f65bda74c0f8c7418b9a9849d83a37c8b176aacb553ffbf3dce591",
+    "source_sha256": {
+      "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+      "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+      "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+      "src/base64.rs": "1ef30d5354a3d565d9f02be46c4664bd52649a25e517b82d7443b0877f695c78",
+      "src/lib.rs": "1bbf2d0f60ed141abebaf8af0cf92c0907b981732a97c7138e0ecfa84e07e660",
+      "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "src/percent.rs": "55aa3a2e21fe1629cbdf7a87180e1f0c2cab1b7573a577b8db8aaec08d92ba37",
+      "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+      "tests/proof_rejection.rs": "b97369cc33b7f50df13a55413cd32a5d0e12db1d1cc5cabf9a40b52970593c91",
+      "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+      "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf",
+      "tests/upstream_comparison.rs": "b71ad9ad49be2599e6ac2fdf8de177b54374f832e02c067515d7032631ee676f"
+    },
+    "verification_checks": 70,
+    "binary": "target/release/deps/primitives-35d398134f8f8ebe",
+    "binary_sha256": "dddfff9eaafad963a19cfdef7b72c00fa9fd6f0b17b11c005a734ed456927f25",
+    "snapshot": "pre-C/D baseline"
+  },
+  "encoding_iteration": {
+    "verification_results": {
+      "encountered-error": false,
+      "encountered-vir-error": false,
+      "success": true,
+      "verified": 71,
+      "errors": 0,
+      "is-verifying-entire-crate": true
+    },
+    "source_sha256": {
+      "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+      "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+      "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+      "src/base64.rs": "64554b3b06976f6b98357dc6e1d8167adae8ca5fdbc44005f51caf3b2264d738",
+      "src/lib.rs": "1bbf2d0f60ed141abebaf8af0cf92c0907b981732a97c7138e0ecfa84e07e660",
+      "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "src/percent.rs": "55aa3a2e21fe1629cbdf7a87180e1f0c2cab1b7573a577b8db8aaec08d92ba37",
+      "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+      "tests/proof_rejection.rs": "7b4e1fc5be5df6fa3011c247eb838d9664f03a20a10fae22e0fa065595de93ec",
+      "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+      "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf",
+      "tests/upstream_comparison.rs": "b71ad9ad49be2599e6ac2fdf8de177b54374f832e02c067515d7032631ee676f"
+    },
+    "binary": "target/release/deps/primitives-35d398134f8f8ebe",
+    "binary_sha256": "006ad7dbe6b921b835d469ebad936922b3b86ce7bedb95a9e62d04b3075f3a79",
+    "patch": "evidence/tables-encoding.patch",
+    "patch_sha256": "810736614b586dafc21dac15f23aa7fe5909c7d7c9d23aecdee5b3eada236ded",
+    "mutations_rejected": 6,
+    "comparison_invocations": 150836
+  },
+  "decoding_iteration": {
+    "verification_results": {
+      "encountered-error": false,
+      "encountered-vir-error": false,
+      "success": true,
+      "verified": 72,
+      "errors": 0,
+      "is-verifying-entire-crate": true
+    },
+    "source_sha256": {
+      "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+      "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+      "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+      "src/base64.rs": "ed2d166667ffcc281a1cc852c736f8cd6c2cb98dfb8b3325fa3362bd348d096a",
+      "src/lib.rs": "1bbf2d0f60ed141abebaf8af0cf92c0907b981732a97c7138e0ecfa84e07e660",
+      "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "src/percent.rs": "55aa3a2e21fe1629cbdf7a87180e1f0c2cab1b7573a577b8db8aaec08d92ba37",
+      "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+      "tests/proof_rejection.rs": "953c2cb4170ab02d06b7ca06a9f230b6dba5b36995a94bd1d4684d836883853d",
+      "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+      "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf",
+      "tests/upstream_comparison.rs": "91f114c0db6c8336b281cdc9c167a85561360b7387de881356de173b4fc454a7"
+    },
+    "binary": "target/release/deps/primitives-35d398134f8f8ebe",
+    "binary_sha256": "efb6155470f676a96aaea49623d782d057991347bd26207104a456c67e8e5a41",
+    "mutations_rejected": 7,
+    "comparison_invocations": 151860
+  },
+  "approved_table_storage_bytes": 320,
+  "host": {
+    "cpu": "Apple M2 Pro",
+    "os": "macOS",
+    "os_version": "26.7.1",
+    "architecture": "aarch64-apple-darwin"
+  },
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: aarch64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.1",
+  "references": [
+    {
+      "name": "base64",
+      "version": "0.23.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5",
+      "git_commit": "069bf7067b949f5c0a92b6ceb82492920502f2c2",
+      "resolved_features": [
+        "alloc",
+        "default",
+        "simd-unsafe",
+        "std"
+      ],
+      "role": "current compatibility and performance reference"
+    },
+    {
+      "name": "lz4_flex",
+      "version": "0.12.0",
+      "source": "git+https://github.com/PSeitz/lz4_flex?rev=975bfa7ac9583da879b5d7578b423232d84f69fe#975bfa7ac9583da879b5d7578b423232d84f69fe",
+      "git_commit": "975bfa7ac9583da879b5d7578b423232d84f69fe",
+      "resolved_features": [
+        "checked-decode",
+        "safe-decode",
+        "safe-encode",
+        "std"
+      ],
+      "role": "historical regression only"
+    },
+    {
+      "name": "lz4_flex",
+      "version": "0.14.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ecbdfe44b1bd960b68170b417450a628c43f7cf56bb3c5317e61cb230ee7f226",
+      "git_commit": "1bffdcbbf906a234b913937cb2f57c0245915038",
+      "resolved_features": [
+        "alloc",
+        "checked-decode",
+        "safe-decode",
+        "safe-encode",
+        "std"
+      ],
+      "role": "current compatibility and performance reference"
+    }
+  ],
+  "method": {
+    "process_runs": 3,
+    "batches_per_process_per_configuration": 9,
+    "batch_samples_per_configuration": 27,
+    "iterations": "clamp(2 MiB / max(input_bytes, logical_bytes, 1), 4, 50000)",
+    "ordering": "rotate first implementation each batch",
+    "warmup_calls": 10,
+    "timed_allocations": false,
+    "output_reset": "before each batch, outside timing",
+    "input_generation": "outside timing; periodic bytes (i*73+19) mod 256, literal-only LZ4, overlapping offset-one LZ4, and current-upstream compression",
+    "validation": "returned results and successful prefixes compared before timing",
+    "latency_statistic": "median of repeated batch-average nanoseconds per call; min/max retained",
+    "not_measured": [
+      "application p95/p99 latency",
+      "cold-cache latency",
+      "other machines",
+      "universal upstream equivalence"
+    ]
+  },
+  "raw_runs": {
+    "baseline": [
+      {
+        "path": "evidence/tables-baseline-run-1.csv",
+        "sha256": "f797a929661bbeae25ee2c5476ae7e2ffc074330d1e0c7ebd9e798f57d24bf08",
+        "samples": 702,
+        "completed_utc": "2026-10-23T22:51:24.976256+00:00"
+      },
+      {
+        "path": "evidence/tables-baseline-run-2.csv",
+        "sha256": "82021d06afa92e876554289639853e86d5bb2faa7663eeacf6fbb00b2168a479",
+        "samples": 702,
+        "completed_utc": "2026-10-23T22:51:25.936714+00:00"
+      },
+      {
+        "path": "evidence/tables-baseline-run-3.csv",
+        "sha256": "df64ebff2bae8eb338d976124f29da7b1c608b4277b46483d8fbee999f4e6825",
+        "samples": 702,
+        "completed_utc": "2026-10-23T22:51:27.065042+00:00"
+      }
+    ],
+    "encoding": [
+      {
+        "path": "evidence/tables-encoding-run-1.csv",
+        "sha256": "7474f172e931dd7d1dfe22c6dd2ab04afc0747cff6939b85071a0ac7a563a8dd",
+        "samples": 702,
+        "completed_utc": "2026-10-23T22:55:13.026757+00:00"
+      },
+      {
+        "path": "evidence/tables-encoding-run-2.csv",
+        "sha256": "e816fe7b4131f6a551c8245b310392038bba5667d01084bfc68cf4be371b4f80",
+        "samples": 702,
+        "completed_utc": "2026-10-23T22:55:13.921034+00:00"
+      },
+      {
+        "path": "evidence/tables-encoding-run-3.csv",
+        "sha256": "87b6b99e10e0c7136157c3d8894f2dd7429e2e6868ca60fb1e5e1f1ce12a5c63",
+        "samples": 702,
+        "completed_utc": "2026-10-23T22:55:14.808728+00:00"
+      }
+    ],
+    "decoding": [
+      {
+        "path": "evidence/tables-decoding-run-1.csv",
+        "sha256": "4a614086ee076cbd62bc9f97810620d45d9e7da9fe70f26153749cd29120018e",
+        "samples": 702,
+        "completed_utc": "2026-10-23T23:00:26.103642+00:00"
+      },
+      {
+        "path": "evidence/tables-decoding-run-2.csv",
+        "sha256": "6967587ca71336923c41034e164dad035512bbcd0e577032588ac39277341c8e",
+        "samples": 702,
+        "completed_utc": "2026-10-23T23:00:26.812934+00:00"
+      },
+      {
+        "path": "evidence/tables-decoding-run-3.csv",
+        "sha256": "90bc426d228147d5e490c7c89787ffa161cb4279f03ff3527c00dbd08f0f41a6",
+        "samples": 702,
+        "completed_utc": "2026-10-23T23:00:27.518173+00:00"
+      }
+    ]
+  },
+  "configurations": [
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 8,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 25.43666,
+          "min_ns_per_call": 22.66416,
+          "max_ns_per_call": 27.45916
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 22.365,
+          "min_ns_per_call": 19.75832,
+          "max_ns_per_call": 25.30918
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 21.6225,
+          "min_ns_per_call": 18.95666,
+          "max_ns_per_call": 25.4225
+        }
+      },
+      "encoding_iteration_speedup": 1.1373422758774872,
+      "decoding_iteration_speedup": 1.0343392299687826,
+      "combined_speedup": 1.1763977338420628
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 8,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 20.16916,
+          "min_ns_per_call": 19.28082,
+          "max_ns_per_call": 22.92834
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 22.81084,
+          "min_ns_per_call": 20.37832,
+          "max_ns_per_call": 26.255
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 21.69416,
+          "min_ns_per_call": 20.555,
+          "max_ns_per_call": 25.8925
+        }
+      },
+      "encoding_iteration_speedup": 0.88419190174496,
+      "decoding_iteration_speedup": 1.0514737606802935,
+      "combined_speedup": 0.9297045840908337
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 47.38584,
+          "min_ns_per_call": 45.9675,
+          "max_ns_per_call": 50.01334
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 47.09582,
+          "min_ns_per_call": 45.97416,
+          "max_ns_per_call": 51.25416
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 30.75916,
+          "min_ns_per_call": 30.5025,
+          "max_ns_per_call": 31.34584
+        }
+      },
+      "encoding_iteration_speedup": 1.0061580836685717,
+      "decoding_iteration_speedup": 1.5311152840324638,
+      "combined_speedup": 1.540544020057765,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.4225533587698,
+        "base64_simd": 1.4178543903059626
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.3095435121473897,
+        "base64_simd": 1.6570253028969157
+      }
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 64,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 37.404012,
+          "min_ns_per_call": 37.145231,
+          "max_ns_per_call": 38.05795
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 37.395241,
+          "min_ns_per_call": 37.154001,
+          "max_ns_per_call": 39.919978
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 37.316604,
+          "min_ns_per_call": 37.159246,
+          "max_ns_per_call": 55.391801
+        }
+      },
+      "encoding_iteration_speedup": 1.0002345485619415,
+      "decoding_iteration_speedup": 1.0021072925071102,
+      "combined_speedup": 1.0023423353314789
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 64,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 24.376526,
+          "min_ns_per_call": 24.266376,
+          "max_ns_per_call": 25.151064
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 24.329319,
+          "min_ns_per_call": 24.243632,
+          "max_ns_per_call": 25.913348
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 24.35202,
+          "min_ns_per_call": 24.248878,
+          "max_ns_per_call": 25.049641
+        }
+      },
+      "encoding_iteration_speedup": 1.0019403338005473,
+      "decoding_iteration_speedup": 0.9990677980717823,
+      "combined_speedup": 1.0010063230894193
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 334.282699,
+          "min_ns_per_call": 331.455541,
+          "max_ns_per_call": 417.705216
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 333.422517,
+          "min_ns_per_call": 330.896018,
+          "max_ns_per_call": 337.641433
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 216.879611,
+          "min_ns_per_call": 215.722169,
+          "max_ns_per_call": 220.687676
+        }
+      },
+      "encoding_iteration_speedup": 1.0025798557570123,
+      "decoding_iteration_speedup": 1.5373622050622362,
+      "combined_speedup": 1.541328377797579,
+      "final_over_reference_latency": {
+        "base64_scalar": 5.811879639422709,
+        "base64_simd": 8.906021389601356
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.5377265066708525,
+        "base64_simd": 1.5397788627753684
+      }
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 4096,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1552.652742,
+          "min_ns_per_call": 1541.665796,
+          "max_ns_per_call": 1616.840731
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 1554.613577,
+          "min_ns_per_call": 1540.143603,
+          "max_ns_per_call": 1627.065274
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 1545.691906,
+          "min_ns_per_call": 1538.4047,
+          "max_ns_per_call": 1652.960836
+        }
+      },
+      "encoding_iteration_speedup": 0.998738699424082,
+      "decoding_iteration_speedup": 1.0057719594476546,
+      "combined_speedup": 1.0045033786959612
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 4096,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 717.798956,
+          "min_ns_per_call": 713.446475,
+          "max_ns_per_call": 746.736292
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 719.214099,
+          "min_ns_per_call": 714.425587,
+          "max_ns_per_call": 764.143603
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 718.232376,
+          "min_ns_per_call": 713.989556,
+          "max_ns_per_call": 772.519582
+        }
+      },
+      "encoding_iteration_speedup": 0.9980323758920081,
+      "decoding_iteration_speedup": 1.0013668598531682,
+      "combined_speedup": 0.9993965462787769
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 21337.357702,
+          "min_ns_per_call": 21132.725849,
+          "max_ns_per_call": 21839.751958
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 21322.563969,
+          "min_ns_per_call": 21069.190601,
+          "max_ns_per_call": 21598.020888
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 12263.490862,
+          "min_ns_per_call": 12191.689295,
+          "max_ns_per_call": 15939.078329
+        }
+      },
+      "encoding_iteration_speedup": 1.0006938064775657,
+      "decoding_iteration_speedup": 1.73870264257877,
+      "combined_speedup": 1.7399089657347517,
+      "final_over_reference_latency": {
+        "base64_scalar": 7.933981419192345,
+        "base64_simd": 17.074544773793377
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.732108624655388,
+        "base64_simd": 1.7409595542562666
+      }
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 262144,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 99308.2,
+          "min_ns_per_call": 98375.0,
+          "max_ns_per_call": 130000.0
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 99383.4,
+          "min_ns_per_call": 97908.4,
+          "max_ns_per_call": 103741.6
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 99008.4,
+          "min_ns_per_call": 98241.8,
+          "max_ns_per_call": 111291.6
+        }
+      },
+      "encoding_iteration_speedup": 0.9992433343999099,
+      "decoding_iteration_speedup": 1.0037875574193704,
+      "combined_speedup": 1.0030280259048727
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 262144,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 45425.0,
+          "min_ns_per_call": 44800.0,
+          "max_ns_per_call": 49508.4
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 45525.0,
+          "min_ns_per_call": 44833.4,
+          "max_ns_per_call": 48825.0
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 45616.6,
+          "min_ns_per_call": 44825.0,
+          "max_ns_per_call": 47658.4
+        }
+      },
+      "encoding_iteration_speedup": 0.9978034047226798,
+      "decoding_iteration_speedup": 0.9979919590675325,
+      "combined_speedup": 0.9957997746434413
+    },
+    {
+      "workload": "base64_decode",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1364983.4,
+          "min_ns_per_call": 1352366.6,
+          "max_ns_per_call": 1441508.2
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 1365041.6,
+          "min_ns_per_call": 1353141.8,
+          "max_ns_per_call": 1386141.8
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 787833.4,
+          "min_ns_per_call": 780241.8,
+          "max_ns_per_call": 813041.6
+        }
+      },
+      "encoding_iteration_speedup": 0.9999573639367473,
+      "decoding_iteration_speedup": 1.7326526141186704,
+      "combined_speedup": 1.7325787406322197,
+      "final_over_reference_latency": {
+        "base64_scalar": 7.957237971727652,
+        "base64_simd": 17.270761082588358
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.7273482852776616,
+        "base64_simd": 1.739886656685167
+      }
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 8,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 21.0775,
+          "min_ns_per_call": 17.90332,
+          "max_ns_per_call": 24.45832
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 20.94584,
+          "min_ns_per_call": 19.09582,
+          "max_ns_per_call": 26.69916
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 21.93666,
+          "min_ns_per_call": 19.08666,
+          "max_ns_per_call": 23.6975
+        }
+      },
+      "encoding_iteration_speedup": 1.0062857350194596,
+      "decoding_iteration_speedup": 0.9548326864709578,
+      "combined_speedup": 0.9608345117260331
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 8,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 18.39334,
+          "min_ns_per_call": 17.28416,
+          "max_ns_per_call": 21.53666
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 19.01584,
+          "min_ns_per_call": 17.56916,
+          "max_ns_per_call": 22.0725
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 18.11166,
+          "min_ns_per_call": 17.20416,
+          "max_ns_per_call": 19.75916
+        }
+      },
+      "encoding_iteration_speedup": 0.9672641334802984,
+      "decoding_iteration_speedup": 1.0499225360900106,
+      "combined_speedup": 1.0155524120925414
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 24.65916,
+          "min_ns_per_call": 24.31834,
+          "max_ns_per_call": 26.075
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 24.6075,
+          "min_ns_per_call": 24.28,
+          "max_ns_per_call": 25.48334
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 14.8125,
+          "min_ns_per_call": 14.74,
+          "max_ns_per_call": 24.71166
+        }
+      },
+      "encoding_iteration_speedup": 1.0020993599512342,
+      "decoding_iteration_speedup": 1.6612658227848103,
+      "combined_speedup": 1.664753417721519,
+      "final_over_reference_latency": {
+        "base64_scalar": 0.675239530539289,
+        "base64_simd": 0.817843311987968
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.7326120132081575,
+        "base64_simd": 1.6392589864380327
+      }
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 64,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 36.417901,
+          "min_ns_per_call": 36.083966,
+          "max_ns_per_call": 39.360497
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 36.312996,
+          "min_ns_per_call": 36.094457,
+          "max_ns_per_call": 37.342831
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 36.225547,
+          "min_ns_per_call": 36.075196,
+          "max_ns_per_call": 41.334438
+        }
+      },
+      "encoding_iteration_speedup": 1.0028889106258267,
+      "decoding_iteration_speedup": 1.002414014617916,
+      "combined_speedup": 1.0053098991162233
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 64,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 23.283748,
+          "min_ns_per_call": 23.154379,
+          "max_ns_per_call": 24.275104
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 23.327473,
+          "min_ns_per_call": 23.138643,
+          "max_ns_per_call": 24.054803
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 23.241786,
+          "min_ns_per_call": 23.159582,
+          "max_ns_per_call": 23.916663
+        }
+      },
+      "encoding_iteration_speedup": 0.9981256006597885,
+      "decoding_iteration_speedup": 1.0036867648639394,
+      "combined_speedup": 1.0018054550540996
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 161.508791,
+          "min_ns_per_call": 160.356594,
+          "max_ns_per_call": 177.499895
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 161.849776,
+          "min_ns_per_call": 160.639839,
+          "max_ns_per_call": 164.433931
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 98.787672,
+          "min_ns_per_call": 98.184424,
+          "max_ns_per_call": 103.18841
+        }
+      },
+      "encoding_iteration_speedup": 0.99789320066776,
+      "decoding_iteration_speedup": 1.6383600577205624,
+      "combined_speedup": 1.6349083618449882,
+      "final_over_reference_latency": {
+        "base64_scalar": 2.727016710058236,
+        "base64_simd": 4.250433766148608
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.6262730161935643,
+        "base64_simd": 1.6319619279341018
+      }
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 4096,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1546.780679,
+          "min_ns_per_call": 1539.490862,
+          "max_ns_per_call": 1621.629243
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 1559.616188,
+          "min_ns_per_call": 1540.796345,
+          "max_ns_per_call": 1690.490862
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 1558.856397,
+          "min_ns_per_call": 1537.642298,
+          "max_ns_per_call": 3063.859008
+        }
+      },
+      "encoding_iteration_speedup": 0.9917700847819104,
+      "decoding_iteration_speedup": 1.0004874028175155,
+      "combined_speedup": 0.9922534763155608
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 4096,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 716.057441,
+          "min_ns_per_call": 712.903394,
+          "max_ns_per_call": 766.535248
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 720.626632,
+          "min_ns_per_call": 712.577023,
+          "max_ns_per_call": 766.101828
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 718.994778,
+          "min_ns_per_call": 713.010444,
+          "max_ns_per_call": 774.911227
+        }
+      },
+      "encoding_iteration_speedup": 0.9936594197367938,
+      "decoding_iteration_speedup": 1.0022696326175542,
+      "combined_speedup": 0.9959146615665685
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 10349.43342,
+          "min_ns_per_call": 10285.574413,
+          "max_ns_per_call": 10556.02611
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 10415.903394,
+          "min_ns_per_call": 10297.976501,
+          "max_ns_per_call": 10963.556136
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 5588.010444,
+          "min_ns_per_call": 5530.24282,
+          "max_ns_per_call": 5877.501305
+        }
+      },
+      "encoding_iteration_speedup": 0.9936184148906094,
+      "decoding_iteration_speedup": 1.863973501549884,
+      "combined_speedup": 1.8520783960080947,
+      "final_over_reference_latency": {
+        "base64_scalar": 3.5846858342782935,
+        "base64_simd": 7.771976396746513
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.866537573529335,
+        "base64_simd": 1.8596758010317724
+      }
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 262144,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 99091.6,
+          "min_ns_per_call": 98158.4,
+          "max_ns_per_call": 104358.2
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 99058.4,
+          "min_ns_per_call": 98241.6,
+          "max_ns_per_call": 103191.6
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 99258.4,
+          "min_ns_per_call": 98066.6,
+          "max_ns_per_call": 105433.2
+        }
+      },
+      "encoding_iteration_speedup": 1.0003351558272697,
+      "decoding_iteration_speedup": 0.9979850571840772,
+      "combined_speedup": 0.9983195376915205
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 262144,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 45441.8,
+          "min_ns_per_call": 44858.4,
+          "max_ns_per_call": 53550.0
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 45416.6,
+          "min_ns_per_call": 44808.4,
+          "max_ns_per_call": 48416.8
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 45658.4,
+          "min_ns_per_call": 44775.0,
+          "max_ns_per_call": 48508.2
+        }
+      },
+      "encoding_iteration_speedup": 1.0005548631997994,
+      "decoding_iteration_speedup": 0.9947041508243828,
+      "combined_speedup": 0.9952560755523628
+    },
+    {
+      "workload": "base64_decode_late_invalid",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 665983.4,
+          "min_ns_per_call": 657750.0,
+          "max_ns_per_call": 737150.0
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 665825.0,
+          "min_ns_per_call": 658158.4,
+          "max_ns_per_call": 689725.0
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 357708.2,
+          "min_ns_per_call": 353433.4,
+          "max_ns_per_call": 365725.0
+        }
+      },
+      "encoding_iteration_speedup": 1.0002379003491908,
+      "decoding_iteration_speedup": 1.8613635359770897,
+      "combined_speedup": 1.8618063550122699,
+      "final_over_reference_latency": {
+        "base64_scalar": 3.6038078389335313,
+        "base64_simd": 7.834444483380933
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.864940316922422,
+        "base64_simd": 1.8706807230279658
+      }
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 8,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 20.705,
+          "min_ns_per_call": 18.65084,
+          "max_ns_per_call": 25.04832
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 25.135,
+          "min_ns_per_call": 20.93834,
+          "max_ns_per_call": 27.10416
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 24.01666,
+          "min_ns_per_call": 20.9725,
+          "max_ns_per_call": 66.03
+        }
+      },
+      "encoding_iteration_speedup": 0.8237517406007558,
+      "decoding_iteration_speedup": 1.0465651760069885,
+      "combined_speedup": 0.8621098853878931
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 8,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 19.91416,
+          "min_ns_per_call": 19.20668,
+          "max_ns_per_call": 21.71668
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 20.1175,
+          "min_ns_per_call": 19.545,
+          "max_ns_per_call": 25.93
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 19.96584,
+          "min_ns_per_call": 18.86916,
+          "max_ns_per_call": 22.49666
+        }
+      },
+      "encoding_iteration_speedup": 0.9898923822542562,
+      "decoding_iteration_speedup": 1.0075959739234612,
+      "combined_speedup": 0.9974115789768925
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 23.28584,
+          "min_ns_per_call": 22.81834,
+          "max_ns_per_call": 24.86584
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 23.22332,
+          "min_ns_per_call": 22.81668,
+          "max_ns_per_call": 25.39416
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 15.1375,
+          "min_ns_per_call": 15.06668,
+          "max_ns_per_call": 15.39334
+        }
+      },
+      "encoding_iteration_speedup": 1.0026921215399003,
+      "decoding_iteration_speedup": 1.534158216350124,
+      "combined_speedup": 1.5382883567299752,
+      "final_over_reference_latency": {
+        "base64_scalar": 0.6302916392204411,
+        "base64_simd": 0.7581699542819135
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.7843297969351624,
+        "base64_simd": 1.5422804278128532
+      }
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 64,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 37.386513,
+          "min_ns_per_call": 37.229197,
+          "max_ns_per_call": 38.624397
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 37.397004,
+          "min_ns_per_call": 37.152239,
+          "max_ns_per_call": 39.196131
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 37.428476,
+          "min_ns_per_call": 37.150476,
+          "max_ns_per_call": 39.147203
+        }
+      },
+      "encoding_iteration_speedup": 0.9997194695061669,
+      "decoding_iteration_speedup": 0.9991591428943032,
+      "combined_speedup": 0.9988788482865292
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 64,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 24.338047,
+          "min_ns_per_call": 24.245395,
+          "max_ns_per_call": 24.859091
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 24.50065,
+          "min_ns_per_call": 24.241912,
+          "max_ns_per_call": 25.457052
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 24.359028,
+          "min_ns_per_call": 24.26113,
+          "max_ns_per_call": 25.404599
+        }
+      },
+      "encoding_iteration_speedup": 0.9933633189323549,
+      "decoding_iteration_speedup": 1.0058139429865594,
+      "combined_speedup": 0.9991386766335668
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 161.989635,
+          "min_ns_per_call": 160.599639,
+          "max_ns_per_call": 216.283412
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 162.445974,
+          "min_ns_per_call": 160.722043,
+          "max_ns_per_call": 166.247031
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 99.439805,
+          "min_ns_per_call": 98.93798,
+          "max_ns_per_call": 101.120054
+        }
+      },
+      "encoding_iteration_speedup": 0.9971908260404163,
+      "decoding_iteration_speedup": 1.6336111479703725,
+      "combined_speedup": 1.6290220500734085,
+      "final_over_reference_latency": {
+        "base64_scalar": 2.656795457020478,
+        "base64_simd": 4.082256689388427
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.6308504808844668,
+        "base64_simd": 1.6304263744069343
+      }
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 4096,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1551.130548,
+          "min_ns_per_call": 1542.211488,
+          "max_ns_per_call": 1604.331593
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 1556.678851,
+          "min_ns_per_call": 1539.490862,
+          "max_ns_per_call": 1627.065274
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 1545.475196,
+          "min_ns_per_call": 1539.597911,
+          "max_ns_per_call": 1610.096606
+        }
+      },
+      "encoding_iteration_speedup": 0.9964358075550165,
+      "decoding_iteration_speedup": 1.0072493269571696,
+      "combined_speedup": 1.0036592965158142
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 4096,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 717.798956,
+          "min_ns_per_call": 713.882507,
+          "max_ns_per_call": 1125.759791
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 718.885117,
+          "min_ns_per_call": 714.099217,
+          "max_ns_per_call": 765.775457
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 715.73107,
+          "min_ns_per_call": 713.882507,
+          "max_ns_per_call": 736.511749
+        }
+      },
+      "encoding_iteration_speedup": 0.998489103509984,
+      "decoding_iteration_speedup": 1.0044067487527124,
+      "combined_speedup": 1.0028891941214735
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 10358.138381,
+          "min_ns_per_call": 10280.569191,
+          "max_ns_per_call": 11666.122715
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 10362.16188,
+          "min_ns_per_call": 10272.629243,
+          "max_ns_per_call": 10775.673629
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 5563.096606,
+          "min_ns_per_call": 5530.45953,
+          "max_ns_per_call": 5791.339426
+        }
+      },
+      "encoding_iteration_speedup": 0.9996117123968344,
+      "decoding_iteration_speedup": 1.8626607829934203,
+      "combined_speedup": 1.8619375349024814,
+      "final_over_reference_latency": {
+        "base64_scalar": 3.599602646744775,
+        "base64_simd": 7.7726073928857105
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.8551489946500421,
+        "base64_simd": 1.8565735335632272
+      }
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 262144,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 99208.2,
+          "min_ns_per_call": 98316.6,
+          "max_ns_per_call": 107733.2
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 99166.8,
+          "min_ns_per_call": 97950.0,
+          "max_ns_per_call": 107208.4
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 99300.0,
+          "min_ns_per_call": 98091.6,
+          "max_ns_per_call": 103091.6
+        }
+      },
+      "encoding_iteration_speedup": 1.000417478430281,
+      "decoding_iteration_speedup": 0.9986586102719034,
+      "combined_speedup": 0.9990755287009063
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 262144,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 45583.2,
+          "min_ns_per_call": 44900.0,
+          "max_ns_per_call": 51900.0
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 45641.6,
+          "min_ns_per_call": 44791.6,
+          "max_ns_per_call": 49666.6
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 45375.0,
+          "min_ns_per_call": 44775.0,
+          "max_ns_per_call": 48625.0
+        }
+      },
+      "encoding_iteration_speedup": 0.9987204655402089,
+      "decoding_iteration_speedup": 1.005875482093664,
+      "combined_speedup": 1.004588429752066
+    },
+    {
+      "workload": "base64_decode_small_output",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 663375.0,
+          "min_ns_per_call": 658658.4,
+          "max_ns_per_call": 682000.0
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 665600.0,
+          "min_ns_per_call": 657075.0,
+          "max_ns_per_call": 682866.6
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 356425.0,
+          "min_ns_per_call": 354066.6,
+          "max_ns_per_call": 363400.0
+        }
+      },
+      "encoding_iteration_speedup": 0.9966571514423077,
+      "decoding_iteration_speedup": 1.8674335414182506,
+      "combined_speedup": 1.8611909938977345,
+      "final_over_reference_latency": {
+        "base64_scalar": 3.5893756294058408,
+        "base64_simd": 7.855096418732782
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.862913203687246,
+        "base64_simd": 1.8526900557246904
+      }
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 8,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 9.1575,
+          "min_ns_per_call": 9.09334,
+          "max_ns_per_call": 10.23084
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 9.18834,
+          "min_ns_per_call": 9.1025,
+          "max_ns_per_call": 9.48668
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 9.12832,
+          "min_ns_per_call": 9.09584,
+          "max_ns_per_call": 9.4375
+        }
+      },
+      "encoding_iteration_speedup": 0.9966435721795233,
+      "decoding_iteration_speedup": 1.0065751419757414,
+      "combined_speedup": 1.0031966451658136
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 8,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 9.44166,
+          "min_ns_per_call": 9.375,
+          "max_ns_per_call": 10.04666
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 9.44582,
+          "min_ns_per_call": 9.37416,
+          "max_ns_per_call": 9.73
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 9.4325,
+          "min_ns_per_call": 9.37084,
+          "max_ns_per_call": 9.98832
+        }
+      },
+      "encoding_iteration_speedup": 0.9995595935556681,
+      "decoding_iteration_speedup": 1.0014121388815267,
+      "combined_speedup": 1.000971110522131
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 17.36332,
+          "min_ns_per_call": 17.29666,
+          "max_ns_per_call": 24.5775
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 10.0975,
+          "min_ns_per_call": 10.01668,
+          "max_ns_per_call": 10.32168
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 10.08416,
+          "min_ns_per_call": 10.02166,
+          "max_ns_per_call": 10.65416
+        }
+      },
+      "encoding_iteration_speedup": 1.7195662292646696,
+      "decoding_iteration_speedup": 1.0013228667534033,
+      "combined_speedup": 1.7218409862596389,
+      "final_over_reference_latency": {
+        "base64_scalar": 1.1047114912711211,
+        "base64_simd": 1.0690866684336073
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.71635441023135,
+        "base64_simd": 1.720170510576958
+      }
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 64,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 29.299408,
+          "min_ns_per_call": 29.127747,
+          "max_ns_per_call": 30.186981
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 29.223114,
+          "min_ns_per_call": 29.083252,
+          "max_ns_per_call": 30.115784
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 29.35791,
+          "min_ns_per_call": 29.093414,
+          "max_ns_per_call": 30.338287
+        }
+      },
+      "encoding_iteration_speedup": 1.0026107416204857,
+      "decoding_iteration_speedup": 0.9954085287406358,
+      "combined_speedup": 0.9980072832160055
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 64,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 29.184967,
+          "min_ns_per_call": 29.069275,
+          "max_ns_per_call": 30.291229
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 29.495239,
+          "min_ns_per_call": 29.313385,
+          "max_ns_per_call": 30.484528
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 29.565186,
+          "min_ns_per_call": 29.401154,
+          "max_ns_per_call": 30.199677
+        }
+      },
+      "encoding_iteration_speedup": 0.9894806073617508,
+      "decoding_iteration_speedup": 0.997634143076252,
+      "combined_speedup": 0.9871396378159095
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 109.160095,
+          "min_ns_per_call": 108.436584,
+          "max_ns_per_call": 110.881805
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 66.710144,
+          "min_ns_per_call": 66.094727,
+          "max_ns_per_call": 68.33902
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 66.922485,
+          "min_ns_per_call": 66.350311,
+          "max_ns_per_call": 68.096161
+        }
+      },
+      "encoding_iteration_speedup": 1.6363342732403636,
+      "decoding_iteration_speedup": 0.9968270604416438,
+      "combined_speedup": 1.6311422834941052,
+      "final_over_reference_latency": {
+        "base64_scalar": 2.2795384616956724,
+        "base64_simd": 2.2635570430708603
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.634399178168188,
+        "base64_simd": 1.6523926514622391
+      }
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 4096,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 1413.900391,
+          "min_ns_per_call": 1407.796875,
+          "max_ns_per_call": 1445.068359
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 1418.294922,
+          "min_ns_per_call": 1406.982422,
+          "max_ns_per_call": 1475.910156
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 1414.388672,
+          "min_ns_per_call": 1406.820312,
+          "max_ns_per_call": 1447.833984
+        }
+      },
+      "encoding_iteration_speedup": 0.9969015393541681,
+      "decoding_iteration_speedup": 1.0027617938953628,
+      "combined_speedup": 0.9996547759398343
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 4096,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 488.199219,
+          "min_ns_per_call": 484.212891,
+          "max_ns_per_call": 514.486328
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 487.060547,
+          "min_ns_per_call": 484.212891,
+          "max_ns_per_call": 517.822266
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 486.328125,
+          "min_ns_per_call": 484.537109,
+          "max_ns_per_call": 516.925781
+        }
+      },
+      "encoding_iteration_speedup": 1.0023378448675706,
+      "decoding_iteration_speedup": 1.0015060243534135,
+      "combined_speedup": 1.0038473900722893
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 6774.902344,
+          "min_ns_per_call": 6710.125,
+          "max_ns_per_call": 6904.785156
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 3507.324219,
+          "min_ns_per_call": 3475.341797,
+          "max_ns_per_call": 3568.197266
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 3499.591797,
+          "min_ns_per_call": 3480.388672,
+          "max_ns_per_call": 3628.417969
+        }
+      },
+      "encoding_iteration_speedup": 1.9316441597553944,
+      "decoding_iteration_speedup": 1.0022095211237576,
+      "combined_speedup": 1.9359121683299567,
+      "final_over_reference_latency": {
+        "base64_scalar": 2.474278722871446,
+        "base64_simd": 7.195947791421687
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.9365807225898475,
+        "base64_simd": 1.9284925054101576
+      }
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 262144,
+      "implementation": "base64_scalar",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 91276.125,
+          "min_ns_per_call": 87833.25,
+          "max_ns_per_call": 97578.125
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 91500.0,
+          "min_ns_per_call": 87489.625,
+          "max_ns_per_call": 95843.75
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 91187.5,
+          "min_ns_per_call": 87510.375,
+          "max_ns_per_call": 93416.625
+        }
+      },
+      "encoding_iteration_speedup": 0.9975532786885246,
+      "decoding_iteration_speedup": 1.0034270047978067,
+      "combined_speedup": 1.000971898560658
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 262144,
+      "implementation": "base64_simd",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 31078.125,
+          "min_ns_per_call": 30572.875,
+          "max_ns_per_call": 32656.25
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 31062.5,
+          "min_ns_per_call": 30473.875,
+          "max_ns_per_call": 33578.125
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 31026.0,
+          "min_ns_per_call": 30468.75,
+          "max_ns_per_call": 37036.5
+        }
+      },
+      "encoding_iteration_speedup": 1.0005030181086518,
+      "decoding_iteration_speedup": 1.0011764326693742,
+      "combined_speedup": 1.0016800425449623
+    },
+    {
+      "workload": "base64_encode",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 433541.75,
+          "min_ns_per_call": 431208.375,
+          "max_ns_per_call": 444718.75
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 224359.375,
+          "min_ns_per_call": 222468.75,
+          "max_ns_per_call": 234599.0
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 225609.375,
+          "min_ns_per_call": 222849.0,
+          "max_ns_per_call": 233755.25
+        }
+      },
+      "encoding_iteration_speedup": 1.9323540636534577,
+      "decoding_iteration_speedup": 0.9944594501004225,
+      "combined_speedup": 1.9216477595401344,
+      "final_over_reference_latency": {
+        "base64_scalar": 2.4741261137765593,
+        "base64_simd": 7.271622993618256
+      },
+      "reference_normalized_combined_speedup": {
+        "base64_scalar": 1.9197819262492355,
+        "base64_simd": 1.918424724383862
+      }
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 8,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 4.79168,
+          "min_ns_per_call": 4.77582,
+          "max_ns_per_call": 5.18832
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 4.79166,
+          "min_ns_per_call": 4.775,
+          "max_ns_per_call": 4.92334
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 4.7925,
+          "min_ns_per_call": 4.775,
+          "max_ns_per_call": 4.9925
+        }
+      },
+      "encoding_iteration_speedup": 1.0000041739188508,
+      "decoding_iteration_speedup": 0.9998247261345853,
+      "combined_speedup": 0.999828899321857
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 12.57334,
+          "min_ns_per_call": 12.49834,
+          "max_ns_per_call": 13.25082
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 12.53166,
+          "min_ns_per_call": 12.4875,
+          "max_ns_per_call": 13.08666
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 12.52834,
+          "min_ns_per_call": 12.49,
+          "max_ns_per_call": 13.06582
+        }
+      },
+      "encoding_iteration_speedup": 1.003325975968068,
+      "decoding_iteration_speedup": 1.0002649991938277,
+      "combined_speedup": 1.003591856542846,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.6141554512258733
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 1.0037636011757025
+      }
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 64,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 8.488057,
+          "min_ns_per_call": 8.452683,
+          "max_ns_per_call": 8.547065
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 8.476255,
+          "min_ns_per_call": 8.446105,
+          "max_ns_per_call": 9.606609
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 8.49989,
+          "min_ns_per_call": 8.448718,
+          "max_ns_per_call": 8.714902
+        }
+      },
+      "encoding_iteration_speedup": 1.0013923601873704,
+      "decoding_iteration_speedup": 0.9972193757801571,
+      "combined_speedup": 0.9986078643370677
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 17.157073,
+          "min_ns_per_call": 17.086294,
+          "max_ns_per_call": 18.846042
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 17.150559,
+          "min_ns_per_call": 17.08236,
+          "max_ns_per_call": 17.908482
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 17.188576,
+          "min_ns_per_call": 17.098065,
+          "max_ns_per_call": 17.602927
+        }
+      },
+      "encoding_iteration_speedup": 1.0003798126929857,
+      "decoding_iteration_speedup": 0.9977882402823829,
+      "combined_speedup": 0.998167212920954,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.0222115815616437
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 0.9995587342821436
+      }
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 4096,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 74.984283,
+          "min_ns_per_call": 70.400786,
+          "max_ns_per_call": 107.072692
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 74.410609,
+          "min_ns_per_call": 69.090373,
+          "max_ns_per_call": 89.636542
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 71.383104,
+          "min_ns_per_call": 68.516699,
+          "max_ns_per_call": 78.831041
+        }
+      },
+      "encoding_iteration_speedup": 1.0077095727035377,
+      "decoding_iteration_speedup": 1.0424120671468697,
+      "combined_speedup": 1.0504486187655835
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 144.155206,
+          "min_ns_per_call": 143.335953,
+          "max_ns_per_call": 146.856582
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 146.284872,
+          "min_ns_per_call": 144.235756,
+          "max_ns_per_call": 163.310413
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 143.909627,
+          "min_ns_per_call": 143.255403,
+          "max_ns_per_call": 159.872299
+        }
+      },
+      "encoding_iteration_speedup": 0.9854416525038897,
+      "decoding_iteration_speedup": 1.0165051153943996,
+      "combined_speedup": 1.0017064806929143,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.0160180622013857
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 0.9535987413359183
+      }
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 262144,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 5327.285714,
+          "min_ns_per_call": 5154.714286,
+          "max_ns_per_call": 5636.857143
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 5232.142857,
+          "min_ns_per_call": 4982.142857,
+          "max_ns_per_call": 5958.428571
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 5327.428571,
+          "min_ns_per_call": 5083.285714,
+          "max_ns_per_call": 5815.428571
+        }
+      },
+      "encoding_iteration_speedup": 1.0181843003144897,
+      "decoding_iteration_speedup": 0.9821141264063697,
+      "combined_speedup": 0.9999731846240457
+    },
+    {
+      "workload": "lz4_literals",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 7559.428571,
+          "min_ns_per_call": 7351.285714,
+          "max_ns_per_call": 9619.142857
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 7613.142857,
+          "min_ns_per_call": 7381.0,
+          "max_ns_per_call": 8904.714286
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 7494.142857,
+          "min_ns_per_call": 7381.0,
+          "max_ns_per_call": 7982.142857
+        }
+      },
+      "encoding_iteration_speedup": 0.9929445319746482,
+      "decoding_iteration_speedup": 1.0158790674625113,
+      "combined_speedup": 1.0087115651844052,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.4067092138587398
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 1.0087386148896031
+      }
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 64,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 13.711273,
+          "min_ns_per_call": 13.58667,
+          "max_ns_per_call": 14.460266
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 13.694763,
+          "min_ns_per_call": 13.591766,
+          "max_ns_per_call": 14.710754
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 13.674408,
+          "min_ns_per_call": 13.589203,
+          "max_ns_per_call": 14.331818
+        }
+      },
+      "encoding_iteration_speedup": 1.0012055703337108,
+      "decoding_iteration_speedup": 1.0014885470727508,
+      "combined_speedup": 1.0026959119546528
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 45.735687,
+          "min_ns_per_call": 45.179993,
+          "max_ns_per_call": 47.241211
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 45.544952,
+          "min_ns_per_call": 45.328766,
+          "max_ns_per_call": 47.138214
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 45.506805,
+          "min_ns_per_call": 45.248688,
+          "max_ns_per_call": 46.316772
+        }
+      },
+      "encoding_iteration_speedup": 1.0041878406195268,
+      "decoding_iteration_speedup": 1.0008382702323313,
+      "combined_speedup": 1.005029621393987,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 3.3278811777445867
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 1.0023274348798181
+      }
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 4096,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 63.884766,
+          "min_ns_per_call": 63.476562,
+          "max_ns_per_call": 77.148438
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 63.720703,
+          "min_ns_per_call": 63.394531,
+          "max_ns_per_call": 67.220703
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 63.720703,
+          "min_ns_per_call": 63.394531,
+          "max_ns_per_call": 66.8125
+        }
+      },
+      "encoding_iteration_speedup": 1.0025747204954722,
+      "decoding_iteration_speedup": 1.0,
+      "combined_speedup": 1.0025747204954722
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 120.361328,
+          "min_ns_per_call": 118.408203,
+          "max_ns_per_call": 136.798828
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 119.548828,
+          "min_ns_per_call": 118.978516,
+          "max_ns_per_call": 121.908203
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 119.873047,
+          "min_ns_per_call": 118.490234,
+          "max_ns_per_call": 135.171875
+        }
+      },
+      "encoding_iteration_speedup": 1.0067963861594695,
+      "decoding_iteration_speedup": 0.9972953135995617,
+      "combined_speedup": 1.0040733176658136,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.881226059291907
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 1.0014947486104584
+      }
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 262144,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 4302.125,
+          "min_ns_per_call": 4057.25,
+          "max_ns_per_call": 5130.25
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 4151.0,
+          "min_ns_per_call": 3994.75,
+          "max_ns_per_call": 4359.375
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 4218.75,
+          "min_ns_per_call": 3984.375,
+          "max_ns_per_call": 4369.75
+        }
+      },
+      "encoding_iteration_speedup": 1.0364068899060468,
+      "decoding_iteration_speedup": 0.9839407407407408,
+      "combined_speedup": 1.019762962962963
+    },
+    {
+      "workload": "lz4_overlap",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 6843.75,
+          "min_ns_per_call": 6010.375,
+          "max_ns_per_call": 7520.875
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 6833.375,
+          "min_ns_per_call": 6390.625,
+          "max_ns_per_call": 7224.0
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 6958.375,
+          "min_ns_per_call": 6198.0,
+          "max_ns_per_call": 7234.375
+        }
+      },
+      "encoding_iteration_speedup": 1.001518283425101,
+      "decoding_iteration_speedup": 0.982036035712361,
+      "combined_speedup": 0.983527044748235,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.6493925925925925
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 0.9644663323431134
+      }
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 64,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 11.417389,
+          "min_ns_per_call": 11.388123,
+          "max_ns_per_call": 12.020111
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 11.458069,
+          "min_ns_per_call": 11.388153,
+          "max_ns_per_call": 12.14093
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 11.425018,
+          "min_ns_per_call": 11.386871,
+          "max_ns_per_call": 12.502045
+        }
+      },
+      "encoding_iteration_speedup": 0.9964496635515112,
+      "decoding_iteration_speedup": 1.002892861963106,
+      "combined_speedup": 0.999332254881349
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 9.952545,
+          "min_ns_per_call": 9.915649,
+          "max_ns_per_call": 10.176331
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 10.077148,
+          "min_ns_per_call": 9.99704,
+          "max_ns_per_call": 10.461182
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 9.99707,
+          "min_ns_per_call": 9.93222,
+          "max_ns_per_call": 12.223541
+        }
+      },
+      "encoding_iteration_speedup": 0.9876350927861733,
+      "decoding_iteration_speedup": 1.008010146973063,
+      "combined_speedup": 0.9955461950351453,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 0.8750156892531812
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 0.9962114103415453
+      }
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 4096,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 61.931641,
+          "min_ns_per_call": 60.791016,
+          "max_ns_per_call": 83.171875
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 61.767578,
+          "min_ns_per_call": 61.523438,
+          "max_ns_per_call": 66.080078
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 62.011719,
+          "min_ns_per_call": 61.117188,
+          "max_ns_per_call": 88.623047
+        }
+      },
+      "encoding_iteration_speedup": 1.0026561345824503,
+      "decoding_iteration_speedup": 0.9960629860946122,
+      "combined_speedup": 0.9987086634382769
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 18.230469,
+          "min_ns_per_call": 18.066406,
+          "max_ns_per_call": 39.306641
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 18.148438,
+          "min_ns_per_call": 18.066406,
+          "max_ns_per_call": 18.636719
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 18.230469,
+          "min_ns_per_call": 18.066406,
+          "max_ns_per_call": 30.193359
+        }
+      },
+      "encoding_iteration_speedup": 1.004520003319294,
+      "decoding_iteration_speedup": 0.9955003351806253,
+      "combined_speedup": 1.0,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 0.2939842548148036
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 1.0012930062679917
+      }
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 262144,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 5463.5,
+          "min_ns_per_call": 5130.25,
+          "max_ns_per_call": 8260.375
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 4948.0,
+          "min_ns_per_call": 4635.5,
+          "max_ns_per_call": 5130.25
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 4890.625,
+          "min_ns_per_call": 3531.25,
+          "max_ns_per_call": 5885.5
+        }
+      },
+      "encoding_iteration_speedup": 1.104183508488278,
+      "decoding_iteration_speedup": 1.0117316293929712,
+      "combined_speedup": 1.1171373801916933
+    },
+    {
+      "workload": "lz4_overlap_small_output",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 541.75,
+          "min_ns_per_call": 526.125,
+          "max_ns_per_call": 1291.75
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 536.5,
+          "min_ns_per_call": 526.0,
+          "max_ns_per_call": 567.75
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 536.5,
+          "min_ns_per_call": 520.875,
+          "max_ns_per_call": 13572.875
+        }
+      },
+      "encoding_iteration_speedup": 1.0097856477166822,
+      "decoding_iteration_speedup": 1.0,
+      "combined_speedup": 1.0097856477166822,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 0.1096996805111821
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 0.9039046276863547
+      }
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 8,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 4.79168,
+          "min_ns_per_call": 4.77666,
+          "max_ns_per_call": 4.86
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 4.8025,
+          "min_ns_per_call": 4.77666,
+          "max_ns_per_call": 4.95666
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 4.80084,
+          "min_ns_per_call": 4.77416,
+          "max_ns_per_call": 5.31
+        }
+      },
+      "encoding_iteration_speedup": 0.9977470067673088,
+      "decoding_iteration_speedup": 1.0003457728230893,
+      "combined_speedup": 0.9980920005665675
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 8,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 12.56666,
+          "min_ns_per_call": 12.49834,
+          "max_ns_per_call": 13.01584
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 12.5825,
+          "min_ns_per_call": 12.4875,
+          "max_ns_per_call": 13.01918
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 12.58166,
+          "min_ns_per_call": 12.48666,
+          "max_ns_per_call": 13.17332
+        }
+      },
+      "encoding_iteration_speedup": 0.9987411086826943,
+      "decoding_iteration_speedup": 1.0000667638451524,
+      "combined_speedup": 0.9988077884794218,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.6207205405720666
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 1.0007171562465662
+      }
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 64,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 8.472321,
+          "min_ns_per_call": 8.447427,
+          "max_ns_per_call": 9.169945
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 8.484123,
+          "min_ns_per_call": 8.450039,
+          "max_ns_per_call": 8.62181
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 8.465775,
+          "min_ns_per_call": 8.446105,
+          "max_ns_per_call": 8.741149
+        }
+      },
+      "encoding_iteration_speedup": 0.9986089310586375,
+      "decoding_iteration_speedup": 1.0021673148648529,
+      "combined_speedup": 1.0007732310390958
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 64,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 17.141369,
+          "min_ns_per_call": 17.078426,
+          "max_ns_per_call": 17.894036
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 17.200346,
+          "min_ns_per_call": 17.081039,
+          "max_ns_per_call": 17.558363
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 17.140047,
+          "min_ns_per_call": 17.083651,
+          "max_ns_per_call": 17.675059
+        }
+      },
+      "encoding_iteration_speedup": 0.996571173626391,
+      "decoding_iteration_speedup": 1.003518018357826,
+      "combined_speedup": 1.000077129310089,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 2.024628223641663
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 0.9993044361025885
+      }
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 4096,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 133.380859,
+          "min_ns_per_call": 131.347656,
+          "max_ns_per_call": 135.171875
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 132.8125,
+          "min_ns_per_call": 131.429688,
+          "max_ns_per_call": 136.3125
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 132.894531,
+          "min_ns_per_call": 131.673828,
+          "max_ns_per_call": 153.644531
+        }
+      },
+      "encoding_iteration_speedup": 1.0042794089411764,
+      "decoding_iteration_speedup": 0.9993827360736162,
+      "combined_speedup": 1.0036595034900269
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 4096,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 168.701172,
+          "min_ns_per_call": 163.574219,
+          "max_ns_per_call": 171.548828
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 166.666016,
+          "min_ns_per_call": 161.458984,
+          "max_ns_per_call": 176.675781
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 168.130859,
+          "min_ns_per_call": 165.363281,
+          "max_ns_per_call": 193.685547
+        }
+      },
+      "encoding_iteration_speedup": 1.0122109836716802,
+      "decoding_iteration_speedup": 0.9912874828052833,
+      "combined_speedup": 1.0033920780717598,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.2651450570227
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 0.9997335496576905
+      }
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 262144,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 7942.75,
+          "min_ns_per_call": 7750.0,
+          "max_ns_per_call": 13015.625
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 7802.0,
+          "min_ns_per_call": 7645.875,
+          "max_ns_per_call": 7963.625
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 8026.0,
+          "min_ns_per_call": 7781.25,
+          "max_ns_per_call": 8619.75
+        }
+      },
+      "encoding_iteration_speedup": 1.018040246090746,
+      "decoding_iteration_speedup": 0.9720907052080737,
+      "combined_speedup": 0.9896274607525541
+    },
+    {
+      "workload": "lz4_upstream_compressed",
+      "logical_bytes": 262144,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 8531.25,
+          "min_ns_per_call": 8270.875,
+          "max_ns_per_call": 13833.25
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 8343.75,
+          "min_ns_per_call": 8104.125,
+          "max_ns_per_call": 8557.25
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 8630.125,
+          "min_ns_per_call": 8458.375,
+          "max_ns_per_call": 10531.25
+        }
+      },
+      "encoding_iteration_speedup": 1.0224719101123596,
+      "decoding_iteration_speedup": 0.9668168189916136,
+      "combined_speedup": 0.9885430396431106,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.075270994268627
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 0.9989042127947633
+      }
+    },
+    {
+      "workload": "lz4_zero_offset",
+      "logical_bytes": 0,
+      "implementation": "lz4_flex_safe",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 3.49666,
+          "min_ns_per_call": 3.48916,
+          "max_ns_per_call": 4.12
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 3.49584,
+          "min_ns_per_call": 3.48916,
+          "max_ns_per_call": 3.64584
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 3.49832,
+          "min_ns_per_call": 3.48918,
+          "max_ns_per_call": 3.68582
+        }
+      },
+      "encoding_iteration_speedup": 1.0002345645109616,
+      "decoding_iteration_speedup": 0.9992910882938095,
+      "combined_speedup": 0.9995254865192434
+    },
+    {
+      "workload": "lz4_zero_offset",
+      "logical_bytes": 0,
+      "implementation": "proven",
+      "stages": {
+        "baseline": {
+          "samples": 27,
+          "median_ns_per_call": 5.035,
+          "min_ns_per_call": 5.01834,
+          "max_ns_per_call": 5.32166
+        },
+        "encoding": {
+          "samples": 27,
+          "median_ns_per_call": 5.04418,
+          "min_ns_per_call": 5.01834,
+          "max_ns_per_call": 5.58584
+        },
+        "decoding": {
+          "samples": 27,
+          "median_ns_per_call": 5.03082,
+          "min_ns_per_call": 5.02,
+          "max_ns_per_call": 5.18
+        }
+      },
+      "encoding_iteration_speedup": 0.9981800808059983,
+      "decoding_iteration_speedup": 1.002655630692412,
+      "combined_speedup": 1.0008308784651407,
+      "final_over_reference_latency": {
+        "lz4_flex_safe": 1.4380674152164468
+      },
+      "reference_normalized_combined_speedup": {
+        "lz4_flex_safe": 1.001306011666039
+      }
+    }
+  ],
+  "unchanged_contract_manifest": {
+    "src/base64.rs": {
+      "public_specifications": [
+        "symbol",
+        "value",
+        "quantum",
+        "encoded",
+        "unquantum",
+        "first",
+        "decoded"
+      ],
+      "public_executable_contracts": [
+        "encode_into",
+        "decode_into"
+      ],
+      "exact_text_sha256": "0fc1cd581f93e2af5516a1987624be804c79a806a0aa6405420b48b0b2da3334"
+    },
+    "src/lz4.rs": {
+      "public_specifications": [
+        "add_length",
+        "extension",
+        "length_field",
+        "segment",
+        "matched",
+        "block_state",
+        "decoded"
+      ],
+      "public_executable_contracts": [
+        "decompress_block_into"
+      ],
+      "exact_text_sha256": "962819b33908017440a80baeeb92b8ff6fb01c55f5341001187cdab41e080053"
+    }
+  },
+  "current_compatibility_report": {
+    "path": "evidence/tables-upstream-comparison.json",
+    "sha256": "9b48cf8544136b219f42ae53b79f3bebe8efe546363ddbed971c1a965d6c3be4",
+    "comparison_invocations": 151860,
+    "added_byte_position_cases": 1024
+  },
+  "historical_compatibility_report": {
+    "path": "evidence/upstream-comparison.json",
+    "sha256": "9905318169b00f0a2aeafca7aa0935ac77cde0efe857cccf584d66fba9a6c0e6",
+    "comparison_invocations": 150836
+  },
+  "limits": [
+    "Three processes and 27 batch-average samples per configuration per stage on one host.",
+    "No single-request tail latency or cross-machine guarantee.",
+    "Lookup-table access is not a cryptographic constant-time guarantee.",
+    "Compiler, modeled library operations, verifier/solver, operating system, and hardware remain in the documented trusted boundary."
+  ]
+}

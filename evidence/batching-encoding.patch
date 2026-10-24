@@ -1,0 +1,112 @@
+diff --git a/src/base64.rs b/src/base64.rs
+index de2617e..6cbc360 100644
+--- a/src/base64.rs
++++ b/src/base64.rs
+@@ -153,0 +154,48 @@ fn make_quantum(input: &[u8], i: usize) -> (r: (usize, [u8; 4]))
++#[verifier::bit_vector]
++proof fn encode_batch_bits(a: u8, b: u8, c: u8, d: u8, e: u8, f: u8, packed: u64)
++    requires packed == ((a as u64) << 40) | ((b as u64) << 32)
++        | ((c as u64) << 24) | ((d as u64) << 16) | ((e as u64) << 8) | f as u64,
++    ensures packed < 0x1_0000_0000_0000u64,
++        ((packed >> 42) & 63) < 64, ((packed >> 42) & 63) as u8 == a / 4,
++        ((packed >> 36) & 63) < 64, ((packed >> 36) & 63) as u8 == (a % 4) * 16 + b / 16,
++        ((packed >> 30) & 63) < 64, ((packed >> 30) & 63) as u8 == (b % 16) * 4 + c / 64,
++        ((packed >> 24) & 63) < 64, ((packed >> 24) & 63) as u8 == c % 64,
++        ((packed >> 18) & 63) < 64, ((packed >> 18) & 63) as u8 == d / 4,
++        ((packed >> 12) & 63) < 64, ((packed >> 12) & 63) as u8 == (d % 4) * 16 + e / 16,
++        ((packed >> 6) & 63) < 64, ((packed >> 6) & 63) as u8 == (e % 16) * 4 + f / 64,
++        (packed & 63) < 64, (packed & 63) as u8 == f % 64,
++{}
++
++// Two complete groups, packed explicitly so host endianness is irrelevant.
++fn make_batch(input: &[u8], i: usize) -> (r: [u8; 8])
++    requires i <= input.len(), input.len() - i >= 6,
++    ensures r@ == quantum(input@.subrange(i as int, i as int + 3))
++        + quantum(input@.subrange(i as int + 3, i as int + 6)),
++{
++    let a = input[i];
++    let b = input[i + 1];
++    let c = input[i + 2];
++    let d = input[i + 3];
++    let e = input[i + 4];
++    let f = input[i + 5];
++    let packed = ((a as u64) << 40) | ((b as u64) << 32)
++        | ((c as u64) << 24) | ((d as u64) << 16)
++        | ((e as u64) << 8) | f as u64;
++    proof { encode_batch_bits(a, b, c, d, e, f, packed); }
++    let v0 = ((packed >> 42) & 63) as u8;
++    let v1 = ((packed >> 36) & 63) as u8;
++    let v2 = ((packed >> 30) & 63) as u8;
++    let v3 = ((packed >> 24) & 63) as u8;
++    let v4 = ((packed >> 18) & 63) as u8;
++    let v5 = ((packed >> 12) & 63) as u8;
++    let v6 = ((packed >> 6) & 63) as u8;
++    let v7 = (packed & 63) as u8;
++    let bytes = [to_symbol(v0), to_symbol(v1), to_symbol(v2), to_symbol(v3),
++        to_symbol(v4), to_symbol(v5), to_symbol(v6), to_symbol(v7)];
++    proof {
++        assert(bytes@ =~= quantum(input@.subrange(i as int, i as int + 3))
++            + quantum(input@.subrange(i as int + 3, i as int + 6)));
++    }
++    bytes
++}
++
+@@ -264,0 +313,20 @@ pub fn encode_into(input: &[u8], output: &mut [u8]) -> (r: Result<usize, Error>)
++    while input.len() - i >= 6
++        invariant i <= input.len(), i % 3 == 0, j <= n <= output.len(),
++            n == encoded(input@).len(), j == encoded(input@.take(i as int)).len(),
++            written(before, output@, encoded(input@.take(i as int))),
++        decreases input.len() - i,
++    {
++        let bytes = make_batch(input, i);
++        proof {
++            encoded_step(input@, i as int, 3);
++            encoded_step(input@, i as int + 3, 3);
++            assert(encoded(input@.take(i as int + 6))
++                =~= encoded(input@.take(i as int)) + bytes@);
++        }
++        let ghost current = output@;
++        let ghost prefix = encoded(input@.take(i as int));
++        copy_bytes(&bytes, output, j);
++        proof { extend_written(before, current, output@, prefix, bytes@); }
++        i = i + 6;
++        j = j + 8;
++    }
+diff --git a/tests/proof_rejection.rs b/tests/proof_rejection.rs
+index fd7a37b..1325ea5 100644
+--- a/tests/proof_rejection.rs
++++ b/tests/proof_rejection.rs
+@@ -59 +59 @@ fn transcript(output: &std::process::Output) -> String {
+-fn the_prover_rejects_seven_semantic_and_security_defects() {
++fn the_prover_rejects_eight_semantic_and_security_defects() {
+@@ -93,0 +94,6 @@ fn the_prover_rejects_seven_semantic_and_security_defects() {
++        (
++            "base64-batch-encode-wrong-shift",
++            "base64.rs",
++            "let v0 = ((packed >> 42) & 63) as u8;",
++            "let v0 = ((packed >> 41) & 63) as u8;",
++        ),
+diff --git a/tests/upstream_comparison.rs b/tests/upstream_comparison.rs
+index 7182d1e..cbe5920 100644
+--- a/tests/upstream_comparison.rs
++++ b/tests/upstream_comparison.rs
+@@ -185,0 +186,16 @@ fn upstream_compatibility_and_historical_security_replay() {
++            // Existing generated sizes cover every batch/remainder boundary
++            // through 64. Add a late invalid byte to test validation before writes.
++            if (1..=64).contains(&size) {
++                let mut malformed = text.as_bytes().to_vec();
++                *malformed.last_mut().unwrap() = b'!';
++                for capacity in [0, size, size + 17] {
++                    decode.compare(
++                        "batch_malformed_suffix",
++                        &malformed,
++                        capacity,
++                        base64::decode_into,
++                        upstream_decode,
++                        false,
++                    );
++                }
++            }
+@@ -379 +395 @@ fn upstream_compatibility_and_historical_security_replay() {
+-    fs::write("evidence/tables-upstream-comparison.json", &report).unwrap();
++    fs::write("evidence/batching-upstream-comparison.json", &report).unwrap();

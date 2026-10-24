@@ -1,0 +1,214 @@
+{
+  "project": "Proven Primitives",
+  "license": "Apache-2.0",
+  "verified_utc": "2026-10-24T19:49:13.986339+00:00",
+  "claim": "Proven secure against the specified per-call bounds, output-integrity and prior-destination-disclosure threats for every admitted input and modeled execution under the published contracts and trusted base.",
+  "source_tree_sha256": "b96376da08d98b7433ee47414eadba64ed12feac0d515f1e80bd948b4121b771",
+  "source_sha256": {
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/lib.rs": "12dd8d0e05b5282f85d4ad2566e78949a4dddb3383e47cd3b7a1153fe2d6f471",
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/brotli_input.rs": "6528bb6a4bb95d88db37fbf3b8505e6c9d45a09bd3e83b083e0979e9ca917cfe",
+    "src/brotli_prefix.rs": "e7fff6dc2e274a027958c975241c25eb3bbd4e054210f461fb9b6228e5d84be6",
+    "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
+  },
+  "validation_source_sha256": {
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "bce64e3fb5fa1a3087f3637b205c9fe946fa9635bf7ffc19a40f05d94cc80e6c",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf"
+  },
+  "verifier": {
+    "profile": "release",
+    "version": "0.2026.10.18.7d82994",
+    "platform": {
+      "os": "macos",
+      "arch": "aarch64"
+    },
+    "toolchain": "1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "commit": "7d829946231d6413a398f6e4160cdfe951261dad"
+  },
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 177,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_options": [
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "60",
+    "--time",
+    "--output-json"
+  ],
+  "cargo_verus_release_build": "passed",
+  "release_tests": {
+    "standard_primitive_test_groups_passed": 9,
+    "proof_source_audit_passed": true,
+    "proof_rejection_test_passed": true,
+    "semantic_mutations_rejected": 25,
+    "unchanged_positive_control_verified": 177,
+    "large_input_bytes": 262144,
+    "upstream_comparison_test_passed": true,
+    "brotli_b1_test_groups_passed": 4,
+    "private_rust_test_groups_passed": 16,
+    "pipeline_gate_test_groups_passed": 15
+  },
+  "public_apis": [
+    "base64::encode_into",
+    "base64::decode_into",
+    "percent::encode_into",
+    "percent::decode_into",
+    "lz4::decompress_block_into"
+  ],
+  "proofs": {
+    "base64": [
+      "executable refinement to encoded/decoded byte specifications",
+      "strict canonical padding and trailing bits",
+      "decoded(encoded(bytes)) == Some(bytes)",
+      "encoded(decoded(canonical_text)) == canonical_text",
+      "exact mathematical encoded length = 4 * ((input_length + 2) / 3)",
+      "overflow-safe O(1) encoding size calculation refines the unchanged exact-size contract",
+      "immutable executable alphabet and classification tables refine unchanged mathematical symbol/value functions for every permitted index",
+      "48-bit encoding and decoding batches refine two unchanged group specifications, including packed-value, shift, table and buffer bounds",
+      "OR-based validation of eight nonfinal characters refines two original groups and preserves full-input validation, canonical tail rules and malformed-input priority",
+      "successful encoding/decoding prefixes are independent of prior destination contents under the checked postconditions",
+      "valid decoded length <= 3 * (encoded text length / 4), with text length divisible by four"
+    ],
+    "percent": [
+      "executable refinement to URI-component byte specifications",
+      "decoded(encoded(bytes)) == Some(bytes)",
+      "strict escape errors and literal plus",
+      "successful encoding/decoding prefixes are independent of prior destination contents under the checked postconditions",
+      "input length <= encoded length <= 3 * input length; valid decoded length <= input length"
+    ],
+    "lz4": [
+      "executable refinement to independent raw block specification",
+      "overlapping-match semantics",
+      "backreference and end-condition validation",
+      "abstract byte-work accounting <= 2 * input_length + 2 * output_length",
+      "successful returned prefix is independent of previous destination contents",
+      "offset-one fill refines the unchanged periodic match specification and byte-work bound"
+    ],
+    "all_apis": [
+      "no well-formed-input or destination-size precondition",
+      "checked bounds and arithmetic",
+      "loop termination",
+      "malformed input takes precedence over small output",
+      "destination unchanged on error",
+      "destination suffix unchanged on success"
+    ],
+    "brotli_b1_private_component": [
+      "eight-byte pending queue bounds and exact minimal input consumption",
+      "bit conservation for widths 0 through 56 across append, extraction and compaction",
+      "RFC 7932 normal window-header result for every byte with exact retained payload bits",
+      "retryable empty input versus terminal final truncation and reserved-pattern error",
+      "sticky Complete/Failed states and explicit reset to the initial state",
+      "valid retained bits and header result independent of unused pending storage",
+      "bounded source-level append, extraction, compaction and header transition work"
+    ],
+    "composition_c1": [
+      "exact stage-specific result priority and buffer effects",
+      "current successful Base64 prefix is the only percent-decoder input",
+      "all errors invalidate publication length; success publishes only the current final prefix",
+      "final prefix is independent of unrelated old scratch/output storage",
+      "successful abstract source work <= 21 * input length + 56"
+    ],
+    "brotli_b2_private_component": [
+      "successful prefix tables implement exact canonical codes within fixed storage",
+      "exact code/width matching and RFC block-length ranges",
+      "literal, command and distance switch state remains bounded across suspension and reset",
+      "a switch with one declared type is permanent, sticky and consumes zero decoded fields",
+      "prefix and block-length results connect to the shared switch transition"
+    ]
+  },
+  "trusted_base": [
+    "published specifications and their interpretation of external standards",
+    "Verus and bundled Z3",
+    "Verus proof/erasure macros and modeled Rust/library operations",
+    "Rust compiler",
+    "operating system and hardware execution"
+  ],
+  "not_claimed": [
+    "Brotli output, dictionary, meta-block or streaming decompression correctness",
+    "CVE-2026-111497 block-switch integration proof or historical replay",
+    "LZ4 frame, dictionary or streaming correctness",
+    "Rust replay of the complete CVE-2026-111497 witness",
+    "absence of every conceivable defect",
+    "adopted PP-Security profile or independent specification review",
+    "complete URL security",
+    "complete or supported Brotli decoder",
+    "constant-time cryptographic behavior",
+    "independent expert audit of the specifications",
+    "practical service-wide denial-of-service resistance",
+    "verification of an upstream crate's entire API",
+    "verification of arbitrary caller composition",
+    "verified arbitrary caller/streaming/concurrent call sequences",
+    "verified compiler/OS/hardware or concrete stack-byte capacity"
+  ],
+  "benchmarks": {
+    "host": {
+      "cpu": "Apple M2 Pro",
+      "os": "macOS",
+      "os_version": "26.7.1",
+      "architecture": "aarch64-apple-darwin"
+    },
+    "report": "evidence/validation.json",
+    "sha256": "c283f563519399927ab56eb09bc74484e58d0e794f23f9966d23423e9e0c1655",
+    "note": "Fresh baseline and candidate, three process runs each; warm host batch averages with all raw samples retained. B1 is private and all existing public executable functions/specifications are source-identical to the measured G revision; no B1 performance claim. The current C1/B2 revision was not benchmarked; historical public-routine measurements remain tied to their recorded revision.",
+    "source_bridge": "evidence/brotli-b1.json"
+  },
+  "publication": {
+    "github_repository_created": true,
+    "github_repository_url": "https://github.com/ericksoa/proven-primitives",
+    "github_repository_visibility": "public",
+    "crate_published": false,
+    "ci_service_configured": false
+  },
+  "upstream_comparison": {
+    "report": "evidence/validation.json",
+    "sha256": "f61e78b9edbeaf23361ff84bc218fd93fd411671e2c847c72411d3f9945298cc",
+    "comparison_invocations": 154498,
+    "unexpected_differences": 0,
+    "benchmark_process_runs": 3,
+    "benchmark_batch_samples": 2106,
+    "baseline_process_runs": 3,
+    "baseline_batch_samples": 2106,
+    "historical_lz4_stale_bytes_disclosed": 18,
+    "universal_upstream_equivalence_proved": false
+  },
+  "security_contract_assessment": {
+    "report": "SECURITY_CONTRACTS.md",
+    "sha256": "fe6a7eec1b4bddaf3d98c9f7233dc9a14b375c90b81c7d19f057089b7f77914a",
+    "evidence": "evidence/b2-c1.json",
+    "evidence_sha256": "40648f6a29b552e2ca53a40bbfc12f57725ac745d7924e3e721c46e2b9ca9a1f"
+  },
+  "brotli_b1": {
+    "status": "checked private component; not a complete decoder",
+    "report": "BROTLI_B1.md",
+    "report_sha256": "cb7d83aaab428f5d74b482fd211da4ba65c43f34c52ad93e8b759c32547f8fbe",
+    "evidence": "evidence/brotli-b1.json",
+    "evidence_sha256": "d95ba5a9692c96802f7b2a2f50b710420ce0bb62d1201bcfe2a3881d350e8f9d"
+  },
+  "b2_c1": {
+    "status": "checked private components; no complete Brotli decoder or adopted profile",
+    "evidence": "evidence/b2-c1.json",
+    "evidence_sha256": "40648f6a29b552e2ca53a40bbfc12f57725ac745d7924e3e721c46e2b9ca9a1f"
+  }
+}

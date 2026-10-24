@@ -1,0 +1,3313 @@
+{
+  "func-details": {
+    "vstd::seq::lemma_seq_subrange_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::decoded_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderDecoder::advance_header": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%5::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::decode_batch_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::axiom_array_has_resolved": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::decoded": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::DECODE_TABLE": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::array_len_matches_n": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::leading_byte_width_1": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::has_width_2_encoding": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::raw_ptr::view_reverse_for_eq_sized": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::Seq::empty": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::batch_table_matches": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::composed_prefix_is_independent_of_previous_storage": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::DecodeCaller::new": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%0::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::encoded_prefix_is_independent_of_previous_output": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::arrow_kind": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockKind::as_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::encoded_prefix_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::num::impl&%8::checked_add": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::ops::index::Index::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::leading_bits_width_4": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::PrefixCode::decode_exact": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%20::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::successful_work_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%10::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%4::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::impl&%2::skip": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::arithmetic::power2::lemma2_to64_rest": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::raw_ptr::impl&%2::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::first_code_exec": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::slice::index::impl&%2::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::consume": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::array_as_slice": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::phase_status": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderError::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::state_prefix": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::validation_or_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::option::impl&%0::arrow_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderStatus::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::copy_bytes": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::read_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::encoded_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::spec_array_fill_for_copy_type": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderPhase::arrow_window_size": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%32::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::axiom_spec_slice_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::header_last": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::resolve_type": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::segment": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%14::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::length_of_first_scalar": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderPhase::arrow_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "verus_builtin::impl&%9::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::impl&%2::take": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%7::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::from_hex": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::nonzero_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%12::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::length_of_first_codepoint": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::valid_leading_and_continuation_bytes_first_codepoint": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::decoded": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::unreserved": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::encoded_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitRead::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%11::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::MAX_BITS": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_index_decreases": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::resolved_type": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::is_continuation_byte": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitReadStatus::arrow_Value_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderPhase::arrow_window_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::bits_value_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::is_leading_byte_width_3": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::str_slice_index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::valid": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderStatus::arrow_Failed_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::encoded_size_is_four_per_group": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::encode_batch_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::block_length_value": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::bytes_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::valid_lengths": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::decode_block_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%2::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::byte_state": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::impl&%2::spec_index_range": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::lemma_slice_index_decreases": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::spec_array_as_slice": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::arithmetic::power::pow": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::first": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::str_slice_in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::matched": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::codepoint_width_1": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::decoded_prefix_is_independent_of_previous_output": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%8::index_req": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderPhase::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::function::axiom_fn_mut_call_ensures": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::prepend_assoc": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::SliceIndexSpec::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::generic_slice_in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::axiom_spec_array_as_slice": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%48::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%46::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::codepoint_width_2": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderStatus::arrow_window_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::read_quantum": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::byte_bit": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::window_size_for": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::second_last_continuation_byte": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::is_char_boundary": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::advance_from_prefixes": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::bound_as_ref": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::core::IndexSpec::index_req": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_update_same": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "verus_builtin::impl&%7::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::raw_ptr::impl&%3::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%20::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::lemma_nonzero_concat": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::arithmetic::power2::lemma_pow2_strictly_increases": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::result::is_err": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::hex_digit": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::round_trip": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::encode_into": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderStatus::arrow_Complete_window_size": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::arrow_Complete_block_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%8::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::option::is_some": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%14::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::first_code": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%7::index_req": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::MAX_SYMBOLS": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::input_bytes_needed": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%44::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::unquantum": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::canonical_code": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::advance_literal": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::arrow_Complete_block_type": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_push_index_same": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::SliceAdditionalSpecFns::spec_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::arithmetic::div_mod::lemma_small_mod": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::impl&%0::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::axiom_str_literal_get_char": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::last_continuation_byte": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%28::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::Error::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::ENCODE_TABLE": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderDecoder::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%3::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%18::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::result::is_ok": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::SliceIndexSpec::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockKind::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::codepoint_width_3": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::Seq::add": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::arrow_Failed_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::append_written": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_two_subranges_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_subrange_decreases": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::written_empty": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_new_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%3::spec_bytes": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::ArrayAdditionalSpecFns::spec_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::arithmetic::power2::pow2": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::slice_range_end": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_ext_equal": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::Clone::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::spec_array_update": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::spec_slice_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::validate_lengths": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::matched_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::encode_into": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderDecoder::rep_valid": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%7::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%5::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::escaped": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::bytes_bits_concat": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::View::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::window_size_safe": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::decoded_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%13::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::Seq::len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%11::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%15::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::decode_into": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::append_byte": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::function::axiom_fn_mut_call_requires": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_add_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::is_scalar": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::lemma_count_concat": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::quantum": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::axiom_new_strlit_view_id": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::encoded_concat": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::encoded": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::canonical_round_trip": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::lemma_array_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::quantum_canonical": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::CODE_SPACE": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::slice::index::impl&%7::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::arrow_block_type": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::handoff_is_current_prefix": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%22::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%2::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%10::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::decoded_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::encoded_concat": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::valid": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::leading_byte_width_4": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::first": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%3::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::leading_bits_width_2": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::slice_range_start": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%50::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::not_overlong_encoding": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::symbol": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%13::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchPhase::arrow_AwaitLength_kind": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::read_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::impl&%2::spec_index_range_from": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::encoded_prefix_is_independent_of_previous_output": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::matched_one_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::StringSliceAdditionalSpecFns::spec_bytes": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%8::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::codepoint_width_4": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::arithmetic::div_mod::lemma_mod_sub_multiples_vanish": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderDecoder::complete": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchPhase::arrow_block_type": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%12::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::is_leading_byte_width_4": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::axiom_array_decreases_to_seq": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::bytes_bits_take_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStep::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::encoded_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::reset": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::lemma_array_index_decreases": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%30::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::str::traits::impl&%7::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::arrow_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::axiom_spec_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::prepend_finish": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::PrefixCode::valid_for": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::byte_bits_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::Seq::push": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::encode_utf8": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::Step::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::validation_table_matches": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderDecoder::stable_valid": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%18::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::prepend": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%15::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::Seq::new": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::is_leading_byte_width_1": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::impl&%0::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq_lib::impl&%0::push_distributes_over_add": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::result::impl&%0::arrow_Ok_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::axiom_slice_has_resolved": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::read_batch": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%2::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::quantum_round_trip": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::option::is_none": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::decoded_prefix_is_independent_of_previous_output": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::result::ResultAdditionalSpecFns::arrow_Ok_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::has_width_1_encoding": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::header_middle": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::used_space": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::header_status_for_byte": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::hex": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderPhase::arrow_Failed_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::option::impl&%6::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::str::traits::impl&%9::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq_lib::impl&%0::add_empty_right": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%15::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchPhase::arrow_kind": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%15::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::axiom_slice_decreases_to_seq": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchPhase::arrow_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%12::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::block_state": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::valid_batch": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::result::spec_unwrap": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::pop_first_scalar": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::PrefixCode::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%6::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::str::traits::impl&%11::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%0::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::valid_first_scalar": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::compact_after": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::code_weight": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::round_trip": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::leading_byte_width_2": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::value": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::DecodeCaller::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::axiom_spec_slice_update": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::from_symbol": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_new_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%26::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::make_batch": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::impl&%2::spec_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::slice::index::impl&%6::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::decode_into": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::arrow_block_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%11::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::bit_at": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq_lib::impl&%0::drop_first": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::impl&%2::spec_add": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::third_last_continuation_byte": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_add_index2": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::valid_utf8": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_update_different": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderPhase::arrow_Complete_window_size": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::advance": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::encoded": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockKind::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::leading_byte_width_3": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::axiom_str_literal_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::make_quantum": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::add_length_assoc": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::bytes_bits_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_add_index1": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%1::index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::not_surrogate": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_empty": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%16::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::escaped_token": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%12::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderStatus::arrow_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderStatus::arrow_Complete_window_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::RangeBoundsSpec::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::expected_result": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::count_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::axiom_slice_ext_equal": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::slice::index::impl&%0::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_push_index_different": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%42::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::decoded_prefix_is_independent_of_previous_output": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::hex_value": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::same_kind": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::impl&%2::spec_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "alloc::boxed::impl&%15::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::decoded_length_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::new": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::decoded": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::decoded_length_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::value_inverse": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::str::traits::impl&%10::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::extend_written": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%12::spec_end_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::has_width_4_encoding": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::leading_bits_width_3": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::axiom_array_ext_equal": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::axiom_spec_array_update": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchError::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitReadStatus::arrow_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::length_field": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%0::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::reset": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::weight": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_push_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchPhase::arrow_AwaitLength_block_type": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::impl&%1::in_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderPhase::arrow_Complete_window_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::count_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::nonzero_count": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderStep::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::hex_inverse": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderDecoder::reset": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::slice::index::SliceIndex::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::input_bytes_taken": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::leading_bits_width_1": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%16::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::encode_scalar": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::Seq::update": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::impl&%17::index_req": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::advance_distance": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::Seq::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::decoded_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%38::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::byte_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchStatus::arrow_Complete_kind": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderStatus::arrow_window_size": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::decompress_block_into": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::continuation_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::pervasive::cloned": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::spec_slice_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::valid_bits_ignore_unused_storage": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::len%returns_clause_autospec": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%24::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%14::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::read_token": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::array_view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::count_exec": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::header_used_bits": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::raw_ptr::ptrs_mut_eq_sized": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::symbol_inverse": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%28::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::raw_ptr::view_reverse_for_eq": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::pervasive::strictly_cloned": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::add_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::decode_first_codepoint": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitReadStatus::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchPhase::arrow_Failed_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::spec_slice_update": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::option::spec_unwrap": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%6::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%11::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_update_len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::has_width_3_encoding": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::utf8::is_leading_byte_width_2": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::to_symbol": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::BlockSwitchCore::advance_command": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::clone::impls::impl&%10::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::string::strlit_view_id": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::RangeBoundsSpec::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::decoded_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::array::impl&%15::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::prepend_empty": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::raw_ptr::ptrs_mut_eq": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::slice::generic_slice_index_postcondition": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::DecodeCaller::decode": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%0::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::view::impl&%58::view": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::extension": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::lemma_used_space_concat": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::lz4::read_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::arithmetic::power2::lemma_pow2_unfold": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::successful_work": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::array::impl&%20::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::slice::impl&%2::spec_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_ext_equal_deep": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::Seq::subrange": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::is_unreserved": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::option::OptionAdditionalFns::arrow_0": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::bits_value": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::slice_range_valid": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::slice::impl&%0::len": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::ComposeError::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::std_specs::range::impl&%14::spec_start_bound": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::axiom_spec_array_fill_for_copy_type": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::BitQueue::new": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::percent::encoded_length_bounds": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::SwitchPhase::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::array::array_fill_for_copy_types": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::written": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::get_byte_bit": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::block_length_range": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::used_space_step": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::composition_demo::composed": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::PrefixError::clone": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_input::HeaderDecoder::new": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::canonical_code_exec": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "core::slice::index::impl&%4::index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_block::declarations_valid": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::arithmetic::power2::lemma2_to64": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq::lemma_seq_subrange_index": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "vstd::seq_lib::impl&%0::add_empty_left": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::PrefixCode::from_lengths": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::base64::encoded_length": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    },
+    "lib::brotli_prefix::BLOCK_LENGTH_OFFSETS": {
+      "obligation_proof_notes": [],
+      "failed_proof_notes": []
+    }
+  },
+  "verification-results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 177,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "times-ms": {
+    "verus-build": {
+      "profile": "release",
+      "version": "0.2026.10.18.7d82994"
+    },
+    "num-threads": 1,
+    "total": 15367,
+    "estimated-cpu-time": 15367,
+    "rust": {
+      "total": 965,
+      "init-and-types": 550,
+      "trait-conflicts": 146,
+      "compile": 268
+    },
+    "verification": {
+      "total": 14224,
+      "vir": {
+        "total": 693,
+        "hir": 246,
+        "import": 173,
+        "rust-to-vir": 161
+      }
+    },
+    "total-verify": 13457,
+    "total-verify-module-times": [
+      {
+        "module": "base64",
+        "time": 9493
+      },
+      {
+        "module": "brotli_input",
+        "time": 1462
+      },
+      {
+        "module": "lz4",
+        "time": 881
+      },
+      {
+        "module": "brotli_block",
+        "time": 413
+      },
+      {
+        "module": "brotli_prefix",
+        "time": 410
+      },
+      {
+        "module": "percent",
+        "time": 409
+      },
+      {
+        "module": "",
+        "time": 201
+      },
+      {
+        "module": "composition_demo",
+        "time": 184
+      }
+    ],
+    "air": {
+      "total": 1194,
+      "module-times": [
+        {
+          "module": "brotli_input",
+          "time": 296
+        },
+        {
+          "module": "base64",
+          "time": 267
+        },
+        {
+          "module": "",
+          "time": 131
+        },
+        {
+          "module": "lz4",
+          "time": 130
+        },
+        {
+          "module": "brotli_block",
+          "time": 99
+        },
+        {
+          "module": "brotli_prefix",
+          "time": 95
+        },
+        {
+          "module": "percent",
+          "time": 88
+        },
+        {
+          "module": "composition_demo",
+          "time": 85
+        }
+      ]
+    },
+    "smt": {
+      "total": 11820,
+      "smt-init": 4,
+      "rlimit-init": 48685,
+      "smt-init-module-times": [
+        {
+          "module": "brotli_input",
+          "time": 1,
+          "time-micros": 1086,
+          "rlimit": 8529
+        },
+        {
+          "module": "base64",
+          "time": 1,
+          "time-micros": 1010,
+          "rlimit": 15458
+        },
+        {
+          "module": "brotli_prefix",
+          "time": 0,
+          "time-micros": 708,
+          "rlimit": 5684
+        },
+        {
+          "module": "percent",
+          "time": 0,
+          "time-micros": 647,
+          "rlimit": 6012
+        },
+        {
+          "module": "lz4",
+          "time": 0,
+          "time-micros": 449,
+          "rlimit": 6342
+        },
+        {
+          "module": "brotli_block",
+          "time": 0,
+          "time-micros": 433,
+          "rlimit": 4237
+        },
+        {
+          "module": "",
+          "time": 0,
+          "time-micros": 226,
+          "rlimit": 1234
+        },
+        {
+          "module": "composition_demo",
+          "time": 0,
+          "time-micros": 195,
+          "rlimit": 1189
+        }
+      ],
+      "smt-run": 11816,
+      "rlimit-run": 100705111,
+      "smt-run-module-times": [
+        {
+          "module": "base64",
+          "time": 9125,
+          "time-micros": 9125452,
+          "rlimit": 63518348,
+          "function-breakdown": [
+            {
+              "function": "lib::base64::encoded",
+              "mode:": "spec",
+              "time": 18,
+              "time-micros": 18890,
+              "rlimit": 84115,
+              "success": true
+            },
+            {
+              "function": "lib::base64::canonical_round_trip",
+              "mode:": "proof",
+              "time": 435,
+              "time-micros": 435178,
+              "rlimit": 2614924,
+              "success": true
+            },
+            {
+              "function": "lib::base64::encode_batch_bits",
+              "mode:": "proof",
+              "time": 4,
+              "time-micros": 4464,
+              "rlimit": 2683,
+              "success": true
+            },
+            {
+              "function": "lib::base64::to_symbol",
+              "mode:": "exec",
+              "time": 112,
+              "time-micros": 112434,
+              "rlimit": 552559,
+              "success": true
+            },
+            {
+              "function": "lib::base64::decoded",
+              "mode:": "spec",
+              "time": 10,
+              "time-micros": 10933,
+              "rlimit": 55685,
+              "success": true
+            },
+            {
+              "function": "lib::base64::validation_or_bits",
+              "mode:": "proof",
+              "time": 0,
+              "time-micros": 745,
+              "rlimit": 1258,
+              "success": true
+            },
+            {
+              "function": "lib::base64::DECODE_TABLE",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 45,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::base64::make_quantum",
+              "mode:": "exec",
+              "time": 162,
+              "time-micros": 162459,
+              "rlimit": 986217,
+              "success": true
+            },
+            {
+              "function": "lib::base64::encoded_concat",
+              "mode:": "proof",
+              "time": 238,
+              "time-micros": 238607,
+              "rlimit": 1870295,
+              "success": true
+            },
+            {
+              "function": "lib::base64::decoded_step",
+              "mode:": "proof",
+              "time": 102,
+              "time-micros": 102596,
+              "rlimit": 502518,
+              "success": true
+            },
+            {
+              "function": "lib::base64::decode_batch_bits",
+              "mode:": "proof",
+              "time": 2,
+              "time-micros": 2042,
+              "rlimit": 5947,
+              "success": true
+            },
+            {
+              "function": "lib::base64::encoded_size_is_four_per_group",
+              "mode:": "proof",
+              "time": 112,
+              "time-micros": 112881,
+              "rlimit": 567463,
+              "success": true
+            },
+            {
+              "function": "lib::base64::quantum_round_trip",
+              "mode:": "proof",
+              "time": 230,
+              "time-micros": 230703,
+              "rlimit": 1982364,
+              "success": true
+            },
+            {
+              "function": "lib::base64::valid_batch",
+              "mode:": "exec",
+              "time": 988,
+              "time-micros": 988301,
+              "rlimit": 8594566,
+              "success": true
+            },
+            {
+              "function": "lib::base64::encoded_length",
+              "mode:": "exec",
+              "time": 129,
+              "time-micros": 129083,
+              "rlimit": 709783,
+              "success": true
+            },
+            {
+              "function": "lib::base64::quantum_canonical",
+              "mode:": "proof",
+              "time": 1154,
+              "time-micros": 1154664,
+              "rlimit": 10207151,
+              "success": true
+            },
+            {
+              "function": "lib::base64::from_symbol",
+              "mode:": "exec",
+              "time": 230,
+              "time-micros": 230539,
+              "rlimit": 1135025,
+              "success": true
+            },
+            {
+              "function": "lib::base64::encoded_prefix_is_independent_of_previous_output",
+              "mode:": "proof",
+              "time": 98,
+              "time-micros": 98730,
+              "rlimit": 445663,
+              "success": true
+            },
+            {
+              "function": "lib::base64::encoded_step",
+              "mode:": "proof",
+              "time": 1064,
+              "time-micros": 1064702,
+              "rlimit": 8855481,
+              "success": true
+            },
+            {
+              "function": "lib::base64::make_batch",
+              "mode:": "exec",
+              "time": 329,
+              "time-micros": 329584,
+              "rlimit": 1849273,
+              "success": true
+            },
+            {
+              "function": "lib::base64::round_trip",
+              "mode:": "proof",
+              "time": 283,
+              "time-micros": 283553,
+              "rlimit": 1584547,
+              "success": true
+            },
+            {
+              "function": "lib::base64::encode_into",
+              "mode:": "exec",
+              "time": 572,
+              "time-micros": 572836,
+              "rlimit": 3338074,
+              "success": true
+            },
+            {
+              "function": "lib::base64::decoded_length_bound",
+              "mode:": "proof",
+              "time": 173,
+              "time-micros": 173314,
+              "rlimit": 1057542,
+              "success": true
+            },
+            {
+              "function": "lib::base64::read_quantum",
+              "mode:": "exec",
+              "time": 300,
+              "time-micros": 300496,
+              "rlimit": 2158887,
+              "success": true
+            },
+            {
+              "function": "lib::base64::batch_table_matches",
+              "mode:": "proof",
+              "time": 145,
+              "time-micros": 145297,
+              "rlimit": 795771,
+              "success": true
+            },
+            {
+              "function": "lib::base64::decode_into",
+              "mode:": "exec",
+              "time": 397,
+              "time-micros": 397998,
+              "rlimit": 2088174,
+              "success": true
+            },
+            {
+              "function": "lib::base64::ENCODE_TABLE",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 56,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::base64::symbol_inverse",
+              "mode:": "proof",
+              "time": 87,
+              "time-micros": 87777,
+              "rlimit": 439026,
+              "success": true
+            },
+            {
+              "function": "lib::base64::validation_table_matches",
+              "mode:": "proof",
+              "time": 224,
+              "time-micros": 224154,
+              "rlimit": 1058337,
+              "success": true
+            },
+            {
+              "function": "lib::base64::decoded_prefix_is_independent_of_previous_output",
+              "mode:": "proof",
+              "time": 102,
+              "time-micros": 102372,
+              "rlimit": 459378,
+              "success": true
+            },
+            {
+              "function": "lib::base64::read_batch",
+              "mode:": "exec",
+              "time": 436,
+              "time-micros": 436566,
+              "rlimit": 2481915,
+              "success": true
+            },
+            {
+              "function": "lib::base64::value_inverse",
+              "mode:": "proof",
+              "time": 82,
+              "time-micros": 82579,
+              "rlimit": 428491,
+              "success": true
+            },
+            {
+              "function": "lib::base64::decoded_length",
+              "mode:": "exec",
+              "time": 890,
+              "time-micros": 890860,
+              "rlimit": 6605232,
+              "success": true
+            }
+          ]
+        },
+        {
+          "module": "brotli_input",
+          "time": 1083,
+          "time-micros": 1083825,
+          "rlimit": 9779992,
+          "function-breakdown": [
+            {
+              "function": "lib::brotli_input::HeaderDecoder::advance_header",
+              "mode:": "exec",
+              "time": 523,
+              "time-micros": 523154,
+              "rlimit": 3010253,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::HeaderStep::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 67,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::bits_value",
+              "mode:": "spec",
+              "time": 1,
+              "time-micros": 1378,
+              "rlimit": 7575,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitQueue::compact_after",
+              "mode:": "exec",
+              "time": 77,
+              "time-micros": 77816,
+              "rlimit": 1622464,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::HeaderDecoder::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 39,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::HeaderDecoder::new",
+              "mode:": "exec",
+              "time": 8,
+              "time-micros": 8087,
+              "rlimit": 13222,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::bytes_bits",
+              "mode:": "spec",
+              "time": 2,
+              "time-micros": 2654,
+              "rlimit": 11172,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::HeaderDecoder::reset",
+              "mode:": "exec",
+              "time": 7,
+              "time-micros": 7079,
+              "rlimit": 14524,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::HeaderDecoder::complete",
+              "mode:": "exec",
+              "time": 5,
+              "time-micros": 5807,
+              "rlimit": 14247,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::window_size_safe",
+              "mode:": "proof",
+              "time": 11,
+              "time-micros": 11362,
+              "rlimit": 1848,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitQueue::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 28,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::bytes_bits_take_step",
+              "mode:": "proof",
+              "time": 15,
+              "time-micros": 15179,
+              "rlimit": 81075,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitRead::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 44,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::bits_value_bound",
+              "mode:": "proof",
+              "time": 3,
+              "time-micros": 3635,
+              "rlimit": 20318,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::bytes_bits_concat",
+              "mode:": "proof",
+              "time": 52,
+              "time-micros": 52610,
+              "rlimit": 357838,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::bytes_bits_len",
+              "mode:": "proof",
+              "time": 18,
+              "time-micros": 18731,
+              "rlimit": 169354,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::HeaderError::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 33,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::get_byte_bit",
+              "mode:": "exec",
+              "time": 4,
+              "time-micros": 4692,
+              "rlimit": 26530,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::HeaderPhase::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 30,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitQueue::new",
+              "mode:": "exec",
+              "time": 2,
+              "time-micros": 2495,
+              "rlimit": 12015,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::HeaderStatus::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 26,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitReadStatus::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 41,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitQueue::bit_at",
+              "mode:": "exec",
+              "time": 7,
+              "time-micros": 7291,
+              "rlimit": 75590,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitQueue::append_byte",
+              "mode:": "exec",
+              "time": 57,
+              "time-micros": 57051,
+              "rlimit": 561951,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitQueue::read_bits",
+              "mode:": "exec",
+              "time": 264,
+              "time-micros": 264240,
+              "rlimit": 3687491,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::BitQueue::reset",
+              "mode:": "exec",
+              "time": 2,
+              "time-micros": 2769,
+              "rlimit": 13198,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::byte_bits_index",
+              "mode:": "proof",
+              "time": 10,
+              "time-micros": 10604,
+              "rlimit": 40426,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_input::valid_bits_ignore_unused_storage",
+              "mode:": "proof",
+              "time": 6,
+              "time-micros": 6870,
+              "rlimit": 38885,
+              "success": true
+            }
+          ]
+        },
+        {
+          "module": "lz4",
+          "time": 692,
+          "time-micros": 692595,
+          "rlimit": 20408129,
+          "function-breakdown": [
+            {
+              "function": "lib::lz4::decompress_block_into",
+              "mode:": "exec",
+              "time": 420,
+              "time-micros": 420943,
+              "rlimit": 15321068,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::extension",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 609,
+              "rlimit": 2267,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::decoded_prefix_is_independent_of_previous_output",
+              "mode:": "proof",
+              "time": 5,
+              "time-micros": 5557,
+              "rlimit": 26826,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::matched_step",
+              "mode:": "proof",
+              "time": 11,
+              "time-micros": 11182,
+              "rlimit": 134721,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::Step::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 37,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::block_state",
+              "mode:": "spec",
+              "time": 3,
+              "time-micros": 3064,
+              "rlimit": 14245,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::read_step",
+              "mode:": "exec",
+              "time": 97,
+              "time-micros": 97458,
+              "rlimit": 2815740,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::state_prefix",
+              "mode:": "proof",
+              "time": 47,
+              "time-micros": 47748,
+              "rlimit": 469937,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::decoded_length",
+              "mode:": "exec",
+              "time": 84,
+              "time-micros": 84637,
+              "rlimit": 1471725,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::read_length",
+              "mode:": "exec",
+              "time": 15,
+              "time-micros": 15025,
+              "rlimit": 119314,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::matched_one_step",
+              "mode:": "proof",
+              "time": 2,
+              "time-micros": 2955,
+              "rlimit": 15723,
+              "success": true
+            },
+            {
+              "function": "lib::lz4::add_length_assoc",
+              "mode:": "proof",
+              "time": 3,
+              "time-micros": 3375,
+              "rlimit": 16561,
+              "success": true
+            }
+          ]
+        },
+        {
+          "module": "percent",
+          "time": 278,
+          "time-micros": 278287,
+          "rlimit": 2855621,
+          "function-breakdown": [
+            {
+              "function": "lib::percent::hex_inverse",
+              "mode:": "proof",
+              "time": 1,
+              "time-micros": 1751,
+              "rlimit": 11986,
+              "success": true
+            },
+            {
+              "function": "lib::percent::encoded_length_bounds",
+              "mode:": "proof",
+              "time": 8,
+              "time-micros": 8171,
+              "rlimit": 56517,
+              "success": true
+            },
+            {
+              "function": "lib::percent::encoded_step",
+              "mode:": "proof",
+              "time": 9,
+              "time-micros": 9083,
+              "rlimit": 64982,
+              "success": true
+            },
+            {
+              "function": "lib::percent::is_unreserved",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 807,
+              "rlimit": 3769,
+              "success": true
+            },
+            {
+              "function": "lib::percent::escaped_token",
+              "mode:": "proof",
+              "time": 8,
+              "time-micros": 8832,
+              "rlimit": 66361,
+              "success": true
+            },
+            {
+              "function": "lib::percent::decoded_prefix_is_independent_of_previous_output",
+              "mode:": "proof",
+              "time": 2,
+              "time-micros": 2212,
+              "rlimit": 14724,
+              "success": true
+            },
+            {
+              "function": "lib::percent::decode_into",
+              "mode:": "exec",
+              "time": 17,
+              "time-micros": 17118,
+              "rlimit": 154878,
+              "success": true
+            },
+            {
+              "function": "lib::percent::encoded",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 878,
+              "rlimit": 4543,
+              "success": true
+            },
+            {
+              "function": "lib::percent::hex_digit",
+              "mode:": "exec",
+              "time": 1,
+              "time-micros": 1238,
+              "rlimit": 8468,
+              "success": true
+            },
+            {
+              "function": "lib::percent::decoded_length",
+              "mode:": "exec",
+              "time": 17,
+              "time-micros": 17453,
+              "rlimit": 145146,
+              "success": true
+            },
+            {
+              "function": "lib::percent::decoded_length_bound",
+              "mode:": "proof",
+              "time": 2,
+              "time-micros": 2060,
+              "rlimit": 13390,
+              "success": true
+            },
+            {
+              "function": "lib::percent::encoded_prefix_is_independent_of_previous_output",
+              "mode:": "proof",
+              "time": 3,
+              "time-micros": 3011,
+              "rlimit": 17567,
+              "success": true
+            },
+            {
+              "function": "lib::percent::encoded_prefix_bound",
+              "mode:": "proof",
+              "time": 11,
+              "time-micros": 11642,
+              "rlimit": 70081,
+              "success": true
+            },
+            {
+              "function": "lib::percent::decoded",
+              "mode:": "spec",
+              "time": 1,
+              "time-micros": 1443,
+              "rlimit": 6290,
+              "success": true
+            },
+            {
+              "function": "lib::percent::encoded_length",
+              "mode:": "exec",
+              "time": 19,
+              "time-micros": 19785,
+              "rlimit": 162371,
+              "success": true
+            },
+            {
+              "function": "lib::percent::from_hex",
+              "mode:": "exec",
+              "time": 2,
+              "time-micros": 2260,
+              "rlimit": 13248,
+              "success": true
+            },
+            {
+              "function": "lib::percent::read_token",
+              "mode:": "exec",
+              "time": 16,
+              "time-micros": 16193,
+              "rlimit": 153161,
+              "success": true
+            },
+            {
+              "function": "lib::percent::round_trip",
+              "mode:": "proof",
+              "time": 35,
+              "time-micros": 35868,
+              "rlimit": 307754,
+              "success": true
+            },
+            {
+              "function": "lib::percent::decoded_step",
+              "mode:": "proof",
+              "time": 8,
+              "time-micros": 8760,
+              "rlimit": 79308,
+              "success": true
+            },
+            {
+              "function": "lib::percent::encoded_concat",
+              "mode:": "proof",
+              "time": 33,
+              "time-micros": 33869,
+              "rlimit": 398741,
+              "success": true
+            },
+            {
+              "function": "lib::percent::encode_into",
+              "mode:": "exec",
+              "time": 75,
+              "time-micros": 75845,
+              "rlimit": 1102336,
+              "success": true
+            }
+          ]
+        },
+        {
+          "module": "brotli_block",
+          "time": 275,
+          "time-micros": 275121,
+          "rlimit": 1686242,
+          "function-breakdown": [
+            {
+              "function": "lib::brotli_block::SwitchPhase::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 28,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockKind::as_index",
+              "mode:": "exec",
+              "time": 3,
+              "time-micros": 3108,
+              "rlimit": 13524,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::advance_literal",
+              "mode:": "exec",
+              "time": 3,
+              "time-micros": 3454,
+              "rlimit": 16957,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::advance_distance",
+              "mode:": "exec",
+              "time": 2,
+              "time-micros": 2954,
+              "rlimit": 16575,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::advance_from_prefixes",
+              "mode:": "exec",
+              "time": 26,
+              "time-micros": 26908,
+              "rlimit": 136993,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 28,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::resolve_type",
+              "mode:": "exec",
+              "time": 8,
+              "time-micros": 8772,
+              "rlimit": 56925,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchError::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 36,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::reset",
+              "mode:": "exec",
+              "time": 14,
+              "time-micros": 14579,
+              "rlimit": 75893,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::same_kind",
+              "mode:": "exec",
+              "time": 2,
+              "time-micros": 2413,
+              "rlimit": 12587,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::SwitchStatus::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 36,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::consume",
+              "mode:": "exec",
+              "time": 19,
+              "time-micros": 19188,
+              "rlimit": 107425,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::new",
+              "mode:": "exec",
+              "time": 15,
+              "time-micros": 15875,
+              "rlimit": 90308,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::SwitchStep::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 31,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::advance",
+              "mode:": "exec",
+              "time": 174,
+              "time-micros": 174507,
+              "rlimit": 1142737,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockKind::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 57,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_block::BlockSwitchCore::advance_command",
+              "mode:": "exec",
+              "time": 3,
+              "time-micros": 3139,
+              "rlimit": 16306,
+              "success": true
+            }
+          ]
+        },
+        {
+          "module": "brotli_prefix",
+          "time": 269,
+          "time-micros": 269983,
+          "rlimit": 1710385,
+          "function-breakdown": [
+            {
+              "function": "lib::brotli_prefix::count_exec",
+              "mode:": "exec",
+              "time": 19,
+              "time-micros": 19649,
+              "rlimit": 123324,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::canonical_code_exec",
+              "mode:": "exec",
+              "time": 10,
+              "time-micros": 10107,
+              "rlimit": 56103,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::PrefixCode::from_lengths",
+              "mode:": "exec",
+              "time": 40,
+              "time-micros": 40127,
+              "rlimit": 266694,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::decode_block_length",
+              "mode:": "exec",
+              "time": 10,
+              "time-micros": 10245,
+              "rlimit": 54968,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::PrefixCode::decode_exact",
+              "mode:": "exec",
+              "time": 14,
+              "time-micros": 14826,
+              "rlimit": 89955,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::lemma_nonzero_concat",
+              "mode:": "proof",
+              "time": 14,
+              "time-micros": 14764,
+              "rlimit": 91062,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::lemma_used_space_concat",
+              "mode:": "proof",
+              "time": 15,
+              "time-micros": 15476,
+              "rlimit": 103061,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::nonzero_count",
+              "mode:": "spec",
+              "time": 2,
+              "time-micros": 2310,
+              "rlimit": 11909,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::PrefixCode::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 31,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::BLOCK_LENGTH_OFFSETS",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 35,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::count_step",
+              "mode:": "proof",
+              "time": 11,
+              "time-micros": 11422,
+              "rlimit": 71193,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::nonzero_step",
+              "mode:": "proof",
+              "time": 12,
+              "time-micros": 12457,
+              "rlimit": 72232,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::first_code",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 300,
+              "rlimit": 1131,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::used_space",
+              "mode:": "spec",
+              "time": 3,
+              "time-micros": 3103,
+              "rlimit": 14218,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::CODE_SPACE",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 47,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::PrefixError::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 35,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::used_space_step",
+              "mode:": "proof",
+              "time": 12,
+              "time-micros": 12781,
+              "rlimit": 73901,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::MAX_BITS",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 40,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::lemma_count_concat",
+              "mode:": "proof",
+              "time": 13,
+              "time-micros": 13360,
+              "rlimit": 93748,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::weight",
+              "mode:": "exec",
+              "time": 3,
+              "time-micros": 3367,
+              "rlimit": 19760,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::first_code_exec",
+              "mode:": "exec",
+              "time": 23,
+              "time-micros": 23389,
+              "rlimit": 144701,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::block_length_range",
+              "mode:": "exec",
+              "time": 19,
+              "time-micros": 19970,
+              "rlimit": 121740,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 122,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::count_length",
+              "mode:": "spec",
+              "time": 2,
+              "time-micros": 2436,
+              "rlimit": 12051,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::validate_lengths",
+              "mode:": "exec",
+              "time": 39,
+              "time-micros": 39526,
+              "rlimit": 288620,
+              "success": true
+            },
+            {
+              "function": "lib::brotli_prefix::MAX_SYMBOLS",
+              "mode:": "spec",
+              "time": 0,
+              "time-micros": 47,
+              "rlimit": 2,
+              "success": true
+            }
+          ]
+        },
+        {
+          "module": "composition_demo",
+          "time": 56,
+          "time-micros": 56370,
+          "rlimit": 374902,
+          "function-breakdown": [
+            {
+              "function": "lib::composition_demo::ComposeError::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 59,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::composition_demo::successful_work_bound",
+              "mode:": "proof",
+              "time": 3,
+              "time-micros": 3292,
+              "rlimit": 19063,
+              "success": true
+            },
+            {
+              "function": "lib::composition_demo::handoff_is_current_prefix",
+              "mode:": "proof",
+              "time": 2,
+              "time-micros": 2072,
+              "rlimit": 10327,
+              "success": true
+            },
+            {
+              "function": "lib::composition_demo::DecodeCaller::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 36,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::composition_demo::DecodeCaller::decode",
+              "mode:": "exec",
+              "time": 47,
+              "time-micros": 47873,
+              "rlimit": 325802,
+              "success": true
+            },
+            {
+              "function": "lib::composition_demo::composed_prefix_is_independent_of_previous_storage",
+              "mode:": "proof",
+              "time": 2,
+              "time-micros": 2825,
+              "rlimit": 19233,
+              "success": true
+            },
+            {
+              "function": "lib::composition_demo::DecodeCaller::new",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 211,
+              "rlimit": 473,
+              "success": true
+            }
+          ]
+        },
+        {
+          "module": "",
+          "time": 34,
+          "time-micros": 34803,
+          "rlimit": 371492,
+          "function-breakdown": [
+            {
+              "function": "lib::prepend_finish",
+              "mode:": "proof",
+              "time": 0,
+              "time-micros": 970,
+              "rlimit": 4442,
+              "success": true
+            },
+            {
+              "function": "lib::written_empty",
+              "mode:": "proof",
+              "time": 4,
+              "time-micros": 4374,
+              "rlimit": 6178,
+              "success": true
+            },
+            {
+              "function": "lib::Error::clone",
+              "mode:": "exec",
+              "time": 0,
+              "time-micros": 628,
+              "rlimit": 2,
+              "success": true
+            },
+            {
+              "function": "lib::append_written",
+              "mode:": "proof",
+              "time": 3,
+              "time-micros": 3294,
+              "rlimit": 26810,
+              "success": true
+            },
+            {
+              "function": "lib::copy_bytes",
+              "mode:": "exec",
+              "time": 18,
+              "time-micros": 18174,
+              "rlimit": 269926,
+              "success": true
+            },
+            {
+              "function": "lib::prepend_assoc",
+              "mode:": "proof",
+              "time": 2,
+              "time-micros": 2956,
+              "rlimit": 20364,
+              "success": true
+            },
+            {
+              "function": "lib::extend_written",
+              "mode:": "proof",
+              "time": 3,
+              "time-micros": 3503,
+              "rlimit": 39676,
+              "success": true
+            },
+            {
+              "function": "lib::prepend_empty",
+              "mode:": "proof",
+              "time": 0,
+              "time-micros": 901,
+              "rlimit": 4094,
+              "success": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "verus": {
+    "profile": "release",
+    "version": "0.2026.10.18.7d82994",
+    "platform": {
+      "os": "macos",
+      "arch": "aarch64"
+    },
+    "toolchain": "1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "commit": "7d829946231d6413a398f6e4160cdfe951261dad"
+  }
+}
