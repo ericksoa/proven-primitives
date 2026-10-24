@@ -4,9 +4,10 @@ C1 is a crate-private verified caller that strict-Base64 decodes into caller
 scratch and then strict-percent decodes only the current returned scratch
 prefix. It is a proof of this exact connecting program, not arbitrary callers.
 
-The whole crate currently passes **177 verification checks with zero errors**
-under `--no-cheating`. The checked C1 contracts establish, for every admitted
-input, capacity and initialized buffer:
+The C1/B2 snapshot passed **177 verification checks with zero errors** under
+`--no-cheating`. The later B3a record supersedes the whole-crate count while
+preserving these checked C1 contracts for every admitted input, capacity and
+initialized buffer:
 
 - Exact stage order and distinct Base64-invalid, scratch-small,
   percent-invalid and output-small results.

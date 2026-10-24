@@ -65,7 +65,7 @@ fn transcript(output: &std::process::Output) -> String {
 
 #[test]
 #[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
-fn the_prover_rejects_twenty_five_semantic_and_security_defects() {
+fn the_prover_rejects_twenty_eight_semantic_and_security_defects() {
     let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
     let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
     let version = Command::new(&verus)
@@ -162,6 +162,24 @@ fn the_prover_rejects_twenty_five_semantic_and_security_defects() {
             "brotli_prefix.rs",
             "code = combined * 2;",
             "code = combined * 2 + 1;",
+        ),
+        (
+            "brotli-workspace-record-offset-shifted",
+            "brotli_prefix.rs",
+            "let absolute = match window_bytes.checked_add(relative) {",
+            "let absolute = match window_bytes.checked_add(relative + 1) {",
+        ),
+        (
+            "brotli-workspace-reads-uninitialized-record",
+            "brotli_prefix.rs",
+            "if symbol >= initialized {",
+            "if symbol > initialized {",
+        ),
+        (
+            "brotli-workspace-total-off-by-one",
+            "brotli_prefix.rs",
+            "pub(crate) const STATE_BYTES: u32 = 16_384;",
+            "pub(crate) const STATE_BYTES: u32 = 16_383;",
         ),
         (
             "brotli-pending-off-by-one-append",
@@ -262,6 +280,96 @@ fn the_prover_rejects_twenty_five_semantic_and_security_defects() {
     ] {
         let path = temporary.join("src").join(file);
         let original = fs::read_to_string(project.join("src").join(file)).unwrap();
+        assert_eq!(
+            original.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        fs::write(&path, original.replacen(old, new, 1)).unwrap();
+        let result = check(&verus, &temporary);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied")
+                || log.contains("precondition not satisfied")
+                || log.contains("invariant not satisfied")
+                || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}"
+        );
+        println!("REJECTED {name}: deliberately wrong implementation, unchanged specification");
+        fs::write(&path, original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_four_b3a_meta_header_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3a-canaries-{}",
+        std::process::id()
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+    let baseline = check(&verus, &temporary);
+    fs::write(
+        project.join("evidence/canary-b3a-baseline.log"),
+        transcript(&baseline),
+    )
+    .unwrap();
+    assert!(
+        baseline.status.success(),
+        "unmodified B3a positive control failed: {}",
+        transcript(&baseline)
+    );
+    for (name, old, new) in [
+        (
+            "brotli-meta-reserved-bit-accepted",
+            "MetaBlockPhase::Reserved { is_last } => {\n                if bits != 0 {",
+            "MetaBlockPhase::Reserved { is_last } => {\n                if bits == 2 {",
+        ),
+        (
+            "brotli-meta-exuberant-length-accepted",
+            "if index + 1 == nibbles && nibbles > 4 && bits == 0 {",
+            "if index + 1 == nibbles && nibbles > 4 && bits == 16 {",
+        ),
+        (
+            "brotli-meta-exuberant-metadata-length-accepted",
+            "if index + 1 == bytes && bytes > 1 && bits == 0 {",
+            "if index + 1 == bytes && bytes > 1 && bits == 256 {",
+        ),
+        (
+            "brotli-meta-truncation-becomes-retryable",
+            "status: MetaBlockStatus::Failed(MetaBlockError::Truncated),",
+            "status: MetaBlockStatus::NeedInput,",
+        ),
+    ] {
+        let path = temporary.join("src/brotli_input.rs");
+        let original = fs::read_to_string(project.join("src/brotli_input.rs")).unwrap();
         assert_eq!(
             original.matches(old).count(),
             1,

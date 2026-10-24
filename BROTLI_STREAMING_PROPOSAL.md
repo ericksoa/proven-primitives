@@ -188,15 +188,15 @@ this library and are not proved merely by this budget theorem.
 |---|---|---|
 | B1 input/header | Yes; completed | Real bit conservation, pending bounds and terminal header behavior; private verified component only |
 | B2 prefix/block-switch core | Yes; implemented and checked | Canonical prefix/block-length and literal/command/distance switch component; complete byte-stream integration remains explicit and unproved |
-| B3 complete decoder | No | Approve/freeze dictionary data, workspace layout and LZ77/context algorithms; implement and prove whole supported grammar and arbitrary streaming transitions. Preserve B1/B2 evidence |
-| B4 caller/resources/profile | No | Checked quarantine caller, cumulative resource/call policy, source-observation obligations and independent specification review; every applicable profile clause discharged |
+| B3 complete decoder | Yes; in progress | Dictionary data, workspace layout and LZ77/context algorithms are approved; implement and prove the whole supported grammar and arbitrary streaming transitions. Preserve B1/B2 evidence |
+| B4 caller/resources/profile | Yes; implementation pending | Checked quarantine caller, cumulative resource/call policy, source-observation obligations and independent specification review; every applicable profile clause discharged |
 | Supported Brotli under V | No | Full decoder plus B4 and exact release gate pass. No helper/one-shot/component result may generate this support claim |
 
 Approval of the API/state/resource design is distinct from approval to
 implement B2; B3 data and any changed algorithms still need their exact
 decisions. No full-decoder milestone receives implied approval from B1.
-The concrete dictionary, workspace, algorithm and resource decision is now in
-[BROTLI_B3_PROPOSAL.md](BROTLI_B3_PROPOSAL.md) and still requires direct approval.
+The approved concrete dictionary, workspace, algorithm and resource decision is
+in [BROTLI_B3_PROPOSAL.md](BROTLI_B3_PROPOSAL.md).
 
 ## R1: exact proposed comparison/replay references and tools
 

@@ -1,0 +1,132 @@
+{
+  "generated_utc": "2026-10-24T20:47:02.323217+00:00",
+  "component": "private Brotli B3a workspace and meta-block-header slice",
+  "status": "checked partial B3a implementation; not a complete decoder or supported API",
+  "claim": "The checked private slice implements the exact fixed workspace/tree-record layout and an RFC meta-block-header state machine with source-linked bit transitions, truthful truncation, permanent reserved/nonminimal-format errors, sticky terminal states, and bounded normal/metadata lengths.",
+  "report": {
+    "path": "BROTLI_B3A.md",
+    "sha256": "15115142b2c7c0ce76c2f2e543dd733b2a6053becb2356a03bb6b2a30b964703"
+  },
+  "source_tree_sha256": "5bca40bd6f951984c6a28ce1001a8d7b04e54556847287f78396647fa52b8851",
+  "source_sha256": {
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/lib.rs": "12dd8d0e05b5282f85d4ad2566e78949a4dddb3383e47cd3b7a1153fe2d6f471",
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/brotli_input.rs": "a8567ef078b686630f789b8d03a8903e2a42c0303a40aab9d53472437f18b37a",
+    "src/brotli_prefix.rs": "e484befae8e276e2292bb69593b521c71f24d6f7f7f3f79f729c830e729a99b8",
+    "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
+  },
+  "validation_source_sha256": {
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "ff60f9d06502d90cb6d3dedde58cf25ab8643ed57fed502d42c48ecdd6a3a5a7",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf"
+  },
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 243,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_evidence": {
+    "path": "evidence/brotli-b3a-verification.json",
+    "sha256": "3447a21a75e4391cbe56d79e3ecaf667a0cc96130c2633a226d4165394c01b2d"
+  },
+  "verification_options": [
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "60",
+    "--time",
+    "--output-json"
+  ],
+  "verifier": {
+    "profile": "release",
+    "version": "0.2026.10.18.7d82994",
+    "platform": {
+      "os": "macos",
+      "arch": "aarch64"
+    },
+    "toolchain": "1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "commit": "7d829946231d6413a398f6e4160cdfe951261dad"
+  },
+  "execution_environment": {
+    "RUSTUP_TOOLCHAIN": "1.99.1",
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+    "target": "aarch64-apple-darwin",
+    "cargo_profile": "release",
+    "python": "3.14.6"
+  },
+  "compiled_artifact": {
+    "path": "target/release/libproven_primitives.rlib",
+    "sha256": "260a35171996e4d9128c4df52b7c818ecab7227ba841291b147f7dd5513cf091",
+    "note": "Ordinary Cargo release library from the same annotated source; compiler remains trusted."
+  },
+  "checked_roots": [
+    "lib::brotli_prefix::fixed_layout_is_exact",
+    "lib::brotli_prefix::tree_layout_is_bounded",
+    "lib::brotli_prefix::workspace_size_fits_u32",
+    "lib::brotli_prefix::required_workspace_bytes",
+    "lib::brotli_prefix::tree_record_offset",
+    "lib::brotli_prefix::TreeMetadata::single",
+    "lib::brotli_prefix::TreeMetadata::canonical",
+    "lib::brotli_prefix::write_next_tree_record",
+    "lib::brotli_prefix::read_tree_record",
+    "lib::brotli_input::MetaBlockDecoder::from_header",
+    "lib::brotli_input::MetaBlockDecoder::reset_after_header",
+    "lib::brotli_input::MetaBlockDecoder::advance_field",
+    "lib::brotli_input::extend_nibble_is_bounded",
+    "lib::brotli_input::extend_metadata_byte_is_bounded"
+  ],
+  "runtime_tests": {
+    "private_rust_groups_passed": 20,
+    "public_primitive_groups_passed": 9,
+    "upstream_comparison_group_passed": 1,
+    "pipeline_gate_groups_passed": 15
+  },
+  "proof_controls": {
+    "total_project_defects_rejected": 32,
+    "new_b3a_defects_rejected": 7,
+    "evidence": {
+      "path": "evidence/brotli-b3a-controls.json",
+      "sha256": "8a8f750171801edf173458f9c094dcb521741ffabd70a005273fa256cbd44438"
+    }
+  },
+  "properties": {
+    "workspace": [
+      "exact (1 << max_window_bits) + 1,176,560 byte requirement for bits 10..24",
+      "all approved region offsets, sizes and total are checked",
+      "tree/symbol addressing stays inside its selected three-byte-record region",
+      "canonical reads require an initialized prefix",
+      "single-symbol zero-bit reads do not inspect old workspace bytes"
+    ],
+    "meta_block_header": [
+      "each transition equals the specified transition for the exact consumed bits",
+      "normal and metadata length bounds",
+      "reserved and nonminimal encodings are permanent errors",
+      "nonfinal exhaustion versus final truncation",
+      "complete and failed states are sticky"
+    ]
+  },
+  "limitations": [
+    "Simple and complex prefix-code descriptions are not yet connected to the bit queue and workspace records.",
+    "No tree groups, context maps, literal/command/distance execution, LZ77, dictionary, output, budgeted public decoder, or B4 caller is implemented.",
+    "No PP-Security profile is adopted and independent specification review remains pending.",
+    "Rust/LLVM, modeled library operations, verifier/solver, OS and hardware remain trusted."
+  ]
+}

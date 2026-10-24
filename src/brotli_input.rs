@@ -758,6 +758,575 @@ impl HeaderDecoder {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MetaBlockError {
+    HeaderNotReady,
+    Truncated,
+    ReservedBit,
+    ExuberantLength,
+    ExuberantMetadataLength,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct MetaBlockHeader {
+    is_last: bool,
+    is_empty: bool,
+    is_uncompressed: bool,
+    is_metadata: bool,
+    length: u32,
+}
+
+impl MetaBlockHeader {
+    spec fn valid(&self) -> bool {
+        &&& self.length <= 16_777_216
+        &&& (self.is_empty ==> {
+            &&& self.is_last
+            &&& !self.is_uncompressed
+            &&& !self.is_metadata
+            &&& self.length == 0
+        })
+        &&& (self.is_metadata ==> {
+            &&& !self.is_empty
+            &&& !self.is_uncompressed
+        })
+        &&& (!self.is_empty && !self.is_metadata ==> 1 <= self.length)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MetaBlockPhase {
+    Last,
+    Empty,
+    Nibbles { is_last: bool },
+    Size {
+        is_last: bool,
+        nibbles: u8,
+        index: u8,
+        value: u32,
+    },
+    Uncompressed { is_last: bool, value: u32 },
+    Reserved { is_last: bool },
+    MetadataBytes { is_last: bool },
+    MetadataSize {
+        is_last: bool,
+        bytes: u8,
+        index: u8,
+        value: u32,
+    },
+    Complete(MetaBlockHeader),
+    Failed(MetaBlockError),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MetaBlockStatus {
+    Progress,
+    NeedInput,
+    Complete(MetaBlockHeader),
+    Failed(MetaBlockError),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct MetaBlockStep {
+    consumed: usize,
+    status: MetaBlockStatus,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct MetaBlockDecoder {
+    queue: BitQueue,
+    phase: MetaBlockPhase,
+}
+
+spec fn meta_phase_width(phase: MetaBlockPhase) -> nat {
+    match phase {
+        MetaBlockPhase::Last | MetaBlockPhase::Empty | MetaBlockPhase::Reserved { .. } => 1,
+        MetaBlockPhase::Nibbles { .. } | MetaBlockPhase::MetadataBytes { .. } => 2,
+        MetaBlockPhase::Size { .. } => 4,
+        MetaBlockPhase::Uncompressed { is_last, .. } => if is_last { 0 } else { 1 },
+        MetaBlockPhase::MetadataSize { .. } => 8,
+        MetaBlockPhase::Complete(_) | MetaBlockPhase::Failed(_) => 0,
+    }
+}
+
+spec fn meta_phase_terminal(phase: MetaBlockPhase) -> bool {
+    match phase {
+        MetaBlockPhase::Complete(_) | MetaBlockPhase::Failed(_) => true,
+        _ => false,
+    }
+}
+
+spec fn meta_transition(
+    phase: MetaBlockPhase,
+    field: nat,
+) -> (MetaBlockPhase, MetaBlockStatus) {
+    match phase {
+        MetaBlockPhase::Last => {
+            let next = if field == 0 {
+                MetaBlockPhase::Nibbles { is_last: false }
+            } else {
+                MetaBlockPhase::Empty
+            };
+            (next, MetaBlockStatus::Progress)
+        },
+        MetaBlockPhase::Empty => {
+            if field != 0 {
+                let header = MetaBlockHeader {
+                    is_last: true,
+                    is_empty: true,
+                    is_uncompressed: false,
+                    is_metadata: false,
+                    length: 0,
+                };
+                (MetaBlockPhase::Complete(header), MetaBlockStatus::Complete(header))
+            } else {
+                (MetaBlockPhase::Nibbles { is_last: true }, MetaBlockStatus::Progress)
+            }
+        },
+        MetaBlockPhase::Nibbles { is_last } => {
+            if field == 3 {
+                (MetaBlockPhase::Reserved { is_last }, MetaBlockStatus::Progress)
+            } else {
+                (MetaBlockPhase::Size {
+                    is_last,
+                    nibbles: (field + 4) as u8,
+                    index: 0,
+                    value: 0,
+                }, MetaBlockStatus::Progress)
+            }
+        },
+        MetaBlockPhase::Size { is_last, nibbles, index, value } => {
+            if index + 1 == nibbles && nibbles > 4 && field == 0 {
+                (MetaBlockPhase::Failed(MetaBlockError::ExuberantLength),
+                    MetaBlockStatus::Failed(MetaBlockError::ExuberantLength))
+            } else {
+                let next = value | ((field as u32) << (4 * index));
+                if index + 1 == nibbles {
+                    (MetaBlockPhase::Uncompressed { is_last, value: next },
+                        MetaBlockStatus::Progress)
+                } else {
+                    (MetaBlockPhase::Size {
+                        is_last,
+                        nibbles,
+                        index: (index as int + 1) as u8,
+                        value: next,
+                    }, MetaBlockStatus::Progress)
+                }
+            }
+        },
+        MetaBlockPhase::Uncompressed { is_last, value } => {
+            let header = MetaBlockHeader {
+                is_last,
+                is_empty: false,
+                is_uncompressed: !is_last && field != 0,
+                is_metadata: false,
+                length: (value as int + 1) as u32,
+            };
+            (MetaBlockPhase::Complete(header), MetaBlockStatus::Complete(header))
+        },
+        MetaBlockPhase::Reserved { is_last } => {
+            if field != 0 {
+                (MetaBlockPhase::Failed(MetaBlockError::ReservedBit),
+                    MetaBlockStatus::Failed(MetaBlockError::ReservedBit))
+            } else {
+                (MetaBlockPhase::MetadataBytes { is_last }, MetaBlockStatus::Progress)
+            }
+        },
+        MetaBlockPhase::MetadataBytes { is_last } => {
+            if field == 0 {
+                let header = MetaBlockHeader {
+                    is_last,
+                    is_empty: false,
+                    is_uncompressed: false,
+                    is_metadata: true,
+                    length: 0,
+                };
+                (MetaBlockPhase::Complete(header), MetaBlockStatus::Complete(header))
+            } else {
+                (MetaBlockPhase::MetadataSize {
+                    is_last,
+                    bytes: field as u8,
+                    index: 0,
+                    value: 0,
+                }, MetaBlockStatus::Progress)
+            }
+        },
+        MetaBlockPhase::MetadataSize { is_last, bytes, index, value } => {
+            if index + 1 == bytes && bytes > 1 && field == 0 {
+                (MetaBlockPhase::Failed(MetaBlockError::ExuberantMetadataLength),
+                    MetaBlockStatus::Failed(MetaBlockError::ExuberantMetadataLength))
+            } else {
+                let next = value | ((field as u32) << (8 * index));
+                if index + 1 == bytes {
+                    let header = MetaBlockHeader {
+                        is_last,
+                        is_empty: false,
+                        is_uncompressed: false,
+                        is_metadata: true,
+                        length: (next as int + 1) as u32,
+                    };
+                    (MetaBlockPhase::Complete(header), MetaBlockStatus::Complete(header))
+                } else {
+                    (MetaBlockPhase::MetadataSize {
+                        is_last,
+                        bytes,
+                        index: (index as int + 1) as u8,
+                        value: next,
+                    }, MetaBlockStatus::Progress)
+                }
+            }
+        },
+        MetaBlockPhase::Complete(header) =>
+            (phase, MetaBlockStatus::Complete(header)),
+        MetaBlockPhase::Failed(error) =>
+            (phase, MetaBlockStatus::Failed(error)),
+    }
+}
+
+proof fn pow2_width_at_most_byte(width: nat)
+    requires width <= 8,
+    ensures pow2(width) <= 256,
+{
+    lemma2_to64();
+    if width < 8 {
+        lemma_pow2_strictly_increases(width, 8);
+    }
+}
+
+#[verifier::bit_vector]
+proof fn extend_nibble_is_bounded(value: u32, digit: u32, index: u8)
+    requires index < 6,
+        value < (1u32 << (4 * index)),
+        digit < 16,
+    ensures (value | (digit << (4 * index))) < (1u32 << (4 * (index + 1))),
+        (value | (digit << (4 * index))) < 16_777_216,
+{
+}
+
+#[verifier::bit_vector]
+proof fn extend_metadata_byte_is_bounded(value: u32, byte: u32, index: u8)
+    requires index < 3,
+        value < (1u32 << (8 * index)),
+        byte < 256,
+    ensures (value | (byte << (8 * index))) < (1u32 << (8 * (index + 1))),
+        (value | (byte << (8 * index))) < 16_777_216,
+{
+}
+
+impl MetaBlockDecoder {
+    spec fn valid(&self) -> bool {
+        &&& self.queue.valid()
+        &&& match self.phase {
+            MetaBlockPhase::Size { nibbles, index, value, .. } => {
+                &&& 4 <= nibbles <= 6
+                &&& index < nibbles
+                &&& value < (1u32 << (4 * index))
+            },
+            MetaBlockPhase::Uncompressed { value, .. } => value < 16_777_216,
+            MetaBlockPhase::MetadataSize { bytes, index, value, .. } => {
+                &&& 1 <= bytes <= 3
+                &&& index < bytes
+                &&& value < (1u32 << (8 * index))
+            },
+            MetaBlockPhase::Complete(header) => header.valid(),
+            _ => true,
+        }
+    }
+
+    fn from_header(header: HeaderDecoder) -> (r: Result<Self, MetaBlockError>)
+        requires header.stable_valid(),
+        ensures r.is_ok() ==> {
+            &&& r.unwrap().valid()
+            &&& r.unwrap().queue == header.queue
+            &&& r.unwrap().phase == MetaBlockPhase::Last
+        },
+    {
+        match header.phase {
+            HeaderPhase::Complete { .. } => Ok(Self {
+                queue: header.queue,
+                phase: MetaBlockPhase::Last,
+            }),
+            _ => Err(MetaBlockError::HeaderNotReady),
+        }
+    }
+
+    fn reset_after_header(&mut self, header: HeaderDecoder) -> (r: Result<(), MetaBlockError>)
+        requires old(self).valid(), header.stable_valid(),
+        ensures r.is_ok() ==> {
+            &&& final(self).valid()
+            &&& final(self).queue == header.queue
+            &&& final(self).phase == MetaBlockPhase::Last
+        },
+    {
+        match header.phase {
+            HeaderPhase::Complete { .. } => {
+                self.queue = header.queue;
+                self.phase = MetaBlockPhase::Last;
+                Ok(())
+            }
+            _ => Err(MetaBlockError::HeaderNotReady),
+        }
+    }
+
+    fn fail(&mut self, error: MetaBlockError) -> (r: MetaBlockStep)
+        requires old(self).queue.valid(),
+        ensures final(self).valid(),
+            final(self).queue == old(self).queue,
+            final(self).phase == MetaBlockPhase::Failed(error),
+            r == (MetaBlockStep { consumed: 0, status: MetaBlockStatus::Failed(error) }),
+    {
+        self.phase = MetaBlockPhase::Failed(error);
+        MetaBlockStep { consumed: 0, status: MetaBlockStatus::Failed(error) }
+    }
+
+    #[verifier::rlimit(500)]
+    fn advance_field(
+        &mut self,
+        input: &[u8],
+        end_of_input: bool,
+    ) -> (r: MetaBlockStep)
+        requires old(self).valid(),
+        ensures final(self).valid(), r.consumed <= input.len(),
+            match old(self).phase {
+                MetaBlockPhase::Complete(header) => {
+                    &&& r == (MetaBlockStep { consumed: 0, status: MetaBlockStatus::Complete(header) })
+                    &&& *final(self) == *old(self)
+                },
+                MetaBlockPhase::Failed(error) => {
+                    &&& r == (MetaBlockStep { consumed: 0, status: MetaBlockStatus::Failed(error) })
+                    &&& *final(self) == *old(self)
+                },
+                _ => true,
+            },
+            r.status == MetaBlockStatus::NeedInput ==> {
+                &&& !end_of_input
+                &&& r.consumed == input.len()
+            },
+            match r.status {
+                MetaBlockStatus::Complete(header) => {
+                    &&& header.valid()
+                    &&& final(self).phase == MetaBlockPhase::Complete(header)
+                },
+                MetaBlockStatus::Failed(error) =>
+                    final(self).phase == MetaBlockPhase::Failed(error),
+                _ => true,
+            },
+            !meta_phase_terminal(old(self).phase) ==> {
+                let width = meta_phase_width(old(self).phase);
+                let available = old(self).queue.bits()
+                    + bytes_bits(input@.take(r.consumed as int));
+                &&& available.len() >= width ==> {
+                    let expected = meta_transition(
+                        old(self).phase,
+                        bits_value(available.take(width as int)),
+                    );
+                    &&& final(self).phase == expected.0
+                    &&& r.status == expected.1
+                }
+            },
+    {
+        let phase = self.phase;
+        match phase {
+            MetaBlockPhase::Complete(header) => {
+                return MetaBlockStep { consumed: 0, status: MetaBlockStatus::Complete(header) };
+            }
+            MetaBlockPhase::Failed(error) => {
+                return MetaBlockStep { consumed: 0, status: MetaBlockStatus::Failed(error) };
+            }
+            _ => {}
+        }
+
+        let width: usize = match phase {
+            MetaBlockPhase::Last => 1,
+            MetaBlockPhase::Empty => 1,
+            MetaBlockPhase::Nibbles { .. } => 2,
+            MetaBlockPhase::Size { .. } => 4,
+            MetaBlockPhase::Uncompressed { is_last, .. } => if is_last { 0 } else { 1 },
+            MetaBlockPhase::Reserved { .. } => 1,
+            MetaBlockPhase::MetadataBytes { .. } => 2,
+            MetaBlockPhase::MetadataSize { .. } => 8,
+            MetaBlockPhase::Complete(_) | MetaBlockPhase::Failed(_) => {
+                proof { assert(false); }
+                0
+            }
+        };
+
+        let read = self.queue.read_bits(width, input, end_of_input);
+        let bits = match read.status {
+            BitReadStatus::Value(value) => {
+                proof {
+                    assert(width <= 8);
+                    pow2_width_at_most_byte(width as nat);
+                    assert(value < 256);
+                }
+                value as u32
+            }
+            BitReadStatus::NeedInput => {
+                return MetaBlockStep { consumed: read.consumed, status: MetaBlockStatus::NeedInput };
+            }
+            BitReadStatus::Truncated => {
+                self.phase = MetaBlockPhase::Failed(MetaBlockError::Truncated);
+                return MetaBlockStep {
+                    consumed: read.consumed,
+                    status: MetaBlockStatus::Failed(MetaBlockError::Truncated),
+                };
+            }
+        };
+        proof {
+            lemma2_to64();
+            assert((bits as nat) < pow2(width as nat));
+        }
+
+        let mut status = MetaBlockStatus::Progress;
+        match phase {
+            MetaBlockPhase::Last => {
+                self.phase = if bits == 0 {
+                    MetaBlockPhase::Nibbles { is_last: false }
+                } else {
+                    MetaBlockPhase::Empty
+                };
+                assert(self.valid());
+            }
+            MetaBlockPhase::Empty => {
+                if bits != 0 {
+                    let header = MetaBlockHeader {
+                        is_last: true,
+                        is_empty: true,
+                        is_uncompressed: false,
+                        is_metadata: false,
+                        length: 0,
+                    };
+                    self.phase = MetaBlockPhase::Complete(header);
+                    status = MetaBlockStatus::Complete(header);
+                } else {
+                    self.phase = MetaBlockPhase::Nibbles { is_last: true };
+                }
+                assert(self.valid());
+            }
+            MetaBlockPhase::Nibbles { is_last } => {
+                assert(width == 2);
+                assert(bits < 4);
+                if bits == 3 {
+                    self.phase = MetaBlockPhase::Reserved { is_last };
+                } else {
+                    let nibbles = bits as u8 + 4;
+                    assert(4 <= nibbles <= 6);
+                    assert(0u32 < (1u32 << 0)) by (bit_vector);
+                    self.phase = MetaBlockPhase::Size {
+                        is_last,
+                        nibbles,
+                        index: 0,
+                        value: 0,
+                    };
+                }
+                assert(self.valid());
+            }
+            MetaBlockPhase::Size { is_last, nibbles, index, value } => {
+                assert(width == 4);
+                assert(bits < 16);
+                if index + 1 == nibbles && nibbles > 4 && bits == 0 {
+                    self.phase = MetaBlockPhase::Failed(MetaBlockError::ExuberantLength);
+                    status = MetaBlockStatus::Failed(MetaBlockError::ExuberantLength);
+                } else {
+                    proof { extend_nibble_is_bounded(value, bits, index); }
+                    let next = value | (bits << (4 * index));
+                    if index + 1 == nibbles {
+                        self.phase = MetaBlockPhase::Uncompressed { is_last, value: next };
+                    } else {
+                        self.phase = MetaBlockPhase::Size {
+                            is_last,
+                            nibbles,
+                            index: index + 1,
+                            value: next,
+                        };
+                    }
+                }
+                assert(self.valid());
+            }
+            MetaBlockPhase::Uncompressed { is_last, value } => {
+                let header = MetaBlockHeader {
+                    is_last,
+                    is_empty: false,
+                    is_uncompressed: !is_last && bits != 0,
+                    is_metadata: false,
+                    length: value + 1,
+                };
+                self.phase = MetaBlockPhase::Complete(header);
+                status = MetaBlockStatus::Complete(header);
+                assert(self.valid());
+            }
+            MetaBlockPhase::Reserved { is_last } => {
+                if bits != 0 {
+                    self.phase = MetaBlockPhase::Failed(MetaBlockError::ReservedBit);
+                    status = MetaBlockStatus::Failed(MetaBlockError::ReservedBit);
+                } else {
+                    self.phase = MetaBlockPhase::MetadataBytes { is_last };
+                }
+                assert(self.valid());
+            }
+            MetaBlockPhase::MetadataBytes { is_last } => {
+                assert(width == 2);
+                assert(bits < 4);
+                if bits == 0 {
+                    let header = MetaBlockHeader {
+                        is_last,
+                        is_empty: false,
+                        is_uncompressed: false,
+                        is_metadata: true,
+                        length: 0,
+                    };
+                    self.phase = MetaBlockPhase::Complete(header);
+                    status = MetaBlockStatus::Complete(header);
+                } else {
+                    let bytes = bits as u8;
+                    assert(1 <= bytes <= 3);
+                    assert(0u32 < (1u32 << 0)) by (bit_vector);
+                    self.phase = MetaBlockPhase::MetadataSize {
+                        is_last,
+                        bytes,
+                        index: 0,
+                        value: 0,
+                    };
+                }
+                assert(self.valid());
+            }
+            MetaBlockPhase::MetadataSize { is_last, bytes, index, value } => {
+                assert(width == 8);
+                assert(bits < 256);
+                if index + 1 == bytes && bytes > 1 && bits == 0 {
+                    self.phase = MetaBlockPhase::Failed(MetaBlockError::ExuberantMetadataLength);
+                    status = MetaBlockStatus::Failed(MetaBlockError::ExuberantMetadataLength);
+                } else {
+                    proof { extend_metadata_byte_is_bounded(value, bits, index); }
+                    let next = value | (bits << (8 * index));
+                    if index + 1 == bytes {
+                        let header = MetaBlockHeader {
+                            is_last,
+                            is_empty: false,
+                            is_uncompressed: false,
+                            is_metadata: true,
+                            length: next + 1,
+                        };
+                        self.phase = MetaBlockPhase::Complete(header);
+                        status = MetaBlockStatus::Complete(header);
+                    } else {
+                        self.phase = MetaBlockPhase::MetadataSize {
+                            is_last,
+                            bytes,
+                            index: index + 1,
+                            value: next,
+                        };
+                    }
+                }
+                assert(self.valid());
+            }
+            MetaBlockPhase::Complete(_) | MetaBlockPhase::Failed(_) => {
+                proof { assert(false); }
+            }
+        }
+        MetaBlockStep { consumed: read.consumed, status }
+    }
+}
+
 proof fn valid_bits_ignore_unused_storage(a: BitQueue, b: BitQueue)
     requires a.valid(), b.valid(),
         a.len == b.len, a.offset == b.offset,
@@ -772,6 +1341,45 @@ proof fn valid_bits_ignore_unused_storage(a: BitQueue, b: BitQueue)
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn pack_lsb_bits(bits: &[u8]) -> Vec<u8> {
+        let mut bytes = vec![0u8; bits.len().div_ceil(8)];
+        for (i, bit) in bits.iter().enumerate() {
+            bytes[i / 8] |= (bit & 1) << (i % 8);
+        }
+        bytes
+    }
+
+    fn parse_meta_bits(bits: &[u8], one_byte_chunks: bool) -> (MetaBlockDecoder, MetaBlockStep) {
+        let bytes = pack_lsb_bits(bits);
+        let mut header = HeaderDecoder::new();
+        let first = header.advance_header(&bytes, bytes.len() == 1);
+        assert!(matches!(first.status, HeaderStatus::Complete { .. }));
+        assert_eq!(first.consumed, 1);
+        let mut decoder = MetaBlockDecoder::from_header(header).unwrap();
+        let mut at = 1usize;
+        for _ in 0..32 {
+            let end = if one_byte_chunks {
+                (at + 1).min(bytes.len())
+            } else {
+                bytes.len()
+            };
+            let final_input = end == bytes.len();
+            let step = decoder.advance_field(&bytes[at..end], final_input);
+            at += step.consumed;
+            if !matches!(
+                step.status,
+                MetaBlockStatus::Progress | MetaBlockStatus::NeedInput
+            ) {
+                return (decoder, step);
+            }
+            if at == bytes.len() && matches!(step.status, MetaBlockStatus::NeedInput) {
+                let terminal = decoder.advance_field(&[], true);
+                return (decoder, terminal);
+            }
+        }
+        panic!("meta-block parser did not terminate")
+    }
 
     fn visible_bits(queue: &BitQueue) -> Vec<u8> {
         let mut result = Vec::new();
@@ -936,5 +1544,118 @@ mod tests {
         assert!(matches!(d.status, BitReadStatus::Value(_)));
         assert_eq!(at, bytes.len());
         assert_eq!(visible_bits(&queue).len(), 0);
+    }
+
+    #[test]
+    fn meta_block_headers_cover_empty_normal_and_metadata_forms() {
+        for chunks in [false, true] {
+            let (_, empty) = parse_meta_bits(&[0, 1, 1], chunks);
+            assert_eq!(
+                empty.status,
+                MetaBlockStatus::Complete(MetaBlockHeader {
+                    is_last: true,
+                    is_empty: true,
+                    is_uncompressed: false,
+                    is_metadata: false,
+                    length: 0,
+                })
+            );
+
+            let mut uncompressed = vec![0, 0, 0, 0];
+            uncompressed.extend([0; 16]);
+            uncompressed.push(1);
+            let (_, normal) = parse_meta_bits(&uncompressed, chunks);
+            assert_eq!(
+                normal.status,
+                MetaBlockStatus::Complete(MetaBlockHeader {
+                    is_last: false,
+                    is_empty: false,
+                    is_uncompressed: true,
+                    is_metadata: false,
+                    length: 1,
+                })
+            );
+
+            let mut last = vec![0, 1, 0, 0, 0, 1];
+            last.extend([0; 15]);
+            let (_, final_normal) = parse_meta_bits(&last, chunks);
+            assert_eq!(
+                final_normal.status,
+                MetaBlockStatus::Complete(MetaBlockHeader {
+                    is_last: true,
+                    is_empty: false,
+                    is_uncompressed: false,
+                    is_metadata: false,
+                    length: 2,
+                })
+            );
+
+            let (_, zero_metadata) = parse_meta_bits(&[0, 0, 1, 1, 0, 0, 0], chunks);
+            assert_eq!(
+                zero_metadata.status,
+                MetaBlockStatus::Complete(MetaBlockHeader {
+                    is_last: false,
+                    is_empty: false,
+                    is_uncompressed: false,
+                    is_metadata: true,
+                    length: 0,
+                })
+            );
+
+            let mut metadata = vec![0, 0, 1, 1, 0, 0, 1];
+            metadata.extend([0; 8]);
+            metadata.extend([1, 0, 0, 0, 0, 0, 0, 0]);
+            let (_, sized_metadata) = parse_meta_bits(&metadata, chunks);
+            assert_eq!(
+                sized_metadata.status,
+                MetaBlockStatus::Complete(MetaBlockHeader {
+                    is_last: false,
+                    is_empty: false,
+                    is_uncompressed: false,
+                    is_metadata: true,
+                    length: 257,
+                })
+            );
+        }
+    }
+
+    #[test]
+    fn meta_block_errors_are_permanent_and_truthful() {
+        let (mut reserved_decoder, reserved) = parse_meta_bits(&[0, 0, 1, 1, 1], true);
+        assert_eq!(
+            reserved.status,
+            MetaBlockStatus::Failed(MetaBlockError::ReservedBit)
+        );
+        assert_eq!(
+            reserved_decoder.advance_field(&[0xff], false),
+            MetaBlockStep {
+                consumed: 0,
+                status: MetaBlockStatus::Failed(MetaBlockError::ReservedBit),
+            }
+        );
+
+        let mut exuberant = vec![0, 0, 1, 0];
+        exuberant.extend([1, 0, 0, 0]);
+        exuberant.extend([0; 16]);
+        let (_, normal_error) = parse_meta_bits(&exuberant, false);
+        assert_eq!(
+            normal_error.status,
+            MetaBlockStatus::Failed(MetaBlockError::ExuberantLength)
+        );
+
+        let mut metadata = vec![0, 0, 1, 1, 0, 0, 1];
+        metadata.extend([1, 0, 0, 0, 0, 0, 0, 0]);
+        metadata.extend([0; 8]);
+        let (_, metadata_error) = parse_meta_bits(&metadata, true);
+        assert_eq!(
+            metadata_error.status,
+            MetaBlockStatus::Failed(MetaBlockError::ExuberantMetadataLength)
+        );
+
+        let (_, truncated) = parse_meta_bits(&[0, 0], true);
+        assert_eq!(
+            truncated.status,
+            MetaBlockStatus::Failed(MetaBlockError::Truncated)
+        );
     }
 }

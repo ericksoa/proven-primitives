@@ -66,3 +66,6 @@ __pycache__/
 !/evidence/b2-c1-verification.json
 !/evidence/b2-c1-controls.json
 !/evidence/b2-c1.json
+!/evidence/brotli-b3a-verification.json
+!/evidence/brotli-b3a-controls.json
+!/evidence/brotli-b3a.json

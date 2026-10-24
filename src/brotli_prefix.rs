@@ -9,6 +9,9 @@
 
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use vstd::arithmetic::mul::{lemma_mul_inequality, lemma_mul_is_distributive_add_other_way};
+
 verus! {
 
 pub(crate) const MAX_SYMBOLS: usize = 258;
@@ -447,6 +450,442 @@ impl PrefixCode {
     }
 }
 
+// B3 fixed caller-workspace layout. Offsets below are relative to the byte
+// immediately following the power-of-two LZ77 window.
+pub(crate) const FIXED_SCRATCH_BYTES: u32 = 1_176_560;
+pub(crate) const LITERAL_TREES_OFFSET: u32 = 0;
+pub(crate) const LITERAL_TREES_BYTES: u32 = 196_608;
+pub(crate) const COMMAND_TREES_OFFSET: u32 = 196_608;
+pub(crate) const COMMAND_TREES_BYTES: u32 = 540_672;
+pub(crate) const DISTANCE_TREES_OFFSET: u32 = 737_280;
+pub(crate) const DISTANCE_TREES_BYTES: u32 = 399_360;
+pub(crate) const LITERAL_CONTEXT_MAP_OFFSET: u32 = 1_136_640;
+pub(crate) const LITERAL_CONTEXT_MAP_BYTES: u32 = 16_384;
+pub(crate) const DISTANCE_CONTEXT_MAP_OFFSET: u32 = 1_153_024;
+pub(crate) const DISTANCE_CONTEXT_MAP_BYTES: u32 = 1_024;
+pub(crate) const LITERAL_CONTEXT_MODES_OFFSET: u32 = 1_154_048;
+pub(crate) const LITERAL_CONTEXT_MODES_BYTES: u32 = 256;
+pub(crate) const BLOCK_TYPE_TREES_OFFSET: u32 = 1_154_304;
+pub(crate) const BLOCK_TYPE_TREES_BYTES: u32 = 2_322;
+pub(crate) const BLOCK_LENGTH_TREES_OFFSET: u32 = 1_156_626;
+pub(crate) const BLOCK_LENGTH_TREES_BYTES: u32 = 234;
+pub(crate) const BUILDER_OFFSET: u32 = 1_156_860;
+pub(crate) const BUILDER_BYTES: u32 = 3_056;
+pub(crate) const TEMP_CONTEXT_TREE_OFFSET: u32 = 1_159_100;
+pub(crate) const TEMP_CONTEXT_TREE_BYTES: u32 = 816;
+pub(crate) const MTF_OFFSET: u32 = 1_159_916;
+pub(crate) const MTF_BYTES: u32 = 260;
+pub(crate) const STATE_OFFSET: u32 = 1_160_176;
+pub(crate) const STATE_BYTES: u32 = 16_384;
+
+pub(crate) const MAX_TREE_GROUPS: u16 = 256;
+pub(crate) const LITERAL_SYMBOLS: u16 = 256;
+pub(crate) const COMMAND_SYMBOLS: u16 = 704;
+pub(crate) const DISTANCE_SYMBOLS: u16 = 520;
+pub(crate) const BLOCK_TYPE_SYMBOLS: u16 = 258;
+pub(crate) const BLOCK_LENGTH_SYMBOLS: u16 = 26;
+pub(crate) const TEMP_CONTEXT_SYMBOLS: u16 = 272;
+const TREE_RECORD_BYTES: u32 = 3;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum WorkspaceError {
+    InvalidWindowBits,
+    WorkspaceTooSmall,
+    InvalidTree,
+    InvalidSymbol,
+    InvalidCodeLength,
+    UninitializedRecord,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum TreeRegion {
+    Literal,
+    Command,
+    Distance,
+    BlockType,
+    BlockLength,
+    TemporaryContext,
+}
+
+spec fn tree_region_offset(region: TreeRegion) -> nat {
+    match region {
+        TreeRegion::Literal => LITERAL_TREES_OFFSET as nat,
+        TreeRegion::Command => COMMAND_TREES_OFFSET as nat,
+        TreeRegion::Distance => DISTANCE_TREES_OFFSET as nat,
+        TreeRegion::BlockType => BLOCK_TYPE_TREES_OFFSET as nat,
+        TreeRegion::BlockLength => BLOCK_LENGTH_TREES_OFFSET as nat,
+        TreeRegion::TemporaryContext => TEMP_CONTEXT_TREE_OFFSET as nat,
+    }
+}
+
+spec fn tree_region_count(region: TreeRegion) -> nat {
+    match region {
+        TreeRegion::Literal | TreeRegion::Command | TreeRegion::Distance => 256,
+        TreeRegion::BlockType | TreeRegion::BlockLength => 3,
+        TreeRegion::TemporaryContext => 1,
+    }
+}
+
+pub(crate) open spec fn tree_region_symbols(region: TreeRegion) -> nat {
+    match region {
+        TreeRegion::Literal => LITERAL_SYMBOLS as nat,
+        TreeRegion::Command => COMMAND_SYMBOLS as nat,
+        TreeRegion::Distance => DISTANCE_SYMBOLS as nat,
+        TreeRegion::BlockType => BLOCK_TYPE_SYMBOLS as nat,
+        TreeRegion::BlockLength => BLOCK_LENGTH_SYMBOLS as nat,
+        TreeRegion::TemporaryContext => TEMP_CONTEXT_SYMBOLS as nat,
+    }
+}
+
+spec fn tree_region_bytes(region: TreeRegion) -> nat {
+    tree_region_count(region) * tree_region_symbols(region) * TREE_RECORD_BYTES as nat
+}
+
+proof fn fixed_layout_is_exact()
+    ensures
+        LITERAL_TREES_OFFSET + LITERAL_TREES_BYTES == COMMAND_TREES_OFFSET,
+        COMMAND_TREES_OFFSET + COMMAND_TREES_BYTES == DISTANCE_TREES_OFFSET,
+        DISTANCE_TREES_OFFSET + DISTANCE_TREES_BYTES == LITERAL_CONTEXT_MAP_OFFSET,
+        LITERAL_CONTEXT_MAP_OFFSET + LITERAL_CONTEXT_MAP_BYTES == DISTANCE_CONTEXT_MAP_OFFSET,
+        DISTANCE_CONTEXT_MAP_OFFSET + DISTANCE_CONTEXT_MAP_BYTES == LITERAL_CONTEXT_MODES_OFFSET,
+        LITERAL_CONTEXT_MODES_OFFSET + LITERAL_CONTEXT_MODES_BYTES == BLOCK_TYPE_TREES_OFFSET,
+        BLOCK_TYPE_TREES_OFFSET + BLOCK_TYPE_TREES_BYTES == BLOCK_LENGTH_TREES_OFFSET,
+        BLOCK_LENGTH_TREES_OFFSET + BLOCK_LENGTH_TREES_BYTES == BUILDER_OFFSET,
+        BUILDER_OFFSET + BUILDER_BYTES == MTF_OFFSET,
+        MTF_OFFSET + MTF_BYTES == STATE_OFFSET,
+        STATE_OFFSET + STATE_BYTES == FIXED_SCRATCH_BYTES,
+        TEMP_CONTEXT_TREE_OFFSET >= BUILDER_OFFSET,
+        TEMP_CONTEXT_TREE_OFFSET + TEMP_CONTEXT_TREE_BYTES == MTF_OFFSET,
+{
+}
+
+proof fn tree_layout_is_bounded(region: TreeRegion)
+    ensures tree_region_offset(region) + tree_region_bytes(region)
+        <= FIXED_SCRATCH_BYTES,
+{
+    fixed_layout_is_exact();
+    match region {
+        TreeRegion::Literal => {}
+        TreeRegion::Command => {}
+        TreeRegion::Distance => {}
+        TreeRegion::BlockType => {}
+        TreeRegion::BlockLength => {}
+        TreeRegion::TemporaryContext => {}
+    }
+}
+
+#[verifier::bit_vector]
+proof fn workspace_size_fits_u32(window_bits: u8)
+    requires 10 <= window_bits <= 24,
+    ensures (1u32 << window_bits) <= 16_777_216,
+        (1u32 << window_bits) + FIXED_SCRATCH_BYTES <= u32::MAX,
+{
+}
+
+pub(crate) fn required_workspace_bytes(window_bits: u8) -> (r: Result<u32, WorkspaceError>)
+    ensures r.is_ok() ==> {
+        &&& 10 <= window_bits <= 24
+        &&& r.unwrap() == (1u32 << window_bits) + FIXED_SCRATCH_BYTES
+    },
+{
+    if window_bits < 10 || window_bits > 24 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    proof { workspace_size_fits_u32(window_bits); }
+    Ok((1u32 << window_bits) + FIXED_SCRATCH_BYTES)
+}
+
+fn tree_region_offset_exec(region: TreeRegion) -> (r: u32)
+    ensures r as nat == tree_region_offset(region),
+{
+    match region {
+        TreeRegion::Literal => LITERAL_TREES_OFFSET,
+        TreeRegion::Command => COMMAND_TREES_OFFSET,
+        TreeRegion::Distance => DISTANCE_TREES_OFFSET,
+        TreeRegion::BlockType => BLOCK_TYPE_TREES_OFFSET,
+        TreeRegion::BlockLength => BLOCK_LENGTH_TREES_OFFSET,
+        TreeRegion::TemporaryContext => TEMP_CONTEXT_TREE_OFFSET,
+    }
+}
+
+fn tree_region_count_exec(region: TreeRegion) -> (r: u16)
+    ensures r as nat == tree_region_count(region),
+{
+    match region {
+        TreeRegion::Literal | TreeRegion::Command | TreeRegion::Distance => 256,
+        TreeRegion::BlockType | TreeRegion::BlockLength => 3,
+        TreeRegion::TemporaryContext => 1,
+    }
+}
+
+fn tree_region_symbols_exec(region: TreeRegion) -> (r: u16)
+    ensures r as nat == tree_region_symbols(region),
+{
+    match region {
+        TreeRegion::Literal => LITERAL_SYMBOLS,
+        TreeRegion::Command => COMMAND_SYMBOLS,
+        TreeRegion::Distance => DISTANCE_SYMBOLS,
+        TreeRegion::BlockType => BLOCK_TYPE_SYMBOLS,
+        TreeRegion::BlockLength => BLOCK_LENGTH_SYMBOLS,
+        TreeRegion::TemporaryContext => TEMP_CONTEXT_SYMBOLS,
+    }
+}
+
+fn tree_record_offset(
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    symbol: u16,
+) -> (r: Result<usize, WorkspaceError>)
+    ensures r.is_ok() ==> {
+        &&& tree < tree_region_count(region)
+        &&& symbol < tree_region_symbols(region)
+        &&& r.unwrap() as nat == window_bytes as nat + tree_region_offset(region)
+            + (tree as nat * tree_region_symbols(region) + symbol as nat) * 3
+        &&& r.unwrap() + 3 <= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+    },
+{
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let count = tree_region_count_exec(region);
+    let symbols = tree_region_symbols_exec(region);
+    if tree >= count {
+        return Err(WorkspaceError::InvalidTree);
+    }
+    if symbol >= symbols {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    proof { tree_layout_is_bounded(region); }
+    let record = match (tree as u32).checked_mul(symbols as u32) {
+        Some(value) => match value.checked_add(symbol as u32) {
+            Some(index) => index,
+            None => return Err(WorkspaceError::InvalidSymbol),
+        },
+        None => return Err(WorkspaceError::InvalidSymbol),
+    };
+    let bytes = match record.checked_mul(TREE_RECORD_BYTES) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::InvalidSymbol),
+    };
+    let relative = match tree_region_offset_exec(region).checked_add(bytes) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::InvalidSymbol),
+    };
+    let absolute = match window_bytes.checked_add(relative) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::InvalidWindowBits),
+    };
+    proof {
+        assert(count as nat == tree_region_count(region));
+        assert(symbols as nat == tree_region_symbols(region));
+        assert(tree < count);
+        assert(symbol < symbols);
+        assert(symbol as nat + 1 <= symbols as nat);
+        assert(tree as nat + 1 <= count as nat);
+        assert(tree as nat * symbols as nat + symbol as nat + 1
+            <= tree as nat * symbols as nat + symbols as nat);
+        lemma_mul_is_distributive_add_other_way(
+            symbols as int,
+            tree as int,
+            1,
+        );
+        assert(tree as nat * symbols as nat + symbol as nat + 1
+            <= (tree as nat + 1) * symbols as nat);
+        lemma_mul_inequality(
+            tree as int + 1,
+            count as int,
+            symbols as int,
+        );
+        assert((tree as nat + 1) * symbols as nat <= count as nat * symbols as nat);
+        assert(tree as nat * tree_region_symbols(region) + symbol as nat + 1
+            <= tree_region_count(region) * tree_region_symbols(region));
+        assert(record as nat
+            == tree as nat * tree_region_symbols(region) + symbol as nat);
+        assert(bytes as nat == record as nat * 3);
+        assert(relative as nat == tree_region_offset(region) + bytes as nat);
+        assert(absolute as nat == window_bytes as nat + relative as nat);
+        assert(relative as nat + 3
+            <= tree_region_offset(region) + tree_region_bytes(region));
+        assert(relative as nat + 3 <= FIXED_SCRATCH_BYTES);
+    }
+    Ok(absolute as usize)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct TreeRecord {
+    pub(crate) length: u8,
+    pub(crate) code: u16,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum TreeStorageState {
+    Unused,
+    Single { symbol: u16 },
+    Canonical { initialized: u16 },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct TreeMetadata {
+    pub(crate) symbols: u16,
+    pub(crate) storage: TreeStorageState,
+}
+
+impl TreeMetadata {
+    pub(crate) open spec fn valid_for(&self, region: TreeRegion) -> bool {
+        &&& self.symbols <= tree_region_symbols(region)
+        &&& match self.storage {
+            TreeStorageState::Unused => self.symbols == 0,
+            TreeStorageState::Single { symbol } => self.symbols > 0 && symbol < self.symbols,
+            TreeStorageState::Canonical { initialized } => initialized <= self.symbols,
+        }
+    }
+
+    pub(crate) fn unused() -> (r: Self)
+        ensures r.symbols == 0, r.storage == TreeStorageState::Unused,
+    {
+        Self { symbols: 0, storage: TreeStorageState::Unused }
+    }
+
+    pub(crate) fn single(
+        region: TreeRegion,
+        symbols: u16,
+        symbol: u16,
+    ) -> (r: Result<Self, WorkspaceError>)
+        ensures r.is_ok() ==> r.unwrap().valid_for(region),
+    {
+        let capacity = tree_region_symbols_exec(region);
+        if symbols == 0 || symbols > capacity || symbol >= symbols {
+            return Err(WorkspaceError::InvalidSymbol);
+        }
+        Ok(Self { symbols, storage: TreeStorageState::Single { symbol } })
+    }
+
+    pub(crate) fn canonical(
+        region: TreeRegion,
+        symbols: u16,
+    ) -> (r: Result<Self, WorkspaceError>)
+        ensures r.is_ok() ==> r.unwrap().valid_for(region),
+    {
+        let capacity = tree_region_symbols_exec(region);
+        if symbols == 0 || symbols > capacity {
+            return Err(WorkspaceError::InvalidSymbol);
+        }
+        Ok(Self { symbols, storage: TreeStorageState::Canonical { initialized: 0 } })
+    }
+}
+
+pub(crate) fn write_next_tree_record(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    meta: &mut TreeMetadata,
+    record: TreeRecord,
+) -> (r: Result<(), WorkspaceError>)
+    requires old(meta).valid_for(region),
+    ensures r.is_ok() ==> {
+        &&& final(meta).valid_for(region)
+        &&& final(meta).symbols == old(meta).symbols
+        &&& match old(meta).storage {
+            TreeStorageState::Canonical { initialized } =>
+                final(meta).storage == TreeStorageState::Canonical {
+                    initialized: (initialized as int + 1) as u16,
+                },
+            _ => false,
+        }
+    },
+{
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::WorkspaceTooSmall),
+    };
+    if workspace.len() < required {
+        return Err(WorkspaceError::WorkspaceTooSmall);
+    }
+    if record.length == 0 || record.length > MAX_BITS {
+        return Err(WorkspaceError::InvalidCodeLength);
+    }
+    let initialized = match meta.storage {
+        TreeStorageState::Canonical { initialized } => initialized,
+        _ => return Err(WorkspaceError::UninitializedRecord),
+    };
+    if initialized >= meta.symbols {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    let at = match tree_record_offset(window_bytes, region, tree, initialized) {
+        Ok(value) => value,
+        Err(error) => return Err(error),
+    };
+    workspace[at] = record.length;
+    workspace[at + 1] = (record.code % 256) as u8;
+    workspace[at + 2] = (record.code / 256) as u8;
+    meta.storage = TreeStorageState::Canonical { initialized: initialized + 1 };
+    Ok(())
+}
+
+pub(crate) fn read_tree_record(
+    workspace: &[u8],
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    meta: &TreeMetadata,
+    symbol: u16,
+) -> (r: Result<TreeRecord, WorkspaceError>)
+    requires meta.valid_for(region),
+    ensures r.is_ok() ==> {
+        &&& symbol < meta.symbols
+        &&& match meta.storage {
+            TreeStorageState::Single { symbol: only } => {
+                &&& symbol == only
+                &&& r.unwrap() == TreeRecord { length: 0, code: 0 }
+            },
+            TreeStorageState::Canonical { initialized } => symbol < initialized,
+            TreeStorageState::Unused => false,
+        }
+    },
+{
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::WorkspaceTooSmall),
+    };
+    if workspace.len() < required {
+        return Err(WorkspaceError::WorkspaceTooSmall);
+    }
+    if symbol >= meta.symbols {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    match meta.storage {
+        TreeStorageState::Unused => Err(WorkspaceError::UninitializedRecord),
+        TreeStorageState::Single { symbol: only } => {
+            if symbol != only {
+                Err(WorkspaceError::InvalidSymbol)
+            } else {
+                Ok(TreeRecord { length: 0, code: 0 })
+            }
+        }
+        TreeStorageState::Canonical { initialized } => {
+            if symbol >= initialized {
+                return Err(WorkspaceError::UninitializedRecord);
+            }
+            let at = match tree_record_offset(window_bytes, region, tree, symbol) {
+                Ok(value) => value,
+                Err(error) => return Err(error),
+            };
+            Ok(TreeRecord {
+                length: workspace[at],
+                code: workspace[at + 1] as u16 | ((workspace[at + 2] as u16) << 8),
+            })
+        }
+    }
+}
+
 }
 
 #[cfg(test)]
@@ -513,6 +952,102 @@ mod tests {
         assert_eq!(
             decode_block_length(0, 4),
             Err(PrefixError::InvalidBlockLengthSuffix)
+        );
+    }
+
+    #[test]
+    fn b3_workspace_layout_is_exact_and_bounded() {
+        assert_eq!(
+            required_workspace_bytes(9),
+            Err(WorkspaceError::InvalidWindowBits)
+        );
+        assert_eq!(
+            required_workspace_bytes(25),
+            Err(WorkspaceError::InvalidWindowBits)
+        );
+        assert_eq!(required_workspace_bytes(10), Ok(1_177_584));
+        assert_eq!(required_workspace_bytes(24), Ok(17_953_776));
+
+        let window = 1u32 << 10;
+        for region in [
+            TreeRegion::Literal,
+            TreeRegion::Command,
+            TreeRegion::Distance,
+            TreeRegion::BlockType,
+            TreeRegion::BlockLength,
+            TreeRegion::TemporaryContext,
+        ] {
+            let trees = tree_region_count_exec(region);
+            let symbols = tree_region_symbols_exec(region);
+            let first = tree_record_offset(window, region, 0, 0).unwrap();
+            let last = tree_record_offset(window, region, trees - 1, symbols - 1).unwrap();
+            assert_eq!(
+                first,
+                window as usize + tree_region_offset_exec(region) as usize
+            );
+            assert_eq!(last + 3, first + trees as usize * symbols as usize * 3);
+            assert!(last + 3 <= required_workspace_bytes(10).unwrap() as usize);
+        }
+    }
+
+    #[test]
+    fn b3_tree_records_never_read_uninitialized_workspace() {
+        let window = 1u32 << 10;
+        let required = required_workspace_bytes(10).unwrap() as usize;
+        let mut workspace = vec![0xa5u8; required];
+        let mut meta = TreeMetadata::canonical(TreeRegion::Literal, 2).unwrap();
+
+        assert_eq!(
+            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 0),
+            Err(WorkspaceError::UninitializedRecord)
+        );
+        write_next_tree_record(
+            &mut workspace,
+            window,
+            TreeRegion::Literal,
+            0,
+            &mut meta,
+            TreeRecord { length: 1, code: 0 },
+        )
+        .unwrap();
+        write_next_tree_record(
+            &mut workspace,
+            window,
+            TreeRegion::Literal,
+            0,
+            &mut meta,
+            TreeRecord { length: 1, code: 1 },
+        )
+        .unwrap();
+        assert_eq!(
+            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 0),
+            Ok(TreeRecord { length: 1, code: 0 })
+        );
+        assert_eq!(
+            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 1),
+            Ok(TreeRecord { length: 1, code: 1 })
+        );
+        assert_eq!(workspace[window as usize + 6], 0xa5);
+
+        let single = TreeMetadata::single(TreeRegion::Literal, 256, 19).unwrap();
+        let first = read_tree_record(&workspace, window, TreeRegion::Literal, 1, &single, 19);
+        workspace.fill(0x5a);
+        let second = read_tree_record(&workspace, window, TreeRegion::Literal, 1, &single, 19);
+        assert_eq!(first, Ok(TreeRecord { length: 0, code: 0 }));
+        assert_eq!(first, second);
+
+        let mut too_small = vec![0u8; required - 1];
+        let mut small_meta = TreeMetadata::canonical(TreeRegion::Literal, 1).unwrap();
+        assert_eq!(
+            write_next_tree_record(
+                &mut too_small,
+                window,
+                TreeRegion::Literal,
+                0,
+                &mut small_meta,
+                TreeRecord { length: 1, code: 0 },
+            ),
+            Err(WorkspaceError::WorkspaceTooSmall)
         );
     }
 }

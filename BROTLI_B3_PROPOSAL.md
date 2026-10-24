@@ -6,6 +6,11 @@ deferred by the earlier approvals. It does not approve B4 profile adoption,
 independent review, a service, CI, crate publication, new dependencies, or a
 changed proof trust boundary.
 
+Implementation status: the fixed workspace/tree-record layout and the
+source-linked meta-block-header state machine are checked as the first B3a
+slice. Simple and complex code-description parsing remains before B3a is
+complete; see [BROTLI_B3A.md](BROTLI_B3A.md).
+
 ## Supported format and public API
 
 Implement the already-approved `RequestLimits`, `RequestBudget`,
@@ -149,7 +154,8 @@ proved; wall-clock availability still needs B4 deployment assumptions.
 ## Implementation and evidence order
 
 1. B3a: meta-block headers, simple/complex code descriptions, checked layout and
-   deliberate malformed-code controls.
+   deliberate malformed-code controls. The layout and meta-header portions are
+   checked; code-description parsing remains.
 2. B3b: tree groups, context maps and all literal/command/distance transitions,
    including integrated CVE-status corruption controls.
 3. B3c: literals, commands, LZ77, dictionary/transforms, metadata,

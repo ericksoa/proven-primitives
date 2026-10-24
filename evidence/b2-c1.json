@@ -11,11 +11,11 @@
   "reports": {
     "composition": {
       "path": "COMPOSITION_C1.md",
-      "sha256": "5bc35240a80d4335b4593349afe6fb90a7298d2df52202fd3e1f4cb2a6c794ca"
+      "sha256": "eab7b6b76a02cccb92d40f05679508dd6c9d0d4a95210e8cd909db74295b3adc"
     },
     "brotli_b2": {
       "path": "BROTLI_B2.md",
-      "sha256": "6604a9393262a1805d4d19c46c197850cf4a30f648bfc8df8c4d69c8bd293f5f"
+      "sha256": "4fb692c2256ff5fed4724d60989c638870102b87606e857ff333b29b922dbd42"
     },
     "pipeline": {
       "path": "PIPELINE.md",

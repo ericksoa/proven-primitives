@@ -1,9 +1,9 @@
 {
   "project": "Proven Primitives",
   "license": "Apache-2.0",
-  "verified_utc": "2026-10-24T19:49:13.986339+00:00",
+  "verified_utc": "2026-10-24T20:47:02.323217+00:00",
   "claim": "Proven secure against the specified per-call bounds, output-integrity and prior-destination-disclosure threats for every admitted input and modeled execution under the published contracts and trusted base.",
-  "source_tree_sha256": "b96376da08d98b7433ee47414eadba64ed12feac0d515f1e80bd948b4121b771",
+  "source_tree_sha256": "5bca40bd6f951984c6a28ce1001a8d7b04e54556847287f78396647fa52b8851",
   "source_sha256": {
     "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
     "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
@@ -12,14 +12,14 @@
     "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
     "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
     "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
-    "src/brotli_input.rs": "6528bb6a4bb95d88db37fbf3b8505e6c9d45a09bd3e83b083e0979e9ca917cfe",
-    "src/brotli_prefix.rs": "e7fff6dc2e274a027958c975241c25eb3bbd4e054210f461fb9b6228e5d84be6",
+    "src/brotli_input.rs": "a8567ef078b686630f789b8d03a8903e2a42c0303a40aab9d53472437f18b37a",
+    "src/brotli_prefix.rs": "e484befae8e276e2292bb69593b521c71f24d6f7f7f3f79f729c830e729a99b8",
     "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
     "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
   },
   "validation_source_sha256": {
     "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
-    "tests/proof_rejection.rs": "bce64e3fb5fa1a3087f3637b205c9fe946fa9635bf7ffc19a40f05d94cc80e6c",
+    "tests/proof_rejection.rs": "ff60f9d06502d90cb6d3dedde58cf25ab8643ed57fed502d42c48ecdd6a3a5a7",
     "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
     "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
     "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
@@ -40,7 +40,7 @@
     "encountered-error": false,
     "encountered-vir-error": false,
     "success": true,
-    "verified": 177,
+    "verified": 243,
     "errors": 0,
     "is-verifying-entire-crate": true
   },
@@ -62,12 +62,12 @@
     "standard_primitive_test_groups_passed": 9,
     "proof_source_audit_passed": true,
     "proof_rejection_test_passed": true,
-    "semantic_mutations_rejected": 25,
-    "unchanged_positive_control_verified": 177,
+    "semantic_mutations_rejected": 32,
+    "unchanged_positive_control_verified": 243,
     "large_input_bytes": 262144,
     "upstream_comparison_test_passed": true,
     "brotli_b1_test_groups_passed": 4,
-    "private_rust_test_groups_passed": 16,
+    "private_rust_test_groups_passed": 20,
     "pipeline_gate_test_groups_passed": 15
   },
   "public_apis": [
@@ -136,6 +136,18 @@
       "literal, command and distance switch state remains bounded across suspension and reset",
       "a switch with one declared type is permanent, sticky and consumes zero decoded fields",
       "prefix and block-length results connect to the shared switch transition"
+    ],
+    "brotli_b3a_private_slice": [
+      "exact (1 << max_window_bits) + 1,176,560 byte requirement for bits 10..24",
+      "all approved region offsets, sizes and total are checked",
+      "tree/symbol addressing stays inside its selected three-byte-record region",
+      "canonical reads require an initialized prefix",
+      "single-symbol zero-bit reads do not inspect old workspace bytes",
+      "each transition equals the specified transition for the exact consumed bits",
+      "normal and metadata length bounds",
+      "reserved and nonminimal encodings are permanent errors",
+      "nonfinal exhaustion versus final truncation",
+      "complete and failed states are sticky"
     ]
   },
   "trusted_base": [
@@ -146,6 +158,7 @@
     "operating system and hardware execution"
   ],
   "not_claimed": [
+    "Brotli output, dictionary, context-map, LZ77 or complete streaming correctness",
     "Brotli output, dictionary, meta-block or streaming decompression correctness",
     "CVE-2026-111497 block-switch integration proof or historical replay",
     "LZ4 frame, dictionary or streaming correctness",
@@ -157,6 +170,7 @@
     "constant-time cryptographic behavior",
     "independent expert audit of the specifications",
     "practical service-wide denial-of-service resistance",
+    "simple and complex Brotli code-description parsing",
     "verification of an upstream crate's entire API",
     "verification of arbitrary caller composition",
     "verified arbitrary caller/streaming/concurrent call sequences",
@@ -171,8 +185,8 @@
     },
     "report": "evidence/validation.json",
     "sha256": "c283f563519399927ab56eb09bc74484e58d0e794f23f9966d23423e9e0c1655",
-    "note": "Fresh baseline and candidate, three process runs each; warm host batch averages with all raw samples retained. B1 is private and all existing public executable functions/specifications are source-identical to the measured G revision; no B1 performance claim. The current C1/B2 revision was not benchmarked; historical public-routine measurements remain tied to their recorded revision.",
-    "source_bridge": "evidence/brotli-b1.json"
+    "note": "Fresh baseline and candidate, three process runs each; warm host batch averages with all raw samples retained. The current B3a code is private and not on any measured public path; all public executable functions and specifications remain source-identical to the measured G revision. Historical public-routine measurements remain tied to their recorded revision.",
+    "source_bridge": "evidence/brotli-b3a.json"
   },
   "publication": {
     "github_repository_created": true,
@@ -195,9 +209,9 @@
   },
   "security_contract_assessment": {
     "report": "SECURITY_CONTRACTS.md",
-    "sha256": "fe6a7eec1b4bddaf3d98c9f7233dc9a14b375c90b81c7d19f057089b7f77914a",
-    "evidence": "evidence/b2-c1.json",
-    "evidence_sha256": "40648f6a29b552e2ca53a40bbfc12f57725ac745d7924e3e721c46e2b9ca9a1f"
+    "sha256": "8862e71224a4eab9e3d2b3834d771ffe45ef28b7b63cdeb2da7879f57697c952",
+    "evidence": "evidence/brotli-b3a.json",
+    "evidence_sha256": "568d6c1732eaa3b95b1978de43b62aa8901f9b486e6614e2a83e56969ca67054"
   },
   "brotli_b1": {
     "status": "checked private component; not a complete decoder",
@@ -210,5 +224,16 @@
     "status": "checked private components; no complete Brotli decoder or adopted profile",
     "evidence": "evidence/b2-c1.json",
     "evidence_sha256": "40648f6a29b552e2ca53a40bbfc12f57725ac745d7924e3e721c46e2b9ca9a1f"
+  },
+  "brotli_b3a": {
+    "status": "checked partial B3a implementation; not a complete decoder or supported API",
+    "report": "BROTLI_B3A.md",
+    "report_sha256": "15115142b2c7c0ce76c2f2e543dd733b2a6053becb2356a03bb6b2a30b964703",
+    "evidence": "evidence/brotli-b3a.json",
+    "evidence_sha256": "568d6c1732eaa3b95b1978de43b62aa8901f9b486e6614e2a83e56969ca67054"
+  },
+  "verification_evidence": {
+    "path": "evidence/brotli-b3a-verification.json",
+    "sha256": "3447a21a75e4391cbe56d79e3ecaf667a0cc96130c2633a226d4165394c01b2d"
   }
 }

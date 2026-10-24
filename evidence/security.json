@@ -3,7 +3,7 @@
   "claim": "Proven secure against the specified per-call bounds, output-integrity and prior-destination-disclosure threats for every admitted input and modeled execution under the published contracts and trusted base.",
   "assessment": {
     "path": "SECURITY_CONTRACTS.md",
-    "sha256": "fe6a7eec1b4bddaf3d98c9f7233dc9a14b375c90b81c7d19f057089b7f77914a"
+    "sha256": "8862e71224a4eab9e3d2b3834d771ffe45ef28b7b63cdeb2da7879f57697c952"
   },
   "source_tree_sha256": "fd2948623242719d88c347dcb0ff80a4e43fd94d2e1e8cf7085190640b1615d8",
   "source_sha256": {

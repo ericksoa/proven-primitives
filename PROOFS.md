@@ -135,6 +135,26 @@ The integrated `advance_from_prefixes` root connects successful prefix and
 block-length results to that state transition. It does not connect a complete
 RFC byte-stream parser or output decoder. See [BROTLI_B2.md](BROTLI_B2.md).
 
+## Private Brotli B3a workspace and meta-block-header slice
+
+`brotli_prefix::fixed_layout_is_exact` proves all fixed scratch regions are
+contiguous or deliberately nested and end at exactly 1,176,560 bytes.
+`required_workspace_bytes` proves the complete window-plus-scratch requirement
+for approved normal-window sizes. The tree-record locator proves every selected
+three-byte record stays in its region. Canonical metadata permits reads only
+from its initialized prefix; single-symbol zero-bit trees synthesize their
+logical record without reading prior workspace bytes.
+
+`brotli_input::MetaBlockDecoder::advance_field` carries the retained B1 queue
+through a field-at-a-time state machine. Its root contract equates every source
+transition and result with `meta_transition` applied to the exact bits consumed
+from the old queue and current input prefix. It proves normal and metadata
+length bounds, permanent reserved/nonminimal-format errors, nonfinal exhaustion,
+final truncation, and sticky complete/failed states.
+
+This is a checked B3a slice. Simple and complex code-description parsing and all
+complete decoder work remain outside its claim. See [BROTLI_B3A.md](BROTLI_B3A.md).
+
 ## C1 exact caller composition
 
 `composition_demo::DecodeCaller::decode` proves exact Base64-to-percent stage

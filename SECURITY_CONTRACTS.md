@@ -8,11 +8,12 @@ streaming, side-channel or deployment security.
 
 The source of truth is the [public contracts](CONTRACTS.md), the actual
 `ensures` clauses and named lemmas, and the [checked security record](evidence/security.json).
-The current source passes 177 checks with `--no-cheating`; the
-[current checker output](evidence/b2-c1-verification.json) retains individual
-results. The earlier [122-check B1 output](evidence/brotli-b1-verification.json)
-and [90-check output](evidence/security-verification.json)
-remains the measured G/security-corollary snapshot.
+The current source passes 243 checks with `--no-cheating`; the
+[current checker output](evidence/brotli-b3a-verification.json) retains
+individual results. The earlier [177-check B2/C1 output](evidence/b2-c1-verification.json),
+[122-check B1 output](evidence/brotli-b1-verification.json), and
+[90-check output](evidence/security-verification.json) remain historical
+component and measured G/security-corollary snapshots.
 The
 [proof guide](PROOFS.md) and [current proof record](evidence/claims.json)
 identify the toolchain, source identities and trusted components.
@@ -24,6 +25,7 @@ identify the toolchain, source identities and trusted components.
 | LZ4 raw block | [Decode](src/lz4.rs#L277) | [Prefix independence](src/lz4.rs#L412); work counters in the decoder and validator | [90-check security record](evidence/security.json) |
 | Brotli B1 private component | No public decoder; private bit queue and window-header driver only | Pending capacity, exact retained bits, header status/window, sticky terminal state, reset, bounded work and unused-storage independence | [122-check B1 record](evidence/brotli-b1.json) |
 | Brotli B2 private component | No complete decoder; canonical prefix/block-length and three-category switch core only | Bounded successful tables, exact code/width matches, state preservation and permanent zero-field invalid switch | [B2 report](BROTLI_B2.md) |
+| Brotli B3a private slice | No complete decoder; fixed workspace/tree records and meta-block headers only | Exact bounded layout, initialized-record discipline, old-storage-independent single-symbol records, exact header transitions, truthful exhaustion/truncation and permanent reserved/nonminimal errors | [B3a report](BROTLI_B3A.md) |
 | C1 private composition | No public API; exact Base64-to-percent caller only | Current-prefix handoff, exact staged errors/effects, stale-length invalidation, final-prefix confidentiality and combined bounds | [C1 report](COMPOSITION_C1.md) |
 
 All successful-buffer statements use the same [\`written\` definition](src/lib.rs#L18).
@@ -153,26 +155,28 @@ policies and evidence beyond the current output-cap guarantees.
 |---|---|---|
 | CVE-2026-32829, LZ4 stale-buffer disclosure | Input-only successful output, valid current-call backreferences, full error-buffer preservation: **proved**. | The pinned historical safe decoder returned 18 old destination bytes in a 25-byte result. Current reference and this decoder reject the zero offset. Deliberate stale-byte reads in general and offset-one paths are rejected by proof. |
 | CVE-2017-1000430, Base64 sizing overflow | Exact mathematical encoded length, guarded executable arithmetic and bounded writes: **proved** for admitted slices/capacities. | The old arithmetic is reproduced with wrapping 32-/64-bit integers; this is not a giant allocation or execution of the old encoder. Exact/small real buffers are tested. A guard that accepts an extra four-byte group is rejected by proof. |
-| CVE-2026-111497, Brotli format-error/input-exhaustion confusion | B1 input/header invariants and B2's corrected shared block-switch transition are **proved for those private components**. Complete-stream Rust integration is **unproved**. | The native R1 replay gives fixed `-17` versus pre-fix `-9` across chunks 1..22, with intact guards and no ASan report. Component mutations must be rejected. No complete decoder exists. |
+| CVE-2026-111497, Brotli format-error/input-exhaustion confusion | B1 input/header invariants, B2's corrected shared block-switch transition, and B3a's exact meta-header permanent-error/truncation distinctions are **proved for those private components**. Complete-stream Rust integration is **unproved**. | The native R1 replay gives fixed `-17` versus pre-fix `-9` across chunks 1..22, with intact guards and no ASan report. Component mutations are rejected. No complete decoder exists. |
 
 [SECURITY_CASES.md](SECURITY_CASES.md) gives source advisories, fixture details
 and limits. [The rejection suite](tests/proof_rejection.rs) first verifies an
 unchanged positive control and then requires real proof rejection. A failing
 tool launch or type error is not accepted as proof rejection. The current-source
-[current control transcripts](evidence/b2-c1-controls.json) retain the current
-results; the sixteen-control B1 and earlier eleven-control records remain
-historical.
+[current B3a control transcripts](evidence/brotli-b3a-controls.json) retain the
+current results; the twenty-five-control B2/C1, sixteen-control B1, and earlier
+eleven-control records remain historical.
 The
 [comparison record](evidence/validation-upstream-comparison.json) is finite
 compiled-behavior evidence; neither tests nor corruption controls replace the
 universal contracts or validate the threat model's completeness.
 
-## Brotli streaming obligations: B1/B2 checked, full decoder unproved
+## Brotli streaming obligations: B1/B2 and a B3a slice checked, full decoder unproved
 
 Brotli remains a candidate. [B1](BROTLI_B1.md) checks the private input/header
-foundation and [B2](BROTLI_B2.md) checks canonical prefix/block lengths plus the
-shared literal/command/distance switch core. The approved public design is not
-yet implemented as a complete decoder; deferred B3/B4 choices and review remain.
+foundation, [B2](BROTLI_B2.md) checks canonical prefix/block lengths plus the
+shared literal/command/distance switch core, and [B3a](BROTLI_B3A.md) checks the
+fixed workspace and meta-block-header slice. The approved public design is not
+yet implemented as a complete decoder; the remaining B3/B4 implementation and
+review remain.
 
 Proposed obligations for every permitted chunk/call sequence:
 

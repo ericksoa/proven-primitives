@@ -26,6 +26,7 @@ whole-application security are not established by these per-call proofs.
 | LZ4 raw block decoding | Output equals the block specification, including overlapping matches; valid backreferences and end conditions; checked linear byte-work accounting |
 | Private Brotli B1 input/header | Eight-byte pending bounds; exact retained bits; RFC normal-window result; truthful exhaustion/truncation/invalid status; sticky terminal states and reset; bounded source work |
 | Private Brotli B2 prefix/block-switch core | Bounded canonical code construction and exact matching; RFC block lengths; literal/command/distance switch invariants; permanent zero-field invalid switch for one declared type |
+| Private Brotli B3a workspace/meta-header slice | Exact fixed workspace layout and bounded three-byte tree records; initialized-range and single-symbol confidentiality; exact normal/empty/uncompressed/metadata header transitions; permanent reserved/nonminimal errors and final truncation |
 | Private C1 caller | Base64 decode into scratch followed by percent decode of only the current prefix; exact errors/effects, stale-length invalidation, confidentiality and combined bounds |
 | Every public routine | No out-of-bounds access or arithmetic overflow under the model; loop termination; correct error results; unchanged destination on error; unchanged destination suffix on success |
 
@@ -34,13 +35,14 @@ buffers, no heap allocation, no executable recursion, and no unsafe code in the
 implementation. The same annotated source is verified and compiled. There is
 no separately maintained unverified implementation behind the API.
 
-The current implementation passes **177 project verification checks** with
+The current implementation passes **243 project verification checks** with
 `--no-cheating`. See [the proof record](evidence/claims.json),
 [the contracts](CONTRACTS.md), and [the proof guide](PROOFS.md).
-The [Brotli B1 record](evidence/brotli-b1.json) binds the current source,
-checked private component and controls. The earlier
-[security proof record](evidence/security.json) remains the immutable 90-check
-snapshot that binds the checked corollaries and measured G executable.
+The [current B3a record](evidence/brotli-b3a.json) binds the exact current
+source, checked private slice and controls. The earlier
+[B1 record](evidence/brotli-b1.json) and
+[security proof record](evidence/security.json) remain historical snapshots;
+the latter binds the checked corollaries and measured G executable.
 
 The [candidate roadmap](ROADMAP.md) includes Brotli decompression and the recent
 CVE-2026-111497 state-transition/buffer-overflow case. It is a research target;
@@ -51,6 +53,9 @@ block-switch integration.
 The [checked B2 component](BROTLI_B2.md) proves canonical prefix/block-length
 and block-switch foundations, including the corrected zero-field permanent
 failure. It still does not decode a complete stream.
+The [checked B3a slice](BROTLI_B3A.md) adds the exact caller-workspace layout,
+safe initialized tree records and the source-linked meta-block-header state
+machine. Prefix-code-description parsing and the rest of B3 remain incomplete.
 [P1](PIPELINE.md) implements fail-closed local evidence bookkeeping without
 adopting the draft security profile. The approved later proof scopes remain in
 [SECURITY_PROOF_EXTENSION_PROPOSAL.md](SECURITY_PROOF_EXTENSION_PROPOSAL.md).
@@ -207,6 +212,13 @@ rejection for:
 23. Falsely rolling scratch back after a downstream error.
 24. Turning a permanent Brotli block-switch error into retryable input.
 25. Computing the wrong canonical prefix-code recurrence.
+26. Shifting every B3a workspace tree-record address by one byte.
+27. Reading an uninitialized canonical tree record.
+28. Reducing the fixed B3a scratch total by one byte.
+29. Accepting the reserved meta-block-header bit.
+30. Accepting a nonminimal normal meta-block length.
+31. Accepting a nonminimal metadata length.
+32. Reporting final meta-block-header truncation as retryable input.
 
 The mathematical specifications stay unchanged. The percent-decoding and LZ4
 read mutations are semantic defects in otherwise memory-safe Rust. A successful

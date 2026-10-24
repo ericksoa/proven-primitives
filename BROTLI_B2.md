@@ -4,8 +4,9 @@ B2 extends the private B1 foundation with a bounded canonical prefix-code core,
 the RFC block-length range table and literal/command/distance block-switch state.
 It remains a component, not a complete or supported Brotli decoder.
 
-The whole crate currently passes **177 verification checks with zero errors**
-under `--no-cheating`. Checked B2 properties include:
+The B2/C1 snapshot passed **177 verification checks with zero errors** under
+`--no-cheating`. The later B3a record supersedes the whole-crate count while
+preserving these checked B2 properties:
 
 - Code-length storage is bounded to 258 symbols and 15 bits. Successful table
   construction has the exact canonical code for every used symbol; exact
@@ -41,7 +42,8 @@ stream, emit literals/copies, implement contexts/dictionaries, manage a window,
 or decode the Node fixture in Rust. It therefore does not establish complete
 stream correctness, arbitrary chunking for a complete decoder, native
 equivalence, resource-policy enforcement or supported Brotli under a profile.
-B3/B4 remain blocked on their explicitly deferred decisions and review.
+B3/B4 remain incomplete; the architecture is approved and independent review
+is still pending.
 
 After the unchanged 177-check positive control, the prover rejects changing
 the permanent invalid switch into `NeedInput` and corrupting the canonical-code

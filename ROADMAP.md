@@ -5,9 +5,10 @@ state models, dependencies, comparison references and proof approaches require
 separate human approval before implementation. The approved Base64 G iteration
 is complete. Current Brotli work is format/source research and the
 already-approved [B1 input/header milestone](BROTLI_PROPOSAL.md).
-P1, B2/R1 and C1 are approved and implemented. No comprehensive security profile
-has been adopted. B3/B4 retain their explicitly deferred data, layout, complete-
-decoder, applicability and independent-review decisions.
+P1, B2/R1 and C1 are approved and implemented. The B3 and B4 architecture is
+approved. The first B3a workspace/meta-header slice is checked, but no
+comprehensive security profile has been adopted and independent review remains
+pending.
 
 B1 is now checked as a private component; see [BROTLI_B1.md](BROTLI_B1.md).
 It does not change Brotli's candidate/support status. The actual block-switch,
@@ -17,9 +18,10 @@ remain subject to the decisions in the streaming proposal.
 B2's canonical prefix/block-length and three-category block-switch core is now
 checked as another private component; see [BROTLI_B2.md](BROTLI_B2.md). The R1
 native status replay is complete. Full grammar/output decoding and B3/B4 remain
-separate. The exact next implementation decision is in
-[BROTLI_B3_PROPOSAL.md](BROTLI_B3_PROPOSAL.md); the subsequent caller/profile
-decision is in [BROTLI_B4_PROFILE_PROPOSAL.md](BROTLI_B4_PROFILE_PROPOSAL.md).
+separate. [BROTLI_B3A.md](BROTLI_B3A.md) records the checked fixed workspace and
+meta-block-header slice. The remaining approved implementation path is in
+[BROTLI_B3_PROPOSAL.md](BROTLI_B3_PROPOSAL.md), followed by the caller/profile
+work in [BROTLI_B4_PROFILE_PROPOSAL.md](BROTLI_B4_PROFILE_PROPOSAL.md).
 
 ## Compositional verification
 
@@ -47,9 +49,9 @@ C1 is now implemented and checked; see [COMPOSITION_C1.md](COMPOSITION_C1.md).
 
 ## Brotli decompression
 
-Added at the human's request on 2026-10-24. Status: candidate with checked B1
-and B2 private components; no complete Brotli decoder or supported public
-streaming implementation exists.
+Added at the human's request on 2026-10-24. Status: candidate with checked B1,
+B2, and partial B3a private components; no complete Brotli decoder or supported
+public streaming implementation exists.
 
 ### Recent security evidence
 
@@ -74,10 +76,10 @@ every Brotli implementation or integration is vulnerable.
 This case connects a wrong state transition to a memory-safety failure. A
 buffer-bounds proof alone is less informative than also specifying the meaning
 of permanent failure, temporary input exhaustion, retained state and progress
-across calls. This makes Brotli a useful prospective test of the project's
-security-contract approach beyond the current small codecs.
+across calls. This makes Brotli a useful test of the project's security-contract
+approach beyond the current small codecs.
 
-Candidate proof goals, subject to a separately approved contract:
+Approved proof goals:
 
 - Every pending-input and output write fits its actual buffer in every reachable
   state, including after repeated calls and errors.
@@ -88,24 +90,24 @@ Candidate proof goals, subject to a separately approved contract:
 - Window references, lengths and resource limits remain bounded under malformed
   input, with termination or an explicit, justified request for more input.
 
-### Decisions and evidence needed before implementation
+### Approved implementation path and remaining evidence
 
-Propose one-shot versus streaming scope, dictionary/window support, caller-buffer
-and error semantics, resource bounds, an independent format specification, and
-exact approved upstream versions/features. The disclosed failure concerns
+The approved B3/B4 documents fix streaming scope, dictionary/window support,
+caller-buffer and error semantics, resource accounting, upstream identities,
+workspace layout and the quarantining caller. The disclosed failure concerns
 streaming state; a one-shot decoder alone would not demonstrate that its
 streaming transition invariants have been proved.
 
-A later approved case study should retain the relevant regression input and
-negative proof controls, explain any intentional differences from upstream,
-and benchmark valid, truncated, malformed and resource-limited cases. Finite
-test agreement would remain distinct from universal upstream equivalence.
+The implementation retains the relevant regression input and negative proof
+controls, explains intentional differences from upstream, and will benchmark
+valid, truncated, malformed and resource-limited cases as matching paths land.
+Finite test agreement remains distinct from universal upstream equivalence.
 
 Brotli's format and streaming behavior expand the proof scope substantially
 beyond the current LZ4 raw-block decoder. No completion date or claim of a
 verified Brotli implementation is made here.
 
-The [security-contract assessment](SECURITY_CONTRACTS.md) records the proposed
+The [security-contract assessment](SECURITY_CONTRACTS.md) records the approved
 Brotli streaming obligations and distinguishes them from the current checked
 per-call guarantees. [Follow-up decisions](SECURITY_PROOF_PROPOSALS.md) remain
 reserved to the human before new APIs, state models or dependencies are adopted.

@@ -33,6 +33,12 @@ component is not a supported Brotli decoder; the support claim requires every
 applicable profile obligation, checked evidence, independent specification
 review, and a passing release gate.
 
+The first B3a slice is complete: the exact fixed workspace/tree-record layout
+and meta-block-header state machine in `src/brotli_prefix.rs` and
+`src/brotli_input.rs`. Preserve their source-linked contracts and seven defect
+controls. B3a prefix-code-description parsing and all later B3 work remain
+incomplete; do not describe this slice as a decoder.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted
