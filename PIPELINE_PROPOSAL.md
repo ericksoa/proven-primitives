@@ -23,7 +23,7 @@ Changing support status requires the human's explicit decision.
 | Item | Actual state / authorization |
 |---|---|
 | Library | Three implemented primitives, five public routines; existing exact Rust/Verus stack, caller buffers and contracts in [CONTRACTS.md](CONTRACTS.md). Preserve them. |
-| Current evidence | 243 checks and thirty-two rejected implementation defects; the earlier 177-check/twenty-five-control, 122-check/sixteen-control and 90-check/eleven-control records remain immutable historical artifacts. |
+| Current evidence | 244 checks and thirty-four rejected implementation defects; the earlier 177-check/twenty-five-control, 122-check/sixteen-control and 90-check/eleven-control records remain immutable historical artifacts. |
 | Optimizations | Approved A through G are complete. Preserve their source, measurements, intentional reference differences and compiler trust limits. |
 | Brotli B1 | Implemented private bit-reader/header core with 122 checked obligations and sixteen controls. It remains component evidence, not supported Brotli. |
 | Brotli B3a | Fixed workspace/tree records and meta-block headers are checked; simple/complex code descriptions and the rest of the decoder remain incomplete. |

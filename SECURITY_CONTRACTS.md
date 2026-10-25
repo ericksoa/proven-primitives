@@ -8,7 +8,7 @@ streaming, side-channel or deployment security.
 
 The source of truth is the [public contracts](CONTRACTS.md), the actual
 `ensures` clauses and named lemmas, and the [checked security record](evidence/security.json).
-The current source passes 243 checks with `--no-cheating`; the
+The current source passes 244 checks with `--no-cheating`; the
 [current checker output](evidence/brotli-b3a-verification.json) retains
 individual results. The earlier [177-check B2/C1 output](evidence/b2-c1-verification.json),
 [122-check B1 output](evidence/brotli-b1-verification.json), and

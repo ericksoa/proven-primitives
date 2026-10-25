@@ -24,6 +24,9 @@ a canonical tree with a contiguous initialized prefix. Reads reject every
 canonical record outside that initialized prefix. A single-symbol read returns
 the logical zero-bit record without inspecting old workspace bytes. This is a
 checked source-level prior-storage confidentiality property for these accessors.
+Every successful record write proves the exact three resulting bytes and that
+all other workspace bytes are preserved; an initialized read proves the exact
+inverse little-endian reconstruction.
 
 ## Checked meta-block-header properties
 
@@ -50,11 +53,11 @@ failure.
 
 ## Checked evidence and deliberate defects
 
-The current whole crate passes **243 verification checks with zero errors**
+The current whole crate passes **244 verification checks with zero errors**
 under `--no-cheating`. The evidence record binds the exact source, tool versions,
 options, report, runtime tests, and checker output.
 
-Seven B3a defects are rejected after unchanged positive controls:
+Nine B3a defects are rejected after unchanged positive controls:
 
 1. shifting every workspace tree-record address by one byte;
 2. reading the first uninitialized canonical record;
@@ -62,7 +65,9 @@ Seven B3a defects are rejected after unchanged positive controls:
 4. accepting the RFC meta-block reserved bit;
 5. accepting a nonminimal normal length;
 6. accepting a nonminimal metadata length; and
-7. reporting final truncation as retryable input exhaustion.
+7. reporting final truncation as retryable input exhaustion;
+8. swapping the low and high bytes of a stored canonical code; and
+9. reconstructing a canonical code from the record length byte.
 
 A type error or checker failure is not counted as a defect rejection.
 

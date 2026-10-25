@@ -55,6 +55,29 @@ fn check(verus: &Path, root: &Path) -> std::process::Output {
         .expect("run pinned Verus")
 }
 
+fn check_brotli_prefix_function(verus: &Path, root: &Path, function: &str) -> std::process::Output {
+    Command::new(verus)
+        .arg(root.join("src/lib.rs"))
+        .args([
+            "--crate-type",
+            "lib",
+            "--verify-only-module",
+            "brotli_prefix",
+            "--verify-function",
+            function,
+            "--no-cheating",
+            "--num-threads",
+            "1",
+            "--triggers-mode",
+            "silent",
+            "--rlimit",
+            "30",
+        ])
+        .current_dir(root)
+        .output()
+        .expect("run selected pinned Verus root")
+}
+
 fn transcript(output: &std::process::Output) -> String {
     format!(
         "{}\n{}",
@@ -377,6 +400,85 @@ fn the_prover_rejects_four_b3a_meta_header_defects() {
         );
         fs::write(&path, original.replacen(old, new, 1)).unwrap();
         let result = check(&verus, &temporary);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied")
+                || log.contains("precondition not satisfied")
+                || log.contains("invariant not satisfied")
+                || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}"
+        );
+        println!("REJECTED {name}: deliberately wrong implementation, unchanged specification");
+        fs::write(&path, original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_two_b3a_record_frame_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3a-frame-canaries-{}",
+        std::process::id()
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+    for function in ["write_next_tree_record", "read_tree_record"] {
+        let positive = check_brotli_prefix_function(&verus, &temporary, function);
+        assert!(
+            positive.status.success(),
+            "unmodified selected root failed: {}",
+            transcript(&positive)
+        );
+    }
+    for (name, function, old, new) in [
+        (
+            "brotli-workspace-write-swaps-code-bytes",
+            "write_next_tree_record",
+            "workspace[at + 1] = (record.code % 256) as u8;",
+            "workspace[at + 1] = (record.code / 256) as u8;",
+        ),
+        (
+            "brotli-workspace-read-uses-length-as-code-byte",
+            "read_tree_record",
+            "code: workspace[at + 1] as u16 | ((workspace[at + 2] as u16) << 8),",
+            "code: workspace[at] as u16 | ((workspace[at + 2] as u16) << 8),",
+        ),
+    ] {
+        let path = temporary.join("src/brotli_prefix.rs");
+        let original = fs::read_to_string(project.join("src/brotli_prefix.rs")).unwrap();
+        assert_eq!(
+            original.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        fs::write(&path, original.replacen(old, new, 1)).unwrap();
+        let result = check_brotli_prefix_function(&verus, &temporary, function);
         let log = transcript(&result);
         fs::write(
             project.join("evidence").join(format!("canary-{name}.log")),

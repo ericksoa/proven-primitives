@@ -1,8 +1,8 @@
 {
   "positive_control": {
     "path": "evidence/brotli-b3a-verification.json",
-    "sha256": "3447a21a75e4391cbe56d79e3ecaf667a0cc96130c2633a226d4165394c01b2d",
-    "verified": 243,
+    "sha256": "af610cca916002c09d614c43a0e4e8c1ee3e10a385be20c13dff91d8930b4b70",
+    "verified": 244,
     "errors": 0
   },
   "mutations": [
@@ -53,6 +53,20 @@
       "raw_transcript_sha256": "da3a9ae7e8165b89d59f369244f327ccef6703ea4b6c871403febfc0153b7f0f",
       "published_transcript_sha256": "7226ac83734bdf030a32365a83499f53e511f03b076583cd1bec9c35efe959ea",
       "transcript": "verification results:: 242 verified, 1 errors\n\nerror: postcondition not satisfied\n    --> <CANARY_DIR>/src/brotli_input.rs:1100:13\n     |\n1100 | /             r.status == MetaBlockStatus::NeedInput ==> {\n1101 | |                 &&& !end_of_input\n1102 | |                 &&& r.consumed == input.len()\n1103 | |             },\n     | |_____________^ failed this postcondition\n...\n1168 | /                 return MetaBlockStep {\n1169 | |                     consumed: read.consumed,\n1170 | |                     status: MetaBlockStatus::NeedInput,\n1171 | |                 };\n     | |_________________- at this exit\n\nnote: function body check has been running for 2 seconds\n      reporting errors as they are discovered (they may not be in source order)\n    --> <CANARY_DIR>/src/brotli_input.rs:1082:5\n     |\n1082 | /     fn advance_field(\n1083 | |         &mut self,\n1084 | |         input: &[u8],\n1085 | |         end_of_input: bool,\n1086 | |     ) -> (r: MetaBlockStep)\n     | |__________________________^\n\nnote: function body check finished in 158 seconds\n    --> <CANARY_DIR>/src/brotli_input.rs:1082:5\n     |\n1082 | /     fn advance_field(\n1083 | |         &mut self,\n1084 | |         input: &[u8],\n1085 | |         end_of_input: bool,\n1086 | |     ) -> (r: MetaBlockStep)\n     | |__________________________^\n\nerror: aborting due to 1 previous error\n\n",
+      "result": "real proof rejection with unchanged specifications"
+    },
+    {
+      "name": "brotli-workspace-write-swaps-code-bytes",
+      "raw_transcript_sha256": "f1d24e5f098a533e332b626032a1f320f249fd4d72278853986eb309a77e0972",
+      "published_transcript_sha256": "d2dac5b28481ee121e9b96132a495da24831a533d75a8731f2f7926ab9f71eb2",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_prefix (selected functions)\n\nerror: postcondition not satisfied\n   --> <CANARY_DIR>/src/brotli_prefix.rs:803:13\n    |\n803 |       ensures r.is_ok() ==> {\n    |  _____________^\n804 | |         &&& final(meta).valid_for(region)\n805 | |         &&& final(meta).symbols == old(meta).symbols\n806 | |         &&& match old(meta).storage {\n...   |\n822 | |     },\n    | |_____^ failed this postcondition\n...\n852 |       Ok(())\n    |       ------ at the end of the function body\n\nerror: aborting due to 1 previous error\n\n",
+      "result": "real proof rejection with unchanged specifications"
+    },
+    {
+      "name": "brotli-workspace-read-uses-length-as-code-byte",
+      "raw_transcript_sha256": "fe309a2fb3c9f19285ac36530a5467945929f63b64445a77492bad09ac38a22c",
+      "published_transcript_sha256": "dd92433cabde580ffe308b94cb366c2215106316c8511404d958002e8cf08622",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_prefix (selected functions)\n\nerror: postcondition not satisfied\n   --> <CANARY_DIR>/src/brotli_prefix.rs:864:13\n    |\n864 |       ensures r.is_ok() ==> {\n    |  _____________^\n865 | |         &&& symbol < meta.symbols\n866 | |         &&& match meta.storage {\n867 | |             TreeStorageState::Single { symbol: only } => {\n...   |\n881 | |     },\n    | |_____^ failed this postcondition\n...\n896 | /     match meta.storage {\n897 | |         TreeStorageState::Unused => Err(WorkspaceError::UninitializedRecord),\n898 | |         TreeStorageState::Single { symbol: only } => {\n899 | |             if symbol != only {\n...   |\n921 | |     }\n    | |_____- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n",
       "result": "real proof rejection with unchanged specifications"
     }
   ]

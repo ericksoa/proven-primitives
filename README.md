@@ -35,7 +35,7 @@ buffers, no heap allocation, no executable recursion, and no unsafe code in the
 implementation. The same annotated source is verified and compiled. There is
 no separately maintained unverified implementation behind the API.
 
-The current implementation passes **243 project verification checks** with
+The current implementation passes **244 project verification checks** with
 `--no-cheating`. See [the proof record](evidence/claims.json),
 [the contracts](CONTRACTS.md), and [the proof guide](PROOFS.md).
 The [current B3a record](evidence/brotli-b3a.json) binds the exact current
@@ -219,6 +219,8 @@ rejection for:
 30. Accepting a nonminimal normal meta-block length.
 31. Accepting a nonminimal metadata length.
 32. Reporting final meta-block-header truncation as retryable input.
+33. Swapping the stored low and high bytes of a workspace tree code.
+34. Reconstructing a workspace tree code from its length byte.
 
 The mathematical specifications stay unchanged. The percent-decoding and LZ4
 read mutations are semantic defects in otherwise memory-safe Rust. A successful

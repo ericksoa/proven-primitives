@@ -35,7 +35,7 @@ review, and a passing release gate.
 
 The first B3a slice is complete: the exact fixed workspace/tree-record layout
 and meta-block-header state machine in `src/brotli_prefix.rs` and
-`src/brotli_input.rs`. Preserve their source-linked contracts and seven defect
+`src/brotli_input.rs`. Preserve their source-linked contracts and nine defect
 controls. B3a prefix-code-description parsing and all later B3 work remain
 incomplete; do not describe this slice as a decoder.
 

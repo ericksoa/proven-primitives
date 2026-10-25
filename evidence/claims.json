@@ -1,9 +1,9 @@
 {
   "project": "Proven Primitives",
   "license": "Apache-2.0",
-  "verified_utc": "2026-10-24T20:47:02.323217+00:00",
+  "verified_utc": "2026-10-24T21:01:54.826162+00:00",
   "claim": "Proven secure against the specified per-call bounds, output-integrity and prior-destination-disclosure threats for every admitted input and modeled execution under the published contracts and trusted base.",
-  "source_tree_sha256": "5bca40bd6f951984c6a28ce1001a8d7b04e54556847287f78396647fa52b8851",
+  "source_tree_sha256": "d3e088258731ad7a93d63877ced37f8a7eecf05196d8f51f51e8e3b263b79d5d",
   "source_sha256": {
     "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
     "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
@@ -13,13 +13,13 @@
     "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
     "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
     "src/brotli_input.rs": "a8567ef078b686630f789b8d03a8903e2a42c0303a40aab9d53472437f18b37a",
-    "src/brotli_prefix.rs": "e484befae8e276e2292bb69593b521c71f24d6f7f7f3f79f729c830e729a99b8",
+    "src/brotli_prefix.rs": "afa34ea6600c4dfb51271aa8182593755ffd1f0ec1ca1a39dc1d1c2a6dea4e6c",
     "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
     "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
   },
   "validation_source_sha256": {
     "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
-    "tests/proof_rejection.rs": "ff60f9d06502d90cb6d3dedde58cf25ab8643ed57fed502d42c48ecdd6a3a5a7",
+    "tests/proof_rejection.rs": "428151c0643813734930bc34601efa6c1011c2e07e41233f5feff33911a3963a",
     "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
     "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
     "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
@@ -40,7 +40,7 @@
     "encountered-error": false,
     "encountered-vir-error": false,
     "success": true,
-    "verified": 243,
+    "verified": 244,
     "errors": 0,
     "is-verifying-entire-crate": true
   },
@@ -62,8 +62,8 @@
     "standard_primitive_test_groups_passed": 9,
     "proof_source_audit_passed": true,
     "proof_rejection_test_passed": true,
-    "semantic_mutations_rejected": 32,
-    "unchanged_positive_control_verified": 243,
+    "semantic_mutations_rejected": 34,
+    "unchanged_positive_control_verified": 244,
     "large_input_bytes": 262144,
     "upstream_comparison_test_passed": true,
     "brotli_b1_test_groups_passed": 4,
@@ -141,6 +141,8 @@
       "exact (1 << max_window_bits) + 1,176,560 byte requirement for bits 10..24",
       "all approved region offsets, sizes and total are checked",
       "tree/symbol addressing stays inside its selected three-byte-record region",
+      "successful record writes produce the exact length and little-endian code bytes while preserving every other workspace byte",
+      "initialized reads reconstruct exactly those record bytes",
       "canonical reads require an initialized prefix",
       "single-symbol zero-bit reads do not inspect old workspace bytes",
       "each transition equals the specified transition for the exact consumed bits",
@@ -209,9 +211,9 @@
   },
   "security_contract_assessment": {
     "report": "SECURITY_CONTRACTS.md",
-    "sha256": "8862e71224a4eab9e3d2b3834d771ffe45ef28b7b63cdeb2da7879f57697c952",
+    "sha256": "fc6ec1166f3a5763c79add49d77147e32dba8a313d9f5858c2d9eaf079daf2c5",
     "evidence": "evidence/brotli-b3a.json",
-    "evidence_sha256": "568d6c1732eaa3b95b1978de43b62aa8901f9b486e6614e2a83e56969ca67054"
+    "evidence_sha256": "1ae10822deca4cef9693b2607e38568619838761c3748c223f243fde785b8ca8"
   },
   "brotli_b1": {
     "status": "checked private component; not a complete decoder",
@@ -228,12 +230,12 @@
   "brotli_b3a": {
     "status": "checked partial B3a implementation; not a complete decoder or supported API",
     "report": "BROTLI_B3A.md",
-    "report_sha256": "15115142b2c7c0ce76c2f2e543dd733b2a6053becb2356a03bb6b2a30b964703",
+    "report_sha256": "b7f85a745492fa4e4984249b1001ddd81d66de917202edad5ed310be8876b9ec",
     "evidence": "evidence/brotli-b3a.json",
-    "evidence_sha256": "568d6c1732eaa3b95b1978de43b62aa8901f9b486e6614e2a83e56969ca67054"
+    "evidence_sha256": "1ae10822deca4cef9693b2607e38568619838761c3748c223f243fde785b8ca8"
   },
   "verification_evidence": {
     "path": "evidence/brotli-b3a-verification.json",
-    "sha256": "3447a21a75e4391cbe56d79e3ecaf667a0cc96130c2633a226d4165394c01b2d"
+    "sha256": "af610cca916002c09d614c43a0e4e8c1ee3e10a385be20c13dff91d8930b4b70"
   }
 }

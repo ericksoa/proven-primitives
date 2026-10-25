@@ -507,7 +507,7 @@ pub(crate) enum TreeRegion {
     TemporaryContext,
 }
 
-spec fn tree_region_offset(region: TreeRegion) -> nat {
+pub(crate) open spec fn tree_region_offset(region: TreeRegion) -> nat {
     match region {
         TreeRegion::Literal => LITERAL_TREES_OFFSET as nat,
         TreeRegion::Command => COMMAND_TREES_OFFSET as nat,
@@ -539,6 +539,16 @@ pub(crate) open spec fn tree_region_symbols(region: TreeRegion) -> nat {
 
 spec fn tree_region_bytes(region: TreeRegion) -> nat {
     tree_region_count(region) * tree_region_symbols(region) * TREE_RECORD_BYTES as nat
+}
+
+pub(crate) open spec fn tree_record_at(
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    symbol: u16,
+) -> nat {
+    window_bytes as nat + tree_region_offset(region)
+        + (tree as nat * tree_region_symbols(region) + symbol as nat) * 3
 }
 
 proof fn fixed_layout_is_exact()
@@ -640,8 +650,7 @@ fn tree_record_offset(
     ensures r.is_ok() ==> {
         &&& tree < tree_region_count(region)
         &&& symbol < tree_region_symbols(region)
-        &&& r.unwrap() as nat == window_bytes as nat + tree_region_offset(region)
-            + (tree as nat * tree_region_symbols(region) + symbol as nat) * 3
+        &&& r.unwrap() as nat == tree_record_at(window_bytes, region, tree, symbol)
         &&& r.unwrap() + 3 <= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
     },
 {
@@ -718,6 +727,13 @@ pub(crate) struct TreeRecord {
     pub(crate) code: u16,
 }
 
+#[verifier::bit_vector]
+proof fn join_tree_code_is_exact(low: u8, high: u8)
+    ensures (low as u16 | ((high as u16) << 8)) as nat
+        == low as nat + 256 * high as nat,
+{
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum TreeStorageState {
     Unused,
@@ -788,10 +804,19 @@ pub(crate) fn write_next_tree_record(
         &&& final(meta).valid_for(region)
         &&& final(meta).symbols == old(meta).symbols
         &&& match old(meta).storage {
-            TreeStorageState::Canonical { initialized } =>
-                final(meta).storage == TreeStorageState::Canonical {
+            TreeStorageState::Canonical { initialized } => {
+                let at = tree_record_at(window_bytes, region, tree, initialized);
+                let low = (record.code % 256) as u8;
+                let high = (record.code / 256) as u8;
+                &&& final(meta).storage == TreeStorageState::Canonical {
                     initialized: (initialized as int + 1) as u16,
-                },
+                }
+                &&& at + 3 <= old(workspace)@.len()
+                &&& final(workspace)@ == old(workspace)@
+                    .update(at as int, record.length)
+                    .update(at as int + 1, low)
+                    .update(at as int + 2, high)
+            },
             _ => false,
         }
     },
@@ -843,7 +868,14 @@ pub(crate) fn read_tree_record(
                 &&& symbol == only
                 &&& r.unwrap() == TreeRecord { length: 0, code: 0 }
             },
-            TreeStorageState::Canonical { initialized } => symbol < initialized,
+            TreeStorageState::Canonical { initialized } => {
+                let at = tree_record_at(window_bytes, region, tree, symbol);
+                &&& symbol < initialized
+                &&& at + 3 <= workspace@.len()
+                &&& r.unwrap().length == workspace@[at as int]
+                &&& r.unwrap().code as nat == workspace@[at as int + 1] as nat
+                    + 256 * workspace@[at as int + 2] as nat
+            },
             TreeStorageState::Unused => false,
         }
     },
@@ -878,6 +910,9 @@ pub(crate) fn read_tree_record(
                 Ok(value) => value,
                 Err(error) => return Err(error),
             };
+            let _low = workspace[at + 1];
+            let _high = workspace[at + 2];
+            proof { join_tree_code_is_exact(_low, _high); }
             Ok(TreeRecord {
                 length: workspace[at],
                 code: workspace[at + 1] as u16 | ((workspace[at + 2] as u16) << 8),
