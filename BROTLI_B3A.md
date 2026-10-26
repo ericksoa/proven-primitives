@@ -1,7 +1,7 @@
 # Checked Brotli B3a workspace, meta-block, and code-description front end
 
-This report records the first checked portion of the approved B3a milestone. It
-is a private implementation slice, not a complete Brotli decoder and not a
+This report records the checked components of the approved B3a milestone. They
+remain a private implementation slice, not a complete Brotli decoder and not a
 supported Brotli API.
 
 ## Checked workspace properties
@@ -27,6 +27,17 @@ checked source-level prior-storage confidentiality property for these accessors.
 Every successful record write proves the exact three resulting bytes and that
 all other workspace bytes are preserved; an initialized read proves the exact
 inverse little-endian reconstruction.
+
+The 3,056-byte builder is partitioned exactly into 704 code-length bytes,
+sixteen `u16` counts, sixteen `u32` next codes, 720 `u16` symbol-chain entries,
+and the 816-byte temporary context tree. Each accessor proves its exact byte
+range, initialized-read condition and write frame. The canonical installer
+validates the complete 32,768-unit code space, uses only these fixed regions,
+and proves that every destination record contains the original length and its
+exact canonical code. Unused symbols receive `(length=0, code=0)` records, while
+tree metadata continues to distinguish those records from a single-symbol
+zero-bit tree. All bytes outside the builder bookkeeping and selected tree are
+preserved.
 
 ## Checked meta-block-header properties
 
@@ -70,13 +81,27 @@ auxiliary alphabets are permanent errors. Runtime cases exercise whole-buffer
 and one-byte chunking, every simple shape, every static prefix length, skips,
 and malformed code space.
 
+The final complex stream begins with previous length eight. Direct symbols
+`0..15` reset repeat chaining, and nonzero direct symbols update the previous
+length. Symbol 16 repeats that previous length with two suffix bits; symbol 17
+repeats zero with three. The checked transition uses the RFC reset rule and
+`(repeat - 2) << extra_bits` recurrence, proves the exact newly emitted span,
+rejects expansion past the selected alphabet, and charges every nonzero span
+against the 32,768-unit code space. Completion requires exact exhaustion;
+oversubscription, incomplete space, final truncation and later retries after a
+permanent failure retain their specified behavior. Runtime cases cover complete
+input and one-byte chunks, both repeat kinds, chained repeats, initial previous
+length eight, overflow, truncation and sticky failure. Auxiliary codes are
+reversed to their active width before comparison with the raw least-significant-
+bit-first stream; a non-palindromic two-bit case checks that source-linked rule.
+
 ## Checked evidence and deliberate defects
 
-The current whole crate passes **263 verification checks with zero errors**
+The current whole crate passes **350 verification checks with zero errors**
 under `--no-cheating`. The evidence record binds the exact source, tool versions,
 options, report, runtime tests, and checker output.
 
-Fifteen B3a defects are rejected after unchanged positive controls:
+Twenty-eight B3a defects are rejected after unchanged positive controls:
 
 1. shifting every workspace tree-record address by one byte;
 2. reading the first uninitialized canonical record;
@@ -92,19 +117,31 @@ Fifteen B3a defects are rejected after unchanged positive controls:
 12. accepting a duplicate simple symbol;
 13. mapping a static-prefix value to the wrong code length;
 14. misclassifying code-space overflow; and
-15. changing the RFC code-length permutation.
+15. changing the RFC code-length permutation;
+16. shifting the builder code-length write region;
+17. reading an uninitialized builder code-length entry;
+18. storing the wrong byte in a builder count;
+19. storing the wrong byte in a builder next-code value;
+20. rejecting a required zero-length canonical record;
+21. installing the wrong canonical code in a destination record;
+22. initializing the repeated previous length to a value other than eight;
+23. failing to reset a repeat after its repeated length changes;
+24. subtracting one instead of two in chained-repeat expansion;
+25. adding four instead of three to a repeat suffix;
+26. rejecting a repeat that exactly fills the selected alphabet;
+27. undercharging repeated nonzero lengths against final code space; and
+28. comparing raw auxiliary stream bits with an unreversed canonical code.
 
 A type error or checker failure is not counted as a defect rejection.
 
-## Remaining B3a and complete-decoder work
+## Remaining complete-decoder work
 
-Simple descriptions and the complex auxiliary code-length alphabet are connected
-to the bit queue. The remaining complex symbol-length stream, repeat codes and
-installation into workspace records are not yet implemented. Tree groups,
-context maps, literal/command/distance execution, LZ77, the static dictionary,
-provisional output, resource budgets, and arbitrary complete-stream sequences
-remain unimplemented or unproved. B3a therefore remains in progress, and no
-complete or supported Brotli claim is made.
+The final-length parser exposes exact internal spans and the canonical installer
+consumes initialized builder lengths. Tree-group orchestration will connect that
+handoff in B3b. Context maps, literal/command/distance execution, LZ77, the
+static dictionary, provisional output, resource budgets, and arbitrary
+complete-stream sequences remain unimplemented or unproved. No complete or
+supported Brotli claim is made.
 
 See [the approved B3 architecture](BROTLI_B3_PROPOSAL.md),
 [the security assessment](SECURITY_CONTRACTS.md), and

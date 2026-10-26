@@ -157,11 +157,19 @@ compressed meta-block header. Its root contract equates every state/result with
 `code_transition_holds` for the exact consumed bits. Simple descriptions prove
 their one-to-four symbol count, alphabet width/bounds, distinctness and tree
 shape. The complex front end proves the RFC 18-entry permutation, fixed prefix
-code and exact auxiliary code-space accounting.
+code and exact auxiliary code-space accounting. Its next phases prove direct
+and repeat-coded final symbol lengths, including initial previous length eight,
+repeat reset and chaining, exact span bounds, 32,768-unit final code-space
+accounting, width-limited reversal of canonical auxiliary codes for the raw
+least-significant-bit-first stream, truncation and sticky permanent errors.
 
-This remains a checked B3a slice. Complex repeat-coded final symbol lengths,
-workspace installation and all complete decoder work remain outside its claim.
-See [BROTLI_B3A.md](BROTLI_B3A.md).
+Builder accessors prove exact initialized reads and framed writes for code
+lengths, counts, next codes and symbol chains. The canonical installer proves
+each selected tree record equals the original builder length and exact canonical
+code, including zero-length unused records, while framing every byte outside
+the builder bookkeeping and selected tree. Tree groups, context maps and all
+complete decoder work remain outside this B3a claim. See
+[BROTLI_B3A.md](BROTLI_B3A.md).
 
 ## C1 exact caller composition
 

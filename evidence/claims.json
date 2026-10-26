@@ -1,9 +1,9 @@
 {
   "project": "Proven Primitives",
   "license": "Apache-2.0",
-  "verified_utc": "2026-10-26T01:07:29.743059+00:00",
+  "verified_utc": "2026-10-26T04:35:03.792429+00:00",
   "claim": "Proven secure against the specified per-call bounds, output-integrity and prior-destination-disclosure threats for every admitted input and modeled execution under the published contracts and trusted base.",
-  "source_tree_sha256": "257fdacc126cf5b794ea0405a9131e2b02c596be3e89e8da0d9b13feb7fc2e79",
+  "source_tree_sha256": "03c3fa4128b8bd649181a41bdcd661fa5e27dbc476c5034b3b2dff2281e9e1ed",
   "source_sha256": {
     "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
     "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
@@ -12,14 +12,14 @@
     "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
     "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
     "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
-    "src/brotli_input.rs": "b77c87a5117708df62f005784878b04f7a2626e3945f8c38ae8bfd6d644cddd0",
-    "src/brotli_prefix.rs": "afa34ea6600c4dfb51271aa8182593755ffd1f0ec1ca1a39dc1d1c2a6dea4e6c",
+    "src/brotli_input.rs": "11ed78e6750d2aac5a45e08551f22a880a62e0f71770a58b3a3d8ea80e75d7bb",
+    "src/brotli_prefix.rs": "f58cfcd1960a9e472ffd83fb8797a749c694cdaed5b269a63d11f72d148f795b",
     "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
     "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
   },
   "validation_source_sha256": {
     "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
-    "tests/proof_rejection.rs": "1b0c10d06ccf85f094197603b5f2dbc9de303755aad9d62e89c3a7272baf2125",
+    "tests/proof_rejection.rs": "667b43c94002286c7a29338c5f29c3598cb7a8ba32559101d0616d91196b80df",
     "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
     "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
     "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
@@ -40,7 +40,7 @@
     "encountered-error": false,
     "encountered-vir-error": false,
     "success": true,
-    "verified": 263,
+    "verified": 350,
     "errors": 0,
     "is-verifying-entire-crate": true
   },
@@ -62,12 +62,12 @@
     "standard_primitive_test_groups_passed": 9,
     "proof_source_audit_passed": true,
     "proof_rejection_test_passed": true,
-    "semantic_mutations_rejected": 40,
-    "unchanged_positive_control_verified": 263,
+    "semantic_mutations_rejected": 53,
+    "unchanged_positive_control_verified": 350,
     "large_input_bytes": 262144,
     "upstream_comparison_test_passed": true,
     "brotli_b1_test_groups_passed": 4,
-    "private_rust_test_groups_passed": 24,
+    "private_rust_test_groups_passed": 31,
     "pipeline_gate_test_groups_passed": 15
   },
   "public_apis": [
@@ -154,7 +154,14 @@
       "all simple one-to-four-symbol descriptions, alphabet widths, bounds, distinctness and shape bits",
       "RFC 18-entry code-length permutation and all six static-prefix values",
       "exact 32-unit auxiliary code-space accounting",
-      "permanent duplicate, alphabet, incomplete, oversubscribed and truncation errors"
+      "permanent duplicate, alphabet, incomplete, oversubscribed and truncation errors",
+      "exact fixed builder subregions with initialized reads and framed writes",
+      "RFC direct and repeat-coded final symbol lengths, including reset and chained-repeat recurrence",
+      "exact 32,768-unit final code-space accounting and alphabet expansion bounds",
+      "canonical installation of every builder length and exact code into the selected tree",
+      "zero-length unused records remain distinct from single-symbol zero-bit trees",
+      "canonical installation frames every byte outside builder bookkeeping and the selected tree",
+      "width-limited reversal connects natural auxiliary canonical codes to raw least-significant-bit-first stream values"
     ]
   },
   "trusted_base": [
@@ -177,11 +184,11 @@
     "constant-time cryptographic behavior",
     "independent expert audit of the specifications",
     "practical service-wide denial-of-service resistance",
-    "simple and complex Brotli code-description parsing",
     "verification of an upstream crate's entire API",
     "verification of arbitrary caller composition",
     "verified arbitrary caller/streaming/concurrent call sequences",
-    "verified compiler/OS/hardware or concrete stack-byte capacity"
+    "verified compiler/OS/hardware or concrete stack-byte capacity",
+    "Brotli tree-group orchestration, context maps, command execution, output or complete streaming correctness"
   ],
   "benchmarks": {
     "host": {
@@ -216,9 +223,9 @@
   },
   "security_contract_assessment": {
     "report": "SECURITY_CONTRACTS.md",
-    "sha256": "1e99b98c5642438630556ccdd5e3ecbdf9ecf64cb7ecc26829319aa5523e4c76",
+    "sha256": "208ce618c401aab570608d6bd6deac4e21f1b8244f5a5051af0fe7652baeec0e",
     "evidence": "evidence/brotli-b3a.json",
-    "evidence_sha256": "aa0235512b323da2600e6326d5f2bc9ea827a28f384632e0e7c633a8654ee016"
+    "evidence_sha256": "79af74a0ed00a679e9edec8c28c5e560039eaec5c3a69fa0b65bedba5994a425"
   },
   "brotli_b1": {
     "status": "checked private component; not a complete decoder",
@@ -233,14 +240,14 @@
     "evidence_sha256": "40648f6a29b552e2ca53a40bbfc12f57725ac745d7924e3e721c46e2b9ca9a1f"
   },
   "brotli_b3a": {
-    "status": "checked partial B3a implementation; not a complete decoder or supported API",
+    "status": "checked B3a components; not a complete decoder or supported API",
     "report": "BROTLI_B3A.md",
-    "report_sha256": "f6e54d7396f48b8d7872982bce7c81ae3c9090f86ad8c47ecfeaa89c5fab8c86",
+    "report_sha256": "6300fffd7406ae3aa63eed7167cea1d8ee7dd791524448c2a6850c2dac470d53",
     "evidence": "evidence/brotli-b3a.json",
-    "evidence_sha256": "aa0235512b323da2600e6326d5f2bc9ea827a28f384632e0e7c633a8654ee016"
+    "evidence_sha256": "79af74a0ed00a679e9edec8c28c5e560039eaec5c3a69fa0b65bedba5994a425"
   },
   "verification_evidence": {
     "path": "evidence/brotli-b3a-verification.json",
-    "sha256": "936d4d930b3da036d5a0bec38a7056417ae0a5f3f68a0337842eb9a7877653ce"
+    "sha256": "a866e2fd5365166b523005122a68c0b3c5b17be87053149f917e219ba6192e26"
   }
 }

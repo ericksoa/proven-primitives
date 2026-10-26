@@ -1,13 +1,13 @@
 {
-  "generated_utc": "2026-10-26T01:07:29.743059+00:00",
-  "component": "private Brotli B3a workspace, meta-block, and code-description front end",
-  "status": "checked partial B3a implementation; not a complete decoder or supported API",
-  "claim": "The checked private front end implements the exact fixed workspace/tree-record layout, exact framed record writes and initialized reads, RFC meta-block headers, every simple code-description shape, and the complex auxiliary code-length alphabet with source-linked bit transitions, truthful truncation, permanent format errors, symbol validation, and exact RFC code-space accounting.",
+  "generated_utc": "2026-10-26T04:35:03.792429+00:00",
+  "component": "private Brotli B3a workspace, meta-block, and complete code-description components",
+  "status": "checked B3a components; not a complete decoder or supported API",
+  "claim": "The checked private B3a components implement the exact fixed workspace and builder layout, exact framed initialized access, RFC meta-block headers, every simple description, the complex auxiliary alphabet with width-limited transmitted-code reversal, RFC repeat-coded final symbol lengths with exact 32,768-unit accounting, and canonical installation into the selected workspace tree with exact per-record and frame guarantees.",
   "report": {
     "path": "BROTLI_B3A.md",
-    "sha256": "f6e54d7396f48b8d7872982bce7c81ae3c9090f86ad8c47ecfeaa89c5fab8c86"
+    "sha256": "6300fffd7406ae3aa63eed7167cea1d8ee7dd791524448c2a6850c2dac470d53"
   },
-  "source_tree_sha256": "257fdacc126cf5b794ea0405a9131e2b02c596be3e89e8da0d9b13feb7fc2e79",
+  "source_tree_sha256": "03c3fa4128b8bd649181a41bdcd661fa5e27dbc476c5034b3b2dff2281e9e1ed",
   "source_sha256": {
     "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
     "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
@@ -16,14 +16,14 @@
     "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
     "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
     "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
-    "src/brotli_input.rs": "b77c87a5117708df62f005784878b04f7a2626e3945f8c38ae8bfd6d644cddd0",
-    "src/brotli_prefix.rs": "afa34ea6600c4dfb51271aa8182593755ffd1f0ec1ca1a39dc1d1c2a6dea4e6c",
+    "src/brotli_input.rs": "11ed78e6750d2aac5a45e08551f22a880a62e0f71770a58b3a3d8ea80e75d7bb",
+    "src/brotli_prefix.rs": "f58cfcd1960a9e472ffd83fb8797a749c694cdaed5b269a63d11f72d148f795b",
     "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
     "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
   },
   "validation_source_sha256": {
     "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
-    "tests/proof_rejection.rs": "1b0c10d06ccf85f094197603b5f2dbc9de303755aad9d62e89c3a7272baf2125",
+    "tests/proof_rejection.rs": "667b43c94002286c7a29338c5f29c3598cb7a8ba32559101d0616d91196b80df",
     "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
     "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
     "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
@@ -34,13 +34,13 @@
     "encountered-error": false,
     "encountered-vir-error": false,
     "success": true,
-    "verified": 263,
+    "verified": 350,
     "errors": 0,
     "is-verifying-entire-crate": true
   },
   "verification_evidence": {
     "path": "evidence/brotli-b3a-verification.json",
-    "sha256": "936d4d930b3da036d5a0bec38a7056417ae0a5f3f68a0337842eb9a7877653ce"
+    "sha256": "a866e2fd5365166b523005122a68c0b3c5b17be87053149f917e219ba6192e26"
   },
   "verification_options": [
     "--crate-type",
@@ -74,7 +74,7 @@
   },
   "compiled_artifact": {
     "path": "target/release/libproven_primitives.rlib",
-    "sha256": "260a35171996e4d9128c4df52b7c818ecab7227ba841291b147f7dd5513cf091",
+    "sha256": "bc92c62ff26a04188b0cdadda1672db49d10e088a186c295d3a91131b39a6deb",
     "note": "Ordinary Cargo release library from the same annotated source; compiler remains trusted."
   },
   "checked_roots": [
@@ -99,20 +99,43 @@
     "lib::brotli_input::code_length_space_weight_exec",
     "lib::brotli_input::process_complex_code_length",
     "lib::brotli_input::CodeDescriptionDecoder::from_meta",
-    "lib::brotli_input::CodeDescriptionDecoder::advance_field"
+    "lib::brotli_input::CodeDescriptionDecoder::advance_field",
+    "lib::brotli_prefix::write_next_builder_code_length",
+    "lib::brotli_prefix::read_builder_code_length",
+    "lib::brotli_prefix::write_next_builder_count",
+    "lib::brotli_prefix::read_builder_count",
+    "lib::brotli_prefix::write_next_builder_next_code",
+    "lib::brotli_prefix::read_builder_next_code",
+    "lib::brotli_prefix::write_next_builder_symbol_chain",
+    "lib::brotli_prefix::read_builder_symbol_chain",
+    "lib::brotli_prefix::write_builder_next_code_at",
+    "lib::brotli_prefix::write_builder_symbol_chain_at",
+    "lib::brotli_prefix::canonical_tree_prefix_after_write",
+    "lib::brotli_prefix::install_builder_canonical_tree",
+    "lib::brotli_input::auxiliary_count_exec",
+    "lib::brotli_input::auxiliary_first_code_exec",
+    "lib::brotli_input::auxiliary_canonical_code_exec",
+    "lib::brotli_input::decode_auxiliary_symbol",
+    "lib::brotli_input::auxiliary_singleton",
+    "lib::brotli_input::symbol_code_length_weight_exec",
+    "lib::brotli_input::process_direct_symbol_length",
+    "lib::brotli_input::process_repeated_symbol_length",
+    "lib::brotli_input::auxiliary_reversed_code",
+    "lib::brotli_input::reverse_auxiliary_code",
+    "lib::brotli_input::start_complex_symbol_progress"
   ],
   "runtime_tests": {
-    "private_rust_groups_passed": 24,
+    "private_rust_groups_passed": 31,
     "public_primitive_groups_passed": 9,
     "upstream_comparison_group_passed": 1,
     "pipeline_gate_groups_passed": 15
   },
   "proof_controls": {
-    "total_project_defects_rejected": 40,
-    "new_b3a_defects_rejected": 15,
+    "total_project_defects_rejected": 53,
+    "new_b3a_defects_rejected": 28,
     "evidence": {
       "path": "evidence/brotli-b3a-controls.json",
-      "sha256": "daf47d709a64586e1da65c86209b942bc35928de2790b971c4077504b2e6d8cb"
+      "sha256": "7b58047a31cd138e023a51e8c21695f8dc8e599e567da32f2f42714d6bb66221"
     }
   },
   "properties": {
@@ -123,7 +146,12 @@
       "successful record writes produce the exact length and little-endian code bytes while preserving every other workspace byte",
       "initialized reads reconstruct exactly those record bytes",
       "canonical reads require an initialized prefix",
-      "single-symbol zero-bit reads do not inspect old workspace bytes"
+      "single-symbol zero-bit reads do not inspect old workspace bytes",
+      "the 3,056-byte builder has exact code-length, count, next-code, symbol-chain and temporary-tree subregions",
+      "builder reads require initialized entries and builder writes have exact byte frames",
+      "canonical installation proves every selected tree record equals the original builder length and exact canonical code",
+      "unused zero-length canonical records contain code zero while remaining distinct from single-symbol zero-bit metadata",
+      "canonical installation preserves every byte outside builder bookkeeping and the selected destination tree"
     ],
     "meta_block_header": [
       "each transition equals the specified transition for the exact consumed bits",
@@ -137,11 +165,17 @@
       "all simple one-to-four-symbol descriptions, alphabet widths, bounds, distinctness and shape bits",
       "RFC 18-entry code-length permutation and all six static-prefix values",
       "exact 32-unit auxiliary code-space accounting",
-      "permanent duplicate, alphabet, incomplete, oversubscribed and truncation errors"
+      "permanent duplicate, alphabet, incomplete, oversubscribed and truncation errors",
+      "initial previous code length eight and exact direct-length previous-value updates",
+      "RFC repeat-16/two-bit and repeat-17/three-bit semantics with reset and chained recurrence",
+      "exact emitted span bounds and rejection beyond the selected alphabet",
+      "exact 32,768-unit final code-space charging and completion",
+      "whole-buffer and one-byte chunk equivalence cases, final truncation and sticky permanent failures",
+      "width-limited reversal connects natural auxiliary canonical codes to the raw least-significant-bit-first stream"
     ]
   },
   "limitations": [
-    "Complex repeat-coded final symbol lengths and installation into workspace records are not yet implemented.",
+    "The checked final-length spans and canonical installer remain separate private components until B3b tree-group orchestration connects the handoff.",
     "No tree groups, context maps, literal/command/distance execution, LZ77, dictionary, output, budgeted public decoder, or B4 caller is implemented.",
     "No PP-Security profile is adopted and independent specification review remains pending.",
     "Rust/LLVM, modeled library operations, verifier/solver, OS and hardware remain trusted."

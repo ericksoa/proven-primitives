@@ -34,11 +34,13 @@ applicable profile obligation, checked evidence, independent specification
 review, and a passing release gate.
 
 The checked B3a front end now includes the exact fixed workspace/tree-record
-layout, meta-block-header state machine, all simple code descriptions, and the
-complex auxiliary code-length alphabet in `src/brotli_prefix.rs` and
-`src/brotli_input.rs`. Preserve their source-linked contracts and fifteen defect
-controls. Complex repeat-coded symbol lengths, workspace installation, and all later B3
-work remain incomplete; do not describe this slice as a decoder.
+layout, meta-block-header state machine, all simple code descriptions, the
+complex auxiliary code-length alphabet, RFC repeat-coded final symbol lengths,
+and canonical installation from the fixed builder region in
+`src/brotli_prefix.rs` and `src/brotli_input.rs`. Preserve their source-linked
+contracts and twenty-eight B3a defect controls. Tree-group orchestration,
+context maps, literal/command/distance execution, and all later B3 work remain
+incomplete; do not describe this slice as a decoder.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,

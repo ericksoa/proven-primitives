@@ -8,7 +8,7 @@ streaming, side-channel or deployment security.
 
 The source of truth is the [public contracts](CONTRACTS.md), the actual
 `ensures` clauses and named lemmas, and the [checked security record](evidence/security.json).
-The current source passes 263 checks with `--no-cheating`; the
+The current source passes 350 checks with `--no-cheating`; the
 [current checker output](evidence/brotli-b3a-verification.json) retains
 individual results. The earlier [177-check B2/C1 output](evidence/b2-c1-verification.json),
 [122-check B1 output](evidence/brotli-b1-verification.json), and
@@ -162,8 +162,9 @@ and limits. [The rejection suite](tests/proof_rejection.rs) first verifies an
 unchanged positive control and then requires real proof rejection. A failing
 tool launch or type error is not accepted as proof rejection. The current-source
 [current B3a control transcripts](evidence/brotli-b3a-controls.json) retain the
-current results; the twenty-five-control B2/C1, sixteen-control B1, and earlier
-eleven-control records remain historical.
+twenty-eight B3a results; the twenty-five-control B2/C1, sixteen-control B1, and
+earlier eleven-control records remain historical. Across the current project,
+all fifty-three deliberate defects are rejected.
 The
 [comparison record](evidence/validation-upstream-comparison.json) is finite
 compiled-behavior evidence; neither tests nor corruption controls replace the
@@ -174,9 +175,10 @@ universal contracts or validate the threat model's completeness.
 Brotli remains a candidate. [B1](BROTLI_B1.md) checks the private input/header
 foundation, [B2](BROTLI_B2.md) checks canonical prefix/block lengths plus the
 shared literal/command/distance switch core, and [B3a](BROTLI_B3A.md) checks the
-fixed workspace, meta-block headers, simple descriptions, and complex auxiliary
-code-length alphabet. The approved public design is not yet implemented as a
-complete decoder; the remaining B3/B4 implementation and review remain.
+fixed workspace, meta-block headers, simple and complex descriptions, RFC
+repeat-coded final lengths, and canonical builder installation. The approved
+public design is not yet implemented as a complete decoder; the remaining
+B3/B4 implementation and review remain.
 
 Proposed obligations for every permitted chunk/call sequence:
 

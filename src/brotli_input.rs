@@ -1399,6 +1399,11 @@ impl ComplexCodeLengthAlphabet {
         &&& (self.skip == 0 || self.skip == 2 || self.skip == 3)
         &&& forall|i: int| 0 <= i < 18 ==> self.lengths@[i] <= 5
     }
+
+    proof fn length_bound(&self, index: int)
+        requires self.valid(), 0 <= index < 18,
+        ensures self.lengths@[index] <= 5,
+    {}
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1408,6 +1413,71 @@ struct ComplexProgress {
     lengths: [u8; 18],
     space: u8,
     nonzero: u8,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct ComplexSymbolProgress {
+    code: ComplexCodeLengthAlphabet,
+    symbol: u16,
+    prev_code_len: u8,
+    repeat: u32,
+    repeat_code_len: u8,
+    space: u32,
+    prefix_width: u8,
+    prefix_bits: u8,
+    singleton: u8,
+}
+
+impl ComplexSymbolProgress {
+    spec fn valid(&self, alphabet_limit: u16) -> bool {
+        &&& self.code.valid()
+        &&& 1 <= alphabet_limit <= 704
+        &&& self.symbol < alphabet_limit
+        &&& 1 <= self.prev_code_len <= 15
+        &&& self.repeat <= self.symbol
+        &&& (self.repeat == 0 || self.repeat >= 3)
+        &&& self.repeat_code_len <= 15
+        &&& 1 <= self.space <= 32_768
+        &&& self.prefix_width < 5
+        &&& self.prefix_bits < (1u8 << self.prefix_width)
+        &&& self.singleton <= 18
+        &&& (self.singleton < 18 ==> {
+            &&& self.code.lengths@[self.singleton as int] != 0
+            &&& forall|i: int| 0 <= i < 18 && i != self.singleton
+                ==> self.code.lengths@[i] == 0
+            &&& self.prefix_width == 0
+            &&& self.prefix_bits == 0
+        })
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ComplexAfterSpan {
+    Symbol(ComplexSymbolProgress),
+    TrailingZeros {
+        code: ComplexCodeLengthAlphabet,
+        start: u16,
+    },
+    Complete {
+        code: ComplexCodeLengthAlphabet,
+        symbols: u16,
+    },
+}
+
+impl ComplexAfterSpan {
+    spec fn valid(&self, alphabet_limit: u16) -> bool {
+        match self {
+            ComplexAfterSpan::Symbol(progress) => progress.valid(alphabet_limit),
+            ComplexAfterSpan::TrailingZeros { code, start } => {
+                &&& code.valid()
+                &&& start < alphabet_limit
+            },
+            ComplexAfterSpan::Complete { code, symbols } => {
+                &&& code.valid()
+                &&& symbols == alphabet_limit
+            },
+        }
+    }
 }
 
 impl ComplexProgress {
@@ -1435,8 +1505,24 @@ enum CodeDescriptionPhase {
     ComplexPrefix2(ComplexProgress),
     ComplexPrefix3(ComplexProgress),
     ComplexPrefix4(ComplexProgress),
+    ComplexSymbol(ComplexSymbolProgress),
+    ComplexRepeat {
+        progress: ComplexSymbolProgress,
+        length: u8,
+        extra_bits: u8,
+    },
+    ComplexPendingSpan {
+        start: u16,
+        span_count: u16,
+        length: u8,
+        after: ComplexAfterSpan,
+    },
     CompleteSimple(SimpleCodeDescription),
     CompleteComplexAlphabet(ComplexCodeLengthAlphabet),
+    CompleteComplex {
+        code: ComplexCodeLengthAlphabet,
+        decoded_symbols: u16,
+    },
     Failed(CodeDescriptionError),
 }
 
@@ -1446,6 +1532,7 @@ enum CodeDescriptionStatus {
     NeedInput,
     Simple(SimpleCodeDescription),
     ComplexAlphabet(ComplexCodeLengthAlphabet),
+    ComplexComplete { symbols: u16 },
     Failed(CodeDescriptionError),
 }
 
@@ -1485,6 +1572,9 @@ spec fn code_phase_width(phase: CodeDescriptionPhase, alphabet_max: u16) -> nat 
         CodeDescriptionPhase::SimpleShape { .. }
         | CodeDescriptionPhase::ComplexPrefix3(_)
         | CodeDescriptionPhase::ComplexPrefix4(_) => 1,
+        CodeDescriptionPhase::ComplexSymbol(progress) =>
+            if progress.singleton < 18 { 0 } else { 1 },
+        CodeDescriptionPhase::ComplexRepeat { extra_bits, .. } => extra_bits as nat,
         _ => 0,
     }
 }
@@ -1492,7 +1582,7 @@ spec fn code_phase_width(phase: CodeDescriptionPhase, alphabet_max: u16) -> nat 
 spec fn code_phase_terminal(phase: CodeDescriptionPhase) -> bool {
     match phase {
         CodeDescriptionPhase::CompleteSimple(_)
-        | CodeDescriptionPhase::CompleteComplexAlphabet(_)
+        | CodeDescriptionPhase::CompleteComplex { .. }
         | CodeDescriptionPhase::Failed(_) => true,
         _ => false,
     }
@@ -1522,6 +1612,340 @@ fn code_length_space_weight_exec(value: u8) -> (r: u8)
     else if value == 5 { 1 }
     else { 0 }
 }
+
+spec fn symbol_code_length_weight(value: u8) -> nat {
+    if value == 1 { 16_384 }
+    else if value == 2 { 8_192 }
+    else if value == 3 { 4_096 }
+    else if value == 4 { 2_048 }
+    else if value == 5 { 1_024 }
+    else if value == 6 { 512 }
+    else if value == 7 { 256 }
+    else if value == 8 { 128 }
+    else if value == 9 { 64 }
+    else if value == 10 { 32 }
+    else if value == 11 { 16 }
+    else if value == 12 { 8 }
+    else if value == 13 { 4 }
+    else if value == 14 { 2 }
+    else if value == 15 { 1 }
+    else { 0 }
+}
+
+fn symbol_code_length_weight_exec(value: u8) -> (r: u32)
+    requires 1 <= value <= 15,
+    ensures r as nat == symbol_code_length_weight(value), 1 <= r <= 16_384,
+{
+    if value == 1 { 16_384 }
+    else if value == 2 { 8_192 }
+    else if value == 3 { 4_096 }
+    else if value == 4 { 2_048 }
+    else if value == 5 { 1_024 }
+    else if value == 6 { 512 }
+    else if value == 7 { 256 }
+    else if value == 8 { 128 }
+    else if value == 9 { 64 }
+    else if value == 10 { 32 }
+    else if value == 11 { 16 }
+    else if value == 12 { 8 }
+    else if value == 13 { 4 }
+    else if value == 14 { 2 }
+    else { 1 }
+}
+
+spec fn auxiliary_count_prefix(lengths: Seq<u8>, length: u8, limit: nat) -> nat
+    decreases limit,
+{
+    if limit == 0 { 0 }
+    else {
+        auxiliary_count_prefix(lengths, length, (limit - 1) as nat)
+            + if lengths[(limit - 1) as int] == length { 1nat } else { 0nat }
+    }
+}
+
+spec fn auxiliary_first_code(lengths: Seq<u8>, length: nat) -> nat
+    decreases length,
+{
+    if length <= 1 { 0 }
+    else {
+        2 * (auxiliary_first_code(lengths, (length - 1) as nat)
+            + auxiliary_count_prefix(lengths, (length - 1) as u8, lengths.len()))
+    }
+}
+
+spec fn auxiliary_canonical_code(lengths: Seq<u8>, symbol: int) -> nat {
+    auxiliary_first_code(lengths, lengths[symbol] as nat)
+        + auxiliary_count_prefix(lengths, lengths[symbol], symbol as nat)
+}
+
+spec fn auxiliary_reversed_code(value: nat, width: u8) -> nat {
+    if width == 1 {
+        value % 2
+    } else if width == 2 {
+        (value % 2) * 2 + (value / 2) % 2
+    } else if width == 3 {
+        (value % 2) * 4 + ((value / 2) % 2) * 2 + (value / 4) % 2
+    } else if width == 4 {
+        (value % 2) * 8 + ((value / 2) % 2) * 4
+            + ((value / 4) % 2) * 2 + (value / 8) % 2
+    } else {
+        (value % 2) * 16 + ((value / 2) % 2) * 8
+            + ((value / 4) % 2) * 4 + ((value / 8) % 2) * 2
+            + (value / 16) % 2
+    }
+}
+
+fn reverse_auxiliary_code(value: u32, width: u8) -> (r: u8)
+    requires 1 <= width <= 5, (value as nat) < pow2(width as nat),
+    ensures r as nat == auxiliary_reversed_code(value as nat, width), r <= 31,
+{
+    if width == 1 {
+        (value % 2) as u8
+    } else if width == 2 {
+        ((value % 2) * 2 + (value / 2) % 2) as u8
+    } else if width == 3 {
+        ((value % 2) * 4 + ((value / 2) % 2) * 2 + (value / 4) % 2) as u8
+    } else if width == 4 {
+        ((value % 2) * 8 + ((value / 2) % 2) * 4
+            + ((value / 4) % 2) * 2 + (value / 8) % 2) as u8
+    } else {
+        ((value % 2) * 16 + ((value / 2) % 2) * 8
+            + ((value / 4) % 2) * 4 + ((value / 8) % 2) * 2
+            + (value / 16) % 2) as u8
+    }
+}
+
+proof fn pow2_matches_auxiliary_shift(width: u8)
+    requires 1 <= width <= 5,
+    ensures pow2(width as nat) == (1u32 << width) as nat,
+{
+    lemma2_to64();
+    if width == 1 {
+        assert((1u32 << 1) == 2) by (bit_vector);
+    } else if width == 2 {
+        assert((1u32 << 2) == 4) by (bit_vector);
+    } else if width == 3 {
+        assert((1u32 << 3) == 8) by (bit_vector);
+    } else if width == 4 {
+        assert((1u32 << 4) == 16) by (bit_vector);
+    } else {
+        assert(width == 5);
+        assert((1u32 << 5) == 32) by (bit_vector);
+    }
+}
+
+fn auxiliary_count_exec(
+    lengths: &[u8; 18],
+    length: u8,
+    limit: usize,
+) -> (r: u32)
+    requires limit <= 18,
+    ensures r as nat == auxiliary_count_prefix(lengths@, length, limit as nat), r <= limit,
+{
+    let mut i: usize = 0;
+    let mut count: u32 = 0;
+    while i < limit
+        invariant i <= limit <= 18, count <= i,
+            count as nat == auxiliary_count_prefix(lengths@, length, i as nat),
+        decreases limit - i,
+    {
+        reveal(auxiliary_count_prefix);
+        if lengths[i] == length {
+            count = count + 1;
+        }
+        i = i + 1;
+    }
+    count
+}
+
+fn auxiliary_first_code_exec(lengths: &[u8; 18], length: u8) -> (r: u32)
+    requires 1 <= length <= 5,
+    ensures r as nat == auxiliary_first_code(lengths@, length as nat), r <= 1116,
+{
+    let mut width: u8 = 1;
+    let mut code: u32 = 0;
+    while width < length
+        invariant 1 <= width <= length <= 5,
+            code as nat == auxiliary_first_code(lengths@, width as nat),
+            (width == 1 ==> code == 0),
+            (width == 2 ==> code <= 36),
+            (width == 3 ==> code <= 108),
+            (width == 4 ==> code <= 252),
+            (width == 5 ==> code <= 540),
+        decreases length - width,
+    {
+        let count = auxiliary_count_exec(lengths, width, 18);
+        assert(code + count <= 558);
+        assert((code + count) * 2 <= 1116);
+        code = (code + count) * 2;
+        reveal(auxiliary_first_code);
+        width = width + 1;
+    }
+    code
+}
+
+fn auxiliary_canonical_code_exec(
+    lengths: &[u8; 18],
+    symbol: usize,
+) -> (r: u32)
+    requires symbol < 18, 1 <= lengths@[symbol as int] <= 5,
+    ensures r as nat == auxiliary_canonical_code(lengths@, symbol as int), r <= 1134,
+{
+    let length = lengths[symbol];
+    let first = auxiliary_first_code_exec(lengths, length);
+    let rank = auxiliary_count_exec(lengths, length, symbol);
+    first + rank
+}
+
+fn decode_auxiliary_symbol(
+    code: &ComplexCodeLengthAlphabet,
+    bits: u8,
+    width: u8,
+) -> (r: Option<u8>)
+    requires code.valid(), 1 <= width <= 5, bits < (1u8 << width),
+    ensures
+        r.is_some() ==> {
+            &&& r.unwrap() < 18
+            &&& auxiliary_symbol_match(*code, bits, width, r.unwrap())
+        },
+        r.is_none() ==> forall|symbol: u8| !auxiliary_symbol_match(
+            *code, bits, width, symbol),
+{
+    let mut i: usize = 0;
+    while i < 18
+        invariant i <= 18, code.valid(), 1 <= width <= 5,
+            forall|symbol: u8| symbol < i
+                ==> !auxiliary_symbol_match(*code, bits, width, symbol),
+        decreases 18 - i,
+    {
+        if code.lengths[i] == width {
+            assert(0 <= (i as int) < 18);
+            assert(code.lengths@[i as int] == width);
+            proof { code.length_bound(i as int); }
+            assert(1 <= code.lengths@[i as int] <= 5);
+            let candidate = auxiliary_canonical_code_exec(&code.lengths, i);
+            proof { pow2_matches_auxiliary_shift(width); }
+            if candidate < (1u32 << width) {
+                let reversed = reverse_auxiliary_code(candidate, width);
+                if reversed == bits {
+                    return Some(i as u8);
+                }
+            }
+        }
+        i = i + 1;
+    }
+    None
+}
+
+fn auxiliary_singleton(code: &ComplexCodeLengthAlphabet) -> (r: Option<u8>)
+    requires code.valid(),
+    ensures
+        r.is_some() ==> {
+            &&& r.unwrap() < 18
+            &&& code.lengths@[r.unwrap() as int] != 0
+            &&& forall|i: int| 0 <= i < 18 && i != r.unwrap()
+                ==> code.lengths@[i] == 0
+        },
+{
+    let mut found: u8 = 18;
+    let mut multiple = false;
+    let mut i: usize = 0;
+    while i < 18
+        invariant i <= 18, found <= 18,
+            found < 18 ==> {
+                &&& code.lengths@[found as int] != 0
+                &&& found < i
+            },
+            !multiple ==> forall|j: int| 0 <= j < i && code.lengths@[j] != 0
+                ==> found == j,
+        decreases 18 - i,
+    {
+        if code.lengths[i] != 0 {
+            if found == 18 {
+                found = i as u8;
+            } else {
+                multiple = true;
+            }
+        }
+        i = i + 1;
+    }
+    if found < 18 && !multiple { Some(found) } else { None }
+}
+
+fn start_complex_symbol_progress(
+    code: ComplexCodeLengthAlphabet,
+    _alphabet_limit: u16,
+) -> (r: ComplexSymbolProgress)
+    requires code.valid(), 1 <= _alphabet_limit <= 704,
+    ensures
+        r.valid(_alphabet_limit),
+        r.code == code,
+        r.symbol == 0,
+        r.prev_code_len == 8,
+        r.repeat == 0,
+        r.repeat_code_len == 0,
+        r.space == 32_768,
+        r.prefix_width == 0,
+        r.prefix_bits == 0,
+        r.singleton <= 18,
+{
+    let singleton = auxiliary_singleton(&code);
+    let singleton_value = match singleton {
+        Some(symbol) => symbol,
+        None => 18,
+    };
+    let progress = ComplexSymbolProgress {
+        code,
+        symbol: 0,
+        prev_code_len: 8,
+        repeat: 0,
+        repeat_code_len: 0,
+        space: 32_768,
+        prefix_width: 0,
+        prefix_bits: 0,
+        singleton: singleton_value,
+    };
+    proof {
+        assert(0u8 < (1u8 << 0)) by (bit_vector);
+    }
+    assert(progress.valid(_alphabet_limit));
+    progress
+}
+
+#[verifier::bit_vector]
+proof fn append_auxiliary_bit_bound(bits: u8, width: u8, bit: u8)
+    requires width < 5, bits < (1u8 << width), bit < 2,
+    ensures (bits | (bit << width)) < (1u8 << (width + 1)),
+        (bits | (bit << width)) <= 31,
+{}
+
+#[verifier::bit_vector]
+proof fn repeated_shift_bound(repeat: u32, extra_bits: u8)
+    requires 3 <= repeat <= 704, 2 <= extra_bits <= 3,
+    ensures (((repeat - 2) as u32) << extra_bits) <= 5_616,
+        (((repeat - 2) as u32) << extra_bits)
+            == if extra_bits == 2 { (repeat - 2) * 4 } else { (repeat - 2) * 8 },
+{}
+
+proof fn pow2_matches_small_shift(width: u8)
+    requires 2 <= width <= 3,
+    ensures pow2(width as nat) == (1u8 << width) as nat,
+{
+    lemma2_to64();
+    if width == 2 {
+        assert((1u8 << 2) == 4) by (bit_vector);
+    } else {
+        assert(width == 3);
+        assert((1u8 << 3) == 8) by (bit_vector);
+    }
+}
+
+#[verifier::bit_vector]
+proof fn repeated_amount_fits(weight: u32, delta: u32)
+    requires weight <= 16_384, delta <= 5_626,
+    ensures weight * delta <= 92_176_384,
+        (weight * delta) as nat == (weight as nat) * (delta as nat),
+{}
 
 spec fn complex_process_holds(
     old: ComplexProgress,
@@ -1575,6 +1999,245 @@ spec fn complex_process_holds(
                 _ => false,
             }
         }
+    }
+}
+
+spec fn complex_after_span_holds(
+    old: ComplexSymbolProgress,
+    next_symbol: u16,
+    next_space: u32,
+    next_prev: u8,
+    next_repeat: u32,
+    next_repeat_code_len: u8,
+    alphabet_limit: u16,
+    after: ComplexAfterSpan,
+) -> bool {
+    if next_space == 0 {
+        if next_symbol < alphabet_limit {
+            match after {
+                ComplexAfterSpan::TrailingZeros { code, start } => {
+                    &&& code == old.code
+                    &&& start == next_symbol
+                },
+                _ => false,
+            }
+        } else {
+            match after {
+                ComplexAfterSpan::Complete { code, symbols } => {
+                    &&& code == old.code
+                    &&& symbols == alphabet_limit
+                },
+                _ => false,
+            }
+        }
+    } else {
+        match after {
+            ComplexAfterSpan::Symbol(next) => {
+                &&& next.code == old.code
+                &&& next.symbol == next_symbol
+                &&& next.prev_code_len == next_prev
+                &&& next.repeat == next_repeat
+                &&& next.repeat_code_len == next_repeat_code_len
+                &&& next.space == next_space
+                &&& next.prefix_width == 0
+                &&& next.prefix_bits == 0
+                &&& next.singleton == old.singleton
+            },
+            _ => false,
+        }
+    }
+}
+
+spec fn direct_symbol_transition_holds(
+    old: ComplexSymbolProgress,
+    length: u8,
+    alphabet_limit: u16,
+    phase: CodeDescriptionPhase,
+    status: CodeDescriptionStatus,
+) -> bool {
+    let amount = symbol_code_length_weight(length);
+    if amount > old.space {
+        &&& phase == CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace)
+        &&& status == CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+    } else {
+        let next_symbol = old.symbol as nat + 1;
+        let next_space = old.space as nat - amount;
+        if next_symbol == alphabet_limit && next_space != 0 {
+            &&& phase == CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace)
+            &&& status == CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+        } else {
+            match phase {
+                CodeDescriptionPhase::ComplexPendingSpan {
+                    start, span_count: count, length: emitted, after,
+                } => {
+                    &&& start == old.symbol
+                    &&& count == 1
+                    &&& emitted == length
+                    &&& status == CodeDescriptionStatus::Progress
+                    &&& complex_after_span_holds(
+                        old,
+                        next_symbol as u16,
+                        next_space as u32,
+                        if length == 0 { old.prev_code_len } else { length },
+                        0,
+                        old.repeat_code_len,
+                        alphabet_limit,
+                        after,
+                    )
+                },
+                _ => false,
+            }
+        }
+    }
+}
+
+spec fn repeated_symbol_transition_holds(
+    old: ComplexSymbolProgress,
+    length: u8,
+    extra_bits: u8,
+    suffix: u8,
+    alphabet_limit: u16,
+    phase: CodeDescriptionPhase,
+    status: CodeDescriptionStatus,
+) -> bool {
+    let reset_repeat: nat = if old.repeat_code_len == length { old.repeat as nat } else { 0nat };
+    let base: nat = if reset_repeat > 0 {
+        ((reset_repeat - 2) as nat) * if extra_bits == 2 { 4nat } else { 8nat }
+    } else { 0nat };
+    let next_repeat = base + suffix as nat + 3;
+    let delta = next_repeat - reset_repeat;
+    let amount = delta * symbol_code_length_weight(length);
+    if old.symbol as nat + delta > alphabet_limit || amount > old.space {
+        &&& phase == CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace)
+        &&& status == CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+    } else {
+        let next_symbol = old.symbol as nat + delta;
+        let next_space = old.space as nat - amount;
+        if next_symbol == alphabet_limit && next_space != 0 {
+            &&& phase == CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace)
+            &&& status == CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+        } else {
+            match phase {
+                CodeDescriptionPhase::ComplexPendingSpan {
+                    start, span_count: count, length: emitted, after,
+                } => {
+                    &&& start == old.symbol
+                    &&& count as nat == delta
+                    &&& emitted == length
+                    &&& status == CodeDescriptionStatus::Progress
+                    &&& complex_after_span_holds(
+                        old,
+                        next_symbol as u16,
+                        next_space as u32,
+                        old.prev_code_len,
+                        next_repeat as u32,
+                        length,
+                        alphabet_limit,
+                        after,
+                    )
+                },
+                _ => false,
+            }
+        }
+    }
+}
+
+spec fn auxiliary_symbol_match(
+    code: ComplexCodeLengthAlphabet,
+    bits: u8,
+    width: u8,
+    symbol: u8,
+) -> bool {
+    &&& symbol < 18
+    &&& code.lengths@[symbol as int] == width
+    &&& auxiliary_canonical_code(code.lengths@, symbol as int) < pow2(width as nat)
+    &&& auxiliary_reversed_code(
+        auxiliary_canonical_code(code.lengths@, symbol as int),
+        width,
+    ) == bits
+}
+
+spec fn complex_symbol_transition_holds(
+    old: ComplexSymbolProgress,
+    field: nat,
+    alphabet_limit: u16,
+    phase: CodeDescriptionPhase,
+    status: CodeDescriptionStatus,
+) -> bool {
+    if old.singleton < 18 {
+        if old.singleton < 16 {
+            direct_symbol_transition_holds(old, old.singleton, alphabet_limit, phase, status)
+        } else {
+            &&& phase == CodeDescriptionPhase::ComplexRepeat {
+                progress: old,
+                length: if old.singleton == 16 { old.prev_code_len } else { 0 },
+                extra_bits: if old.singleton == 16 { 2 } else { 3 },
+            }
+            &&& status == CodeDescriptionStatus::Progress
+        }
+    } else {
+        let next_bits = old.prefix_bits | ((field as u8) << old.prefix_width);
+        let next_width = (old.prefix_width + 1) as u8;
+        if exists|symbol: u8| auxiliary_symbol_match(old.code, next_bits, next_width, symbol) {
+            exists|symbol: u8| {
+                &&& auxiliary_symbol_match(old.code, next_bits, next_width, symbol)
+                &&& if symbol < 16 {
+                    direct_symbol_transition_holds(old, symbol, alphabet_limit, phase, status)
+                } else {
+                    &&& phase == CodeDescriptionPhase::ComplexRepeat {
+                        progress: ComplexSymbolProgress {
+                            prefix_width: 0,
+                            prefix_bits: 0,
+                            ..old
+                        },
+                        length: if symbol == 16 { old.prev_code_len } else { 0 },
+                        extra_bits: if symbol == 16 { 2 } else { 3 },
+                    }
+                    &&& status == CodeDescriptionStatus::Progress
+                }
+            }
+        } else if next_width == 5 {
+            &&& phase == CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace)
+            &&& status == CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+        } else {
+            &&& phase == CodeDescriptionPhase::ComplexSymbol(ComplexSymbolProgress {
+                prefix_width: next_width,
+                prefix_bits: next_bits,
+                ..old
+            })
+            &&& status == CodeDescriptionStatus::Progress
+        }
+    }
+}
+
+spec fn pending_span_transition_holds(
+    after: ComplexAfterSpan,
+    alphabet_limit: u16,
+    phase: CodeDescriptionPhase,
+    status: CodeDescriptionStatus,
+) -> bool {
+    match after {
+        ComplexAfterSpan::Symbol(progress) => {
+            &&& phase == CodeDescriptionPhase::ComplexSymbol(progress)
+            &&& status == CodeDescriptionStatus::Progress
+        },
+        ComplexAfterSpan::TrailingZeros { code, start } => {
+            let count = (alphabet_limit - start) as u16;
+            &&& phase == CodeDescriptionPhase::ComplexPendingSpan {
+                start,
+                span_count: count,
+                length: 0,
+                after: ComplexAfterSpan::Complete {
+                    code,
+                    symbols: alphabet_limit,
+                },
+            }
+            &&& status == CodeDescriptionStatus::Progress
+        },
+        ComplexAfterSpan::Complete { code, symbols } => {
+            &&& phase == CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: symbols }
+            &&& status == CodeDescriptionStatus::ComplexComplete { symbols }
+        },
     }
 }
 
@@ -1722,6 +2385,37 @@ spec fn code_transition_holds(
                 complex_process_holds(progress, 5, phase, status)
             }
         },
+        CodeDescriptionPhase::CompleteComplexAlphabet(code) => match phase {
+            CodeDescriptionPhase::ComplexSymbol(next) => {
+                &&& next.code == code
+                &&& next.symbol == 0
+                &&& next.prev_code_len == 8
+                &&& next.repeat == 0
+                &&& next.repeat_code_len == 0
+                &&& next.space == 32_768
+                &&& next.prefix_width == 0
+                &&& next.prefix_bits == 0
+                &&& status == CodeDescriptionStatus::Progress
+            },
+            _ => false,
+        },
+        CodeDescriptionPhase::ComplexSymbol(progress) =>
+            complex_symbol_transition_holds(progress, field, alphabet_limit, phase, status),
+        CodeDescriptionPhase::ComplexRepeat {
+            progress,
+            length,
+            extra_bits,
+        } => repeated_symbol_transition_holds(
+            progress,
+            length,
+            extra_bits,
+            field as u8,
+            alphabet_limit,
+            phase,
+            status,
+        ),
+        CodeDescriptionPhase::ComplexPendingSpan { after, .. } =>
+            pending_span_transition_holds(after, alphabet_limit, phase, status),
         _ => false,
     }
 }
@@ -1826,6 +2520,295 @@ fn process_complex_code_length(
     CodeDescriptionPhase::ComplexPrefix2(next)
 }
 
+fn complex_after_symbol(
+    progress: ComplexSymbolProgress,
+    next_symbol: u16,
+    next_space: u32,
+    next_prev: u8,
+    next_repeat: u32,
+    next_repeat_code_len: u8,
+    alphabet_limit: u16,
+) -> (r: ComplexAfterSpan)
+    requires progress.valid(alphabet_limit),
+        progress.symbol < next_symbol <= alphabet_limit,
+        next_space <= progress.space,
+        next_space == 0 || next_symbol < alphabet_limit,
+        1 <= next_prev <= 15,
+        next_repeat <= next_symbol,
+        next_repeat == 0 || next_repeat >= 3,
+        next_repeat_code_len <= 15,
+    ensures r.valid(alphabet_limit),
+        complex_after_span_holds(
+            progress,
+            next_symbol,
+            next_space,
+            next_prev,
+            next_repeat,
+            next_repeat_code_len,
+            alphabet_limit,
+            r,
+        ),
+{
+    if next_space == 0 {
+        if next_symbol < alphabet_limit {
+            ComplexAfterSpan::TrailingZeros {
+                code: progress.code,
+                start: next_symbol,
+            }
+        } else {
+            ComplexAfterSpan::Complete {
+                code: progress.code,
+                symbols: alphabet_limit,
+            }
+        }
+    } else {
+        assert(1 <= next_space <= 32_768);
+        let next = ComplexSymbolProgress {
+            code: progress.code,
+            symbol: next_symbol,
+            prev_code_len: next_prev,
+            repeat: next_repeat,
+            repeat_code_len: next_repeat_code_len,
+            space: next_space,
+            prefix_width: 0,
+            prefix_bits: 0,
+            singleton: progress.singleton,
+        };
+        proof {
+            assert(0u8 < (1u8 << 0)) by (bit_vector);
+        }
+        assert(next.valid(alphabet_limit));
+        ComplexAfterSpan::Symbol(next)
+    }
+}
+
+fn process_direct_symbol_length(
+    progress: ComplexSymbolProgress,
+    length: u8,
+    alphabet_limit: u16,
+) -> (r: CodeDescriptionPhase)
+    requires progress.valid(alphabet_limit), length <= 15,
+    ensures direct_symbol_transition_holds(
+        progress,
+        length,
+        alphabet_limit,
+        r,
+        match r {
+            CodeDescriptionPhase::Failed(error) => CodeDescriptionStatus::Failed(error),
+            _ => CodeDescriptionStatus::Progress,
+        },
+    ),
+        match r {
+            CodeDescriptionPhase::ComplexPendingSpan { after, .. } =>
+                after.valid(alphabet_limit),
+            CodeDescriptionPhase::Failed(_) => true,
+            _ => false,
+        },
+{
+    let start = progress.symbol;
+    let next_symbol = progress.symbol + 1;
+    let mut next_space = progress.space;
+    let mut next_prev = progress.prev_code_len;
+    if length != 0 {
+        let amount = symbol_code_length_weight_exec(length);
+        if amount > progress.space {
+            let result = CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace);
+            assert(direct_symbol_transition_holds(
+                progress,
+                length,
+                alphabet_limit,
+                result,
+                CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace),
+            ));
+            return result;
+        }
+        next_space = progress.space - amount;
+        next_prev = length;
+    }
+    if next_symbol == alphabet_limit && next_space != 0 {
+        let result = CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace);
+        assert(direct_symbol_transition_holds(
+            progress,
+            length,
+            alphabet_limit,
+            result,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace),
+        ));
+        return result;
+    }
+    let after = complex_after_symbol(
+        progress,
+        next_symbol,
+        next_space,
+        next_prev,
+        0,
+        progress.repeat_code_len,
+        alphabet_limit,
+    );
+    let result = CodeDescriptionPhase::ComplexPendingSpan {
+        start,
+        span_count: 1,
+        length,
+        after,
+    };
+    assert(direct_symbol_transition_holds(
+        progress,
+        length,
+        alphabet_limit,
+        result,
+        CodeDescriptionStatus::Progress,
+    ));
+    result
+}
+
+fn process_repeated_symbol_length(
+    progress: ComplexSymbolProgress,
+    length: u8,
+    extra_bits: u8,
+    suffix: u8,
+    alphabet_limit: u16,
+) -> (r: CodeDescriptionPhase)
+    requires progress.valid(alphabet_limit),
+        (length == 0 && extra_bits == 3) || (1 <= length <= 15 && extra_bits == 2),
+        suffix < (1u8 << extra_bits),
+    ensures repeated_symbol_transition_holds(
+        progress,
+        length,
+        extra_bits,
+        suffix,
+        alphabet_limit,
+        r,
+        match r {
+            CodeDescriptionPhase::Failed(error) => CodeDescriptionStatus::Failed(error),
+            _ => CodeDescriptionStatus::Progress,
+        },
+    ),
+        match r {
+            CodeDescriptionPhase::ComplexPendingSpan { after, .. } =>
+                after.valid(alphabet_limit),
+            CodeDescriptionPhase::Failed(_) => true,
+            _ => false,
+        },
+{
+    let old_repeat = if progress.repeat_code_len != length {
+        0
+    } else {
+        progress.repeat
+    };
+    assert(old_repeat as nat == if progress.repeat_code_len == length {
+        progress.repeat as nat
+    } else { 0nat });
+    assert(old_repeat == 0 || 3 <= old_repeat <= 704);
+    if extra_bits == 2 {
+        assert((1u8 << 2) == 4) by (bit_vector);
+        assert(suffix < 4);
+    } else {
+        assert(extra_bits == 3);
+        assert((1u8 << 3) == 8) by (bit_vector);
+        assert(suffix < 8);
+    }
+    let base = if old_repeat > 0 {
+        assert(old_repeat >= 3);
+        assert(old_repeat - 2 <= 702);
+        proof { repeated_shift_bound(old_repeat, extra_bits); }
+        (old_repeat - 2) << extra_bits
+    } else {
+        0
+    };
+    assert(base <= 5_616);
+    assert(base as nat == if old_repeat > 0 {
+        ((old_repeat - 2) as nat) * if extra_bits == 2 { 4nat } else { 8nat }
+    } else { 0nat });
+    let next_repeat = base + suffix as u32 + 3;
+    assert(next_repeat as nat == base as nat + suffix as nat + 3);
+    assert(next_repeat <= 5_626);
+    assert(next_repeat > old_repeat);
+    let delta = next_repeat - old_repeat;
+    assert(delta as nat == next_repeat as nat - old_repeat as nat);
+    if delta > alphabet_limit as u32 - progress.symbol as u32 {
+        let result = CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace);
+        assert(repeated_symbol_transition_holds(
+            progress,
+            length,
+            extra_bits,
+            suffix,
+            alphabet_limit,
+            result,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace),
+        ));
+        return result;
+    }
+    let next_symbol = progress.symbol + delta as u16;
+    let mut next_space = progress.space;
+    if length != 0 {
+        let weight = symbol_code_length_weight_exec(length);
+        assert(weight <= 16_384);
+        assert(delta <= 5_626);
+        proof { repeated_amount_fits(weight, delta); }
+        let amount = weight * delta;
+        assert(amount as nat == (weight as nat) * (delta as nat));
+        assert(weight as nat == symbol_code_length_weight(length));
+        assert((weight as nat) * (delta as nat)
+            == (delta as nat) * (weight as nat)) by (nonlinear_arith);
+        assert((delta as nat) * (weight as nat)
+            == (delta as nat) * symbol_code_length_weight(length));
+        assert(amount as nat
+            == (delta as nat) * symbol_code_length_weight(length));
+        if amount > progress.space {
+            let result = CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace);
+            assert(repeated_symbol_transition_holds(
+                progress,
+                length,
+                extra_bits,
+                suffix,
+                alphabet_limit,
+                result,
+                CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace),
+            ));
+            return result;
+        }
+        next_space = progress.space - amount;
+    }
+    if next_symbol == alphabet_limit && next_space != 0 {
+        let result = CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace);
+        assert(repeated_symbol_transition_holds(
+            progress,
+            length,
+            extra_bits,
+            suffix,
+            alphabet_limit,
+            result,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace),
+        ));
+        return result;
+    }
+    let after = complex_after_symbol(
+        progress,
+        next_symbol,
+        next_space,
+        progress.prev_code_len,
+        next_repeat,
+        length,
+        alphabet_limit,
+    );
+    let result = CodeDescriptionPhase::ComplexPendingSpan {
+        start: next_symbol - delta as u16,
+        span_count: delta as u16,
+        length,
+        after,
+    };
+    assert(repeated_symbol_transition_holds(
+        progress,
+        length,
+        extra_bits,
+        suffix,
+        alphabet_limit,
+        result,
+        CodeDescriptionStatus::Progress,
+    ));
+    result
+}
+
 impl CodeDescriptionDecoder {
     spec fn valid(&self) -> bool {
         &&& self.queue.valid()
@@ -1850,8 +2833,28 @@ impl CodeDescriptionDecoder {
             CodeDescriptionPhase::ComplexPrefix2(progress)
             | CodeDescriptionPhase::ComplexPrefix3(progress)
             | CodeDescriptionPhase::ComplexPrefix4(progress) => progress.valid(),
+            CodeDescriptionPhase::ComplexSymbol(progress) =>
+                progress.valid(self.alphabet_limit),
+            CodeDescriptionPhase::ComplexRepeat { progress, length, extra_bits } => {
+                &&& progress.valid(self.alphabet_limit)
+                &&& (length == 0 || 1 <= length <= 15)
+                &&& ((length == 0 && extra_bits == 3)
+                    || (length != 0 && extra_bits == 2))
+            },
+            CodeDescriptionPhase::ComplexPendingSpan {
+                start, span_count: count, length, after,
+            } => {
+                &&& count > 0
+                &&& length <= 15
+                &&& start as nat + count as nat <= self.alphabet_limit
+                &&& after.valid(self.alphabet_limit)
+            },
             CodeDescriptionPhase::CompleteSimple(code) => code.valid(self.alphabet_limit),
             CodeDescriptionPhase::CompleteComplexAlphabet(code) => code.valid(),
+            CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: symbols } => {
+                &&& code.valid()
+                &&& symbols == self.alphabet_limit
+            },
             _ => true,
         }
     }
@@ -1904,10 +2907,10 @@ impl CodeDescriptionDecoder {
                     })
                     &&& *final(self) == *old(self)
                 },
-                CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+                CodeDescriptionPhase::CompleteComplex { decoded_symbols: symbols, .. } => {
                     &&& r == (CodeDescriptionStep {
                         consumed: 0,
-                        status: CodeDescriptionStatus::ComplexAlphabet(code),
+                        status: CodeDescriptionStatus::ComplexComplete { symbols },
                     })
                     &&& *final(self) == *old(self)
                 },
@@ -1932,6 +2935,15 @@ impl CodeDescriptionDecoder {
                 CodeDescriptionStatus::ComplexAlphabet(code) => {
                     &&& code.valid()
                     &&& final(self).phase == CodeDescriptionPhase::CompleteComplexAlphabet(code)
+                },
+                CodeDescriptionStatus::ComplexComplete { symbols } => match final(self).phase {
+                    CodeDescriptionPhase::CompleteComplex {
+                        decoded_symbols: final_symbols,
+                        ..
+                    } => {
+                        &&& final_symbols == symbols
+                    },
+                    _ => false,
                 },
                 CodeDescriptionStatus::Failed(error) =>
                     final(self).phase == CodeDescriptionPhase::Failed(error),
@@ -1959,10 +2971,10 @@ impl CodeDescriptionDecoder {
                     status: CodeDescriptionStatus::Simple(code),
                 };
             }
-            CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+            CodeDescriptionPhase::CompleteComplex { decoded_symbols: symbols, .. } => {
                 return CodeDescriptionStep {
                     consumed: 0,
-                    status: CodeDescriptionStatus::ComplexAlphabet(code),
+                    status: CodeDescriptionStatus::ComplexComplete { symbols },
                 };
             }
             CodeDescriptionPhase::Failed(error) => {
@@ -1974,6 +2986,56 @@ impl CodeDescriptionDecoder {
             _ => {}
         }
 
+        if let CodeDescriptionPhase::ComplexPendingSpan { after, .. } = phase {
+            self.phase = match after {
+                ComplexAfterSpan::Symbol(progress) => CodeDescriptionPhase::ComplexSymbol(progress),
+                ComplexAfterSpan::TrailingZeros { code, start } => {
+                    let count = self.alphabet_limit - start;
+                    CodeDescriptionPhase::ComplexPendingSpan {
+                        start,
+                        span_count: count,
+                        length: 0,
+                        after: ComplexAfterSpan::Complete {
+                            code,
+                            symbols: self.alphabet_limit,
+                        },
+                    }
+                }
+                ComplexAfterSpan::Complete { code, symbols } =>
+                    CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: symbols },
+            };
+            assert(match self.phase {
+                CodeDescriptionPhase::ComplexSymbol(progress) =>
+                    progress.valid(self.alphabet_limit),
+                CodeDescriptionPhase::ComplexPendingSpan {
+                    start, span_count: count, length, after,
+                } => {
+                    &&& count > 0
+                    &&& length <= 15
+                    &&& start as nat + count as nat <= self.alphabet_limit
+                    &&& after.valid(self.alphabet_limit)
+                },
+                CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: symbols } =>
+                    code.valid() && symbols == self.alphabet_limit,
+                _ => false,
+            });
+            let status = match self.phase {
+                CodeDescriptionPhase::CompleteComplex { decoded_symbols: symbols, .. } =>
+                    CodeDescriptionStatus::ComplexComplete { symbols },
+                _ => CodeDescriptionStatus::Progress,
+            };
+            assert(self.valid());
+            return CodeDescriptionStep { consumed: 0, status };
+        }
+
+        if let CodeDescriptionPhase::CompleteComplexAlphabet(code) = phase {
+            let progress = start_complex_symbol_progress(code, self.alphabet_limit);
+            self.phase = CodeDescriptionPhase::ComplexSymbol(progress);
+            let status = CodeDescriptionStatus::Progress;
+            assert(self.valid());
+            return CodeDescriptionStep { consumed: 0, status };
+        }
+
         let width: usize = match phase {
             CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize
             | CodeDescriptionPhase::ComplexPrefix2(_) => 2,
@@ -1981,8 +3043,14 @@ impl CodeDescriptionDecoder {
             CodeDescriptionPhase::SimpleShape { .. }
             | CodeDescriptionPhase::ComplexPrefix3(_)
             | CodeDescriptionPhase::ComplexPrefix4(_) => 1,
+            CodeDescriptionPhase::ComplexSymbol(progress) => {
+                if progress.singleton < 18 { 0 } else { 1 }
+            }
+            CodeDescriptionPhase::ComplexRepeat { extra_bits, .. } => extra_bits as usize,
             CodeDescriptionPhase::CompleteSimple(_)
             | CodeDescriptionPhase::CompleteComplexAlphabet(_)
+            | CodeDescriptionPhase::ComplexPendingSpan { .. }
+            | CodeDescriptionPhase::CompleteComplex { .. }
             | CodeDescriptionPhase::Failed(_) => {
                 proof { assert(false); }
                 0
@@ -2177,8 +3245,143 @@ impl CodeDescriptionDecoder {
                     process_complex_code_length(progress, 5)
                 };
             }
+            CodeDescriptionPhase::ComplexSymbol(mut progress) => {
+                let ghost started_progress = progress;
+                if progress.singleton < 18 {
+                    assert(width == 0);
+                    assert(field == 0);
+                    let symbol = progress.singleton;
+                    if symbol < 16 {
+                        self.phase = process_direct_symbol_length(
+                            progress,
+                            symbol,
+                            self.alphabet_limit,
+                        );
+                    } else {
+                        let (length, extra_bits) = if symbol == 16 {
+                            (progress.prev_code_len, 2u8)
+                        } else {
+                            (0u8, 3u8)
+                        };
+                        assert(progress.valid(self.alphabet_limit));
+                        self.phase = CodeDescriptionPhase::ComplexRepeat {
+                            progress,
+                            length,
+                            extra_bits,
+                        };
+                    }
+                } else {
+                assert(width == 1);
+                assert(field < 2);
+                let bit = field as u8;
+                proof {
+                    append_auxiliary_bit_bound(
+                        progress.prefix_bits,
+                        progress.prefix_width,
+                        bit,
+                    );
+                }
+                let next_bits = progress.prefix_bits | (bit << progress.prefix_width);
+                let next_width = progress.prefix_width + 1;
+                match decode_auxiliary_symbol(&progress.code, next_bits, next_width) {
+                    Some(symbol) => {
+                        assert(auxiliary_symbol_match(
+                            started_progress.code,
+                            next_bits,
+                            next_width,
+                            symbol,
+                        ));
+                        if symbol < 16 {
+                            self.phase = process_direct_symbol_length(
+                                progress,
+                                symbol,
+                                self.alphabet_limit,
+                            );
+                        } else {
+                            let (length, extra_bits) = if symbol == 16 {
+                                (progress.prev_code_len, 2u8)
+                            } else {
+                                (0u8, 3u8)
+                            };
+                            progress.prefix_width = 0;
+                            progress.prefix_bits = 0;
+                            assert(progress.singleton == 18);
+                            proof {
+                                assert(0u8 < (1u8 << 0)) by (bit_vector);
+                            }
+                            assert(progress.valid(self.alphabet_limit));
+                            self.phase = CodeDescriptionPhase::ComplexRepeat {
+                                progress,
+                                length,
+                                extra_bits,
+                            };
+                        }
+                    }
+                    None => {
+                        assert(!exists|symbol: u8| auxiliary_symbol_match(
+                            started_progress.code,
+                            next_bits,
+                            next_width,
+                            symbol,
+                        ));
+                        if next_width == 5 {
+                            self.phase = CodeDescriptionPhase::Failed(
+                                CodeDescriptionError::CodeLengthSpace,
+                            );
+                        } else {
+                            progress.prefix_width = next_width;
+                            progress.prefix_bits = next_bits;
+                            self.phase = CodeDescriptionPhase::ComplexSymbol(progress);
+                        }
+                    }
+                }
+                }
+                status = match self.phase {
+                    CodeDescriptionPhase::Failed(error) => CodeDescriptionStatus::Failed(error),
+                    _ => CodeDescriptionStatus::Progress,
+                };
+                assert(complex_symbol_transition_holds(
+                    started_progress,
+                    field as nat,
+                    self.alphabet_limit,
+                    self.phase,
+                    status,
+                ));
+            }
+            CodeDescriptionPhase::ComplexRepeat {
+                progress,
+                length,
+                extra_bits,
+            } => {
+                assert(width == extra_bits as usize);
+                assert(field < 8);
+                proof { pow2_matches_small_shift(extra_bits); }
+                let next = process_repeated_symbol_length(
+                    progress,
+                    length,
+                    extra_bits,
+                    field as u8,
+                    self.alphabet_limit,
+                );
+                status = match next {
+                    CodeDescriptionPhase::Failed(error) => CodeDescriptionStatus::Failed(error),
+                    _ => CodeDescriptionStatus::Progress,
+                };
+                assert(repeated_symbol_transition_holds(
+                    progress,
+                    length,
+                    extra_bits,
+                    field as u8,
+                    self.alphabet_limit,
+                    next,
+                    status,
+                ));
+                self.phase = next;
+            }
             CodeDescriptionPhase::CompleteSimple(_)
             | CodeDescriptionPhase::CompleteComplexAlphabet(_)
+            | CodeDescriptionPhase::ComplexPendingSpan { .. }
+            | CodeDescriptionPhase::CompleteComplex { .. }
             | CodeDescriptionPhase::Failed(_) => {
                 proof { assert(false); }
             }
@@ -2188,11 +3391,44 @@ impl CodeDescriptionDecoder {
             CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
                 status = CodeDescriptionStatus::ComplexAlphabet(code);
             }
+            CodeDescriptionPhase::CompleteComplex { decoded_symbols: symbols, .. } => {
+                status = CodeDescriptionStatus::ComplexComplete { symbols };
+            }
             CodeDescriptionPhase::Failed(error) => {
                 status = CodeDescriptionStatus::Failed(error);
             }
             _ => {}
         }
+        assert(code_transition_holds(
+            phase,
+            field as nat,
+            self.alphabet_max,
+            self.alphabet_limit,
+            self.phase,
+            status,
+        ));
+        assert(self.queue.valid());
+        assert(1 <= self.alphabet_limit <= self.alphabet_max <= 704);
+        proof { match self.phase {
+            CodeDescriptionPhase::ComplexSymbol(progress) => {
+                assert(progress.valid(self.alphabet_limit));
+            },
+            CodeDescriptionPhase::ComplexRepeat { progress, length, extra_bits } => {
+                assert(progress.valid(self.alphabet_limit));
+                assert(length == 0 || 1 <= length <= 15);
+                assert((length == 0 && extra_bits == 3)
+                    || (length != 0 && extra_bits == 2));
+            },
+            CodeDescriptionPhase::ComplexPendingSpan {
+                start, span_count: count, length, after,
+            } => {
+                assert(count > 0);
+                assert(length <= 15);
+                assert(start as nat + count as nat <= self.alphabet_limit);
+                assert(after.valid(self.alphabet_limit));
+            },
+            _ => {},
+        } }
         assert(self.valid());
         CodeDescriptionStep { consumed: read.consumed, status }
     }
@@ -2259,12 +3495,12 @@ mod tests {
         bits
     }
 
-    fn parse_code_description_bits(
+    fn parse_code_description_bits_with_lengths(
         description_bits: &[u8],
         alphabet_max: u16,
         alphabet_limit: u16,
         one_byte_chunks: bool,
-    ) -> (CodeDescriptionDecoder, CodeDescriptionStep) {
+    ) -> (CodeDescriptionDecoder, CodeDescriptionStep, Vec<u8>) {
         let mut bits = compressed_meta_prefix_bits();
         bits.extend_from_slice(description_bits);
         let bytes = pack_lsb_bits(&bits);
@@ -2292,7 +3528,8 @@ mod tests {
         assert!(matches!(meta.phase, MetaBlockPhase::Complete(_)));
         let mut decoder =
             CodeDescriptionDecoder::from_meta(meta, alphabet_max, alphabet_limit).unwrap();
-        for _ in 0..256 {
+        let mut lengths = Vec::new();
+        for _ in 0..4096 {
             let end = if one_byte_chunks {
                 (at + 1).min(bytes.len())
             } else {
@@ -2300,18 +3537,45 @@ mod tests {
             };
             let step = decoder.advance_field(&bytes[at..end], end == bytes.len());
             at += step.consumed;
+            if let CodeDescriptionPhase::ComplexPendingSpan {
+                start,
+                span_count: count,
+                length,
+                ..
+            } = decoder.phase
+            {
+                assert_eq!(start as usize, lengths.len());
+                lengths.extend(std::iter::repeat_n(length, count as usize));
+            }
             if !matches!(
                 step.status,
-                CodeDescriptionStatus::Progress | CodeDescriptionStatus::NeedInput
+                CodeDescriptionStatus::Progress
+                    | CodeDescriptionStatus::NeedInput
+                    | CodeDescriptionStatus::ComplexAlphabet(_)
             ) {
-                return (decoder, step);
+                return (decoder, step, lengths);
             }
             if at == bytes.len() && matches!(step.status, CodeDescriptionStatus::NeedInput) {
                 let terminal = decoder.advance_field(&[], true);
-                return (decoder, terminal);
+                return (decoder, terminal, lengths);
             }
         }
         panic!("code-description parser did not terminate")
+    }
+
+    fn parse_code_description_bits(
+        description_bits: &[u8],
+        alphabet_max: u16,
+        alphabet_limit: u16,
+        one_byte_chunks: bool,
+    ) -> (CodeDescriptionDecoder, CodeDescriptionStep) {
+        let (decoder, step, _) = parse_code_description_bits_with_lengths(
+            description_bits,
+            alphabet_max,
+            alphabet_limit,
+            one_byte_chunks,
+        );
+        (decoder, step)
     }
 
     fn push_bits(bits: &mut Vec<u8>, value: u16, width: u8) {
@@ -2330,6 +3594,32 @@ mod tests {
             5 => bits.extend([1, 1, 1, 1]),
             _ => panic!("invalid static code-length value"),
         }
+    }
+
+    fn push_auxiliary_code_lengths(bits: &mut Vec<u8>, entries: &[(u8, u8)]) {
+        let mut space = 32u8;
+        for symbol in CODE_LENGTH_ORDER {
+            let value = entries
+                .iter()
+                .find_map(|(entry_symbol, length)| {
+                    if *entry_symbol == symbol {
+                        Some(*length)
+                    } else {
+                        None
+                    }
+                })
+                .unwrap_or(0);
+            push_static_code_length(bits, value);
+            space -= code_length_space_weight_exec(value);
+            if space == 0 {
+                return;
+            }
+        }
+        assert_eq!(
+            entries.len(),
+            1,
+            "only singleton auxiliary trees may be incomplete"
+        );
     }
 
     fn visible_bits(queue: &BitQueue) -> Vec<u8> {
@@ -2680,10 +3970,15 @@ mod tests {
             let mut two_length_one = vec![0, 0];
             push_static_code_length(&mut two_length_one, 1);
             push_static_code_length(&mut two_length_one, 1);
-            let (_, step) = parse_code_description_bits(&two_length_one, 256, 256, chunks);
-            let code = match step.status {
-                CodeDescriptionStatus::ComplexAlphabet(code) => code,
-                other => panic!("unexpected complex result: {other:?}"),
+            two_length_one.extend([0, 0]);
+            let (decoder, step) = parse_code_description_bits(&two_length_one, 2, 2, chunks);
+            assert_eq!(
+                step.status,
+                CodeDescriptionStatus::ComplexComplete { symbols: 2 }
+            );
+            let code = match decoder.phase {
+                CodeDescriptionPhase::CompleteComplex { code, .. } => code,
+                other => panic!("unexpected complex phase: {other:?}"),
             };
             assert_eq!(code.lengths[1], 1);
             assert_eq!(code.lengths[2], 1);
@@ -2694,10 +3989,14 @@ mod tests {
                 for _ in 1..18 {
                     push_static_code_length(&mut singleton, 0);
                 }
-                let (_, step) = parse_code_description_bits(&singleton, 256, 256, chunks);
-                let code = match step.status {
-                    CodeDescriptionStatus::ComplexAlphabet(code) => code,
-                    other => panic!("unexpected singleton complex result: {other:?}"),
+                let (decoder, step) = parse_code_description_bits(&singleton, 2, 2, chunks);
+                assert_eq!(
+                    step.status,
+                    CodeDescriptionStatus::ComplexComplete { symbols: 2 }
+                );
+                let code = match decoder.phase {
+                    CodeDescriptionPhase::CompleteComplex { code, .. } => code,
+                    other => panic!("unexpected singleton complex phase: {other:?}"),
                 };
                 assert_eq!(code.lengths[1], value);
             }
@@ -2705,10 +4004,15 @@ mod tests {
             let mut skip_three = vec![1, 1];
             push_static_code_length(&mut skip_three, 1);
             push_static_code_length(&mut skip_three, 1);
-            let (_, step) = parse_code_description_bits(&skip_three, 256, 256, chunks);
-            let code = match step.status {
-                CodeDescriptionStatus::ComplexAlphabet(code) => code,
-                other => panic!("unexpected skipped complex result: {other:?}"),
+            skip_three.extend([1; 16]);
+            let (decoder, step) = parse_code_description_bits(&skip_three, 16, 16, chunks);
+            assert_eq!(
+                step.status,
+                CodeDescriptionStatus::ComplexComplete { symbols: 16 }
+            );
+            let code = match decoder.phase {
+                CodeDescriptionPhase::CompleteComplex { code, .. } => code,
+                other => panic!("unexpected skipped complex phase: {other:?}"),
             };
             assert_eq!(code.skip, 3);
             assert_eq!(code.lengths[4], 1);
@@ -2738,6 +4042,108 @@ mod tests {
         assert_eq!(
             step.status,
             CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+        );
+    }
+
+    #[test]
+    fn complex_repeats_follow_rfc_chaining_in_whole_and_one_byte_chunks() {
+        for chunks in [false, true] {
+            let mut previous = vec![0, 0];
+            push_auxiliary_code_lengths(&mut previous, &[(8, 1), (16, 1)]);
+            for final_suffix in [1u16, 1, 2] {
+                previous.push(0); // Direct length 8.
+                previous.push(1); // Repeat previous length.
+                push_bits(&mut previous, 3, 2); // repeat = 6
+                previous.push(1);
+                push_bits(&mut previous, 3, 2); // repeat = 22
+                previous.push(1);
+                push_bits(&mut previous, final_suffix, 2); // repeat = 84, 84, 85
+            }
+            let (decoder, step, lengths) =
+                parse_code_description_bits_with_lengths(&previous, 256, 256, chunks);
+            assert_eq!(
+                step.status,
+                CodeDescriptionStatus::ComplexComplete { symbols: 256 }
+            );
+            assert!(matches!(
+                decoder.phase,
+                CodeDescriptionPhase::CompleteComplex { .. }
+            ));
+            assert_eq!(lengths, vec![8u8; 256]);
+
+            let mut zero = vec![0, 0];
+            push_auxiliary_code_lengths(&mut zero, &[(1, 1), (17, 1)]);
+            zero.push(1);
+            push_bits(&mut zero, 0, 3); // Three zero lengths.
+            zero.push(1);
+            push_bits(&mut zero, 0, 3); // Chain to eleven zero lengths.
+            zero.extend([0, 0]); // Two direct length-1 symbols exhaust the space.
+            let (_, step, lengths) =
+                parse_code_description_bits_with_lengths(&zero, 13, 13, chunks);
+            assert_eq!(
+                step.status,
+                CodeDescriptionStatus::ComplexComplete { symbols: 13 }
+            );
+            assert_eq!(lengths, vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]);
+        }
+    }
+
+    #[test]
+    fn complex_auxiliary_codes_reverse_nonpalindromic_stream_bits() {
+        for chunks in [false, true] {
+            let mut bits = vec![0, 0];
+            push_auxiliary_code_lengths(&mut bits, &[(7, 2), (8, 2), (16, 1)]);
+            for _ in 0..128 {
+                // Natural canonical code 2 is `10`; the LSB-first stream value is 1.
+                push_bits(&mut bits, 1, 2);
+            }
+            let (_, step, lengths) =
+                parse_code_description_bits_with_lengths(&bits, 128, 128, chunks);
+            assert_eq!(
+                step.status,
+                CodeDescriptionStatus::ComplexComplete { symbols: 128 }
+            );
+            assert_eq!(lengths, vec![7u8; 128]);
+        }
+    }
+
+    #[test]
+    fn complex_repeat_overflow_truncation_and_failure_are_permanent() {
+        let mut overflow = vec![0, 0];
+        push_auxiliary_code_lengths(&mut overflow, &[(7, 1), (16, 1)]);
+        overflow.push(1);
+        push_bits(&mut overflow, 0, 2);
+        let (mut decoder, step) = parse_code_description_bits(&overflow, 2, 2, true);
+        assert_eq!(
+            step.status,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+        );
+        assert_eq!(
+            decoder.advance_field(&[0xff], false),
+            CodeDescriptionStep {
+                consumed: 0,
+                status: CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace),
+            }
+        );
+
+        let mut truncated = vec![0, 0];
+        push_auxiliary_code_lengths(&mut truncated, &[(7, 1), (16, 1)]);
+        truncated.push(1);
+        assert_eq!(
+            (compressed_meta_prefix_bits().len() + truncated.len()) % 8,
+            0
+        );
+        let (mut decoder, step) = parse_code_description_bits(&truncated, 8, 8, true);
+        assert_eq!(
+            step.status,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)
+        );
+        assert_eq!(
+            decoder.advance_field(&[], false),
+            CodeDescriptionStep {
+                consumed: 0,
+                status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),
+            }
         );
     }
 }

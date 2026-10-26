@@ -6,11 +6,12 @@ deferred by the earlier approvals. It does not approve B4 profile adoption,
 independent review, a service, CI, crate publication, new dependencies, or a
 changed proof trust boundary.
 
-Implementation status: the fixed workspace/tree-record layout and the
-source-linked meta-block-header state machine are checked as the first B3a
-slice. All simple code descriptions and the complex auxiliary code-length alphabet
-are checked. Complex repeat-coded symbol lengths and workspace installation
-remain before B3a is complete; see [BROTLI_B3A.md](BROTLI_B3A.md).
+Implementation status: the B3a components are checked: the fixed
+workspace/tree-record layout, source-linked meta-block-header state machine,
+all simple code descriptions, the complex auxiliary code-length alphabet, RFC
+repeat-coded final symbol lengths, and canonical installation from the fixed
+builder region. Their internal handoff is specified; tree-group orchestration
+begins in B3b. See [BROTLI_B3A.md](BROTLI_B3A.md).
 
 ## Supported format and public API
 
@@ -155,8 +156,9 @@ proved; wall-clock availability still needs B4 deployment assumptions.
 ## Implementation and evidence order
 
 1. B3a: meta-block headers, simple/complex code descriptions, checked layout and
-   deliberate malformed-code controls. The layout, meta-header, all simple descriptions, and complex auxiliary
-   alphabet are checked; repeat-coded symbol lengths and installation remain.
+   deliberate malformed-code controls. The layout, meta-header, all simple
+   descriptions, complex auxiliary alphabet, repeat-coded final lengths and
+   canonical builder installation are checked.
 2. B3b: tree groups, context maps and all literal/command/distance transitions,
    including integrated CVE-status corruption controls.
 3. B3c: literals, commands, LZ77, dictionary/transforms, metadata,

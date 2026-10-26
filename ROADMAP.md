@@ -6,9 +6,10 @@ separate human approval before implementation. The approved Base64 G iteration
 is complete. Current Brotli work is format/source research and the
 already-approved [B1 input/header milestone](BROTLI_PROPOSAL.md).
 P1, B2/R1 and C1 are approved and implemented. The B3 and B4 architecture is
-approved. The B3a workspace, meta-header, simple-description and complex
-auxiliary-alphabet slices are checked, but no comprehensive security profile
-has been adopted and independent review remains pending.
+approved. The B3a workspace, meta-header, simple and complex descriptions,
+repeat-coded final lengths, and canonical builder installation are checked,
+but no comprehensive security profile has been adopted and independent review
+remains pending.
 
 B1 is now checked as a private component; see [BROTLI_B1.md](BROTLI_B1.md).
 It does not change Brotli's candidate/support status. The actual block-switch,
@@ -18,8 +19,9 @@ remain subject to the decisions in the streaming proposal.
 B2's canonical prefix/block-length and three-category block-switch core is now
 checked as another private component; see [BROTLI_B2.md](BROTLI_B2.md). The R1
 native status replay is complete. Full grammar/output decoding and B3/B4 remain
-separate. [BROTLI_B3A.md](BROTLI_B3A.md) records the checked fixed workspace, meta-block
-headers, simple descriptions, and complex auxiliary code-length alphabet. The remaining approved implementation path is in
+separate. [BROTLI_B3A.md](BROTLI_B3A.md) records the checked fixed workspace,
+meta-block headers, simple and complex descriptions, repeat-coded final lengths,
+and canonical builder installation. The remaining approved implementation path is in
 [BROTLI_B3_PROPOSAL.md](BROTLI_B3_PROPOSAL.md), followed by the caller/profile
 work in [BROTLI_B4_PROFILE_PROPOSAL.md](BROTLI_B4_PROFILE_PROPOSAL.md).
 
@@ -50,8 +52,8 @@ C1 is now implemented and checked; see [COMPOSITION_C1.md](COMPOSITION_C1.md).
 ## Brotli decompression
 
 Added at the human's request on 2026-10-24. Status: candidate with checked B1,
-B2, and partial B3a private components; no complete Brotli decoder or supported
-public streaming implementation exists.
+B2, and B3a private components; no complete Brotli decoder or supported public
+streaming implementation exists.
 
 ### Recent security evidence
 
