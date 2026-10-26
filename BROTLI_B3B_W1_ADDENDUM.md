@@ -6,6 +6,11 @@ positions without enumerating every serialized tag, error mapping, reset value,
 result field, work formula or cross-module helper. This addendum supplies those
 exact decisions. Alternatives remain unapproved.
 
+Implementation then reached the existing B2 module boundary: E1 authorized
+module-private B2 adapters but did not freeze their callable shape. Candidate
+E2 below supplies that one remaining cross-module API and a bounded rule for
+input-local implementation helpers. E2 remains pending direct human approval.
+
 ## E1 serialized tag tables
 
 All tags are `u8`. Values not listed for a field are invalid serialized state,
@@ -375,3 +380,146 @@ B1/B3a serialization relation, simple-tree mapping, temporary-state lifecycle,
 MTF/coverage work formulas and helper ownership/signatures as an addendum to
 approved W1. It does not alter W1's public API, workspace size, dependencies,
 tools, trust boundary, B3c/B4 scope or support status.
+
+## Candidate E2: narrow B2 adapter and local-helper rule
+
+E2 exposes none of the existing private B2 types or fields. `brotli_block.rs`
+adds only these crate-private logical adapter types:
+
+```rust
+enum B3bSwitchFailure {
+    InvalidDeclaration,
+    InvalidBlockSwitch,
+    InvalidPrefixSymbol,
+    InvalidBlockLength,
+    InvalidSequence,
+}
+
+enum B3bSwitchPhase {
+    Ready,
+    AwaitLength { kind: u8, block_type: u16 },
+    Failed(B3bSwitchFailure),
+}
+
+struct B3bSwitchState {
+    num_types: [u16; 3],
+    ring: [u16; 6],
+    remaining: [u32; 3],
+    phase: B3bSwitchPhase,
+}
+
+enum B3bSwitchOutcome {
+    NeedInput,
+    Complete { kind: u8, block_type: u16, block_length: u32 },
+    Failed(B3bSwitchFailure),
+}
+
+struct B3bSwitchResult {
+    state: B3bSwitchState,
+    consumed_fields: u8,
+    outcome: B3bSwitchOutcome,
+}
+
+fn advance_b3b_switch(
+    state: B3bSwitchState,
+    requested_kind: u8,
+    type_symbol: Option<u16>,
+    block_length: Option<u32>,
+) -> B3bSwitchResult;
+```
+
+All fields are crate-visible only to permit the exact logical snapshot handoff.
+Kind values are E1's `0 Literal`, `1 Command`, `2 Distance`; other values are
+excluded by the checked precondition. `B3bSwitchState::valid` is exactly the
+existing `BlockSwitchCore::valid` invariant: all three declarations are
+`1..=256`; current ring entries are below their declared counts; previous ring
+entries obey the existing one-type exception; `AwaitLength` has a valid kind
+and block type with zero remaining length for that kind; and `Failed` contains
+one listed failure. A `Ready` call additionally requires zero remaining length
+for `requested_kind`. `brotli_input.rs` validates the serialized snapshot and
+maps any violation to E1 `InternalState` before calling the adapter; corrupt
+serialized state never becomes B2 `InvalidDeclaration` or an attacker format
+error. Failure variants follow the existing B2
+declaration order and map to E1 exactly. The adapter validates/restores the
+existing private `BlockSwitchCore`, invokes its unchanged transition, and
+exports the exact next snapshot and result. A `Failed` input state is sticky.
+No workspace access or tag serialization occurs in `brotli_block.rs`;
+`brotli_input.rs` alone maps snapshots to E1 bytes.
+
+Installed-tree symbol decoding remains input-module-private:
+
+```rust
+enum InstalledSymbolStatus {
+    NeedInput,
+    Symbol(u16),
+    Truncated,
+    InvalidPrefixCode,
+    InternalState,
+}
+
+struct InstalledSymbolStep {
+    consumed: usize,
+    status: InstalledSymbolStatus,
+}
+
+fn advance_installed_tree_symbol(
+    workspace: &[u8],
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    meta: TreeMetadata,
+    queue: &mut BitQueue,
+    prefix: &mut InstalledPrefixState,
+    input: &[u8],
+    end_of_input: bool,
+) -> InstalledSymbolStep;
+
+struct InstalledPrefixState { width: u8, bits: u16, scan: u16 }
+```
+
+The prefix state is exactly E1 bytes 115 and 122..126. Its call-boundary
+invariant is `width <= 14`, `bits < 1 << width`, and `scan == 0`; initial state
+is `{width:0, bits:0, scan:0}`. Scan is a bounded within-call cursor over the
+current width and returns to zero before any result.
+
+Input first requires `meta.valid_for(region)` and either
+`Single { symbol }` or fully initialized
+`Canonical { initialized == symbols }`. `Unused`, incomplete canonical metadata
+or an impossible record read maps to `InternalState` before or within the
+helper. `Single` additionally requires the prefix to equal its initial
+`{width:0, bits:0, scan:0}` value; input validates this relation and maps a
+noninitial Single prefix to `InternalState`. A valid `Single` returns its symbol
+with `consumed=0`, queue unchanged, prefix initial, and no bit or record read.
+
+For a canonical tree the helper reads one bit at a time, linearly scans
+`0..meta.symbols` at each width, ignores canonical zero-length records, and
+compares raw LSB-first bits with the width-reversed stored natural canonical
+code. `InstalledSymbolStep.consumed <= input.len()`. `NeedInput` implies
+nonfinal input and `consumed == input.len()`; it preserves the exact **advanced**
+queue/prefix produced by all consumed input, with no reset or loss. A symbol
+resets prefix to its initial value and leaves exact unread queue bits. Final
+exhaustion is `Truncated`; no match after width 15 is `InvalidPrefixCode`; both
+are terminal and reset the prefix. `InternalState` maps to E1 terminal
+`InternalState`. The helper uses the existing crate-private tree-record read
+helper and adds no prefix-module API.
+
+E2 also authorizes refactoring names and signatures of other
+`brotli_input.rs`-private executable helpers without repeated architectural
+approval only when all of these remain true:
+
+- the helper is not callable from another module or public API;
+- it introduces no persistent Rust field or shadow state;
+- it reads/writes only the exact W1/E1 scalar bytes assigned to its logical
+  state, through exact framed accessors;
+- it refines the already-approved B1/B2/B3a or W1/E1 transition contract; and
+- it does not change statuses, effects, work accounting, dependencies, tools,
+  component ownership or trust boundaries.
+
+Any cross-module helper, persistent field, changed byte ownership or changed
+contract remains a new architectural decision.
+
+Approval of **Candidate E2 as written** authorizes only this narrow B2 snapshot
+adapter, the exact input-local installed-tree decoder, and the bounded
+input-local helper-refactoring rule. It does not approve changes to existing B2
+semantics, public APIs, workspace layout, dependencies, tools, trust, B3c/B4 or
+support claims.

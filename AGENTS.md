@@ -54,6 +54,11 @@ The human approved Candidate E1 exactly as written in
 reset image, result fields, work formulas, authority rules and helper signatures
 are now part of the approved B3b W1 boundary. Alternatives remain unapproved.
 
+Candidate E2 in `BROTLI_B3B_W1_ADDENDUM.md` defines the narrow crate-private B2
+snapshot adapter, input-local installed-tree decoder, and bounded local-helper
+refactoring rule that E1 did not enumerate. E2 remains pending direct human
+approval. Do not add the B2 adapter or depend on E2 until it is approved.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted
