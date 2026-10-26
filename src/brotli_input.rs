@@ -1327,6 +1327,877 @@ impl MetaBlockDecoder {
     }
 }
 
+const CODE_LENGTH_ORDER: [u8; 18] = [
+    1, 2, 3, 4, 0, 5, 17, 6, 16, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+];
+
+proof fn code_length_order_is_rfc()
+    ensures CODE_LENGTH_ORDER@[0] == 1,
+        CODE_LENGTH_ORDER@[1] == 2,
+        CODE_LENGTH_ORDER@[2] == 3,
+        CODE_LENGTH_ORDER@[3] == 4,
+        CODE_LENGTH_ORDER@[4] == 0,
+        CODE_LENGTH_ORDER@[5] == 5,
+        CODE_LENGTH_ORDER@[6] == 17,
+        CODE_LENGTH_ORDER@[7] == 6,
+        CODE_LENGTH_ORDER@[8] == 16,
+        CODE_LENGTH_ORDER@[9] == 7,
+        CODE_LENGTH_ORDER@[10] == 8,
+        CODE_LENGTH_ORDER@[11] == 9,
+        CODE_LENGTH_ORDER@[12] == 10,
+        CODE_LENGTH_ORDER@[13] == 11,
+        CODE_LENGTH_ORDER@[14] == 12,
+        CODE_LENGTH_ORDER@[15] == 13,
+        CODE_LENGTH_ORDER@[16] == 14,
+        CODE_LENGTH_ORDER@[17] == 15,
+{
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CodeDescriptionError {
+    MetaBlockNotCompressed,
+    InvalidAlphabet,
+    DuplicateSimpleSymbol,
+    CodeLengthSpace,
+    Truncated,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct SimpleCodeDescription {
+    selector: u8,
+    count: u8,
+    symbols: [u16; 4],
+}
+
+spec fn simple_count(selector: u8) -> nat {
+    if selector <= 2 { selector as nat + 1 } else { 4 }
+}
+
+spec fn active_symbols_distinct(symbols: Seq<u16>, count: nat) -> bool {
+    forall|i: int, j: int| 0 <= i < count && 0 <= j < count && i != j
+        ==> symbols[i] != symbols[j]
+}
+
+impl SimpleCodeDescription {
+    spec fn valid(&self, alphabet_limit: u16) -> bool {
+        &&& 1 <= alphabet_limit <= 704
+        &&& self.selector <= 4
+        &&& self.count as nat == simple_count(self.selector)
+        &&& forall|i: int| 0 <= i < self.count ==> self.symbols@[i] < alphabet_limit
+        &&& active_symbols_distinct(self.symbols@, self.count as nat)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct ComplexCodeLengthAlphabet {
+    skip: u8,
+    lengths: [u8; 18],
+}
+
+impl ComplexCodeLengthAlphabet {
+    spec fn valid(&self) -> bool {
+        &&& (self.skip == 0 || self.skip == 2 || self.skip == 3)
+        &&& forall|i: int| 0 <= i < 18 ==> self.lengths@[i] <= 5
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct ComplexProgress {
+    skip: u8,
+    index: u8,
+    lengths: [u8; 18],
+    space: u8,
+    nonzero: u8,
+}
+
+impl ComplexProgress {
+    spec fn valid(&self) -> bool {
+        &&& (self.skip == 0 || self.skip == 2 || self.skip == 3)
+        &&& self.skip <= self.index < 18
+        &&& self.space <= 32
+        &&& self.nonzero <= self.index - self.skip
+        &&& forall|i: int| 0 <= i < 18 ==> self.lengths@[i] <= 5
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CodeDescriptionPhase {
+    Selector,
+    SimpleSize,
+    SimpleSymbols {
+        selector: u8,
+        count: u8,
+        index: u8,
+        width: u8,
+        symbols: [u16; 4],
+    },
+    SimpleShape { symbols: [u16; 4] },
+    ComplexPrefix2(ComplexProgress),
+    ComplexPrefix3(ComplexProgress),
+    ComplexPrefix4(ComplexProgress),
+    CompleteSimple(SimpleCodeDescription),
+    CompleteComplexAlphabet(ComplexCodeLengthAlphabet),
+    Failed(CodeDescriptionError),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CodeDescriptionStatus {
+    Progress,
+    NeedInput,
+    Simple(SimpleCodeDescription),
+    ComplexAlphabet(ComplexCodeLengthAlphabet),
+    Failed(CodeDescriptionError),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct CodeDescriptionStep {
+    consumed: usize,
+    status: CodeDescriptionStatus,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct CodeDescriptionDecoder {
+    queue: BitQueue,
+    alphabet_max: u16,
+    alphabet_limit: u16,
+    phase: CodeDescriptionPhase,
+}
+
+spec fn alphabet_bit_width_spec(alphabet_max: u16) -> nat {
+    if alphabet_max <= 1 { 0 }
+    else if alphabet_max <= 2 { 1 }
+    else if alphabet_max <= 4 { 2 }
+    else if alphabet_max <= 8 { 3 }
+    else if alphabet_max <= 16 { 4 }
+    else if alphabet_max <= 32 { 5 }
+    else if alphabet_max <= 64 { 6 }
+    else if alphabet_max <= 128 { 7 }
+    else if alphabet_max <= 256 { 8 }
+    else if alphabet_max <= 512 { 9 }
+    else { 10 }
+}
+
+spec fn code_phase_width(phase: CodeDescriptionPhase, alphabet_max: u16) -> nat {
+    match phase {
+        CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize
+        | CodeDescriptionPhase::ComplexPrefix2(_) => 2,
+        CodeDescriptionPhase::SimpleSymbols { .. } => alphabet_bit_width_spec(alphabet_max),
+        CodeDescriptionPhase::SimpleShape { .. }
+        | CodeDescriptionPhase::ComplexPrefix3(_)
+        | CodeDescriptionPhase::ComplexPrefix4(_) => 1,
+        _ => 0,
+    }
+}
+
+spec fn code_phase_terminal(phase: CodeDescriptionPhase) -> bool {
+    match phase {
+        CodeDescriptionPhase::CompleteSimple(_)
+        | CodeDescriptionPhase::CompleteComplexAlphabet(_)
+        | CodeDescriptionPhase::Failed(_) => true,
+        _ => false,
+    }
+}
+
+spec fn simple_prefix_contains(symbols: Seq<u16>, count: nat, symbol: u16) -> bool {
+    exists|i: int| 0 <= i < count && symbols[i] == symbol
+}
+
+spec fn code_length_space_weight(value: u8) -> nat {
+    if value == 1 { 16 }
+    else if value == 2 { 8 }
+    else if value == 3 { 4 }
+    else if value == 4 { 2 }
+    else if value == 5 { 1 }
+    else { 0 }
+}
+
+fn code_length_space_weight_exec(value: u8) -> (r: u8)
+    requires value <= 5,
+    ensures r as nat == code_length_space_weight(value),
+{
+    if value == 1 { 16 }
+    else if value == 2 { 8 }
+    else if value == 3 { 4 }
+    else if value == 4 { 2 }
+    else if value == 5 { 1 }
+    else { 0 }
+}
+
+spec fn complex_process_holds(
+    old: ComplexProgress,
+    value: u8,
+    phase: CodeDescriptionPhase,
+    status: CodeDescriptionStatus,
+) -> bool {
+    let slot = CODE_LENGTH_ORDER@[old.index as int] as int;
+    let lengths = old.lengths@.update(slot, value);
+    let amount = code_length_space_weight(value);
+    if amount > old.space {
+        &&& phase == CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace)
+        &&& status == CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+    } else {
+        let next_space = old.space as nat - amount;
+        let next_nonzero = old.nonzero as nat + if value == 0 { 0nat } else { 1nat };
+        let next_index = old.index as nat + 1;
+        if next_space == 0 {
+            match phase {
+                CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+                    &&& code.skip == old.skip
+                    &&& code.lengths@ == lengths
+                    &&& status == CodeDescriptionStatus::ComplexAlphabet(code)
+                },
+                _ => false,
+            }
+        } else if next_index == 18 {
+            if next_nonzero == 1 {
+                match phase {
+                    CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+                        &&& code.skip == old.skip
+                        &&& code.lengths@ == lengths
+                        &&& status == CodeDescriptionStatus::ComplexAlphabet(code)
+                    },
+                    _ => false,
+                }
+            } else {
+                &&& phase == CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace)
+                &&& status == CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+            }
+        } else {
+            match phase {
+                CodeDescriptionPhase::ComplexPrefix2(next) => {
+                    &&& next.skip == old.skip
+                    &&& next.index as nat == next_index
+                    &&& next.lengths@ == lengths
+                    &&& next.space as nat == next_space
+                    &&& next.nonzero as nat == next_nonzero
+                    &&& status == CodeDescriptionStatus::Progress
+                },
+                _ => false,
+            }
+        }
+    }
+}
+
+spec fn code_transition_holds(
+    old: CodeDescriptionPhase,
+    field: nat,
+    alphabet_max: u16,
+    alphabet_limit: u16,
+    phase: CodeDescriptionPhase,
+    status: CodeDescriptionStatus,
+) -> bool {
+    match old {
+        CodeDescriptionPhase::Selector => {
+            if field == 1 {
+                &&& phase == CodeDescriptionPhase::SimpleSize
+                &&& status == CodeDescriptionStatus::Progress
+            } else {
+                let skip = field as u8;
+                &&& (skip == 0 || skip == 2 || skip == 3)
+                &&& match phase {
+                    CodeDescriptionPhase::ComplexPrefix2(next) => {
+                        &&& next.skip == skip
+                        &&& next.index == skip
+                        &&& next.space == 32
+                        &&& next.nonzero == 0
+                        &&& forall|i: int| 0 <= i < 18 ==> next.lengths@[i] == 0
+                        &&& status == CodeDescriptionStatus::Progress
+                    },
+                    _ => false,
+                }
+            }
+        },
+        CodeDescriptionPhase::SimpleSize => {
+            let selector = field as u8;
+            match phase {
+                CodeDescriptionPhase::SimpleSymbols {
+                    selector: next_selector,
+                    count,
+                    index,
+                    width,
+                    symbols,
+                } => {
+                    &&& next_selector == selector
+                    &&& count as nat == field + 1
+                    &&& index == 0
+                    &&& width as nat == alphabet_bit_width_spec(alphabet_max)
+                    &&& forall|i: int| 0 <= i < 4 ==> symbols@[i] == 0
+                    &&& status == CodeDescriptionStatus::Progress
+                },
+                _ => false,
+            }
+        },
+        CodeDescriptionPhase::SimpleSymbols {
+            selector, count, index, width, symbols,
+        } => {
+            if field >= alphabet_limit {
+                &&& phase == CodeDescriptionPhase::Failed(CodeDescriptionError::InvalidAlphabet)
+                &&& status == CodeDescriptionStatus::Failed(CodeDescriptionError::InvalidAlphabet)
+            } else {
+                let symbol = field as u16;
+                if simple_prefix_contains(symbols@, index as nat, symbol) {
+                    &&& phase == CodeDescriptionPhase::Failed(
+                        CodeDescriptionError::DuplicateSimpleSymbol,
+                    )
+                    &&& status == CodeDescriptionStatus::Failed(
+                        CodeDescriptionError::DuplicateSimpleSymbol,
+                    )
+                } else {
+                    let updated = symbols@.update(index as int, symbol);
+                    if index + 1 < count {
+                        match phase {
+                            CodeDescriptionPhase::SimpleSymbols {
+                                selector: next_selector,
+                                count: next_count,
+                                index: next_index,
+                                width: next_width,
+                                symbols: next_symbols,
+                            } => {
+                                &&& next_selector == selector
+                                &&& next_count == count
+                                &&& next_index == index + 1
+                                &&& next_width == width
+                                &&& next_symbols@ == updated
+                                &&& status == CodeDescriptionStatus::Progress
+                            },
+                            _ => false,
+                        }
+                    } else if selector == 3 {
+                        match phase {
+                            CodeDescriptionPhase::SimpleShape { symbols: next_symbols } => {
+                                &&& next_symbols@ == updated
+                                &&& status == CodeDescriptionStatus::Progress
+                            },
+                            _ => false,
+                        }
+                    } else {
+                        match phase {
+                            CodeDescriptionPhase::CompleteSimple(code) => {
+                                &&& code.selector == selector
+                                &&& code.count == count
+                                &&& code.symbols@ == updated
+                                &&& status == CodeDescriptionStatus::Simple(code)
+                            },
+                            _ => false,
+                        }
+                    }
+                }
+            }
+        },
+        CodeDescriptionPhase::SimpleShape { symbols } => {
+            match phase {
+                CodeDescriptionPhase::CompleteSimple(code) => {
+                    &&& code.selector as nat == 3 + field
+                    &&& code.count == 4
+                    &&& code.symbols == symbols
+                    &&& status == CodeDescriptionStatus::Simple(code)
+                },
+                _ => false,
+            }
+        },
+        CodeDescriptionPhase::ComplexPrefix2(progress) => {
+            if field == 0 {
+                complex_process_holds(progress, 0, phase, status)
+            } else if field == 1 {
+                complex_process_holds(progress, 4, phase, status)
+            } else if field == 2 {
+                complex_process_holds(progress, 3, phase, status)
+            } else {
+                &&& phase == CodeDescriptionPhase::ComplexPrefix3(progress)
+                &&& status == CodeDescriptionStatus::Progress
+            }
+        },
+        CodeDescriptionPhase::ComplexPrefix3(progress) => {
+            if field == 0 {
+                complex_process_holds(progress, 2, phase, status)
+            } else {
+                &&& phase == CodeDescriptionPhase::ComplexPrefix4(progress)
+                &&& status == CodeDescriptionStatus::Progress
+            }
+        },
+        CodeDescriptionPhase::ComplexPrefix4(progress) => {
+            if field == 0 {
+                complex_process_holds(progress, 1, phase, status)
+            } else {
+                complex_process_holds(progress, 5, phase, status)
+            }
+        },
+        _ => false,
+    }
+}
+
+fn alphabet_bit_width(alphabet_max: u16) -> (r: u8)
+    requires 1 <= alphabet_max <= 704,
+    ensures r <= 10, r as nat == alphabet_bit_width_spec(alphabet_max),
+{
+    if alphabet_max <= 1 { 0 }
+    else if alphabet_max <= 2 { 1 }
+    else if alphabet_max <= 4 { 2 }
+    else if alphabet_max <= 8 { 3 }
+    else if alphabet_max <= 16 { 4 }
+    else if alphabet_max <= 32 { 5 }
+    else if alphabet_max <= 64 { 6 }
+    else if alphabet_max <= 128 { 7 }
+    else if alphabet_max <= 256 { 8 }
+    else if alphabet_max <= 512 { 9 }
+    else { 10 }
+}
+
+fn simple_symbols_distinct(symbols: &[u16; 4], count: u8) -> (r: bool)
+    requires 1 <= count <= 4,
+    ensures r == active_symbols_distinct(symbols@, count as nat),
+{
+    let mut i: usize = 0;
+    while i < count as usize
+        invariant i <= count <= 4,
+            forall|a: int, b: int| 0 <= a < i && 0 <= b < count && a != b
+                ==> symbols@[a] != symbols@[b],
+        decreases count as usize - i,
+    {
+        let mut j = i + 1;
+        while j < count as usize
+            invariant i < count <= 4, i + 1 <= j <= count,
+                forall|a: int, b: int| 0 <= a < i && 0 <= b < count && a != b
+                    ==> symbols@[a] != symbols@[b],
+                forall|b: int| i < b < j ==> symbols@[i as int] != symbols@[b],
+            decreases count as usize - j,
+        {
+            if symbols[i] == symbols[j] {
+                return false;
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    true
+}
+
+fn process_complex_code_length(
+    progress: ComplexProgress,
+    value: u8,
+) -> (r: CodeDescriptionPhase)
+    requires progress.valid(), progress.index < 18, value <= 5,
+    ensures
+        match r {
+            CodeDescriptionPhase::ComplexPrefix2(next) => next.valid(),
+            CodeDescriptionPhase::CompleteComplexAlphabet(code) => code.valid(),
+            CodeDescriptionPhase::Failed(_) => true,
+            _ => false,
+        },
+        complex_process_holds(
+            progress,
+            value,
+            r,
+            match r {
+                CodeDescriptionPhase::CompleteComplexAlphabet(code) =>
+                    CodeDescriptionStatus::ComplexAlphabet(code),
+                CodeDescriptionPhase::Failed(error) => CodeDescriptionStatus::Failed(error),
+                _ => CodeDescriptionStatus::Progress,
+            },
+        ),
+{
+    let mut next = progress;
+    let slot = CODE_LENGTH_ORDER[progress.index as usize] as usize;
+    next.lengths[slot] = value;
+    next.index = progress.index + 1;
+    if value != 0 {
+        let amount = code_length_space_weight_exec(value);
+        if amount > progress.space {
+            return CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace);
+        }
+        next.space = progress.space - amount;
+        next.nonzero = progress.nonzero + 1;
+    }
+    if next.space == 0 {
+        return CodeDescriptionPhase::CompleteComplexAlphabet(ComplexCodeLengthAlphabet {
+            skip: next.skip,
+            lengths: next.lengths,
+        });
+    }
+    if next.index == 18 {
+        if next.nonzero == 1 {
+            return CodeDescriptionPhase::CompleteComplexAlphabet(ComplexCodeLengthAlphabet {
+                skip: next.skip,
+                lengths: next.lengths,
+            });
+        }
+        return CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace);
+    }
+    CodeDescriptionPhase::ComplexPrefix2(next)
+}
+
+impl CodeDescriptionDecoder {
+    spec fn valid(&self) -> bool {
+        &&& self.queue.valid()
+        &&& 1 <= self.alphabet_limit <= self.alphabet_max <= 704
+        &&& match self.phase {
+            CodeDescriptionPhase::SimpleSymbols {
+                selector, count, index, width, symbols, ..
+            } => {
+                &&& selector <= 3
+                &&& count as nat == simple_count(selector)
+                &&& 1 <= count <= 4
+                &&& index < count
+                &&& width <= 10
+                &&& width as nat == alphabet_bit_width_spec(self.alphabet_max)
+                &&& forall|i: int| 0 <= i < index ==> symbols@[i] < self.alphabet_limit
+                &&& active_symbols_distinct(symbols@, index as nat)
+            },
+            CodeDescriptionPhase::SimpleShape { symbols } => {
+                &&& forall|i: int| 0 <= i < 4 ==> symbols@[i] < self.alphabet_limit
+                &&& active_symbols_distinct(symbols@, 4)
+            },
+            CodeDescriptionPhase::ComplexPrefix2(progress)
+            | CodeDescriptionPhase::ComplexPrefix3(progress)
+            | CodeDescriptionPhase::ComplexPrefix4(progress) => progress.valid(),
+            CodeDescriptionPhase::CompleteSimple(code) => code.valid(self.alphabet_limit),
+            CodeDescriptionPhase::CompleteComplexAlphabet(code) => code.valid(),
+            _ => true,
+        }
+    }
+
+    fn from_meta(
+        meta: MetaBlockDecoder,
+        alphabet_max: u16,
+        alphabet_limit: u16,
+    ) -> (r: Result<Self, CodeDescriptionError>)
+        requires meta.valid(),
+        ensures r.is_ok() ==> {
+            &&& r.unwrap().valid()
+            &&& r.unwrap().queue == meta.queue
+            &&& r.unwrap().phase == CodeDescriptionPhase::Selector
+        },
+    {
+        if alphabet_max == 0 || alphabet_max > 704
+            || alphabet_limit == 0 || alphabet_limit > alphabet_max {
+            return Err(CodeDescriptionError::InvalidAlphabet);
+        }
+        match meta.phase {
+            MetaBlockPhase::Complete(header) => {
+                if header.is_empty || header.is_uncompressed || header.is_metadata {
+                    return Err(CodeDescriptionError::MetaBlockNotCompressed);
+                }
+                Ok(Self {
+                    queue: meta.queue,
+                    alphabet_max,
+                    alphabet_limit,
+                    phase: CodeDescriptionPhase::Selector,
+                })
+            }
+            _ => Err(CodeDescriptionError::MetaBlockNotCompressed),
+        }
+    }
+
+    #[verifier::rlimit(500)]
+    fn advance_field(
+        &mut self,
+        input: &[u8],
+        end_of_input: bool,
+    ) -> (r: CodeDescriptionStep)
+        requires old(self).valid(),
+        ensures final(self).valid(), r.consumed <= input.len(),
+            match old(self).phase {
+                CodeDescriptionPhase::CompleteSimple(code) => {
+                    &&& r == (CodeDescriptionStep {
+                        consumed: 0,
+                        status: CodeDescriptionStatus::Simple(code),
+                    })
+                    &&& *final(self) == *old(self)
+                },
+                CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+                    &&& r == (CodeDescriptionStep {
+                        consumed: 0,
+                        status: CodeDescriptionStatus::ComplexAlphabet(code),
+                    })
+                    &&& *final(self) == *old(self)
+                },
+                CodeDescriptionPhase::Failed(error) => {
+                    &&& r == (CodeDescriptionStep {
+                        consumed: 0,
+                        status: CodeDescriptionStatus::Failed(error),
+                    })
+                    &&& *final(self) == *old(self)
+                },
+                _ => true,
+            },
+            r.status == CodeDescriptionStatus::NeedInput ==> {
+                &&& !end_of_input
+                &&& r.consumed == input.len()
+            },
+            match r.status {
+                CodeDescriptionStatus::Simple(code) => {
+                    &&& code.valid(final(self).alphabet_limit)
+                    &&& final(self).phase == CodeDescriptionPhase::CompleteSimple(code)
+                },
+                CodeDescriptionStatus::ComplexAlphabet(code) => {
+                    &&& code.valid()
+                    &&& final(self).phase == CodeDescriptionPhase::CompleteComplexAlphabet(code)
+                },
+                CodeDescriptionStatus::Failed(error) =>
+                    final(self).phase == CodeDescriptionPhase::Failed(error),
+                _ => true,
+            },
+            !code_phase_terminal(old(self).phase) ==> {
+                let width = code_phase_width(old(self).phase, old(self).alphabet_max);
+                let available = old(self).queue.bits()
+                    + bytes_bits(input@.take(r.consumed as int));
+                &&& available.len() >= width ==> code_transition_holds(
+                    old(self).phase,
+                    bits_value(available.take(width as int)),
+                    old(self).alphabet_max,
+                    old(self).alphabet_limit,
+                    final(self).phase,
+                    r.status,
+                )
+            },
+    {
+        let phase = self.phase;
+        match phase {
+            CodeDescriptionPhase::CompleteSimple(code) => {
+                return CodeDescriptionStep {
+                    consumed: 0,
+                    status: CodeDescriptionStatus::Simple(code),
+                };
+            }
+            CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+                return CodeDescriptionStep {
+                    consumed: 0,
+                    status: CodeDescriptionStatus::ComplexAlphabet(code),
+                };
+            }
+            CodeDescriptionPhase::Failed(error) => {
+                return CodeDescriptionStep {
+                    consumed: 0,
+                    status: CodeDescriptionStatus::Failed(error),
+                };
+            }
+            _ => {}
+        }
+
+        let width: usize = match phase {
+            CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize
+            | CodeDescriptionPhase::ComplexPrefix2(_) => 2,
+            CodeDescriptionPhase::SimpleSymbols { width, .. } => width as usize,
+            CodeDescriptionPhase::SimpleShape { .. }
+            | CodeDescriptionPhase::ComplexPrefix3(_)
+            | CodeDescriptionPhase::ComplexPrefix4(_) => 1,
+            CodeDescriptionPhase::CompleteSimple(_)
+            | CodeDescriptionPhase::CompleteComplexAlphabet(_)
+            | CodeDescriptionPhase::Failed(_) => {
+                proof { assert(false); }
+                0
+            }
+        };
+        proof {
+            assert(width as nat == code_phase_width(phase, self.alphabet_max));
+        }
+        let ghost queue_before = self.queue.bits();
+        let read = self.queue.read_bits(width, input, end_of_input);
+        let field = match read.status {
+            BitReadStatus::Value(value) => value,
+            BitReadStatus::NeedInput => {
+                proof {
+                    assert(read.consumed == input.len());
+                    assert(input@.take(read.consumed as int) =~= input@);
+                    assert((queue_before + bytes_bits(input@)).len() < width);
+                }
+                return CodeDescriptionStep {
+                    consumed: read.consumed,
+                    status: CodeDescriptionStatus::NeedInput,
+                };
+            }
+            BitReadStatus::Truncated => {
+                proof {
+                    assert(read.consumed == input.len());
+                    assert(input@.take(read.consumed as int) =~= input@);
+                    assert((queue_before + bytes_bits(input@)).len() < width);
+                }
+                self.phase = CodeDescriptionPhase::Failed(CodeDescriptionError::Truncated);
+                return CodeDescriptionStep {
+                    consumed: read.consumed,
+                    status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),
+                };
+            }
+        };
+        proof {
+            lemma2_to64();
+            assert((field as nat) < pow2(width as nat));
+        }
+
+        let mut status = CodeDescriptionStatus::Progress;
+        match phase {
+            CodeDescriptionPhase::Selector => {
+                assert(width == 2);
+                assert(field < 4);
+                if field == 1 {
+                    self.phase = CodeDescriptionPhase::SimpleSize;
+                } else {
+                    let skip = field as u8;
+                    assert(skip == 0 || skip == 2 || skip == 3);
+                    self.phase = CodeDescriptionPhase::ComplexPrefix2(ComplexProgress {
+                        skip,
+                        index: skip,
+                        lengths: [0u8; 18],
+                        space: 32,
+                        nonzero: 0,
+                    });
+                }
+            }
+            CodeDescriptionPhase::SimpleSize => {
+                assert(width == 2);
+                assert(field < 4);
+                let selector = field as u8;
+                let count = selector + 1;
+                let width = alphabet_bit_width(self.alphabet_max);
+                self.phase = CodeDescriptionPhase::SimpleSymbols {
+                    selector,
+                    count,
+                    index: 0,
+                    width,
+                    symbols: [0u16; 4],
+                };
+            }
+            CodeDescriptionPhase::SimpleSymbols {
+                selector, count, index, width: symbol_width, mut symbols,
+            } => {
+                if field >= self.alphabet_limit as u64 {
+                    self.phase = CodeDescriptionPhase::Failed(CodeDescriptionError::InvalidAlphabet);
+                    status = CodeDescriptionStatus::Failed(CodeDescriptionError::InvalidAlphabet);
+                } else {
+                    assert(field < 704);
+                    let symbol = field as u16;
+                    let mut duplicate = false;
+                    let mut i: usize = 0;
+                    while i < index as usize
+                        invariant i <= index <= count <= 4,
+                            !duplicate ==> forall|j: int| 0 <= j < i
+                                ==> symbols@[j] != symbol,
+                            duplicate ==> exists|j: int| 0 <= j < i && symbols@[j] == symbol,
+                        decreases index as usize - i,
+                    {
+                        if symbols[i] == symbol {
+                            duplicate = true;
+                        }
+                        i = i + 1;
+                    }
+                    if duplicate {
+                        self.phase = CodeDescriptionPhase::Failed(
+                            CodeDescriptionError::DuplicateSimpleSymbol,
+                        );
+                        status = CodeDescriptionStatus::Failed(
+                            CodeDescriptionError::DuplicateSimpleSymbol,
+                        );
+                    } else {
+                        symbols[index as usize] = symbol;
+                        proof {
+                            assert(active_symbols_distinct(
+                                symbols@,
+                                (index as nat) + 1,
+                            )) by {
+                                assert forall|a: int, b: int|
+                                    0 <= a < index + 1 && 0 <= b < index + 1 && a != b
+                                    implies symbols@[a] != symbols@[b] by {
+                                    if a < index && b < index {
+                                    } else if a == index {
+                                        assert(b < index);
+                                    } else {
+                                        assert(b == index);
+                                        assert(a < index);
+                                    }
+                                }
+                            }
+                        }
+                        if index + 1 < count {
+                            self.phase = CodeDescriptionPhase::SimpleSymbols {
+                                selector,
+                                count,
+                                index: index + 1,
+                                width: symbol_width,
+                                symbols,
+                            };
+                        } else if selector == 3 {
+                            assert(count == 4);
+                            let _distinct = simple_symbols_distinct(&symbols, 4);
+                            assert(_distinct);
+                            self.phase = CodeDescriptionPhase::SimpleShape { symbols };
+                        } else {
+                            let _distinct = simple_symbols_distinct(&symbols, count);
+                            assert(_distinct);
+                            let code = SimpleCodeDescription {
+                                selector,
+                                count,
+                                symbols,
+                            };
+                            self.phase = CodeDescriptionPhase::CompleteSimple(code);
+                            status = CodeDescriptionStatus::Simple(code);
+                        }
+                    }
+                }
+            }
+            CodeDescriptionPhase::SimpleShape { symbols } => {
+                assert(width == 1);
+                assert(field < 2);
+                let selector = 3 + field as u8;
+                let code = SimpleCodeDescription {
+                    selector,
+                    count: 4,
+                    symbols,
+                };
+                self.phase = CodeDescriptionPhase::CompleteSimple(code);
+                status = CodeDescriptionStatus::Simple(code);
+            }
+            CodeDescriptionPhase::ComplexPrefix2(progress) => {
+                assert(width == 2);
+                assert(field < 4);
+                self.phase = if field == 0 {
+                    process_complex_code_length(progress, 0)
+                } else if field == 1 {
+                    process_complex_code_length(progress, 4)
+                } else if field == 2 {
+                    process_complex_code_length(progress, 3)
+                } else {
+                    CodeDescriptionPhase::ComplexPrefix3(progress)
+                };
+            }
+            CodeDescriptionPhase::ComplexPrefix3(progress) => {
+                assert(width == 1);
+                assert(field < 2);
+                self.phase = if field == 0 {
+                    process_complex_code_length(progress, 2)
+                } else {
+                    CodeDescriptionPhase::ComplexPrefix4(progress)
+                };
+            }
+            CodeDescriptionPhase::ComplexPrefix4(progress) => {
+                assert(width == 1);
+                assert(field < 2);
+                self.phase = if field == 0 {
+                    process_complex_code_length(progress, 1)
+                } else {
+                    process_complex_code_length(progress, 5)
+                };
+            }
+            CodeDescriptionPhase::CompleteSimple(_)
+            | CodeDescriptionPhase::CompleteComplexAlphabet(_)
+            | CodeDescriptionPhase::Failed(_) => {
+                proof { assert(false); }
+            }
+        }
+
+        match self.phase {
+            CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+                status = CodeDescriptionStatus::ComplexAlphabet(code);
+            }
+            CodeDescriptionPhase::Failed(error) => {
+                status = CodeDescriptionStatus::Failed(error);
+            }
+            _ => {}
+        }
+        assert(self.valid());
+        CodeDescriptionStep { consumed: read.consumed, status }
+    }
+}
+
 proof fn valid_bits_ignore_unused_storage(a: BitQueue, b: BitQueue)
     requires a.valid(), b.valid(),
         a.len == b.len, a.offset == b.offset,
@@ -1379,6 +2250,86 @@ mod tests {
             }
         }
         panic!("meta-block parser did not terminate")
+    }
+
+    fn compressed_meta_prefix_bits() -> Vec<u8> {
+        let mut bits = vec![0, 0, 0, 0];
+        bits.extend([0; 16]);
+        bits.push(0);
+        bits
+    }
+
+    fn parse_code_description_bits(
+        description_bits: &[u8],
+        alphabet_max: u16,
+        alphabet_limit: u16,
+        one_byte_chunks: bool,
+    ) -> (CodeDescriptionDecoder, CodeDescriptionStep) {
+        let mut bits = compressed_meta_prefix_bits();
+        bits.extend_from_slice(description_bits);
+        let bytes = pack_lsb_bits(&bits);
+        let mut header = HeaderDecoder::new();
+        let first = header.advance_header(&bytes, false);
+        assert!(matches!(first.status, HeaderStatus::Complete { .. }));
+        let mut at = first.consumed;
+        let mut meta = MetaBlockDecoder::from_header(header).unwrap();
+        for _ in 0..32 {
+            let end = if one_byte_chunks {
+                (at + 1).min(bytes.len())
+            } else {
+                bytes.len()
+            };
+            let step = meta.advance_field(&bytes[at..end], end == bytes.len());
+            at += step.consumed;
+            if matches!(step.status, MetaBlockStatus::Complete(_)) {
+                break;
+            }
+            assert!(matches!(
+                step.status,
+                MetaBlockStatus::Progress | MetaBlockStatus::NeedInput
+            ));
+        }
+        assert!(matches!(meta.phase, MetaBlockPhase::Complete(_)));
+        let mut decoder =
+            CodeDescriptionDecoder::from_meta(meta, alphabet_max, alphabet_limit).unwrap();
+        for _ in 0..256 {
+            let end = if one_byte_chunks {
+                (at + 1).min(bytes.len())
+            } else {
+                bytes.len()
+            };
+            let step = decoder.advance_field(&bytes[at..end], end == bytes.len());
+            at += step.consumed;
+            if !matches!(
+                step.status,
+                CodeDescriptionStatus::Progress | CodeDescriptionStatus::NeedInput
+            ) {
+                return (decoder, step);
+            }
+            if at == bytes.len() && matches!(step.status, CodeDescriptionStatus::NeedInput) {
+                let terminal = decoder.advance_field(&[], true);
+                return (decoder, terminal);
+            }
+        }
+        panic!("code-description parser did not terminate")
+    }
+
+    fn push_bits(bits: &mut Vec<u8>, value: u16, width: u8) {
+        for i in 0..width {
+            bits.push(((value >> i) & 1) as u8);
+        }
+    }
+
+    fn push_static_code_length(bits: &mut Vec<u8>, value: u8) {
+        match value {
+            0 => bits.extend([0, 0]),
+            4 => bits.extend([1, 0]),
+            3 => bits.extend([0, 1]),
+            2 => bits.extend([1, 1, 0]),
+            1 => bits.extend([1, 1, 1, 0]),
+            5 => bits.extend([1, 1, 1, 1]),
+            _ => panic!("invalid static code-length value"),
+        }
     }
 
     fn visible_bits(queue: &BitQueue) -> Vec<u8> {
@@ -1656,6 +2607,137 @@ mod tests {
         assert_eq!(
             truncated.status,
             MetaBlockStatus::Failed(MetaBlockError::Truncated)
+        );
+    }
+
+    #[test]
+    fn simple_code_descriptions_cover_all_rfc_shapes_and_chunks() {
+        for chunks in [false, true] {
+            for (raw_selector, shape, symbols, expected_selector) in [
+                (0u8, None, vec![5u16], 0u8),
+                (1, None, vec![1, 6], 1),
+                (2, None, vec![0, 3, 7], 2),
+                (3, Some(0u8), vec![0, 2, 4, 6], 3),
+                (3, Some(1u8), vec![1, 3, 5, 7], 4),
+            ] {
+                let mut bits = vec![1, 0];
+                push_bits(&mut bits, raw_selector as u16, 2);
+                for symbol in &symbols {
+                    push_bits(&mut bits, *symbol, 3);
+                }
+                if let Some(bit) = shape {
+                    bits.push(bit);
+                }
+                let (_, step) = parse_code_description_bits(&bits, 8, 8, chunks);
+                let code = match step.status {
+                    CodeDescriptionStatus::Simple(code) => code,
+                    other => panic!("unexpected simple result: {other:?}"),
+                };
+                assert_eq!(code.selector, expected_selector);
+                assert_eq!(code.count as usize, symbols.len());
+                assert_eq!(&code.symbols[..symbols.len()], symbols.as_slice());
+            }
+        }
+    }
+
+    #[test]
+    fn simple_code_description_errors_are_permanent() {
+        let mut duplicate = vec![1, 0, 1, 0];
+        push_bits(&mut duplicate, 3, 3);
+        push_bits(&mut duplicate, 3, 3);
+        let (mut decoder, step) = parse_code_description_bits(&duplicate, 8, 8, true);
+        assert_eq!(
+            step.status,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::DuplicateSimpleSymbol)
+        );
+        assert_eq!(
+            decoder.advance_field(&[0xff], false),
+            CodeDescriptionStep {
+                consumed: 0,
+                status: CodeDescriptionStatus::Failed(CodeDescriptionError::DuplicateSimpleSymbol,),
+            }
+        );
+
+        let mut outside = vec![1, 0, 0, 0];
+        push_bits(&mut outside, 6, 3);
+        let (_, step) = parse_code_description_bits(&outside, 8, 4, false);
+        assert_eq!(
+            step.status,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::InvalidAlphabet)
+        );
+
+        let truncated = vec![1, 0, 0, 0];
+        let (_, step) = parse_code_description_bits(&truncated, 704, 704, true);
+        assert_eq!(
+            step.status,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)
+        );
+    }
+
+    #[test]
+    fn complex_code_length_alphabet_parses_static_prefixes() {
+        for chunks in [false, true] {
+            let mut two_length_one = vec![0, 0];
+            push_static_code_length(&mut two_length_one, 1);
+            push_static_code_length(&mut two_length_one, 1);
+            let (_, step) = parse_code_description_bits(&two_length_one, 256, 256, chunks);
+            let code = match step.status {
+                CodeDescriptionStatus::ComplexAlphabet(code) => code,
+                other => panic!("unexpected complex result: {other:?}"),
+            };
+            assert_eq!(code.lengths[1], 1);
+            assert_eq!(code.lengths[2], 1);
+
+            for value in [4u8, 5u8] {
+                let mut singleton = vec![0, 0];
+                push_static_code_length(&mut singleton, value);
+                for _ in 1..18 {
+                    push_static_code_length(&mut singleton, 0);
+                }
+                let (_, step) = parse_code_description_bits(&singleton, 256, 256, chunks);
+                let code = match step.status {
+                    CodeDescriptionStatus::ComplexAlphabet(code) => code,
+                    other => panic!("unexpected singleton complex result: {other:?}"),
+                };
+                assert_eq!(code.lengths[1], value);
+            }
+
+            let mut skip_three = vec![1, 1];
+            push_static_code_length(&mut skip_three, 1);
+            push_static_code_length(&mut skip_three, 1);
+            let (_, step) = parse_code_description_bits(&skip_three, 256, 256, chunks);
+            let code = match step.status {
+                CodeDescriptionStatus::ComplexAlphabet(code) => code,
+                other => panic!("unexpected skipped complex result: {other:?}"),
+            };
+            assert_eq!(code.skip, 3);
+            assert_eq!(code.lengths[4], 1);
+            assert_eq!(code.lengths[0], 1);
+        }
+    }
+
+    #[test]
+    fn complex_code_length_space_errors_are_permanent() {
+        let mut oversubscribed = vec![0, 0];
+        for value in [2u8, 1, 1] {
+            push_static_code_length(&mut oversubscribed, value);
+        }
+        let (_, step) = parse_code_description_bits(&oversubscribed, 256, 256, true);
+        assert_eq!(
+            step.status,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
+        );
+
+        let mut incomplete = vec![0, 0];
+        push_static_code_length(&mut incomplete, 2);
+        push_static_code_length(&mut incomplete, 2);
+        for _ in 2..18 {
+            push_static_code_length(&mut incomplete, 0);
+        }
+        let (_, step) = parse_code_description_bits(&incomplete, 256, 256, false);
+        assert_eq!(
+            step.status,
+            CodeDescriptionStatus::Failed(CodeDescriptionError::CodeLengthSpace)
         );
     }
 }

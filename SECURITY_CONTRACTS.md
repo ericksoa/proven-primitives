@@ -8,7 +8,7 @@ streaming, side-channel or deployment security.
 
 The source of truth is the [public contracts](CONTRACTS.md), the actual
 `ensures` clauses and named lemmas, and the [checked security record](evidence/security.json).
-The current source passes 244 checks with `--no-cheating`; the
+The current source passes 263 checks with `--no-cheating`; the
 [current checker output](evidence/brotli-b3a-verification.json) retains
 individual results. The earlier [177-check B2/C1 output](evidence/b2-c1-verification.json),
 [122-check B1 output](evidence/brotli-b1-verification.json), and
@@ -25,7 +25,7 @@ identify the toolchain, source identities and trusted components.
 | LZ4 raw block | [Decode](src/lz4.rs#L277) | [Prefix independence](src/lz4.rs#L412); work counters in the decoder and validator | [90-check security record](evidence/security.json) |
 | Brotli B1 private component | No public decoder; private bit queue and window-header driver only | Pending capacity, exact retained bits, header status/window, sticky terminal state, reset, bounded work and unused-storage independence | [122-check B1 record](evidence/brotli-b1.json) |
 | Brotli B2 private component | No complete decoder; canonical prefix/block-length and three-category switch core only | Bounded successful tables, exact code/width matches, state preservation and permanent zero-field invalid switch | [B2 report](BROTLI_B2.md) |
-| Brotli B3a private slice | No complete decoder; fixed workspace/tree records and meta-block headers only | Exact bounded layout, initialized-record discipline, old-storage-independent single-symbol records, exact header transitions, truthful exhaustion/truncation and permanent reserved/nonminimal errors | [B3a report](BROTLI_B3A.md) |
+| Brotli B3a private front end | No complete decoder; fixed workspace/tree records, meta-block headers, simple descriptions, and complex auxiliary code-length alphabets only | Exact bounded layout, initialized-record discipline, old-storage-independent single-symbol records, exact header and code-description transitions, symbol/distinctness checks, RFC permutation/space accounting, truthful exhaustion/truncation, and permanent format errors | [B3a report](BROTLI_B3A.md) |
 | C1 private composition | No public API; exact Base64-to-percent caller only | Current-prefix handoff, exact staged errors/effects, stale-length invalidation, final-prefix confidentiality and combined bounds | [C1 report](COMPOSITION_C1.md) |
 
 All successful-buffer statements use the same [\`written\` definition](src/lib.rs#L18).
@@ -174,9 +174,9 @@ universal contracts or validate the threat model's completeness.
 Brotli remains a candidate. [B1](BROTLI_B1.md) checks the private input/header
 foundation, [B2](BROTLI_B2.md) checks canonical prefix/block lengths plus the
 shared literal/command/distance switch core, and [B3a](BROTLI_B3A.md) checks the
-fixed workspace and meta-block-header slice. The approved public design is not
-yet implemented as a complete decoder; the remaining B3/B4 implementation and
-review remain.
+fixed workspace, meta-block headers, simple descriptions, and complex auxiliary
+code-length alphabet. The approved public design is not yet implemented as a
+complete decoder; the remaining B3/B4 implementation and review remain.
 
 Proposed obligations for every permitted chunk/call sequence:
 

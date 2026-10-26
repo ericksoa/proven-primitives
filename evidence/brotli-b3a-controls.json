@@ -1,8 +1,8 @@
 {
   "positive_control": {
     "path": "evidence/brotli-b3a-verification.json",
-    "sha256": "af610cca916002c09d614c43a0e4e8c1ee3e10a385be20c13dff91d8930b4b70",
-    "verified": 244,
+    "sha256": "936d4d930b3da036d5a0bec38a7056417ae0a5f3f68a0337842eb9a7877653ce",
+    "verified": 263,
     "errors": 0
   },
   "mutations": [
@@ -67,6 +67,48 @@
       "raw_transcript_sha256": "fe309a2fb3c9f19285ac36530a5467945929f63b64445a77492bad09ac38a22c",
       "published_transcript_sha256": "dd92433cabde580ffe308b94cb366c2215106316c8511404d958002e8cf08622",
       "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_prefix (selected functions)\n\nerror: postcondition not satisfied\n   --> <CANARY_DIR>/src/brotli_prefix.rs:864:13\n    |\n864 |       ensures r.is_ok() ==> {\n    |  _____________^\n865 | |         &&& symbol < meta.symbols\n866 | |         &&& match meta.storage {\n867 | |             TreeStorageState::Single { symbol: only } => {\n...   |\n881 | |     },\n    | |_____^ failed this postcondition\n...\n896 | /     match meta.storage {\n897 | |         TreeStorageState::Unused => Err(WorkspaceError::UninitializedRecord),\n898 | |         TreeStorageState::Single { symbol: only } => {\n899 | |             if symbol != only {\n...   |\n921 | |     }\n    | |_____- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n",
+      "result": "real proof rejection with unchanged specifications"
+    },
+    {
+      "name": "brotli-code-selector-misclassifies-simple",
+      "raw_transcript_sha256": "681dd73c6702a7c2268fc15c09f063007d5474ae44ec6d942a17c0d3931fa995",
+      "published_transcript_sha256": "fac926b1689db21b21541fa3edfdcdc09956f4ceaefec302e264ceebe8161dd9",
+      "transcript": "verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nnote: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function\n    --> <CANARY_DIR>/src/brotli_input.rs:1890:5\n     |\n1890 | /     fn advance_field(\n1891 | |         &mut self,\n1892 | |         input: &[u8],\n1893 | |         end_of_input: bool,\n1894 | |     ) -> (r: CodeDescriptionStep)\n     | |________________________________^\n\nerror: postcondition not satisfied\n    --> <CANARY_DIR>/src/brotli_input.rs:1938:13\n     |\n1938 | /             !code_phase_terminal(old(self).phase) ==> {\n1939 | |                 let width = code_phase_width(old(self).phase, old(self).alphabet_max);\n1940 | |                 let available = old(self).queue.bits()\n1941 | |                     + bytes_bits(input@.take(r.consumed as int));\n...    |\n1950 | |             },\n     | |_____________^ failed this postcondition\n...\n2195 |           CodeDescriptionStep { consumed: read.consumed, status }\n     |           ------------------------------------------------------- at the end of the function body\n\nerror: assertion failed\n    --> <CANARY_DIR>/src/brotli_input.rs:2034:28\n     |\n2034 |                     assert(skip == 0 || skip == 2 || skip == 3);\n     |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed\n\nerror: aborting due to 2 previous errors\n\n",
+      "result": "real proof rejection with unchanged specifications"
+    },
+    {
+      "name": "brotli-simple-code-accepts-limit-value",
+      "raw_transcript_sha256": "0865bf0c55e00a2837f56e107515889b6015a9d50fb7506deae63bda0cad7703",
+      "published_transcript_sha256": "5f83634e86f02f8a66326d4b0881e88c72ff2ff467cfa3e52e30d70c67dadada",
+      "transcript": "verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nnote: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function\n    --> <CANARY_DIR>/src/brotli_input.rs:1890:5\n     |\n1890 | /     fn advance_field(\n1891 | |         &mut self,\n1892 | |         input: &[u8],\n1893 | |         end_of_input: bool,\n1894 | |     ) -> (r: CodeDescriptionStep)\n     | |________________________________^\n\nerror: assertion failed\n    --> <CANARY_DIR>/src/brotli_input.rs:2194:16\n     |\n2194 |         assert(self.valid());\n     |                ^^^^^^^^^^^^ assertion failed\n\nerror: assertion failed\n    --> <CANARY_DIR>/src/brotli_input.rs:2065:28\n     |\n2065 |                     assert(field < 704);\n     |                            ^^^^^^^^^^^ assertion failed\n\nerror: aborting due to 2 previous errors\n\n",
+      "result": "real proof rejection with unchanged specifications"
+    },
+    {
+      "name": "brotli-simple-code-accepts-duplicate-symbol",
+      "raw_transcript_sha256": "6442bd1cbbad7808c07e189f6313ff40549f24e1d8ee43f5bd1d5c51901b4aab",
+      "published_transcript_sha256": "bf82c93a6662f029cae74880eb15a346cb1018f9afc72234d1ed8e3a24f03dcb",
+      "transcript": "verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nnote: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function\n    --> <CANARY_DIR>/src/brotli_input.rs:1890:5\n     |\n1890 | /     fn advance_field(\n1891 | |         &mut self,\n1892 | |         input: &[u8],\n1893 | |         end_of_input: bool,\n1894 | |     ) -> (r: CodeDescriptionStep)\n     | |________________________________^\n\nerror: assertion failed\n    --> <CANARY_DIR>/src/brotli_input.rs:2097:45\n     |\n2097 | ...                   implies symbols@[a] != symbols@[b] by {\n     |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed\n\nerror: postcondition not satisfied\n    --> <CANARY_DIR>/src/brotli_input.rs:1938:13\n     |\n1938 | /             !code_phase_terminal(old(self).phase) ==> {\n1939 | |                 let width = code_phase_width(old(self).phase, old(self).alphabet_max);\n1940 | |                 let available = old(self).queue.bits()\n1941 | |                     + bytes_bits(input@.take(r.consumed as int));\n...    |\n1950 | |             },\n     | |_____________^ failed this postcondition\n...\n2195 |           CodeDescriptionStep { consumed: read.consumed, status }\n     |           ------------------------------------------------------- at the end of the function body\n\nerror: aborting due to 2 previous errors\n\n",
+      "result": "real proof rejection with unchanged specifications"
+    },
+    {
+      "name": "brotli-complex-static-prefix-maps-four-to-five",
+      "raw_transcript_sha256": "0c5029a28c1974bea1e2bece6d073990ccc6bc1b4f53ee1305c19ca1b3853bf9",
+      "published_transcript_sha256": "4ad1a57cb03469eceeec61d1f2912f6e4fefa7d8f5bb66e4406dd0daf95d56df",
+      "transcript": "verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nerror: postcondition not satisfied\n    --> <CANARY_DIR>/src/brotli_input.rs:1938:13\n     |\n1938 | /             !code_phase_terminal(old(self).phase) ==> {\n1939 | |                 let width = code_phase_width(old(self).phase, old(self).alphabet_max);\n1940 | |                 let available = old(self).queue.bits()\n1941 | |                     + bytes_bits(input@.take(r.consumed as int));\n...    |\n1950 | |             },\n     | |_____________^ failed this postcondition\n...\n2195 |           CodeDescriptionStep { consumed: read.consumed, status }\n     |           ------------------------------------------------------- at the end of the function body\n\nnote: function body check has been running for 2 seconds\n      reporting errors as they are discovered (they may not be in source order)\n    --> <CANARY_DIR>/src/brotli_input.rs:1890:5\n     |\n1890 | /     fn advance_field(\n1891 | |         &mut self,\n1892 | |         input: &[u8],\n1893 | |         end_of_input: bool,\n1894 | |     ) -> (r: CodeDescriptionStep)\n     | |________________________________^\n\nnote: function body check finished in 4 seconds\n    --> <CANARY_DIR>/src/brotli_input.rs:1890:5\n     |\n1890 | /     fn advance_field(\n1891 | |         &mut self,\n1892 | |         input: &[u8],\n1893 | |         end_of_input: bool,\n1894 | |     ) -> (r: CodeDescriptionStep)\n     | |________________________________^\n\nerror: aborting due to 1 previous error\n\n",
+      "result": "real proof rejection with unchanged specifications"
+    },
+    {
+      "name": "brotli-complex-code-misclassifies-space-overflow",
+      "raw_transcript_sha256": "62cdd6559d54208aee604ccbdfe8b5574bc30e41e7bd2990a8758a497fbb69d5",
+      "published_transcript_sha256": "849dc076093c6ef7246a5795edd71431d50173a426789147b57f42a4e40f3547",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nerror: postcondition not satisfied\n    --> <CANARY_DIR>/src/brotli_input.rs:1785:9\n     |\n1785 | /         complex_process_holds(\n1786 | |             progress,\n1787 | |             value,\n1788 | |             r,\n...    |\n1794 | |             },\n1795 | |         ),\n     | |_________^ failed this postcondition\n...\n1804 |               return CodeDescriptionPhase::Failed(CodeDescriptionError::InvalidAlphabet);\n     |               -------------------------------------------------------------------------- at this exit\n\nerror: aborting due to 1 previous error\n\n",
+      "result": "real proof rejection with unchanged specifications"
+    },
+    {
+      "name": "brotli-code-length-order-starts-at-zero",
+      "raw_transcript_sha256": "017bba47e4ba610eb19354b039a193199c9f5c82e28c473d2910f93671863832",
+      "published_transcript_sha256": "98a42c0ff3c756a8c16c4696cc1de8b4713fff8ac116b2453b965777ffcd037e",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nerror: postcondition not satisfied\n    --> <CANARY_DIR>/src/brotli_input.rs:1335:13\n     |\n1334 | proof fn code_length_order_is_rfc()\n     |       ----------------------------- at the end of the function body\n1335 |     ensures CODE_LENGTH_ORDER@[0] == 1,\n     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n\nerror: aborting due to 1 previous error\n\n",
       "result": "real proof rejection with unchanged specifications"
     }
   ]

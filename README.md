@@ -26,7 +26,7 @@ whole-application security are not established by these per-call proofs.
 | LZ4 raw block decoding | Output equals the block specification, including overlapping matches; valid backreferences and end conditions; checked linear byte-work accounting |
 | Private Brotli B1 input/header | Eight-byte pending bounds; exact retained bits; RFC normal-window result; truthful exhaustion/truncation/invalid status; sticky terminal states and reset; bounded source work |
 | Private Brotli B2 prefix/block-switch core | Bounded canonical code construction and exact matching; RFC block lengths; literal/command/distance switch invariants; permanent zero-field invalid switch for one declared type |
-| Private Brotli B3a workspace/meta-header slice | Exact fixed workspace layout and bounded three-byte tree records; initialized-range and single-symbol confidentiality; exact normal/empty/uncompressed/metadata header transitions; permanent reserved/nonminimal errors and final truncation |
+| Private Brotli B3a front end | Exact fixed workspace and tree records; initialized-range and single-symbol confidentiality; exact meta-block headers; all simple code-description shapes; the complex auxiliary code-length alphabet and its RFC space accounting |
 | Private C1 caller | Base64 decode into scratch followed by percent decode of only the current prefix; exact errors/effects, stale-length invalidation, confidentiality and combined bounds |
 | Every public routine | No out-of-bounds access or arithmetic overflow under the model; loop termination; correct error results; unchanged destination on error; unchanged destination suffix on success |
 
@@ -35,7 +35,7 @@ buffers, no heap allocation, no executable recursion, and no unsafe code in the
 implementation. The same annotated source is verified and compiled. There is
 no separately maintained unverified implementation behind the API.
 
-The current implementation passes **244 project verification checks** with
+The current implementation passes **263 project verification checks** with
 `--no-cheating`. See [the proof record](evidence/claims.json),
 [the contracts](CONTRACTS.md), and [the proof guide](PROOFS.md).
 The [current B3a record](evidence/brotli-b3a.json) binds the exact current
@@ -54,8 +54,9 @@ The [checked B2 component](BROTLI_B2.md) proves canonical prefix/block-length
 and block-switch foundations, including the corrected zero-field permanent
 failure. It still does not decode a complete stream.
 The [checked B3a slice](BROTLI_B3A.md) adds the exact caller-workspace layout,
-safe initialized tree records and the source-linked meta-block-header state
-machine. Prefix-code-description parsing and the rest of B3 remain incomplete.
+safe initialized tree records, source-linked meta-block headers, all simple code
+descriptions, and the complex auxiliary code-length alphabet. Complex repeat
+lengths, workspace installation, and the rest of B3 remain incomplete.
 [P1](PIPELINE.md) implements fail-closed local evidence bookkeeping without
 adopting the draft security profile. The approved later proof scopes remain in
 [SECURITY_PROOF_EXTENSION_PROPOSAL.md](SECURITY_PROOF_EXTENSION_PROPOSAL.md).
@@ -221,6 +222,12 @@ rejection for:
 32. Reporting final meta-block-header truncation as retryable input.
 33. Swapping the stored low and high bytes of a workspace tree code.
 34. Reconstructing a workspace tree code from its length byte.
+35. Misclassifying the simple/complex code selector.
+36. Accepting a symbol equal to the alphabet limit.
+37. Accepting a duplicate simple symbol.
+38. Mapping a static-prefix value to the wrong code length.
+39. Misclassifying complex code-space overflow.
+40. Changing the RFC code-length permutation.
 
 The mathematical specifications stay unchanged. The percent-decoding and LZ4
 read mutations are semantic defects in otherwise memory-safe Rust. A successful

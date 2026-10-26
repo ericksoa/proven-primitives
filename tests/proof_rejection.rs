@@ -78,6 +78,29 @@ fn check_brotli_prefix_function(verus: &Path, root: &Path, function: &str) -> st
         .expect("run selected pinned Verus root")
 }
 
+fn check_brotli_input_function(verus: &Path, root: &Path, function: &str) -> std::process::Output {
+    Command::new(verus)
+        .arg(root.join("src/lib.rs"))
+        .args([
+            "--crate-type",
+            "lib",
+            "--verify-only-module",
+            "brotli_input",
+            "--verify-function",
+            function,
+            "--no-cheating",
+            "--num-threads",
+            "1",
+            "--triggers-mode",
+            "silent",
+            "--rlimit",
+            "30",
+        ])
+        .current_dir(root)
+        .output()
+        .expect("run selected pinned Verus input root")
+}
+
 fn transcript(output: &std::process::Output) -> String {
     format!(
         "{}\n{}",
@@ -479,6 +502,113 @@ fn the_prover_rejects_two_b3a_record_frame_defects() {
         );
         fs::write(&path, original.replacen(old, new, 1)).unwrap();
         let result = check_brotli_prefix_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied")
+                || log.contains("precondition not satisfied")
+                || log.contains("invariant not satisfied")
+                || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}"
+        );
+        println!("REJECTED {name}: deliberately wrong implementation, unchanged specification");
+        fs::write(&path, original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_b3a_code_description_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3a-code-canaries-{}",
+        std::process::id()
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+    for function in [
+        "*CodeDescriptionDecoder*",
+        "process_complex_code_length",
+        "code_length_order_is_rfc",
+    ] {
+        let positive = check_brotli_input_function(&verus, &temporary, function);
+        assert!(
+            positive.status.success(),
+            "unmodified selected root failed: {}",
+            transcript(&positive)
+        );
+    }
+    for (name, function, old, new) in [
+        (
+            "brotli-code-selector-misclassifies-simple",
+            "*CodeDescriptionDecoder*",
+            "assert(field < 4);\n                if field == 1 {",
+            "assert(field < 4);\n                if field == 0 {",
+        ),
+        (
+            "brotli-simple-code-accepts-limit-value",
+            "*CodeDescriptionDecoder*",
+            "if field >= self.alphabet_limit as u64 {",
+            "if field > self.alphabet_limit as u64 {",
+        ),
+        (
+            "brotli-simple-code-accepts-duplicate-symbol",
+            "*CodeDescriptionDecoder*",
+            "if duplicate {",
+            "if duplicate && symbol == u16::MAX {",
+        ),
+        (
+            "brotli-complex-static-prefix-maps-four-to-five",
+            "*CodeDescriptionDecoder*",
+            "process_complex_code_length(progress, 4)",
+            "process_complex_code_length(progress, 5)",
+        ),
+        (
+            "brotli-complex-code-misclassifies-space-overflow",
+            "process_complex_code_length",
+            "if amount > progress.space {\n            return CodeDescriptionPhase::Failed(CodeDescriptionError::CodeLengthSpace);",
+            "if amount > progress.space {\n            return CodeDescriptionPhase::Failed(CodeDescriptionError::InvalidAlphabet);",
+        ),
+        (
+            "brotli-code-length-order-starts-at-zero",
+            "code_length_order_is_rfc",
+            "const CODE_LENGTH_ORDER: [u8; 18] = [\n    1, 2, 3, 4, 0, 5,",
+            "const CODE_LENGTH_ORDER: [u8; 18] = [\n    0, 2, 3, 4, 0, 5,",
+        ),
+    ] {
+        let path = temporary.join("src/brotli_input.rs");
+        let original = fs::read_to_string(project.join("src/brotli_input.rs")).unwrap();
+        assert_eq!(
+            original.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        fs::write(&path, original.replacen(old, new, 1)).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
         let log = transcript(&result);
         fs::write(
             project.join("evidence").join(format!("canary-{name}.log")),

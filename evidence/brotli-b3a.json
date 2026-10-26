@@ -1,13 +1,13 @@
 {
-  "generated_utc": "2026-10-24T21:01:54.826162+00:00",
-  "component": "private Brotli B3a workspace and meta-block-header slice",
+  "generated_utc": "2026-10-26T01:07:29.743059+00:00",
+  "component": "private Brotli B3a workspace, meta-block, and code-description front end",
   "status": "checked partial B3a implementation; not a complete decoder or supported API",
-  "claim": "The checked private slice implements the exact fixed workspace/tree-record layout, exact framed little-endian record writes and initialized reads, and an RFC meta-block-header state machine with source-linked bit transitions, truthful truncation, permanent reserved/nonminimal-format errors, sticky terminal states, and bounded normal/metadata lengths.",
+  "claim": "The checked private front end implements the exact fixed workspace/tree-record layout, exact framed record writes and initialized reads, RFC meta-block headers, every simple code-description shape, and the complex auxiliary code-length alphabet with source-linked bit transitions, truthful truncation, permanent format errors, symbol validation, and exact RFC code-space accounting.",
   "report": {
     "path": "BROTLI_B3A.md",
-    "sha256": "b7f85a745492fa4e4984249b1001ddd81d66de917202edad5ed310be8876b9ec"
+    "sha256": "f6e54d7396f48b8d7872982bce7c81ae3c9090f86ad8c47ecfeaa89c5fab8c86"
   },
-  "source_tree_sha256": "d3e088258731ad7a93d63877ced37f8a7eecf05196d8f51f51e8e3b263b79d5d",
+  "source_tree_sha256": "257fdacc126cf5b794ea0405a9131e2b02c596be3e89e8da0d9b13feb7fc2e79",
   "source_sha256": {
     "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
     "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
@@ -16,14 +16,14 @@
     "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
     "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
     "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
-    "src/brotli_input.rs": "a8567ef078b686630f789b8d03a8903e2a42c0303a40aab9d53472437f18b37a",
+    "src/brotli_input.rs": "b77c87a5117708df62f005784878b04f7a2626e3945f8c38ae8bfd6d644cddd0",
     "src/brotli_prefix.rs": "afa34ea6600c4dfb51271aa8182593755ffd1f0ec1ca1a39dc1d1c2a6dea4e6c",
     "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
     "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
   },
   "validation_source_sha256": {
     "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
-    "tests/proof_rejection.rs": "428151c0643813734930bc34601efa6c1011c2e07e41233f5feff33911a3963a",
+    "tests/proof_rejection.rs": "1b0c10d06ccf85f094197603b5f2dbc9de303755aad9d62e89c3a7272baf2125",
     "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
     "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
     "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
@@ -34,13 +34,13 @@
     "encountered-error": false,
     "encountered-vir-error": false,
     "success": true,
-    "verified": 244,
+    "verified": 263,
     "errors": 0,
     "is-verifying-entire-crate": true
   },
   "verification_evidence": {
     "path": "evidence/brotli-b3a-verification.json",
-    "sha256": "af610cca916002c09d614c43a0e4e8c1ee3e10a385be20c13dff91d8930b4b70"
+    "sha256": "936d4d930b3da036d5a0bec38a7056417ae0a5f3f68a0337842eb9a7877653ce"
   },
   "verification_options": [
     "--crate-type",
@@ -92,20 +92,27 @@
     "lib::brotli_input::MetaBlockDecoder::reset_after_header",
     "lib::brotli_input::MetaBlockDecoder::advance_field",
     "lib::brotli_input::extend_nibble_is_bounded",
-    "lib::brotli_input::extend_metadata_byte_is_bounded"
+    "lib::brotli_input::extend_metadata_byte_is_bounded",
+    "lib::brotli_input::code_length_order_is_rfc",
+    "lib::brotli_input::alphabet_bit_width",
+    "lib::brotli_input::simple_symbols_distinct",
+    "lib::brotli_input::code_length_space_weight_exec",
+    "lib::brotli_input::process_complex_code_length",
+    "lib::brotli_input::CodeDescriptionDecoder::from_meta",
+    "lib::brotli_input::CodeDescriptionDecoder::advance_field"
   ],
   "runtime_tests": {
-    "private_rust_groups_passed": 20,
+    "private_rust_groups_passed": 24,
     "public_primitive_groups_passed": 9,
     "upstream_comparison_group_passed": 1,
     "pipeline_gate_groups_passed": 15
   },
   "proof_controls": {
-    "total_project_defects_rejected": 34,
-    "new_b3a_defects_rejected": 9,
+    "total_project_defects_rejected": 40,
+    "new_b3a_defects_rejected": 15,
     "evidence": {
       "path": "evidence/brotli-b3a-controls.json",
-      "sha256": "d6d43f5f99bfdd460f7d2c6643a0379a13a2642b67e47829176e4f8434e2c9a9"
+      "sha256": "daf47d709a64586e1da65c86209b942bc35928de2790b971c4077504b2e6d8cb"
     }
   },
   "properties": {
@@ -124,10 +131,17 @@
       "reserved and nonminimal encodings are permanent errors",
       "nonfinal exhaustion versus final truncation",
       "complete and failed states are sticky"
+    ],
+    "code_description_front_end": [
+      "every transition equals the specified transition for the exact consumed bits",
+      "all simple one-to-four-symbol descriptions, alphabet widths, bounds, distinctness and shape bits",
+      "RFC 18-entry code-length permutation and all six static-prefix values",
+      "exact 32-unit auxiliary code-space accounting",
+      "permanent duplicate, alphabet, incomplete, oversubscribed and truncation errors"
     ]
   },
   "limitations": [
-    "Simple and complex prefix-code descriptions are not yet connected to the bit queue and workspace records.",
+    "Complex repeat-coded final symbol lengths and installation into workspace records are not yet implemented.",
     "No tree groups, context maps, literal/command/distance execution, LZ77, dictionary, output, budgeted public decoder, or B4 caller is implemented.",
     "No PP-Security profile is adopted and independent specification review remains pending.",
     "Rust/LLVM, modeled library operations, verifier/solver, OS and hardware remain trusted."

@@ -1,4 +1,4 @@
-# Checked Brotli B3a workspace and meta-block-header slice
+# Checked Brotli B3a workspace, meta-block, and code-description front end
 
 This report records the first checked portion of the approved B3a milestone. It
 is a private implementation slice, not a complete Brotli decoder and not a
@@ -51,13 +51,32 @@ Runtime cases cover complete forms, one-byte chunking, retained bits from the
 window header, the three permanent format failures, truncation, and retry after
 failure.
 
+## Checked prefix-code-description front end
+
+The next private state machine continues from a completed compressed meta-block
+header using the same retained-bit queue. Its source transition contract binds
+every field result to the exact accepted bits.
+
+For simple descriptions, it proves the selector, one-to-four symbol count,
+alphabet-dependent bit width, symbol bounds, pairwise distinctness and both
+four-symbol tree shapes. Out-of-alphabet and duplicate symbols are permanent
+errors; final exhaustion is permanent truncation.
+
+For complex descriptions, it proves the RFC 18-entry code-length permutation,
+all six values of the fixed two-to-four-bit prefix code, skip values 0/2/3, and
+exact 32-unit code-space accounting. A complete auxiliary alphabet has either
+one nonzero code or exactly exhausted code space. Oversubscribed and incomplete
+auxiliary alphabets are permanent errors. Runtime cases exercise whole-buffer
+and one-byte chunking, every simple shape, every static prefix length, skips,
+and malformed code space.
+
 ## Checked evidence and deliberate defects
 
-The current whole crate passes **244 verification checks with zero errors**
+The current whole crate passes **263 verification checks with zero errors**
 under `--no-cheating`. The evidence record binds the exact source, tool versions,
 options, report, runtime tests, and checker output.
 
-Nine B3a defects are rejected after unchanged positive controls:
+Fifteen B3a defects are rejected after unchanged positive controls:
 
 1. shifting every workspace tree-record address by one byte;
 2. reading the first uninitialized canonical record;
@@ -67,18 +86,25 @@ Nine B3a defects are rejected after unchanged positive controls:
 6. accepting a nonminimal metadata length; and
 7. reporting final truncation as retryable input exhaustion;
 8. swapping the low and high bytes of a stored canonical code; and
-9. reconstructing a canonical code from the record length byte.
+9. reconstructing a canonical code from the record length byte;
+10. misclassifying the simple/complex selector;
+11. accepting a symbol equal to the alphabet limit;
+12. accepting a duplicate simple symbol;
+13. mapping a static-prefix value to the wrong code length;
+14. misclassifying code-space overflow; and
+15. changing the RFC code-length permutation.
 
 A type error or checker failure is not counted as a defect rejection.
 
 ## Remaining B3a and complete-decoder work
 
-Simple and complex prefix-code descriptions are not yet connected to the bit
-queue and workspace records. Tree groups, context maps, literal/command/distance
-execution, LZ77, the static dictionary, provisional output, resource budgets,
-and arbitrary complete-stream sequences remain unimplemented or unproved.
-B3a therefore remains in progress, and no complete or supported Brotli claim is
-made.
+Simple descriptions and the complex auxiliary code-length alphabet are connected
+to the bit queue. The remaining complex symbol-length stream, repeat codes and
+installation into workspace records are not yet implemented. Tree groups,
+context maps, literal/command/distance execution, LZ77, the static dictionary,
+provisional output, resource budgets, and arbitrary complete-stream sequences
+remain unimplemented or unproved. B3a therefore remains in progress, and no
+complete or supported Brotli claim is made.
 
 See [the approved B3 architecture](BROTLI_B3_PROPOSAL.md),
 [the security assessment](SECURITY_CONTRACTS.md), and
