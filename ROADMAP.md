@@ -24,6 +24,8 @@ meta-block headers, simple and complex descriptions, repeat-coded final lengths,
 and canonical builder installation. The remaining approved implementation path is in
 [BROTLI_B3_PROPOSAL.md](BROTLI_B3_PROPOSAL.md), followed by the caller/profile
 work in [BROTLI_B4_PROFILE_PROPOSAL.md](BROTLI_B4_PROFILE_PROPOSAL.md).
+The exact private B3b encodings and state ownership choices are pending direct
+human selection in [BROTLI_B3B_PROPOSAL.md](BROTLI_B3B_PROPOSAL.md).
 
 ## Compositional verification
 

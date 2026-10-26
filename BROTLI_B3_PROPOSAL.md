@@ -11,7 +11,10 @@ workspace/tree-record layout, source-linked meta-block-header state machine,
 all simple code descriptions, the complex auxiliary code-length alphabet, RFC
 repeat-coded final symbol lengths, and canonical installation from the fixed
 builder region. Their internal handoff is specified; tree-group orchestration
-begins in B3b. See [BROTLI_B3A.md](BROTLI_B3A.md).
+begins in B3b. The outer B3 architecture is approved, but exact B3b metadata,
+state and MTF encodings were not fixed; the concrete candidates await human
+selection in [BROTLI_B3B_PROPOSAL.md](BROTLI_B3B_PROPOSAL.md). See
+[BROTLI_B3A.md](BROTLI_B3A.md).
 
 ## Supported format and public API
 

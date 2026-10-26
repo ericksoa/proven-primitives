@@ -42,6 +42,11 @@ contracts and twenty-eight B3a defect controls. Tree-group orchestration,
 context maps, literal/command/distance execution, and all later B3 work remain
 incomplete; do not describe this slice as a decoder.
 
+The exact B3b metadata encoding/order, private orchestration boundary, scalar
+state layout, MTF representation/granularity and RFC context-tree coverage
+mechanism remain pending in `BROTLI_B3B_PROPOSAL.md`. Do not implement B3b
+until the human directly approves one exact candidate.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted
