@@ -1,12 +1,12 @@
 # B3b compressed-header, tree-group, and context-map decision proposal
 
-Status: pending direct human approval. The approved B3 architecture fixes the
-outer workspace regions, capacities, algorithms, public API, dependency set and
-proof trust boundary. It does not fix the private orchestration boundary,
-four-byte metadata encoding, block-metadata order, scalar-state byte layout,
-inverse-MTF representation, or RFC context-tree coverage mechanism. No B3b
-implementation depends on this document until the human selects an exact
-candidate.
+Status: the human approved Candidate W1 exactly as written on 2026-10-26. The
+approved B3 architecture fixes the outer workspace regions, capacities,
+algorithms, public API, dependency set and proof trust boundary. This approval
+additionally fixes W1's private orchestration boundary, four-byte metadata
+encoding, block-metadata order, scalar-state byte layout, inverse-MTF
+representation and RFC context-tree coverage mechanism. Alternative R1 and all
+other listed alternatives remain unapproved.
 
 ## Frozen format order and bounds
 

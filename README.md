@@ -58,7 +58,7 @@ safe initialized tree records, source-linked meta-block headers, simple and
 complex code descriptions, RFC repeat-coded final lengths, and canonical
 installation from the fixed builder region. Tree groups, context maps,
 literal/command/distance execution, and the rest of B3 remain incomplete.
-The exact B3b metadata/state/MTF choices await human selection in the
+The approved exact B3b metadata/state/MTF choices are in the
 [B3b decision proposal](BROTLI_B3B_PROPOSAL.md).
 [P1](PIPELINE.md) implements fail-closed local evidence bookkeeping without
 adopting the draft security profile. The approved later proof scopes remain in

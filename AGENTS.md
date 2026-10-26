@@ -42,10 +42,12 @@ contracts and twenty-eight B3a defect controls. Tree-group orchestration,
 context maps, literal/command/distance execution, and all later B3 work remain
 incomplete; do not describe this slice as a decoder.
 
-The exact B3b metadata encoding/order, private orchestration boundary, scalar
-state layout, MTF representation/granularity and RFC context-tree coverage
-mechanism remain pending in `BROTLI_B3B_PROPOSAL.md`. Do not implement B3b
-until the human directly approves one exact candidate.
+The human approved B3b Candidate W1 exactly as written in
+`BROTLI_B3B_PROPOSAL.md` on 2026-10-26. Implement B3b only within W1's exact
+private API, metadata encoding/order, 256-byte scalar-state layout,
+initialized-range policy, source-linked atomic MTF, builder-bitmap RFC coverage,
+B3a/B2 handoff, dependencies and proof trust boundary. Alternative R1 and the
+other listed alternatives remain unapproved.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
