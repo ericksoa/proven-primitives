@@ -9,7 +9,8 @@ exact decisions. Alternatives remain unapproved.
 Implementation then reached the existing B2 module boundary: E1 authorized
 module-private B2 adapters but did not freeze their callable shape. Candidate
 E2 below supplies that one remaining cross-module API and a bounded rule for
-input-local implementation helpers. E2 remains pending direct human approval.
+input-local implementation helpers. The human approved Candidate E2 exactly as
+written on 2026-10-26.
 
 ## E1 serialized tag tables
 
