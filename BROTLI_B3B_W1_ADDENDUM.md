@@ -1,10 +1,10 @@
 # B3b W1 serialized-state and error-tag addendum
 
-Status: pending direct human approval. Candidate W1 was approved on 2026-10-26,
-but its proposal fixed byte positions without enumerating every serialized tag,
-error mapping, reset value, result field, work formula or cross-module helper.
-This addendum supplies one exact Candidate E1. No implementation may depend on
-E1 until the human approves it.
+Status: the human approved Candidate E1 exactly as written on 2026-10-26.
+Candidate W1 was approved on the same date, but its proposal fixed byte
+positions without enumerating every serialized tag, error mapping, reset value,
+result field, work formula or cross-module helper. This addendum supplies those
+exact decisions. Alternatives remain unapproved.
 
 ## E1 serialized tag tables
 

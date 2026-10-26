@@ -49,10 +49,10 @@ initialized-range policy, source-linked atomic MTF, builder-bitmap RFC coverage,
 B3a/B2 handoff, dependencies and proof trust boundary. Alternative R1 and the
 other listed alternatives remain unapproved.
 
-`BROTLI_B3B_W1_ADDENDUM.md` contains exact serialized tag/error tables, reset
-image, result fields, work formulas and helper signatures that W1 did not
-enumerate. Candidate E1 remains pending direct human approval. Continue only
-W1 work independent of those values until E1 is approved.
+The human approved Candidate E1 exactly as written in
+`BROTLI_B3B_W1_ADDENDUM.md` on 2026-10-26. Its serialized tag/error tables,
+reset image, result fields, work formulas, authority rules and helper signatures
+are now part of the approved B3b W1 boundary. Alternatives remain unapproved.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,

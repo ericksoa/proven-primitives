@@ -10,9 +10,8 @@ other listed alternatives remain unapproved.
 
 Implementation audit found that W1 did not enumerate every serialized tag,
 error mapping, reset value, complete result field, work formula or helper
-signature. Those exact decisions are Candidate E1 in
-[BROTLI_B3B_W1_ADDENDUM.md](BROTLI_B3B_W1_ADDENDUM.md) and remain pending direct
-human approval.
+signature. The human approved exact Candidate E1 in
+[BROTLI_B3B_W1_ADDENDUM.md](BROTLI_B3B_W1_ADDENDUM.md) on 2026-10-26.
 
 ## Frozen format order and bounds
 
