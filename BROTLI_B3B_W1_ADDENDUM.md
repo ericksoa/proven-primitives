@@ -38,6 +38,21 @@ The variable-integer width byte is zero outside `WidthSuffix` and `1..=7`
 inside it. The code-description auxiliary byte is zero outside
 `ComplexAuxiliary`.
 
+State byte 85 is the intermediate B3a code-description error tag:
+
+| Tag | Meaning |
+|---:|---|
+| 0 | none |
+| 1 | `MetaBlockNotCompressed` |
+| 2 | `InvalidAlphabet` |
+| 3 | `DuplicateSimpleSymbol` |
+| 4 | `CodeLengthSpace` |
+| 5 | `Truncated` |
+
+`MetaBlockNotCompressed` in the serialized B3b path maps to `InternalState`;
+tags 2, 3 and 4 map to format details 1, 2 and 3; tag 5 maps to terminal
+`Truncated`. Other values are invalid state.
+
 ## E1 private errors and serialized mapping
 
 The exact private errors are:
@@ -152,6 +167,13 @@ and `consumed == input.len()`. Final exhaustion at any required field is
 and tree handoff continue in the same call without manufacturing `NeedInput`.
 Every loop has a decreasing bound from the fixed state and capacities.
 
+Context-map repeat arithmetic is evaluated before casting in `u32`/natural
+numbers: `repeat = (1u32 << symbol) + suffix as u32`. Symbol 16 may therefore
+denote up to 131,071 repeats without machine overflow. The decoder first checks
+`context_index as u32 + repeat <= active_map_size as u32`; only a bounded result
+is cast and written. Exact fill is valid and any excess is a permanent
+`ContextMapRepeat` error.
+
 ## E1 canonical initialization image
 
 Construction and reset first write zero to all 256 scalar-state bytes, then set:
@@ -171,11 +193,19 @@ Construction and reset first write zero to all 256 scalar-state bytes, then set:
 - MTF upper-bound byte 159 to `63`.
 
 All other counters, arrays, errors and padding remain zero. `from_meta` then
-zeros queue bytes 0..8, copies only the B1 queue's valid pending bytes, and
-stores its length/offset in bytes 8 and 9. The serialized queue invariant is
+copies exactly the B1 queue's valid pending bytes into the already-zero queue
+area and stores its length/offset in bytes 8 and 9. The serialized queue invariant is
 exactly B1's valid LSB-first logical bit sequence; unused queue bytes are zero
 and never influence results. No mutable queue/parser shadow state survives a
 return from `step`.
+
+The image performs exactly 256 zero writes, then eight nonzero override writes:
+bytes 53, 54, 114, the low bytes of ring entries 0/2/4, byte 158 and byte 159.
+It then writes all six block metadata records and the temporary metadata record
+to canonical `Unused`, for 28 more byte writes. `from_meta` writes exactly the
+valid pending-byte count plus bytes 8 and 9. Thus scalar/metadata initialization
+costs exactly `294 + pending_len` byte writes. Zero-valued phase/kind/counter
+fields and ring high bytes are not rewritten after the initial 256 zero writes.
 
 Reset uses this same image. Starting a later compressed meta-block uses the same
 image followed by the new completed meta-header queue. Public request reset is
@@ -183,29 +213,44 @@ charged and additionally performs the already-approved outer decoder reset.
 
 ## E1 code-description and temporary-state lifecycle
 
-The current B3a logical state is serialized only in bytes 60..134. Each
+The current B3a logical state is serialized in bytes 60..126 plus pending-span
+length byte 174. Each
 transition loads a local value, applies the already-checked transition, and
 stores the exact next value before returning or continuing. Persistent Rust
 fields do not shadow it.
 
+Byte 174 is `pending_span_length`: it is `0..=15` only during `PendingSpan` and
+zero otherwise. During a pending span, `span_start` is the builder initialized
+count, `span_count` is `final_symbol_index - builder_initialized`, and byte 174
+is the exact emitted length. This includes generated trailing-zero spans and
+allows direct zero-length spans to resume without shadow state. Checked padding
+therefore begins at byte 175.
+
 For simple trees, source symbols receive these exact lengths:
 
-- selector 0: `symbols[0]` is a metadata `Single` and no record is read;
+- selector 0: `symbols[0]` is a metadata `Single`; every tree-record byte for
+  that tree remains stale/uninitialized and no record is read;
 - selector 1: `symbols[0..2]` receive `[1, 1]`;
 - selector 2: `symbols[0..3]` receive `[1, 2, 2]`;
 - selector 3: `symbols[0..4]` receive `[2, 2, 2, 2]`; and
 - selector 4: `symbols[0..4]` receive `[1, 2, 3, 3]`.
 
-Every other admitted symbol receives `(length=0, code=0)`. Complex spans are
+For selectors 1 through 4, every other admitted symbol receives
+`(length=0, code=0)`. Complex spans are
 drained once in increasing symbol order. No new tree starts until destination
 metadata is complete.
 
-Builder initialized counts reset to zero before every description. Temporary
-metadata changes from `Unused` to the selected `Single` or a zero-initialized
-`Canonical`, then to complete before map-item decoding. Coverage bitmap reuse
-starts only after all map items and optional MTF finish. It ends before the next
-temporary tree begins. Builder/temp bytes may remain stale afterward but cannot
-be read without the corresponding new initialized state.
+Builder initialized counts reset to zero before every description. Construction
+and every compressed-meta-block reset write all three block-type, all three
+block-length and the temporary metadata records to `Unused`; these seven records
+therefore have initialized authority immediately. Group metadata remains stale
+with initialized-prefix counts zero and is overwritten sequentially before
+those counts advance. Temporary metadata changes from initialized `Unused` to
+the selected `Single` or a zero-initialized `Canonical`, then to complete before
+map-item decoding. Coverage bitmap reuse starts only after all map items and
+optional MTF finish. It ends before the next temporary tree begins. Builder/temp
+bytes may remain stale afterward but cannot be read without the corresponding
+new initialized state.
 
 ## E1 MTF bytes and exact work
 
@@ -226,6 +271,18 @@ formula, excluding separately charged state transitions, is:
 
 It is at most 8,454,400 for the 16,384-byte literal map. The next bound is
 `OR(all raw ranks) >> 2` and is at most 63.
+
+The reusable-list invariant requires the 256-byte list to be a permutation of
+`0..255` and every position at or above `4 * (U + 1)` to contain its identity
+value. First use has `U=63`, so full initialization establishes the invariant
+independently of old list storage. The transform preserves the permutation and
+establishes the suffix-identity condition for its returned next bound. With
+input ranks below `num_htrees`, every transformed map value is also below
+`num_htrees`.
+
+`inverse_mtf_context_map` receives `num_htrees`; its returned `u64` is exactly
+the transform formula above and excludes the separately charged pre-scan map
+reads.
 
 B3c first charges each pre-scan map read while accumulating the exact formula,
 then requires and deducts the complete transform charge before the first MTF
@@ -251,15 +308,26 @@ coverage cell-work formula, excluding state transitions, is:
 This counts bitmap clears; each map read plus bitmap read/write; and each final
 required-bit read.
 
+The coverage helper requires the checked precondition that every transformed
+map value is below `num_htrees`. It returns `false` exactly for missing required
+tree indices. Out-of-range parsed direct values are rejected by the caller as
+`InvalidFormat(ContextMapValue)` before any context write; they never reach the
+storage or coverage helper.
+
 ## E1 private helper ownership and signatures
 
 `brotli_prefix.rs` owns only byte-addressed storage/transform helpers:
 
 ```rust
+enum MetadataReadError {
+    Workspace(WorkspaceError),
+    InvalidEncoding,
+}
+
 fn write_tree_metadata(workspace, window_bytes, region, tree, meta)
     -> Result<(), WorkspaceError>;
-fn read_tree_metadata(workspace, window_bytes, region, tree)
-    -> Result<TreeMetadata, WorkspaceError>;
+fn read_tree_metadata(workspace, window_bytes, region, initialized_prefix, tree)
+    -> Result<TreeMetadata, MetadataReadError>;
 fn write_next_context_entry(workspace, window_bytes, kind, active_len,
     initialized, value, num_htrees) -> Result<u16, WorkspaceError>;
 fn read_context_entry(workspace, window_bytes, kind, initialized, index,
@@ -269,16 +337,28 @@ fn write_next_context_mode(workspace, window_bytes, initialized, value)
 fn read_context_mode(workspace, window_bytes, initialized, index)
     -> Result<u8, WorkspaceError>;
 fn inverse_mtf_context_map(workspace, window_bytes, kind, active_len,
-    mtf_upper_bound) -> Result<(u8, u64), WorkspaceError>;
+    num_htrees, mtf_upper_bound) -> Result<(u8, u64), WorkspaceError>;
 fn check_context_tree_coverage(workspace, window_bytes, kind, active_len,
     num_htrees) -> Result<(bool, u64), WorkspaceError>;
+fn install_simple_tree(workspace, window_bytes, region, tree, alphabet_limit,
+    selector, count, symbols) -> Result<TreeMetadata, WorkspaceError>;
 ```
 
 Here `kind` is the exact `Literal=0` / `Distance=1` context-map enum. Result
 errors are the existing workspace error for address/initialization failures.
+Metadata reads require `tree < initialized_prefix`; the prefix is three for
+each block metadata region after reset, one for temporary metadata after reset,
+and the exact installed group count for literal/command/distance regions.
+`InvalidEncoding` maps to format detail 10. Context write helpers have proved
+preconditions `value < num_htrees` and therefore cannot produce a format error.
 The coverage boolean is false exactly when a required tree is absent; the
 caller maps it to the approved format detail. Every helper proves exact frames
 and old-storage independence.
+
+The approved B3a builder/tree-record/canonical-installer helpers remain
+crate-private cross-module helpers. `install_simple_tree` implements the exact
+selector mapping above, including metadata-only selector 0 and full zero records
+for inactive symbols in selectors 1 through 4.
 
 `brotli_input.rs` owns the scalar-state offsets, typed tag serializers,
 constructor/reset image, all parser phases and the outer private API. Scalar
