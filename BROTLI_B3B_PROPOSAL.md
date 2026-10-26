@@ -8,6 +8,12 @@ encoding, block-metadata order, scalar-state byte layout, inverse-MTF
 representation and RFC context-tree coverage mechanism. Alternative R1 and all
 other listed alternatives remain unapproved.
 
+Implementation audit found that W1 did not enumerate every serialized tag,
+error mapping, reset value, complete result field, work formula or helper
+signature. Those exact decisions are Candidate E1 in
+[BROTLI_B3B_W1_ADDENDUM.md](BROTLI_B3B_W1_ADDENDUM.md) and remain pending direct
+human approval.
+
 ## Frozen format order and bounds
 
 The pinned normal-window format processes a compressed meta-block header in
