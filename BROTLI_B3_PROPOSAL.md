@@ -14,7 +14,10 @@ builder region. Their internal handoff is specified; tree-group orchestration
 begins in B3b. The human approved exact B3b Candidate W1 on 2026-10-26; its
 metadata, state, MTF, coverage and handoff decisions are fixed in
 [BROTLI_B3B_PROPOSAL.md](BROTLI_B3B_PROPOSAL.md). See
-[BROTLI_B3A.md](BROTLI_B3A.md).
+[BROTLI_B3A.md](BROTLI_B3A.md). B3b is now checked through compressed-header
+orchestration, context maps, tree groups and the initial B2 `Ready` handoff; see
+[BROTLI_B3B.md](BROTLI_B3B.md). The concrete body/resource/layout decisions for
+B3c are pending in [BROTLI_B3C_PROPOSAL.md](BROTLI_B3C_PROPOSAL.md).
 
 ## Supported format and public API
 
