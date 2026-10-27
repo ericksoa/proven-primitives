@@ -1,12 +1,12 @@
 # Brotli B3c body, resource, and public-core proposal
 
-Status: **pending direct human approval**. The approved B3 architecture fixes
+Status: **Candidate C1 approved exactly as written by the human on 2026-10-26**.
+The approved B3 architecture fixes
 the supported format, public API shape, dictionary identity, workspace ceiling,
 safe bytewise algorithms and resource categories. B3b intentionally leaves
 13,028 workspace bytes unassigned until a concrete B3c layout is approved.
-This document proposes that exact assignment and the remaining body-level
-choices. No dependent implementation may begin until the human approves one
-candidate.
+This document fixes that exact assignment and the remaining body-level choices.
+Alternatives C2 through C5 remain unapproved.
 
 B3c is not B3d or B4. It does not claim arbitrary call-sequence induction,
 complete supported-format refinement, source-observation equality, an adopted

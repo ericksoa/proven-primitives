@@ -17,7 +17,8 @@ metadata, state, MTF, coverage and handoff decisions are fixed in
 [BROTLI_B3A.md](BROTLI_B3A.md). B3b is now checked through compressed-header
 orchestration, context maps, tree groups and the initial B2 `Ready` handoff; see
 [BROTLI_B3B.md](BROTLI_B3B.md). The concrete body/resource/layout decisions for
-B3c are pending in [BROTLI_B3C_PROPOSAL.md](BROTLI_B3C_PROPOSAL.md).
+B3c are approved as Candidate C1 in
+[BROTLI_B3C_PROPOSAL.md](BROTLI_B3C_PROPOSAL.md).
 
 ## Supported format and public API
 

@@ -26,9 +26,10 @@ work in [BROTLI_B4_PROFILE_PROPOSAL.md](BROTLI_B4_PROFILE_PROPOSAL.md).
 The human approved exact B3b Candidate W1 on 2026-10-26; its private encodings
 and state ownership are fixed in [BROTLI_B3B_PROPOSAL.md](BROTLI_B3B_PROPOSAL.md).
 The checked result is recorded in [BROTLI_B3B.md](BROTLI_B3B.md).
-The exact B3c body/resource/state proposal is pending human approval in
-[BROTLI_B3C_PROPOSAL.md](BROTLI_B3C_PROPOSAL.md); no dependent B3c code has
-been implemented.
+The human approved exact B3c Candidate C1 on 2026-10-26 in
+[BROTLI_B3C_PROPOSAL.md](BROTLI_B3C_PROPOSAL.md). Its body/resource/state
+implementation is in progress; no B3c proof claim exists until checked evidence
+is published.
 
 ## Compositional verification
 

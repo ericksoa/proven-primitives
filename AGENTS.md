@@ -68,12 +68,12 @@ Ready handoff. It is not a complete decoder or supported API. An
 exhaustion-triggered call from the body decoder into the checked B2 adapter is
 B3c work and must not be claimed as B3b integration.
 
-`BROTLI_B3C_PROPOSAL.md` contains pending Candidate C1 for the body decoder,
-resource policy, public-core boundary and exact assignment of the 13,028
-reserved state bytes. Investigation and proposal work are authorized, but C1
-is not approved. Do not implement its modules, APIs, state layout, tables,
-terminal/call priority, resource escrow, algorithms or controls until the human
-approves Candidate C1 exactly as written or selects a documented alternative.
+The human approved Candidate C1 in `BROTLI_B3C_PROPOSAL.md` exactly as written
+on 2026-10-26. Implement B3c only within its exact modules and crate-private
+adapters, public private-field representations, 13,028-byte assignment, scalar
+tags, immutable-data identities, terminal/call priority, four-unit escrow,
+425-unit initialization charge, algorithms, proof controls, fixtures and staged
+order. Alternatives C2 through C5 remain unapproved. B3d and B4 remain separate.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
