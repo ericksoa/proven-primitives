@@ -8,10 +8,11 @@ streaming, side-channel or deployment security.
 
 The source of truth is the [public contracts](CONTRACTS.md), the actual
 `ensures` clauses and named lemmas, and the [checked security record](evidence/security.json).
-The current source passes 350 checks with `--no-cheating`; the
-[current checker output](evidence/brotli-b3a-verification.json) retains
+The current source passes 738 checks with `--no-cheating`; the
+[current checker output](evidence/brotli-b3b-verification.json) retains
 individual results. The earlier [177-check B2/C1 output](evidence/b2-c1-verification.json),
 [122-check B1 output](evidence/brotli-b1-verification.json), and
+[350-check B3a output](evidence/brotli-b3a-verification.json) and
 [90-check output](evidence/security-verification.json) remain historical
 component and measured G/security-corollary snapshots.
 The
@@ -26,6 +27,7 @@ identify the toolchain, source identities and trusted components.
 | Brotli B1 private component | No public decoder; private bit queue and window-header driver only | Pending capacity, exact retained bits, header status/window, sticky terminal state, reset, bounded work and unused-storage independence | [122-check B1 record](evidence/brotli-b1.json) |
 | Brotli B2 private component | No complete decoder; canonical prefix/block-length and three-category switch core only | Bounded successful tables, exact code/width matches, state preservation and permanent zero-field invalid switch | [B2 report](BROTLI_B2.md) |
 | Brotli B3a private front end | No complete decoder; fixed workspace/tree records, meta-block headers, simple descriptions, and complex auxiliary code-length alphabets only | Exact bounded layout, initialized-record discipline, old-storage-independent single-symbol records, exact header and code-description transitions, symbol/distinctness checks, RFC permutation/space accounting, truthful exhaustion/truncation, and permanent format errors | [B3a report](BROTLI_B3A.md) |
+| Brotli B3b private compressed-header component | No complete decoder; serialized compressed-header orchestration through initial active-tree selection and B2 `Ready` state only | Exact field/category order, bounded serialized state, literal/distance context maps, all RLE widths, inverse MTF, RFC tree coverage, installed-tree decoding, tree groups, exact exhaustion/truncation, sticky terminal failures, and initial B2 handoff | [B3b report](BROTLI_B3B.md) |
 | C1 private composition | No public API; exact Base64-to-percent caller only | Current-prefix handoff, exact staged errors/effects, stale-length invalidation, final-prefix confidentiality and combined bounds | [C1 report](COMPOSITION_C1.md) |
 
 All successful-buffer statements use the same [\`written\` definition](src/lib.rs#L18).
@@ -155,48 +157,59 @@ policies and evidence beyond the current output-cap guarantees.
 |---|---|---|
 | CVE-2026-32829, LZ4 stale-buffer disclosure | Input-only successful output, valid current-call backreferences, full error-buffer preservation: **proved**. | The pinned historical safe decoder returned 18 old destination bytes in a 25-byte result. Current reference and this decoder reject the zero offset. Deliberate stale-byte reads in general and offset-one paths are rejected by proof. |
 | CVE-2017-1000430, Base64 sizing overflow | Exact mathematical encoded length, guarded executable arithmetic and bounded writes: **proved** for admitted slices/capacities. | The old arithmetic is reproduced with wrapping 32-/64-bit integers; this is not a giant allocation or execution of the old encoder. Exact/small real buffers are tested. A guard that accepts an extra four-byte group is rejected by proof. |
-| CVE-2026-111497, Brotli format-error/input-exhaustion confusion | B1 input/header invariants, B2's corrected shared block-switch transition, and B3a's exact meta-header permanent-error/truncation distinctions are **proved for those private components**. Complete-stream Rust integration is **unproved**. | The native R1 replay gives fixed `-17` versus pre-fix `-9` across chunks 1..22, with intact guards and no ASan report. Component mutations are rejected. No complete decoder exists. |
+| CVE-2026-111497, Brotli format-error/input-exhaustion confusion | B1 input/header invariants, B2's corrected shared block-switch transition, B3a's meta-header distinctions, and B3b's compressed-header suspension, terminal truncation, sticky failure and exact initial B2 `Ready` handoff are **proved for those private components**. An exhaustion-triggered B2 call from body execution and complete-stream Rust integration are **unproved** B3c/B4 work. | The native R1 replay gives fixed `-17` versus pre-fix `-9` across chunks 1..22, with intact guards and no ASan report. B3b runtime cases exercise nonfinal exhaustion, final truncation, sticky error and whole/one-byte/every-split compressed-header input; 58 B3b semantic mutations are rejected. No complete decoder exists. |
 
 [SECURITY_CASES.md](SECURITY_CASES.md) gives source advisories, fixture details
 and limits. [The rejection suite](tests/proof_rejection.rs) first verifies an
 unchanged positive control and then requires real proof rejection. A failing
 tool launch or type error is not accepted as proof rejection. The current-source
-[current B3a control transcripts](evidence/brotli-b3a-controls.json) retain the
-twenty-eight B3a results; the twenty-five-control B2/C1, sixteen-control B1, and
-earlier eleven-control records remain historical. Across the current project,
-all fifty-three deliberate defects are rejected.
+[B3b control transcripts](evidence/brotli-b3b-controls.json) retain 58 semantic
+rejections with no accepted mutation or tool failure. The twenty-eight-control
+B3a, twenty-five-control B2/C1, sixteen-control B1, and earlier eleven-control
+records remain historical source snapshots. The current and historical suites
+cover 111 distinct deliberate defects.
 The
 [comparison record](evidence/validation-upstream-comparison.json) is finite
 compiled-behavior evidence; neither tests nor corruption controls replace the
 universal contracts or validate the threat model's completeness.
 
-## Brotli streaming obligations: B1/B2 and a B3a slice checked, full decoder unproved
+## Brotli streaming obligations: B1 through B3b components checked, full decoder unproved
 
 Brotli remains a candidate. [B1](BROTLI_B1.md) checks the private input/header
 foundation, [B2](BROTLI_B2.md) checks canonical prefix/block lengths plus the
 shared literal/command/distance switch core, and [B3a](BROTLI_B3A.md) checks the
 fixed workspace, meta-block headers, simple and complex descriptions, RFC
-repeat-coded final lengths, and canonical builder installation. The approved
-public design is not yet implemented as a complete decoder; the remaining
-B3/B4 implementation and review remain.
+repeat-coded final lengths, and canonical builder installation.
+[B3b](BROTLI_B3B.md) checks serialized compressed-header state, context maps,
+inverse MTF, tree groups, exact suspension/truncation and sticky errors through
+the initial B2 `Ready` handoff. The approved public design is not yet implemented
+as a complete decoder; B3c body execution, B4 caller/profile work and independent
+review remain.
 
 Proposed obligations for every permitted chunk/call sequence:
 
-1. B1's checked constructor establishes its bit-reader/header invariant. Future
-   decoder transitions, including error and suspension, must preserve pending,
-   window and output bounds; every append must establish capacity first.
+1. B1's checked constructor establishes its bit-reader/header invariant. B3b
+   preserves the approved serialized queue and state through compressed-header
+   progress, suspension and terminal failure. Future body/output transitions
+   must preserve pending, window and output bounds; every append must establish
+   capacity first.
 2. B1 distinguishes its reserved header error from genuine input exhaustion.
-   B2 proves that a one-type block switch is a permanent zero-field error before
-   prefix parsing and remains terminal until explicit reset.
-3. B1 covers its one-byte header, empty calls and terminal retries. Arbitrary
-   full-decoder chunk boundaries, partial fields, retries and output backpressure
-   remain proposed integration obligations.
+   B3a/B3b distinguish final truncation from nonfinal exhaustion for their
+   fields and keep terminal failures sticky. B2 proves that a one-type block
+   switch is a permanent zero-field error before prefix parsing and remains
+   terminal until explicit reset. Calling that transition when a body category
+   is exhausted remains B3c work.
+3. B1 covers its one-byte header, empty calls and terminal retries. B3b checks
+   exact compressed-header suspension state and supplements it with whole-input,
+   one-byte and every-byte-split cases. Full-decoder chunk boundaries, body
+   retries and output backpressure remain integration obligations.
 4. B1 retained bits/header results depend only on valid supplied bits. Future
    produced prefixes must depend only on authorized compressed input and any
    explicitly approved dictionary, excluding unrelated old decoder memory.
-5. B1 pending storage and abstract reader/header work have checked bounds.
-   Future expansion, window/table storage and complete-decoder work need explicit
-   cumulative bounds and deployment assumptions.
+5. B1 pending storage and abstract reader/header work have checked bounds. B3b
+   checks the approved fixed workspace regions and bounded per-transition work
+   formulas for its component. Output expansion, body work, complete-call
+   budgets and deployment assumptions remain future obligations.
 
 A one-shot output-correctness proof does not establish these temporal
 properties. An empty-input call may legitimately make no stream progress;

@@ -1,0 +1,189 @@
+{
+  "generated_utc": "2026-10-27T03:28:20.366141+00:00",
+  "component": "private Brotli B3b compressed-header orchestration component",
+  "status": "checked B3b component; not a complete decoder or supported API",
+  "claim": "The checked private B3b component implements the approved serialized compressed-header transitions from the B3a handoff through exact context maps, inverse MTF, RFC tree coverage, tree groups, sticky terminal errors, and the initial B2 Ready snapshot for every admitted component call and state.",
+  "report": {
+    "path": "BROTLI_B3B.md",
+    "sha256": "30b9a4e47f44ce42c775e7bfab5f2e1e97aa2d025df8ff2c51670d52aa73ad92"
+  },
+  "source_tree_sha256": "66b7c8d6632d08e33fac38b40690fb1b7cc0d75dedc8068fa26c75f6f47ae050",
+  "source_sha256": {
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/lib.rs": "12dd8d0e05b5282f85d4ad2566e78949a4dddb3383e47cd3b7a1153fe2d6f471",
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/brotli_input.rs": "b9a19b8d41b81a94566e8f74b9c9676e9f751668953427900935a1fe6b739517",
+    "src/brotli_prefix.rs": "b0ae2907d08787d6680cba90d81edf49131ff6530d8a87993390183774c05287",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
+  },
+  "validation_source_sha256": {
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "45116aea4fb52afa8799a3e8ba881b59170f653a4bd72bc3771a8df4be8253db",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf"
+  },
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 738,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_evidence": {
+    "path": "evidence/brotli-b3b-verification.json",
+    "sha256": "1a5221e7023c0347002846ccad5123e1b7898fb8d4e397f3293d9083cf5f3bed"
+  },
+  "verification_options": [
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "60",
+    "--time",
+    "--output-json"
+  ],
+  "verifier": {
+    "profile": "release",
+    "version": "0.2026.10.18.7d82994",
+    "binary_sha256": "483703c79cf57530a9864de2e69326740ee69162dd98b853aedb8273c74a06f6",
+    "platform": {
+      "os": "macos",
+      "arch": "aarch64"
+    },
+    "toolchain": "1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "commit": "7d829946231d6413a398f6e4160cdfe951261dad"
+  },
+  "execution_environment": {
+    "RUSTUP_TOOLCHAIN": "1.99.1",
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+    "target": "aarch64-apple-darwin",
+    "cargo_profile": "release",
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "llvm": "23.1.1",
+    "python": "3.14.6"
+  },
+  "locked_dependencies": {
+    "path": "Cargo.lock",
+    "sha256": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7"
+  },
+  "compiled_artifact": {
+    "path": "target/release/libproven_primitives.rlib",
+    "sha256": "f79683e782c1e82700eee79798bde374f4d74df5c9bfb34c601d7653214ee5a5",
+    "note": "Ordinary Cargo release library built from the same annotated source; Rust/LLVM remains trusted."
+  },
+  "checked_roots": [
+    "lib::brotli_input::b3b_scalar_layout_is_exact",
+    "lib::brotli_input::initialize_b3b_state_image",
+    "lib::brotli_input::b3b_state_address",
+    "lib::brotli_input::write_b3b_state_byte",
+    "lib::brotli_input::write_b3b_state_u16",
+    "lib::brotli_input::write_b3b_state_u32",
+    "lib::brotli_input::read_b3b_state_byte",
+    "lib::brotli_input::read_b3b_state_u16",
+    "lib::brotli_input::read_b3b_state_u32",
+    "lib::brotli_input::advance_installed_tree_symbol",
+    "lib::brotli_input::start_context_map",
+    "lib::brotli_input::advance_context_map",
+    "lib::brotli_input::advance_context_mtf_phase",
+    "lib::brotli_input::advance_context_coverage_phase",
+    "lib::brotli_input::drain_serialized_pending_span",
+    "lib::brotli_input::CompressedMetaBlockDecoder::from_meta",
+    "lib::brotli_input::CompressedMetaBlockDecoder::advance_block_count_phase",
+    "lib::brotli_input::CompressedMetaBlockDecoder::advance_context_maps_phase",
+    "lib::brotli_input::CompressedMetaBlockDecoder::advance_tree_groups_phase",
+    "lib::brotli_input::CompressedMetaBlockDecoder::finish_header",
+    "lib::brotli_input::CompressedMetaBlockDecoder::repeat_terminal_failure",
+    "lib::brotli_input::CompressedMetaBlockDecoder::step",
+    "lib::brotli_prefix::inverse_mtf_context_map",
+    "lib::brotli_block::snapshot_b3b_switch",
+    "lib::brotli_block::restore_b3b_switch",
+    "lib::brotli_block::advance_b3b_switch"
+  ],
+  "runtime_tests": {
+    "private_rust_groups_passed": 40,
+    "new_b3b_groups_passed": 5,
+    "new_b3b_scenarios_passed": 64,
+    "public_primitive_groups_passed": 9,
+    "upstream_comparison_group_passed": 1,
+    "pipeline_gate_groups_passed": 15
+  },
+  "comparison": {
+    "native_scope": "stream acceptance and status only; internal context-map, inverse-MTF and active-tree fields are unavailable",
+    "intentional_difference": "the checked component rejects missing advertised tree coverage that the pinned native decoder accepts",
+    "universal_equivalence_proved": false
+  },
+  "proof_controls": {
+    "suite_count": 12,
+    "new_b3b_defects_rejected": 58,
+    "accepted_mutations": 0,
+    "tool_failures": 0,
+    "evidence": {
+      "path": "evidence/brotli-b3b-controls.json",
+      "sha256": "15b7363bc9f6d60d913694982e7367145da6ee578482a78ab0e55bac13876f4c"
+    }
+  },
+  "properties": {
+    "serialized_state": [
+      "exact approved 256-byte scalar layout, seven metadata records, reset image and initialized-read authority",
+      "exact little-endian scalar and metadata values with framed writes",
+      "unused reserved state is not read"
+    ],
+    "compressed_header": [
+      "exact literal, command and distance count/category order and raw-plus-one count semantics",
+      "one-type tree elision and implicit 1 << 24 initial block length",
+      "exact distance postfix/direct parameters and literal context modes",
+      "literal context extent 64 times the literal block-type count and distance extent 4 times the distance block-type count"
+    ],
+    "context_maps": [
+      "all one-to-sixteen-bit zero-run suffix widths, direct values, exact fills and overflow rejection",
+      "exact suspended pending-run state across admitted calls",
+      "source-linked inverse MTF with reusable-list invariant and bounded cell work",
+      "RFC coverage requires every advertised tree before the next phase"
+    ],
+    "trees_and_handoff": [
+      "installed-tree decoding uses the earliest matching width and the reversed on-wire canonical code",
+      "literal, command and distance tree groups use exact order, counts, alphabets and initialized metadata",
+      "pending builder spans are written and acknowledged exactly once",
+      "completion returns exact active trees and the initial serialized B2 Ready snapshot",
+      "the E2 adapter maps B2 Ready, suspended and failed states exactly"
+    ],
+    "streaming_errors": [
+      "nonfinal exhaustion returns NeedInput only after consuming the supplied input and preserving the exact serialized suspension state",
+      "final exhaustion returns terminal Truncated",
+      "terminal errors are sticky, consume no later input and preserve state"
+    ],
+    "resources": [
+      "all component storage stays in the approved fixed caller workspace",
+      "per-transition loops and recorded work formulas are bounded",
+      "these component bounds do not establish body, output, complete-call or service availability budgets"
+    ]
+  },
+  "trusted_components": [
+    "RFC 7932 and the project specifications and their interpretation",
+    "Verus and bundled Z3",
+    "Verus proof and erasure macros plus modeled Rust and vstd operations",
+    "Rust and LLVM compilation",
+    "operating system and hardware execution"
+  ],
+  "limitations": [
+    "B3c literal, command and distance body execution, LZ77 window behavior, dictionary and output are not implemented.",
+    "The body decoder does not call the checked B2 adapter on category exhaustion; B3b proves only the initial Ready handoff and the adapter itself.",
+    "B4 caller quarantine, complete-stream budgets and a release security profile remain future work.",
+    "No complete or supported Brotli decoder, output correctness, side-channel, practical denial-of-service or arbitrary caller-composition claim is made.",
+    "No PP-Security profile is adopted and independent specification review remains pending.",
+    "Rust/LLVM, modeled library operations, verifier/solver, OS and hardware remain trusted."
+  ]
+}

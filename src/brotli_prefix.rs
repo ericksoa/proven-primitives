@@ -485,6 +485,26 @@ pub(crate) const MTF_OFFSET: u32 = 1_159_916;
 pub(crate) const MTF_BYTES: u32 = 260;
 pub(crate) const STATE_OFFSET: u32 = 1_160_176;
 pub(crate) const STATE_BYTES: u32 = 16_384;
+pub(crate) const LITERAL_METADATA_OFFSET: u32 = STATE_OFFSET;
+pub(crate) const LITERAL_METADATA_BYTES: u32 = 1_024;
+pub(crate) const COMMAND_METADATA_OFFSET: u32 = 1_161_200;
+pub(crate) const COMMAND_METADATA_BYTES: u32 = 1_024;
+pub(crate) const DISTANCE_METADATA_OFFSET: u32 = 1_162_224;
+pub(crate) const DISTANCE_METADATA_BYTES: u32 = 1_024;
+pub(crate) const BLOCK_TYPE_METADATA_OFFSET: u32 = 1_163_248;
+pub(crate) const BLOCK_TYPE_METADATA_BYTES: u32 = 12;
+pub(crate) const BLOCK_LENGTH_METADATA_OFFSET: u32 = 1_163_260;
+pub(crate) const BLOCK_LENGTH_METADATA_BYTES: u32 = 12;
+pub(crate) const TEMP_CONTEXT_METADATA_OFFSET: u32 = 1_163_272;
+pub(crate) const TEMP_CONTEXT_METADATA_BYTES: u32 = 4;
+const B3B_SCALAR_OFFSET: u32 = 1_163_276;
+const B3B_SCALAR_BYTES: u32 = 256;
+const B3B_RESERVED_STATE_OFFSET: u32 = 1_163_532;
+const B3B_RESERVED_STATE_BYTES: u32 = 13_028;
+const TREE_METADATA_RECORD_BYTES: u32 = 4;
+pub(crate) const MTF_LIST_OFFSET: u32 = MTF_OFFSET + 4;
+pub(crate) const MTF_LIST_BYTES: u32 = 256;
+const COVERAGE_BITMAP_BYTES: u16 = 32;
 
 pub(crate) const MAX_TREE_GROUPS: u16 = 256;
 pub(crate) const LITERAL_SYMBOLS: u16 = 256;
@@ -507,6 +527,18 @@ pub(crate) enum WorkspaceError {
     InvalidSymbol,
     InvalidCodeLength,
     UninitializedRecord,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum MetadataReadError {
+    Workspace(WorkspaceError),
+    InvalidEncoding,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ContextMapKind {
+    Literal,
+    Distance,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -581,6 +613,17 @@ proof fn fixed_layout_is_exact()
         BUILDER_OFFSET + BUILDER_BYTES == MTF_OFFSET,
         MTF_OFFSET + MTF_BYTES == STATE_OFFSET,
         STATE_OFFSET + STATE_BYTES == FIXED_SCRATCH_BYTES,
+        LITERAL_METADATA_OFFSET == STATE_OFFSET,
+        LITERAL_METADATA_OFFSET + LITERAL_METADATA_BYTES == COMMAND_METADATA_OFFSET,
+        COMMAND_METADATA_OFFSET + COMMAND_METADATA_BYTES == DISTANCE_METADATA_OFFSET,
+        DISTANCE_METADATA_OFFSET + DISTANCE_METADATA_BYTES == BLOCK_TYPE_METADATA_OFFSET,
+        BLOCK_TYPE_METADATA_OFFSET + BLOCK_TYPE_METADATA_BYTES == BLOCK_LENGTH_METADATA_OFFSET,
+        BLOCK_LENGTH_METADATA_OFFSET + BLOCK_LENGTH_METADATA_BYTES
+            == TEMP_CONTEXT_METADATA_OFFSET,
+        TEMP_CONTEXT_METADATA_OFFSET + TEMP_CONTEXT_METADATA_BYTES == B3B_SCALAR_OFFSET,
+        B3B_SCALAR_OFFSET + B3B_SCALAR_BYTES == B3B_RESERVED_STATE_OFFSET,
+        B3B_RESERVED_STATE_OFFSET + B3B_RESERVED_STATE_BYTES == FIXED_SCRATCH_BYTES,
+        MTF_LIST_OFFSET + MTF_LIST_BYTES == STATE_OFFSET,
         TEMP_CONTEXT_TREE_OFFSET >= BUILDER_OFFSET,
         TEMP_CONTEXT_TREE_OFFSET + TEMP_CONTEXT_TREE_BYTES == MTF_OFFSET,
 {
@@ -922,7 +965,7 @@ proof fn canonical_tree_prefix_after_write(
     }
 }
 
-pub(crate) closed spec fn canonical_installer_frame(
+pub(crate) open spec fn canonical_installer_frame(
     before: Seq<u8>,
     after: Seq<u8>,
     window_bytes: u32,
@@ -2106,12 +2149,22 @@ impl TreeMetadata {
         &&& match self.storage {
             TreeStorageState::Unused => self.symbols == 0,
             TreeStorageState::Single { symbol } => self.symbols > 0 && symbol < self.symbols,
-            TreeStorageState::Canonical { initialized } => initialized <= self.symbols,
+            TreeStorageState::Canonical { initialized } => {
+                self.symbols > 0 && initialized <= self.symbols
+            },
         }
     }
 
     pub(crate) fn unused() -> (r: Self)
-        ensures r.symbols == 0, r.storage == TreeStorageState::Unused,
+        ensures
+            r.valid_for(TreeRegion::Literal),
+            r.valid_for(TreeRegion::Command),
+            r.valid_for(TreeRegion::Distance),
+            r.valid_for(TreeRegion::BlockType),
+            r.valid_for(TreeRegion::BlockLength),
+            r.valid_for(TreeRegion::TemporaryContext),
+            r.symbols == 0,
+            r.storage == TreeStorageState::Unused,
     {
         Self { symbols: 0, storage: TreeStorageState::Unused }
     }
@@ -2121,7 +2174,11 @@ impl TreeMetadata {
         symbols: u16,
         symbol: u16,
     ) -> (r: Result<Self, WorkspaceError>)
-        ensures r.is_ok() ==> r.unwrap().valid_for(region),
+        ensures r.is_ok() ==> {
+            &&& r.unwrap().valid_for(region)
+            &&& r.unwrap().symbols == symbols
+            &&& r.unwrap().storage == TreeStorageState::Single { symbol }
+        },
     {
         let capacity = tree_region_symbols_exec(region);
         if symbols == 0 || symbols > capacity || symbol >= symbols {
@@ -2134,7 +2191,11 @@ impl TreeMetadata {
         region: TreeRegion,
         symbols: u16,
     ) -> (r: Result<Self, WorkspaceError>)
-        ensures r.is_ok() ==> r.unwrap().valid_for(region),
+        ensures r.is_ok() ==> {
+            &&& r.unwrap().valid_for(region)
+            &&& r.unwrap().symbols == symbols
+            &&& r.unwrap().storage == TreeStorageState::Canonical { initialized: 0 }
+        },
     {
         let capacity = tree_region_symbols_exec(region);
         if symbols == 0 || symbols > capacity {
@@ -2142,6 +2203,2239 @@ impl TreeMetadata {
         }
         Ok(Self { symbols, storage: TreeStorageState::Canonical { initialized: 0 } })
     }
+}
+
+pub(crate) open spec fn tree_metadata_region_offset(region: TreeRegion) -> nat {
+    match region {
+        TreeRegion::Literal => LITERAL_METADATA_OFFSET as nat,
+        TreeRegion::Command => COMMAND_METADATA_OFFSET as nat,
+        TreeRegion::Distance => DISTANCE_METADATA_OFFSET as nat,
+        TreeRegion::BlockType => BLOCK_TYPE_METADATA_OFFSET as nat,
+        TreeRegion::BlockLength => BLOCK_LENGTH_METADATA_OFFSET as nat,
+        TreeRegion::TemporaryContext => TEMP_CONTEXT_METADATA_OFFSET as nat,
+    }
+}
+
+pub(crate) open spec fn tree_metadata_at(
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+) -> nat {
+    window_bytes as nat + tree_metadata_region_offset(region) + tree as nat * 4
+}
+
+pub(crate) open spec fn tree_metadata_descriptor(meta: TreeMetadata) -> nat {
+    match meta.storage {
+        TreeStorageState::Unused => 0,
+        TreeStorageState::Single { symbol } => 0x8000nat + symbol as nat,
+        TreeStorageState::Canonical { initialized } => initialized as nat,
+    }
+}
+
+proof fn metadata_layout_is_bounded(region: TreeRegion)
+    ensures tree_metadata_region_offset(region) + tree_region_count(region) * 4
+        <= FIXED_SCRATCH_BYTES,
+{
+    fixed_layout_is_exact();
+    match region {
+        TreeRegion::Literal => {}
+        TreeRegion::Command => {}
+        TreeRegion::Distance => {}
+        TreeRegion::BlockType => {}
+        TreeRegion::BlockLength => {}
+        TreeRegion::TemporaryContext => {}
+    }
+}
+
+fn tree_metadata_offset(
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+) -> (r: Result<usize, WorkspaceError>)
+    ensures
+        window_bytes <= 16_777_216 && tree < tree_region_count(region) ==> r.is_ok(),
+        r.is_ok() ==> {
+            &&& tree < tree_region_count(region)
+            &&& r.unwrap() as nat == tree_metadata_at(window_bytes, region, tree)
+            &&& r.unwrap() as nat + 4
+                <= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+        },
+{
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let count = tree_region_count_exec(region);
+    if tree >= count {
+        return Err(WorkspaceError::InvalidTree);
+    }
+    let region_offset = match region {
+        TreeRegion::Literal => LITERAL_METADATA_OFFSET,
+        TreeRegion::Command => COMMAND_METADATA_OFFSET,
+        TreeRegion::Distance => DISTANCE_METADATA_OFFSET,
+        TreeRegion::BlockType => BLOCK_TYPE_METADATA_OFFSET,
+        TreeRegion::BlockLength => BLOCK_LENGTH_METADATA_OFFSET,
+        TreeRegion::TemporaryContext => TEMP_CONTEXT_METADATA_OFFSET,
+    };
+    proof {
+        metadata_layout_is_bounded(region);
+        assert(count as nat == tree_region_count(region));
+        assert(tree as nat + 1 <= tree_region_count(region));
+        assert(region_offset as nat == tree_metadata_region_offset(region));
+        assert(region_offset as nat + tree as nat * 4 + 4
+            <= FIXED_SCRATCH_BYTES as nat);
+        assert(window_bytes as nat + region_offset as nat + tree as nat * 4
+            <= u32::MAX);
+    }
+    Ok((window_bytes + region_offset + tree as u32 * TREE_METADATA_RECORD_BYTES) as usize)
+}
+
+#[verifier::bit_vector]
+proof fn single_metadata_descriptor_is_exact(symbol: u16)
+    requires symbol < 0x8000,
+    ensures (0x8000u16 | symbol) as nat == 0x8000nat + symbol as nat,
+{
+}
+
+#[verifier::bit_vector]
+proof fn split_single_metadata_descriptor_is_exact(descriptor: u16)
+    requires descriptor & 0x8000 != 0,
+    ensures descriptor as nat == 0x8000nat + (descriptor & 0x7fff) as nat,
+{
+}
+
+#[verifier::bit_vector]
+proof fn metadata_descriptor_high_bit_is_exact(descriptor: u16)
+    ensures
+        (descriptor & 0x8000 != 0) == (0x8000nat <= descriptor as nat),
+{
+}
+
+pub(crate) fn write_tree_metadata(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    meta: TreeMetadata,
+) -> (r: Result<(), WorkspaceError>)
+    requires meta.valid_for(region),
+    ensures
+        window_bytes <= 16_777_216
+            && window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= old(workspace)@.len()
+            && tree < tree_region_count(region) ==> r.is_ok(),
+        r.is_ok() ==> {
+            let at = tree_metadata_at(window_bytes, region, tree);
+            let descriptor = tree_metadata_descriptor(meta);
+            &&& tree < tree_region_count(region)
+            &&& at + 4 <= old(workspace)@.len()
+            &&& final(workspace)@ == old(workspace)@
+                .update(at as int, (meta.symbols % 256) as u8)
+                .update(at as int + 1, (meta.symbols / 256) as u8)
+                .update(at as int + 2, (descriptor % 256) as u8)
+                .update(at as int + 3, (descriptor / 256) as u8)
+        },
+        r.is_err() ==> final(workspace)@ == old(workspace)@,
+{
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::WorkspaceTooSmall),
+    };
+    if workspace.len() < required {
+        return Err(WorkspaceError::WorkspaceTooSmall);
+    }
+    let descriptor = match meta.storage {
+        TreeStorageState::Unused => 0,
+        TreeStorageState::Single { symbol } => {
+            proof { single_metadata_descriptor_is_exact(symbol); }
+            0x8000u16 | symbol
+        }
+        TreeStorageState::Canonical { initialized } => initialized,
+    };
+    let at = match tree_metadata_offset(window_bytes, region, tree) {
+        Ok(value) => value,
+        Err(error) => return Err(error),
+    };
+    workspace[at] = (meta.symbols % 256) as u8;
+    workspace[at + 1] = (meta.symbols / 256) as u8;
+    workspace[at + 2] = (descriptor % 256) as u8;
+    workspace[at + 3] = (descriptor / 256) as u8;
+    Ok(())
+}
+
+pub(crate) fn read_tree_metadata(
+    workspace: &[u8],
+    window_bytes: u32,
+    region: TreeRegion,
+    initialized_prefix: u16,
+    tree: u16,
+) -> (r: Result<TreeMetadata, MetadataReadError>)
+    ensures
+        window_bytes <= 16_777_216
+            && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+            && initialized_prefix <= tree_region_count(region)
+            && tree < tree_region_count(region)
+            && tree >= initialized_prefix
+            ==> r == Err(MetadataReadError::Workspace(
+                WorkspaceError::UninitializedRecord,
+            )),
+        window_bytes <= 16_777_216
+            && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+            && tree < initialized_prefix <= tree_region_count(region)
+            ==> (r.is_ok() == {
+                let at = tree_metadata_at(window_bytes, region, tree);
+                let symbols = little_u16_at(workspace@, at);
+                let descriptor = little_u16_at(workspace@, at + 2);
+                &&& symbols <= tree_region_symbols(region)
+                &&& if symbols == 0 {
+                    descriptor == 0
+                } else {
+                    ||| descriptor <= symbols
+                    ||| 0x8000 <= descriptor && descriptor - 0x8000 < symbols
+                }
+            }),
+        window_bytes <= 16_777_216
+            && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+            && tree < initialized_prefix <= tree_region_count(region)
+            && !{
+                let at = tree_metadata_at(window_bytes, region, tree);
+                let symbols = little_u16_at(workspace@, at);
+                let descriptor = little_u16_at(workspace@, at + 2);
+                &&& symbols <= tree_region_symbols(region)
+                &&& if symbols == 0 {
+                    descriptor == 0
+                } else {
+                    ||| descriptor <= symbols
+                    ||| 0x8000 <= descriptor && descriptor - 0x8000 < symbols
+                }
+            }
+            ==> r == Err(MetadataReadError::InvalidEncoding),
+        r.is_ok() ==> {
+        &&& tree < initialized_prefix <= tree_region_count(region)
+        &&& r.unwrap().valid_for(region)
+        &&& {
+            let at = tree_metadata_at(window_bytes, region, tree);
+            &&& at + 4 <= workspace@.len()
+            &&& r.unwrap().symbols as nat == workspace@[at as int] as nat
+                + 256 * workspace@[at as int + 1] as nat
+            &&& tree_metadata_descriptor(r.unwrap())
+                == workspace@[at as int + 2] as nat
+                    + 256 * workspace@[at as int + 3] as nat
+        }
+    },
+{
+    let count = tree_region_count_exec(region);
+    if initialized_prefix > count || tree >= count {
+        return Err(MetadataReadError::Workspace(WorkspaceError::InvalidTree));
+    }
+    if tree >= initialized_prefix {
+        return Err(MetadataReadError::Workspace(WorkspaceError::UninitializedRecord));
+    }
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(MetadataReadError::Workspace(WorkspaceError::WorkspaceTooSmall)),
+    };
+    if workspace.len() < required {
+        return Err(MetadataReadError::Workspace(WorkspaceError::WorkspaceTooSmall));
+    }
+    let at = match tree_metadata_offset(window_bytes, region, tree) {
+        Ok(value) => value,
+        Err(error) => return Err(MetadataReadError::Workspace(error)),
+    };
+    let symbols_low = workspace[at];
+    let symbols_high = workspace[at + 1];
+    let descriptor_low = workspace[at + 2];
+    let descriptor_high = workspace[at + 3];
+    proof {
+        join_tree_code_is_exact(symbols_low, symbols_high);
+        join_tree_code_is_exact(descriptor_low, descriptor_high);
+    }
+    let symbols = symbols_low as u16 | ((symbols_high as u16) << 8);
+    let descriptor = descriptor_low as u16 | ((descriptor_high as u16) << 8);
+    proof { metadata_descriptor_high_bit_is_exact(descriptor); }
+    let capacity = tree_region_symbols_exec(region);
+    let storage = if symbols == 0 {
+        if descriptor != 0 {
+            return Err(MetadataReadError::InvalidEncoding);
+        }
+        TreeStorageState::Unused
+    } else if symbols > capacity {
+        return Err(MetadataReadError::InvalidEncoding);
+    } else if descriptor & 0x8000 != 0 {
+        proof { split_single_metadata_descriptor_is_exact(descriptor); }
+        let symbol = descriptor & 0x7fff;
+        if symbol >= symbols {
+            return Err(MetadataReadError::InvalidEncoding);
+        }
+        TreeStorageState::Single { symbol }
+    } else {
+        if descriptor > symbols {
+            return Err(MetadataReadError::InvalidEncoding);
+        }
+        TreeStorageState::Canonical { initialized: descriptor }
+    };
+    let meta = TreeMetadata { symbols, storage };
+    proof {
+        match storage {
+            TreeStorageState::Single { symbol } => {
+                single_metadata_descriptor_is_exact(symbol);
+                assert(descriptor as nat == 0x8000nat + symbol as nat);
+            }
+            TreeStorageState::Unused => assert(descriptor == 0),
+            TreeStorageState::Canonical { initialized } => assert(descriptor == initialized),
+        }
+        assert(meta.valid_for(region));
+        assert(meta.symbols as nat == workspace@[at as int] as nat
+            + 256 * workspace@[at as int + 1] as nat);
+        assert(tree_metadata_descriptor(meta) == descriptor as nat);
+    }
+    Ok(meta)
+}
+
+pub(crate) open spec fn context_map_offset(kind: ContextMapKind) -> nat {
+    match kind {
+        ContextMapKind::Literal => LITERAL_CONTEXT_MAP_OFFSET as nat,
+        ContextMapKind::Distance => DISTANCE_CONTEXT_MAP_OFFSET as nat,
+    }
+}
+
+pub(crate) open spec fn context_map_capacity(kind: ContextMapKind) -> nat {
+    match kind {
+        ContextMapKind::Literal => LITERAL_CONTEXT_MAP_BYTES as nat,
+        ContextMapKind::Distance => DISTANCE_CONTEXT_MAP_BYTES as nat,
+    }
+}
+
+pub(crate) open spec fn context_entry_at(
+    window_bytes: u32,
+    kind: ContextMapKind,
+    index: u16,
+) -> nat {
+    window_bytes as nat + context_map_offset(kind) + index as nat
+}
+
+pub(crate) open spec fn literal_context_entry_at(
+    window_bytes: u32,
+    block: u16,
+    context: u8,
+) -> nat {
+    window_bytes as nat + LITERAL_CONTEXT_MAP_OFFSET as nat
+        + block as nat * 64 + context as nat
+}
+
+pub(crate) open spec fn distance_context_entry_at(
+    window_bytes: u32,
+    block: u16,
+    context: u8,
+) -> nat {
+    window_bytes as nat + DISTANCE_CONTEXT_MAP_OFFSET as nat
+        + block as nat * 4 + context as nat
+}
+
+pub(crate) open spec fn context_mode_at(window_bytes: u32, index: u16) -> nat {
+    window_bytes as nat + LITERAL_CONTEXT_MODES_OFFSET as nat + index as nat
+}
+
+fn context_entry_offset(
+    window_bytes: u32,
+    kind: ContextMapKind,
+    index: u16,
+) -> (r: Result<usize, WorkspaceError>)
+    ensures
+        window_bytes <= 16_777_216 && index < context_map_capacity(kind) ==> r.is_ok(),
+        r.is_ok() ==> {
+            &&& index < context_map_capacity(kind)
+            &&& r.unwrap() as nat == context_entry_at(window_bytes, kind, index)
+            &&& (r.unwrap() as nat) < window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+        },
+{
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let (base, capacity) = match kind {
+        ContextMapKind::Literal => (LITERAL_CONTEXT_MAP_OFFSET, LITERAL_CONTEXT_MAP_BYTES),
+        ContextMapKind::Distance => (DISTANCE_CONTEXT_MAP_OFFSET, DISTANCE_CONTEXT_MAP_BYTES),
+    };
+    if index as u32 >= capacity {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    proof {
+        fixed_layout_is_exact();
+        assert((base as nat) + (index as nat) < (FIXED_SCRATCH_BYTES as nat));
+        assert(window_bytes as nat + base as nat + index as nat <= u32::MAX);
+    }
+    Ok((window_bytes + base + index as u32) as usize)
+}
+
+proof fn bitmap_update_preserves_context_map(
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+    byte: u16,
+    value: u8,
+)
+    requires
+        active_len <= context_map_capacity(kind),
+        byte < COVERAGE_BITMAP_BYTES,
+        coverage_bitmap_at(window_bytes, byte) < before.len(),
+        after == before.update(coverage_bitmap_at(window_bytes, byte) as int, value),
+    ensures context_map_values(after, window_bytes, kind, active_len)
+        == context_map_values(before, window_bytes, kind, active_len),
+{
+    fixed_layout_is_exact();
+    assert(context_map_values(after, window_bytes, kind, active_len) =~=
+        context_map_values(before, window_bytes, kind, active_len));
+}
+
+pub(crate) fn write_next_context_entry(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+    initialized: u16,
+    value: u8,
+    num_htrees: u16,
+) -> (r: Result<u16, WorkspaceError>)
+    requires
+        active_len <= context_map_capacity(kind),
+        initialized <= active_len,
+        1 <= num_htrees <= 256,
+        (value as int) < num_htrees,
+    ensures
+        r.is_ok() ==> {
+            let at = context_entry_at(window_bytes, kind, initialized);
+            &&& initialized < active_len
+            &&& r.unwrap() == initialized + 1
+            &&& at < old(workspace)@.len()
+            &&& final(workspace)@ == old(workspace)@.update(at as int, value)
+        },
+        r.is_ok() ==> {
+            (forall|i: int| 0 <= i < initialized ==> #[trigger]
+                old(workspace)@[context_entry_at(window_bytes, kind, i as u16) as int]
+                    < num_htrees)
+            ==> forall|i: int| 0 <= i < r.unwrap() ==> #[trigger]
+                final(workspace)@[
+                    context_entry_at(window_bytes, kind, i as u16) as int
+                ] < num_htrees
+        },
+        r.is_err() ==> final(workspace)@ == old(workspace)@,
+{
+    if num_htrees == 0 || num_htrees > 256 || value as u16 >= num_htrees {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    if initialized >= active_len {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::WorkspaceTooSmall),
+    };
+    if workspace.len() < required {
+        return Err(WorkspaceError::WorkspaceTooSmall);
+    }
+    let at = match context_entry_offset(window_bytes, kind, initialized) {
+        Ok(value) => value,
+        Err(error) => return Err(error),
+    };
+    workspace[at] = value;
+    proof {
+        assert forall|i: int| 0 <= i < initialized implies
+            #[trigger] workspace@[
+                context_entry_at(window_bytes, kind, i as u16) as int
+            ] == old(workspace)@[
+                context_entry_at(window_bytes, kind, i as u16) as int
+            ] by {
+            assert(context_entry_at(window_bytes, kind, i as u16) != at as nat);
+        }
+    }
+    Ok(initialized + 1)
+}
+
+pub(crate) fn read_context_entry(
+    workspace: &[u8],
+    window_bytes: u32,
+    kind: ContextMapKind,
+    initialized: u16,
+    index: u16,
+    num_htrees: u16,
+) -> (r: Result<u8, WorkspaceError>)
+    requires
+        initialized <= context_map_capacity(kind),
+        1 <= num_htrees <= 256,
+        index < initialized ==> workspace@[context_entry_at(window_bytes, kind, index) as int]
+            < num_htrees,
+    ensures r.is_ok() ==> {
+        let at = context_entry_at(window_bytes, kind, index);
+        &&& index < initialized
+        &&& at < workspace@.len()
+        &&& r.unwrap() == workspace@[at as int]
+        &&& (r.unwrap() as int) < num_htrees
+    },
+{
+    if num_htrees == 0 || num_htrees > 256 {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    if index >= initialized {
+        return Err(WorkspaceError::UninitializedRecord);
+    }
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::WorkspaceTooSmall),
+    };
+    if workspace.len() < required {
+        return Err(WorkspaceError::WorkspaceTooSmall);
+    }
+    let at = match context_entry_offset(window_bytes, kind, index) {
+        Ok(value) => value,
+        Err(error) => return Err(error),
+    };
+    Ok(workspace[at])
+}
+
+pub(crate) fn write_next_context_mode(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    initialized: u16,
+    value: u8,
+) -> (r: Result<u16, WorkspaceError>)
+    requires initialized <= LITERAL_CONTEXT_MODES_BYTES, value < 4,
+    ensures
+        r.is_ok() ==> {
+            let at = context_mode_at(window_bytes, initialized);
+            &&& initialized < LITERAL_CONTEXT_MODES_BYTES
+            &&& r.unwrap() == initialized + 1
+            &&& at < old(workspace)@.len()
+            &&& final(workspace)@ == old(workspace)@.update(at as int, value)
+        },
+        r.is_err() ==> final(workspace)@ == old(workspace)@,
+{
+    if initialized >= LITERAL_CONTEXT_MODES_BYTES as u16 {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::WorkspaceTooSmall),
+    };
+    if workspace.len() < required {
+        return Err(WorkspaceError::WorkspaceTooSmall);
+    }
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let at = (window_bytes + LITERAL_CONTEXT_MODES_OFFSET + initialized as u32) as usize;
+    workspace[at] = value;
+    Ok(initialized + 1)
+}
+
+pub(crate) fn read_context_mode(
+    workspace: &[u8],
+    window_bytes: u32,
+    initialized: u16,
+    index: u16,
+) -> (r: Result<u8, WorkspaceError>)
+    requires
+        initialized <= LITERAL_CONTEXT_MODES_BYTES,
+        index < initialized ==> workspace@[context_mode_at(window_bytes, index) as int] < 4,
+    ensures r.is_ok() ==> {
+        let at = context_mode_at(window_bytes, index);
+        &&& index < initialized
+        &&& at < workspace@.len()
+        &&& r.unwrap() == workspace@[at as int]
+        &&& r.unwrap() < 4
+    },
+{
+    if index >= initialized {
+        return Err(WorkspaceError::UninitializedRecord);
+    }
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::WorkspaceTooSmall),
+    };
+    if workspace.len() < required {
+        return Err(WorkspaceError::WorkspaceTooSmall);
+    }
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let at = (window_bytes + LITERAL_CONTEXT_MODES_OFFSET + index as u32) as usize;
+    Ok(workspace[at])
+}
+
+pub(crate) open spec fn simple_selector_count(selector: u8) -> nat {
+    if selector <= 2 { selector as nat + 1 } else { 4 }
+}
+
+pub(crate) open spec fn simple_rank_length(selector: u8, rank: nat) -> u8 {
+    if selector == 1 { 1 }
+    else if selector == 2 { if rank == 0 { 1 } else { 2 } }
+    else if selector == 3 { 2 }
+    else if rank == 0 { 1 } else if rank == 1 { 2 } else { 3 }
+}
+
+pub(crate) open spec fn simple_rank_code(selector: u8, rank: nat) -> u16 {
+    if selector == 1 { rank as u16 }
+    else if selector == 2 { if rank == 0 { 0 } else { (rank + 1) as u16 } }
+    else if selector == 3 { rank as u16 }
+    else if rank == 0 { 0 } else if rank == 1 { 2 } else { (rank + 4) as u16 }
+}
+
+pub(crate) open spec fn simple_record_for_symbol(
+    selector: u8,
+    count: u8,
+    symbols: Seq<u16>,
+    symbol: u16,
+) -> TreeRecord {
+    if symbol == symbols[0] {
+        TreeRecord {
+            length: simple_rank_length(selector, 0),
+            code: simple_rank_code(selector, 0),
+        }
+    } else if count > 1 && symbol == symbols[1] {
+        TreeRecord {
+            length: simple_rank_length(selector, 1),
+            code: simple_rank_code(selector, 1),
+        }
+    } else if count > 2 && symbol == symbols[2] {
+        TreeRecord {
+            length: simple_rank_length(selector, 2),
+            code: simple_rank_code(selector, 2),
+        }
+    } else if count > 3 && symbol == symbols[3] {
+        TreeRecord {
+            length: simple_rank_length(selector, 3),
+            code: simple_rank_code(selector, 3),
+        }
+    } else {
+        TreeRecord { length: 0, code: 0 }
+    }
+}
+
+pub(crate) open spec fn simple_tree_prefix(
+    workspace: Seq<u8>,
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    alphabet_limit: u16,
+    selector: u8,
+    count: u8,
+    symbols: Seq<u16>,
+    initialized: nat,
+) -> bool {
+    &&& initialized <= alphabet_limit
+    &&& forall|i: int| 0 <= i < initialized
+        ==> #[trigger] workspace[
+            tree_record_at(window_bytes, region, tree, i as u16) as int
+        ] == simple_record_for_symbol(selector, count, symbols, i as u16).length
+    &&& forall|i: int| 0 <= i < initialized
+        ==> #[trigger] little_u16_at(
+            workspace,
+            tree_record_at(window_bytes, region, tree, i as u16) + 1,
+        ) == simple_record_for_symbol(selector, count, symbols, i as u16).code
+}
+
+pub(crate) open spec fn selected_tree_frame(
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    symbols: u16,
+) -> bool {
+    &&& before.len() == after.len()
+    &&& forall|i: int| 0 <= i < before.len() ==> {
+        let start = tree_record_at(window_bytes, region, tree, 0);
+        let end = start + symbols as nat * 3;
+        !(start <= i < end) ==> #[trigger] after[i] == before[i]
+    }
+}
+
+proof fn simple_tree_prefix_after_write(
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    alphabet_limit: u16,
+    selector: u8,
+    count: u8,
+    symbols: Seq<u16>,
+    index: u16,
+    record: TreeRecord,
+)
+    requires
+        index < alphabet_limit,
+        simple_tree_prefix(
+            before,
+            window_bytes,
+            region,
+            tree,
+            alphabet_limit,
+            selector,
+            count,
+            symbols,
+            index as nat,
+        ),
+        record == simple_record_for_symbol(selector, count, symbols, index),
+        {
+            let at = tree_record_at(window_bytes, region, tree, index);
+            &&& at + 3 <= before.len()
+            &&& after == before
+                .update(at as int, record.length)
+                .update(at as int + 1, (record.code % 256) as u8)
+                .update(at as int + 2, (record.code / 256) as u8)
+        },
+    ensures simple_tree_prefix(
+        after,
+        window_bytes,
+        region,
+        tree,
+        alphabet_limit,
+        selector,
+        count,
+        symbols,
+        index as nat + 1,
+    ),
+{
+    reveal(simple_tree_prefix);
+    split_builder_u16_is_exact(record.code);
+    assert(index as nat + 1 <= alphabet_limit);
+    assert forall|i: int| 0 <= i < index as int + 1 implies
+        #[trigger] after[tree_record_at(window_bytes, region, tree, i as u16) as int]
+            == simple_record_for_symbol(selector, count, symbols, i as u16).length by {
+        if i < index {
+            assert(tree_record_at(window_bytes, region, tree, i as u16) + 3
+                <= tree_record_at(window_bytes, region, tree, index));
+            assert(before[tree_record_at(window_bytes, region, tree, i as u16) as int]
+                == simple_record_for_symbol(selector, count, symbols, i as u16).length);
+        } else {
+            assert(i == index);
+        }
+    }
+    assert forall|i: int| 0 <= i < index as int + 1 implies
+        #[trigger] little_u16_at(
+            after,
+            tree_record_at(window_bytes, region, tree, i as u16) + 1,
+        ) == simple_record_for_symbol(selector, count, symbols, i as u16).code by {
+        if i < index {
+            assert(tree_record_at(window_bytes, region, tree, i as u16) + 3
+                <= tree_record_at(window_bytes, region, tree, index));
+            assert(little_u16_at(
+                before,
+                tree_record_at(window_bytes, region, tree, i as u16) + 1,
+            ) == simple_record_for_symbol(selector, count, symbols, i as u16).code);
+        } else {
+            assert(i == index);
+        }
+    }
+}
+
+proof fn selected_tree_frame_after_write(
+    original: Seq<u8>,
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    symbols: u16,
+    index: u16,
+    record: TreeRecord,
+)
+    requires
+        index < symbols,
+        selected_tree_frame(original, before, window_bytes, region, tree, symbols),
+        {
+            let at = tree_record_at(window_bytes, region, tree, index);
+            &&& at + 3 <= before.len()
+            &&& after == before
+                .update(at as int, record.length)
+                .update(at as int + 1, (record.code % 256) as u8)
+                .update(at as int + 2, (record.code / 256) as u8)
+        },
+    ensures selected_tree_frame(original, after, window_bytes, region, tree, symbols),
+{
+    reveal(selected_tree_frame);
+}
+
+fn simple_record_exec(
+    selector: u8,
+    count: u8,
+    symbols: &[u16; 4],
+    symbol: u16,
+) -> (r: TreeRecord)
+    requires 1 <= selector <= 4, count as nat == simple_selector_count(selector),
+    ensures r == simple_record_for_symbol(selector, count, symbols@, symbol),
+{
+    if symbol == symbols[0] {
+        if selector == 1 {
+            TreeRecord { length: 1, code: 0 }
+        } else if selector == 2 {
+            TreeRecord { length: 1, code: 0 }
+        } else if selector == 3 {
+            TreeRecord { length: 2, code: 0 }
+        } else {
+            TreeRecord { length: 1, code: 0 }
+        }
+    } else if count > 1 && symbol == symbols[1] {
+        if selector == 1 {
+            TreeRecord { length: 1, code: 1 }
+        } else if selector == 2 {
+            TreeRecord { length: 2, code: 2 }
+        } else if selector == 3 {
+            TreeRecord { length: 2, code: 1 }
+        } else {
+            TreeRecord { length: 2, code: 2 }
+        }
+    } else if count > 2 && symbol == symbols[2] {
+        if selector == 2 {
+            TreeRecord { length: 2, code: 3 }
+        } else if selector == 3 {
+            TreeRecord { length: 2, code: 2 }
+        } else {
+            TreeRecord { length: 3, code: 6 }
+        }
+    } else if count > 3 && symbol == symbols[3] {
+        if selector == 3 {
+            TreeRecord { length: 2, code: 3 }
+        } else {
+            TreeRecord { length: 3, code: 7 }
+        }
+    } else {
+        TreeRecord { length: 0, code: 0 }
+    }
+}
+
+pub(crate) fn install_simple_tree(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    region: TreeRegion,
+    tree: u16,
+    alphabet_limit: u16,
+    selector: u8,
+    count: u8,
+    symbols: [u16; 4],
+) -> (r: Result<TreeMetadata, WorkspaceError>)
+    ensures r.is_ok() ==> {
+        &&& r.unwrap().valid_for(region)
+        &&& r.unwrap().symbols == alphabet_limit
+        &&& (tree as nat) < tree_region_count(region)
+        &&& (alphabet_limit as nat) <= tree_region_symbols(region)
+        &&& if selector == 0 {
+            &&& count == 1
+            &&& r.unwrap().storage == TreeStorageState::Single { symbol: symbols[0] }
+            &&& final(workspace)@ == old(workspace)@
+        } else {
+            &&& 1 <= selector <= 4
+            &&& count as nat == simple_selector_count(selector)
+            &&& r.unwrap().storage == TreeStorageState::Canonical {
+                initialized: alphabet_limit,
+            }
+            &&& simple_tree_prefix(
+                final(workspace)@,
+                window_bytes,
+                region,
+                tree,
+                alphabet_limit,
+                selector,
+                count,
+                symbols@,
+                alphabet_limit as nat,
+            )
+            &&& selected_tree_frame(
+                old(workspace)@,
+                final(workspace)@,
+                window_bytes,
+                region,
+                tree,
+                alphabet_limit,
+            )
+        }
+    },
+    r.is_err() ==> final(workspace)@ == old(workspace)@,
+{
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::WorkspaceTooSmall),
+    };
+    if workspace.len() < required {
+        return Err(WorkspaceError::WorkspaceTooSmall);
+    }
+    let capacity = tree_region_symbols_exec(region);
+    if alphabet_limit == 0 || alphabet_limit > capacity || tree >= tree_region_count_exec(region) {
+        return Err(WorkspaceError::InvalidSymbol);
+    }
+    let expected = if selector <= 2 { selector + 1 } else { 4 };
+    if selector > 4 || count != expected {
+        return Err(WorkspaceError::InvalidCodeLength);
+    }
+    let mut i: u8 = 0;
+    while i < count
+        invariant i <= count <= 4,
+        decreases count - i,
+    {
+        if symbols[i as usize] >= alphabet_limit {
+            return Err(WorkspaceError::InvalidSymbol);
+        }
+        let mut j: u8 = 0;
+        while j < i
+            invariant j <= i < count <= 4,
+            decreases i - j,
+        {
+            if symbols[j as usize] == symbols[i as usize] {
+                return Err(WorkspaceError::InvalidSymbol);
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    if selector == 0 {
+        return TreeMetadata::single(region, alphabet_limit, symbols[0]);
+    }
+    let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {
+        Ok(value) => value,
+        Err(error) => return Err(error),
+    };
+    let ghost before_workspace = workspace@;
+    let mut symbol: u16 = 0;
+    while symbol < alphabet_limit
+        invariant
+            symbol <= alphabet_limit <= tree_region_symbols(region),
+            window_bytes <= 16_777_216,
+            workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat,
+            tree < tree_region_count(region),
+            1 <= selector <= 4,
+            count as nat == simple_selector_count(selector),
+            meta.valid_for(region),
+            meta.symbols == alphabet_limit,
+            meta.storage == (TreeStorageState::Canonical { initialized: symbol }),
+            simple_tree_prefix(
+                workspace@,
+                window_bytes,
+                region,
+                tree,
+                alphabet_limit,
+                selector,
+                count,
+                symbols@,
+                symbol as nat,
+            ),
+            selected_tree_frame(
+                before_workspace,
+                workspace@,
+                window_bytes,
+                region,
+                tree,
+                alphabet_limit,
+            ),
+        decreases alphabet_limit - symbol,
+    {
+        let record = simple_record_exec(selector, count, &symbols, symbol);
+        let ghost before_write = workspace@;
+        match write_next_tree_record(
+            workspace,
+            window_bytes,
+            region,
+            tree,
+            &mut meta,
+            record,
+        ) {
+            Ok(()) => {}
+            Err(error) => return Err(error),
+        }
+        proof {
+            simple_tree_prefix_after_write(
+                before_write,
+                workspace@,
+                window_bytes,
+                region,
+                tree,
+                alphabet_limit,
+                selector,
+                count,
+                symbols@,
+                symbol,
+                record,
+            );
+            selected_tree_frame_after_write(
+                before_workspace,
+                before_write,
+                workspace@,
+                window_bytes,
+                region,
+                tree,
+                alphabet_limit,
+                symbol,
+                record,
+            );
+        }
+        symbol = symbol + 1;
+    }
+    Ok(meta)
+}
+
+pub(crate) open spec fn context_map_values(
+    workspace: Seq<u8>,
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+) -> Seq<u8> {
+    Seq::new(active_len as nat, |i: int| {
+        workspace[(window_bytes as nat + context_map_offset(kind) + i as nat) as int]
+    })
+}
+
+spec fn context_map_suffix_matches(
+    workspace: Seq<u8>,
+    window_bytes: u32,
+    kind: ContextMapKind,
+    ranks: Seq<u8>,
+    start: nat,
+) -> bool {
+    forall|i: int| start <= i < ranks.len()
+        ==> #[trigger] workspace[
+            context_entry_at(window_bytes, kind, i as u16) as int
+        ] == ranks[i]
+}
+
+proof fn context_map_suffix_index(
+    workspace: Seq<u8>,
+    window_bytes: u32,
+    kind: ContextMapKind,
+    ranks: Seq<u8>,
+    start: nat,
+    index: int,
+)
+    requires
+        context_map_suffix_matches(workspace, window_bytes, kind, ranks, start),
+        start <= index < ranks.len(),
+    ensures workspace[context_entry_at(window_bytes, kind, index as u16) as int]
+        == ranks[index],
+{
+    reveal(context_map_suffix_matches);
+}
+
+pub(crate) open spec fn value_seen(values: Seq<u8>, prefix: nat, value: nat) -> bool {
+    exists|i: int| 0 <= i < prefix && values[i] as nat == value
+}
+
+pub(crate) open spec fn context_tree_coverage(values: Seq<u8>, num_htrees: u16) -> bool {
+    forall|tree: int| 0 <= tree < num_htrees
+        ==> #[trigger] value_seen(values, values.len(), tree as nat)
+}
+
+pub(crate) open spec fn byte_has_bit(value: u8, bit: nat) -> bool {
+    if bit == 0 { value % 2 == 1 }
+    else if bit == 1 { (value / 2) % 2 == 1 }
+    else if bit == 2 { (value / 4) % 2 == 1 }
+    else if bit == 3 { (value / 8) % 2 == 1 }
+    else if bit == 4 { (value / 16) % 2 == 1 }
+    else if bit == 5 { (value / 32) % 2 == 1 }
+    else if bit == 6 { (value / 64) % 2 == 1 }
+    else if bit == 7 { (value / 128) % 2 == 1 }
+    else { false }
+}
+
+pub(crate) open spec fn coverage_bitmap_at(window_bytes: u32, byte: u16) -> nat {
+    window_bytes as nat + BUILDER_CODE_LENGTHS_OFFSET as nat + byte as nat
+}
+
+pub(crate) open spec fn coverage_bitmap_represents(
+    workspace: Seq<u8>,
+    window_bytes: u32,
+    values: Seq<u8>,
+    prefix: nat,
+) -> bool {
+    forall|tree: int| 0 <= tree < 256 ==>
+        #[trigger] byte_has_bit(
+            workspace[coverage_bitmap_at(window_bytes, (tree / 8) as u16) as int],
+            (tree % 8) as nat,
+        ) == value_seen(values, prefix, tree as nat)
+}
+
+pub(crate) open spec fn coverage_bitmap_frame(
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+) -> bool {
+    &&& before.len() == after.len()
+    &&& forall|i: int| 0 <= i < before.len()
+        && !(window_bytes as nat + BUILDER_CODE_LENGTHS_OFFSET as nat
+            <= i < window_bytes as nat + BUILDER_CODE_LENGTHS_OFFSET as nat + 32)
+        ==> #[trigger] after[i] == before[i]
+}
+
+proof fn value_seen_step(values: Seq<u8>, prefix: nat, tree: nat)
+    requires prefix < values.len(),
+    ensures value_seen(values, prefix + 1, tree)
+        == (value_seen(values, prefix, tree) || values[prefix as int] as nat == tree),
+{
+    if value_seen(values, prefix + 1, tree) {
+        let witness = choose|i: int| 0 <= i < prefix + 1 && values[i] as nat == tree;
+        if witness < prefix {
+            assert(value_seen(values, prefix, tree));
+        } else {
+            assert(witness == prefix);
+        }
+    }
+}
+
+#[verifier::bit_vector]
+proof fn set_coverage_bit(value: u8, bit: u8)
+    requires bit < 8,
+    ensures byte_has_bit(value | (1u8 << bit), bit as nat),
+{
+}
+
+#[verifier::bit_vector]
+proof fn set_coverage_bit_preserves(value: u8, bit: u8, other: u8)
+    requires bit < 8, other < 8, bit != other,
+    ensures byte_has_bit(value | (1u8 << bit), other as nat)
+        == byte_has_bit(value, other as nat),
+{
+}
+
+#[verifier::bit_vector]
+proof fn coverage_bit_exec_matches(value: u8, bit: u8)
+    requires bit < 8,
+    ensures ((value & (1u8 << bit)) != 0) == byte_has_bit(value, bit as nat),
+{
+}
+
+pub(crate) fn check_context_tree_coverage(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+    num_htrees: u16,
+) -> (r: Result<(bool, u64), WorkspaceError>)
+    requires
+        active_len <= context_map_capacity(kind),
+        1 <= num_htrees <= 256,
+        window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= old(workspace)@.len(),
+        forall|i: int| 0 <= i < active_len
+            ==> #[trigger] old(workspace)@[
+                context_entry_at(window_bytes, kind, i as u16) as int
+            ]
+                < num_htrees,
+    ensures r.is_ok() ==> {
+        let values = context_map_values(old(workspace)@, window_bytes, kind, active_len);
+        &&& r.unwrap().0 == context_tree_coverage(values, num_htrees)
+        &&& r.unwrap().1 == 32u64 + 3u64 * active_len as u64 + num_htrees as u64
+        &&& coverage_bitmap_represents(
+            final(workspace)@,
+            window_bytes,
+            values,
+            active_len as nat,
+        )
+        &&& context_map_values(final(workspace)@, window_bytes, kind, active_len)
+            == values
+        &&& coverage_bitmap_frame(old(workspace)@, final(workspace)@, window_bytes)
+    },
+    r.is_err() ==> final(workspace)@ == old(workspace)@,
+{
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let ghost original_workspace = workspace@;
+    let ghost values = context_map_values(original_workspace, window_bytes, kind, active_len);
+    let bitmap_base_u32 = match window_bytes.checked_add(BUILDER_CODE_LENGTHS_OFFSET) {
+        Some(value) => value,
+        None => return Err(WorkspaceError::InvalidWindowBits),
+    };
+    proof {
+        assert(bitmap_base_u32 as nat
+            == window_bytes as nat + BUILDER_CODE_LENGTHS_OFFSET as nat);
+        assert(bitmap_base_u32 as nat + COVERAGE_BITMAP_BYTES as nat
+            <= workspace@.len());
+        assert(coverage_bitmap_frame(original_workspace, workspace@, window_bytes));
+    }
+    let bitmap_base = bitmap_base_u32 as usize;
+    let mut cleared: u16 = 0;
+    while cleared < COVERAGE_BITMAP_BYTES
+        invariant
+            cleared <= COVERAGE_BITMAP_BYTES,
+            window_bytes <= 16_777_216,
+            workspace@.len() == original_workspace.len(),
+            bitmap_base as nat
+                == window_bytes as nat + BUILDER_CODE_LENGTHS_OFFSET as nat,
+            bitmap_base + COVERAGE_BITMAP_BYTES as usize <= workspace@.len(),
+            forall|byte: int| 0 <= byte < cleared
+                ==> #[trigger] workspace@[
+                    coverage_bitmap_at(window_bytes, byte as u16) as int
+                ] == 0,
+            coverage_bitmap_frame(original_workspace, workspace@, window_bytes),
+        decreases COVERAGE_BITMAP_BYTES - cleared,
+    {
+        let at = bitmap_base + cleared as usize;
+        workspace[at] = 0;
+        cleared = cleared + 1;
+    }
+    proof {
+        assert forall|tree: int| 0 <= tree < 256 implies
+            #[trigger] byte_has_bit(
+                workspace@[
+                    coverage_bitmap_at(window_bytes, (tree / 8) as u16) as int
+                ],
+                (tree % 8) as nat,
+            ) == false by {}
+        assert(coverage_bitmap_represents(workspace@, window_bytes, values, 0));
+    }
+    let mut index: u16 = 0;
+    while index < active_len
+        invariant
+            index <= active_len,
+            active_len <= context_map_capacity(kind),
+            window_bytes <= 16_777_216,
+            workspace@.len() == original_workspace.len(),
+            window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= workspace@.len(),
+            bitmap_base as nat
+                == window_bytes as nat + BUILDER_CODE_LENGTHS_OFFSET as nat,
+            bitmap_base + COVERAGE_BITMAP_BYTES as usize <= workspace@.len(),
+            context_map_values(workspace@, window_bytes, kind, active_len) == values,
+            coverage_bitmap_represents(workspace@, window_bytes, values, index as nat),
+            coverage_bitmap_frame(original_workspace, workspace@, window_bytes),
+        decreases active_len - index,
+    {
+        let map_at = match context_entry_offset(window_bytes, kind, index) {
+            Ok(value) => value,
+            Err(error) => return Err(error),
+        };
+        let value = workspace[map_at];
+        proof {
+            assert(value == values[index as int]);
+        }
+        let byte = value / 8;
+        let bit = value % 8;
+        let bitmap_at = bitmap_base + byte as usize;
+        let old_bitmap = workspace[bitmap_at];
+        let ghost before_bitmap = workspace@;
+        workspace[bitmap_at] = old_bitmap | (1u8 << bit);
+        proof {
+            bitmap_update_preserves_context_map(
+                before_bitmap,
+                workspace@,
+                window_bytes,
+                kind,
+                active_len,
+                byte as u16,
+                old_bitmap | (1u8 << bit),
+            );
+            set_coverage_bit(old_bitmap, bit);
+            assert(context_map_values(workspace@, window_bytes, kind, active_len) == values);
+            assert forall|tree: int| 0 <= tree < 256 implies
+                #[trigger] byte_has_bit(
+                    workspace@[
+                        coverage_bitmap_at(window_bytes, (tree / 8) as u16) as int
+                    ],
+                    (tree % 8) as nat,
+                ) == value_seen(values, index as nat + 1, tree as nat) by {
+                value_seen_step(values, index as nat, tree as nat);
+                if tree != value {
+                    if tree / 8 == value as int / 8 {
+                        set_coverage_bit_preserves(old_bitmap, bit, (tree % 8) as u8);
+                    } else {
+                        assert(coverage_bitmap_at(window_bytes, (tree / 8) as u16)
+                            != coverage_bitmap_at(window_bytes, byte as u16));
+                        assert(workspace@[
+                            coverage_bitmap_at(window_bytes, (tree / 8) as u16) as int
+                        ] == before_bitmap[
+                            coverage_bitmap_at(window_bytes, (tree / 8) as u16) as int
+                        ]);
+                    }
+                } else {
+                    assert(tree as nat == value as nat);
+                }
+            }
+        }
+        index = index + 1;
+    }
+    let mut complete = true;
+    let mut tree: u16 = 0;
+    while tree < num_htrees
+        invariant
+            tree <= num_htrees <= 256,
+            bitmap_base as nat
+                == window_bytes as nat + BUILDER_CODE_LENGTHS_OFFSET as nat,
+            bitmap_base + COVERAGE_BITMAP_BYTES as usize <= workspace@.len(),
+            complete ==> (forall|t: int| 0 <= t < tree
+                ==> #[trigger] value_seen(values, active_len as nat, t as nat)),
+            !complete ==> (exists|t: int| 0 <= t < tree
+                && !#[trigger] value_seen(values, active_len as nat, t as nat)),
+            coverage_bitmap_represents(workspace@, window_bytes, values, active_len as nat),
+        decreases num_htrees - tree,
+    {
+        let ghost old_tree = tree;
+        let ghost old_complete = complete;
+        let byte = tree / 8;
+        let bit = (tree % 8) as u8;
+        let bitmap_at = bitmap_base + byte as usize;
+        let present = workspace[bitmap_at] & (1u8 << bit) != 0;
+        proof {
+            assert(bitmap_at as nat == coverage_bitmap_at(window_bytes, byte));
+            assert(byte as nat == tree as nat / 8);
+            assert(bit as nat == tree as nat % 8);
+            reveal(coverage_bitmap_represents);
+            assert(byte_has_bit(
+                workspace@[
+                    coverage_bitmap_at(
+                        window_bytes,
+                        ((tree as int) / 8) as u16,
+                    ) as int
+                ],
+                ((tree as int) % 8) as nat,
+            ) == value_seen(values, active_len as nat, tree as nat));
+            coverage_bit_exec_matches(workspace@[bitmap_at as int], bit);
+            assert(byte_has_bit(
+                workspace@[coverage_bitmap_at(window_bytes, byte) as int],
+                bit as nat,
+            ) == value_seen(values, active_len as nat, tree as nat));
+            assert(present == value_seen(values, active_len as nat, tree as nat));
+        }
+        complete = complete && present;
+        tree = tree + 1;
+        proof {
+            assert(complete == (old_complete
+                && value_seen(values, active_len as nat, old_tree as nat)));
+            if complete {
+                assert forall|t: int| 0 <= t < tree implies
+                    #[trigger] value_seen(values, active_len as nat, t as nat) by {
+                    if t < old_tree {
+                        assert(old_complete);
+                    } else {
+                        assert(t == old_tree);
+                    }
+                }
+            } else if old_complete {
+                assert(!value_seen(values, active_len as nat, old_tree as nat));
+                assert(0 <= (old_tree as int) < (tree as int));
+                assert(exists|t: int| 0 <= t < tree
+                    && !#[trigger] value_seen(values, active_len as nat, t as nat)) by {
+                    let witness = old_tree as int;
+                    assert(0 <= witness < tree);
+                    assert(!value_seen(values, active_len as nat, witness as nat));
+                }
+            } else {
+                let missing = choose|t: int| 0 <= t < old_tree
+                    && !#[trigger] value_seen(values, active_len as nat, t as nat);
+                assert(0 <= missing < tree);
+                assert(!value_seen(values, active_len as nat, missing as nat));
+                assert(exists|t: int| 0 <= t < tree
+                    && !#[trigger] value_seen(values, active_len as nat, t as nat));
+                }
+        }
+    }
+    proof {
+        reveal(context_tree_coverage);
+        assert(complete == context_tree_coverage(values, num_htrees));
+    }
+    Ok((complete, 32u64 + 3u64 * active_len as u64 + num_htrees as u64))
+}
+
+pub(crate) open spec fn mtf_list_at(window_bytes: u32, index: u16) -> nat {
+    window_bytes as nat + MTF_LIST_OFFSET as nat + index as nat
+}
+
+pub(crate) open spec fn mtf_scratch_at(window_bytes: u32) -> nat {
+    window_bytes as nat + MTF_OFFSET as nat + 3
+}
+
+pub(crate) open spec fn mtf_list_values(
+    workspace: Seq<u8>,
+    window_bytes: u32,
+) -> Seq<u8> {
+    Seq::new(256, |i: int| workspace[mtf_list_at(window_bytes, i as u16) as int])
+}
+
+proof fn mtf_list_values_index(workspace: Seq<u8>, window_bytes: u32, index: u16)
+    requires
+        index < 256,
+        window_bytes as nat + MTF_LIST_OFFSET as nat + 256 <= workspace.len(),
+    ensures mtf_list_values(workspace, window_bytes)[index as int]
+        == workspace[mtf_list_at(window_bytes, index) as int],
+{
+}
+
+proof fn context_map_values_index(
+    workspace: Seq<u8>,
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+    index: u16,
+)
+    requires
+        index < active_len,
+        window_bytes as nat + context_map_offset(kind) + active_len as nat
+            <= workspace.len(),
+    ensures context_map_values(workspace, window_bytes, kind, active_len)[index as int]
+        == workspace[context_entry_at(window_bytes, kind, index) as int],
+{
+}
+
+pub(crate) open spec fn mtf_identity() -> Seq<u8> {
+    Seq::new(256, |i: int| i as u8)
+}
+
+pub(crate) open spec fn mtf_move_front(list: Seq<u8>, rank: u8) -> Seq<u8> {
+    Seq::new(256, |i: int|
+        if i == 0 { list[rank as int] }
+        else if i <= rank { list[i - 1] }
+        else { list[i] })
+}
+
+pub(crate) open spec fn mtf_output_values(ranks: Seq<u8>, list: Seq<u8>) -> Seq<u8>
+    decreases ranks.len(),
+{
+    if ranks.len() == 0 {
+        Seq::empty()
+    } else {
+        seq![list[ranks[0] as int]]
+            + mtf_output_values(ranks.skip(1), mtf_move_front(list, ranks[0]))
+    }
+}
+
+pub(crate) open spec fn mtf_final_list(ranks: Seq<u8>, list: Seq<u8>) -> Seq<u8>
+    decreases ranks.len(),
+{
+    if ranks.len() == 0 {
+        list
+    } else {
+        mtf_final_list(ranks.skip(1), mtf_move_front(list, ranks[0]))
+    }
+}
+
+pub(crate) open spec fn mtf_prefix_or(ranks: Seq<u8>, prefix: nat) -> u8
+    decreases prefix,
+{
+    if prefix == 0 { 0 }
+    else { mtf_prefix_or(ranks, (prefix - 1) as nat) | ranks[prefix as int - 1] }
+}
+
+pub(crate) open spec fn mtf_rank_or(ranks: Seq<u8>) -> u8 {
+    mtf_prefix_or(ranks, ranks.len())
+}
+
+pub(crate) open spec fn mtf_rank_work(ranks: Seq<u8>) -> nat
+    decreases ranks.len(),
+{
+    if ranks.len() == 0 {
+        0
+    } else {
+        2 * ranks[0] as nat + 6 + mtf_rank_work(ranks.skip(1))
+    }
+}
+
+pub(crate) open spec fn mtf_list_distinct(list: Seq<u8>) -> bool {
+    &&& list.len() == 256
+    &&& forall|i: int, j: int| 0 <= i < j < 256 ==> list[i] != list[j]
+}
+
+pub(crate) open spec fn mtf_reusable(list: Seq<u8>, upper_bound: u8) -> bool {
+    &&& upper_bound <= 63
+    &&& mtf_list_distinct(list)
+    &&& forall|i: int| 4 * (upper_bound as int + 1) <= i < 256
+        ==> #[trigger] list[i] == i as u8
+}
+
+pub(crate) open spec fn mtf_workspace_frame(
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+) -> bool {
+    &&& before.len() == after.len()
+    &&& forall|i: int| 0 <= i < before.len() ==> {
+        let map_start = window_bytes as nat + context_map_offset(kind);
+        let map_end = map_start + active_len as nat;
+        let mtf_start = mtf_scratch_at(window_bytes);
+        let mtf_end = window_bytes as nat + MTF_OFFSET as nat + MTF_BYTES as nat;
+        !(map_start <= i < map_end || mtf_start <= i < mtf_end)
+            ==> #[trigger] after[i] == before[i]
+    }
+}
+
+proof fn mtf_identity_distinct()
+    ensures mtf_list_distinct(mtf_identity()),
+{
+    reveal(mtf_list_distinct);
+}
+
+proof fn mtf_move_front_preserves_distinct(list: Seq<u8>, rank: u8)
+    requires mtf_list_distinct(list),
+    ensures mtf_list_distinct(mtf_move_front(list, rank)),
+{
+    reveal(mtf_list_distinct);
+    assert forall|i: int, j: int| 0 <= i < j < 256 implies
+        mtf_move_front(list, rank)[i] != mtf_move_front(list, rank)[j] by {
+        if i == 0 {
+            if j <= rank {
+                assert(j - 1 < rank);
+            } else {
+                assert(rank < j);
+            }
+        } else if i <= rank {
+            if j <= rank {
+                assert(i - 1 < j - 1);
+            } else {
+                assert(i - 1 < j);
+            }
+        }
+    }
+}
+
+proof fn mtf_prefix_or_contains(ranks: Seq<u8>, prefix: nat, index: int)
+    requires 0 <= index < prefix <= ranks.len(),
+    ensures (ranks[index] | mtf_prefix_or(ranks, prefix)) == mtf_prefix_or(ranks, prefix),
+    decreases prefix,
+{
+    if index < prefix - 1 {
+        mtf_prefix_or_contains(ranks, (prefix - 1) as nat, index);
+        mtf_or_absorb_append(
+            ranks[index],
+            mtf_prefix_or(ranks, (prefix - 1) as nat),
+            ranks[prefix as int - 1],
+        );
+    } else {
+        assert(index == prefix - 1);
+        mtf_or_last_absorbs(
+            ranks[index],
+            mtf_prefix_or(ranks, (prefix - 1) as nat),
+        );
+    }
+    reveal_with_fuel(mtf_prefix_or, 2);
+}
+
+#[verifier::bit_vector]
+proof fn mtf_or_absorb_append(value: u8, prefix: u8, last: u8)
+    requires value | prefix == prefix,
+    ensures value | (prefix | last) == prefix | last,
+{
+}
+
+#[verifier::bit_vector]
+proof fn mtf_or_last_absorbs(last: u8, prefix: u8)
+    ensures last | (prefix | last) == prefix | last,
+{
+}
+
+proof fn mtf_or_contains_rank(ranks: Seq<u8>, index: int)
+    requires 0 <= index < ranks.len(),
+    ensures (ranks[index] | mtf_rank_or(ranks)) == mtf_rank_or(ranks),
+{
+    mtf_prefix_or_contains(ranks, ranks.len(), index);
+}
+
+#[verifier::bit_vector]
+proof fn mtf_or_head_absorbs(head: u8, tail: u8)
+    ensures head | (head | tail) == head | tail,
+{
+}
+
+#[verifier::bit_vector]
+proof fn mtf_or_absorb_through_head(value: u8, head: u8, tail: u8)
+    requires value | tail == tail,
+    ensures value | (head | tail) == head | tail,
+{
+}
+
+#[verifier::bit_vector]
+proof fn mtf_or_is_at_least(value: u8, combined: u8)
+    requires value | combined == combined,
+    ensures value <= combined,
+{
+}
+
+spec fn mtf_region_frame(
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+) -> bool {
+    &&& before.len() == after.len()
+    &&& forall|i: int| 0 <= i < before.len()
+        && !(mtf_scratch_at(window_bytes) <= i
+            < window_bytes as nat + MTF_OFFSET as nat + MTF_BYTES as nat)
+        ==> #[trigger] after[i] == before[i]
+}
+
+#[verifier::bit_vector]
+proof fn mtf_list_offset_fits_u32(window_bytes: u32, index: u16)
+    requires window_bytes <= 16_777_216, index < 256,
+    ensures window_bytes as nat + MTF_LIST_OFFSET as nat + index as nat <= u32::MAX,
+{
+}
+
+proof fn mtf_region_frame_after_update(
+    original: Seq<u8>,
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+    at: int,
+    value: u8,
+)
+    requires
+        mtf_region_frame(original, before, window_bytes),
+        mtf_scratch_at(window_bytes) <= at
+            < window_bytes as nat + MTF_OFFSET as nat + MTF_BYTES as nat,
+        0 <= at < before.len(),
+        after == before.update(at, value),
+    ensures mtf_region_frame(original, after, window_bytes),
+{
+    reveal(mtf_region_frame);
+}
+
+proof fn mtf_workspace_frame_after_update(
+    original: Seq<u8>,
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+    at: int,
+    value: u8,
+)
+    requires
+        mtf_workspace_frame(original, before, window_bytes, kind, active_len),
+        0 <= at < before.len(),
+        {
+            let map_start = window_bytes as nat + context_map_offset(kind);
+            let map_end = map_start + active_len as nat;
+            let mtf_start = mtf_scratch_at(window_bytes);
+            let mtf_end = window_bytes as nat + MTF_OFFSET as nat + MTF_BYTES as nat;
+            &&& map_start <= at < map_end || mtf_start <= at < mtf_end
+        },
+        after == before.update(at, value),
+    ensures mtf_workspace_frame(original, after, window_bytes, kind, active_len),
+{
+    reveal(mtf_workspace_frame);
+}
+
+proof fn mtf_workspace_frame_after_mtf_region(
+    original: Seq<u8>,
+    before: Seq<u8>,
+    after: Seq<u8>,
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+)
+    requires
+        mtf_workspace_frame(original, before, window_bytes, kind, active_len),
+        mtf_region_frame(before, after, window_bytes),
+    ensures mtf_workspace_frame(original, after, window_bytes, kind, active_len),
+{
+    reveal(mtf_workspace_frame);
+    reveal(mtf_region_frame);
+}
+
+fn mtf_move_rank(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    rank: u8,
+) -> (r: u8)
+    requires
+        window_bytes <= 16_777_216,
+        window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= old(workspace)@.len(),
+    ensures
+        r == mtf_list_values(old(workspace)@, window_bytes)[rank as int],
+        final(workspace)@[mtf_scratch_at(window_bytes) as int] == r,
+        mtf_list_values(final(workspace)@, window_bytes)
+            == mtf_move_front(mtf_list_values(old(workspace)@, window_bytes), rank),
+        mtf_region_frame(old(workspace)@, final(workspace)@, window_bytes),
+{
+    let ghost before = workspace@;
+    let ghost old_list = mtf_list_values(before, window_bytes);
+    let list_base = (window_bytes + MTF_LIST_OFFSET) as usize;
+    let scratch = (window_bytes + MTF_OFFSET + 3) as usize;
+    proof {
+        fixed_layout_is_exact();
+        assert(scratch + 1 == list_base);
+        assert(list_base as nat == window_bytes as nat + MTF_LIST_OFFSET as nat);
+        assert(list_base as nat + 256
+            == window_bytes as nat + MTF_OFFSET as nat + MTF_BYTES as nat);
+        assert(list_base + 256 <= workspace@.len());
+        assert(window_bytes as nat + MTF_LIST_OFFSET as nat + 256 <= before.len());
+        assert(mtf_region_frame(before, workspace@, window_bytes));
+        mtf_list_values_index(before, window_bytes, rank as u16);
+    }
+    let value = workspace[list_base + rank as usize];
+    let ghost before_scratch = workspace@;
+    workspace[scratch] = value;
+    proof {
+        mtf_region_frame_after_update(
+            before,
+            before_scratch,
+            workspace@,
+            window_bytes,
+            scratch as int,
+            value,
+        );
+    }
+    let mut cursor: u16 = rank as u16;
+    while cursor > 0
+        invariant
+            cursor <= rank,
+            window_bytes <= 16_777_216,
+            workspace@.len() == before.len(),
+            scratch + 1 == list_base,
+            list_base as nat == window_bytes as nat + MTF_LIST_OFFSET as nat,
+            list_base as nat + 256
+                == window_bytes as nat + MTF_OFFSET as nat + MTF_BYTES as nat,
+            list_base + 256 <= workspace@.len(),
+            workspace@[scratch as int] == value,
+            value == old_list[rank as int],
+            forall|i: int| 0 <= i <= cursor
+                ==> #[trigger] workspace@[(list_base + i) as int] == old_list[i],
+            forall|i: int| cursor < i <= rank
+                ==> #[trigger] workspace@[(list_base + i) as int] == old_list[i - 1],
+            forall|i: int| rank < i < 256
+                ==> #[trigger] workspace@[(list_base + i) as int] == old_list[i],
+            mtf_region_frame(before, workspace@, window_bytes),
+        decreases cursor,
+    {
+        let ghost old_cursor = cursor;
+        let ghost before_write = workspace@;
+        let source_index = (cursor - 1) as usize;
+        proof {
+            assert(0 <= old_cursor as int - 1 <= cursor);
+            assert(source_index as int == old_cursor as int - 1);
+            assert(source_index < 256);
+        }
+        proof {
+            mtf_list_offset_fits_u32(window_bytes, source_index as u16);
+        }
+        let source_at = (window_bytes + MTF_LIST_OFFSET + source_index as u32) as usize;
+        proof {
+            assert(source_at == list_base + source_index);
+            assert(source_at < workspace@.len());
+        }
+        let source = workspace[source_at];
+        proof {
+            assert(source_at == list_base + source_index);
+            assert(before_write[source_at as int]
+                == old_list[source_index as int]);
+        }
+        workspace[list_base + cursor as usize] = source;
+        cursor = cursor - 1;
+        proof {
+            assert(source == old_list[old_cursor as int - 1]);
+            assert(workspace@[scratch as int] == value);
+            assert forall|i: int| cursor < i <= rank implies
+                #[trigger] workspace@[(list_base + i) as int] == old_list[i - 1] by {
+                if i == old_cursor {
+                    assert(workspace@[(list_base + i) as int] == source);
+                } else {
+                    assert(before_write[(list_base + i) as int] == old_list[i - 1]);
+                }
+            }
+            let dest_at = (list_base + old_cursor as usize) as int;
+            let mtf_end = window_bytes as int + MTF_OFFSET as int + MTF_BYTES as int;
+            assert((mtf_scratch_at(window_bytes) as int) <= dest_at);
+            assert(dest_at < mtf_end);
+            mtf_region_frame_after_update(
+                before,
+                before_write,
+                workspace@,
+                window_bytes,
+                (list_base + old_cursor as usize) as int,
+                source,
+            );
+        }
+    }
+    let front = workspace[scratch];
+    let ghost before_front = workspace@;
+    workspace[list_base] = front;
+    proof {
+        mtf_region_frame_after_update(
+            before,
+            before_front,
+            workspace@,
+            window_bytes,
+            list_base as int,
+            front,
+        );
+        assert(mtf_list_values(workspace@, window_bytes) =~= mtf_move_front(old_list, rank));
+    }
+    value
+}
+
+proof fn mtf_append_one(ranks: Seq<u8>, list: Seq<u8>, rank: u8)
+    ensures
+        mtf_final_list(ranks + seq![rank], list)
+            == mtf_move_front(mtf_final_list(ranks, list), rank),
+        mtf_output_values(ranks + seq![rank], list)
+            == mtf_output_values(ranks, list)
+                + seq![mtf_final_list(ranks, list)[rank as int]],
+        mtf_rank_work(ranks + seq![rank]) == mtf_rank_work(ranks) + 2 * rank as nat + 6,
+    decreases ranks.len(),
+{
+    if ranks.len() > 0 {
+        mtf_append_one(ranks.skip(1), mtf_move_front(list, ranks[0]), rank);
+        assert((ranks + seq![rank]).skip(1) =~= ranks.skip(1) + seq![rank]);
+        reveal_with_fuel(mtf_final_list, 2);
+        reveal_with_fuel(mtf_output_values, 2);
+        reveal_with_fuel(mtf_rank_work, 2);
+    } else {
+        assert(ranks =~= Seq::<u8>::empty());
+        reveal_with_fuel(mtf_final_list, 2);
+        reveal_with_fuel(mtf_output_values, 2);
+        reveal_with_fuel(mtf_rank_work, 2);
+    }
+}
+
+#[verifier::bit_vector]
+proof fn mtf_or_append_associative(head: u8, tail: u8, last: u8)
+    ensures head | (tail | last) == (head | tail) | last,
+{
+}
+
+proof fn mtf_final_list_distinct(ranks: Seq<u8>, list: Seq<u8>)
+    requires mtf_list_distinct(list),
+    ensures mtf_list_distinct(mtf_final_list(ranks, list)),
+    decreases ranks.len(),
+{
+    if ranks.len() > 0 {
+        mtf_move_front_preserves_distinct(list, ranks[0]);
+        mtf_final_list_distinct(ranks.skip(1), mtf_move_front(list, ranks[0]));
+    }
+}
+
+proof fn mtf_move_front_preserves_suffix(list: Seq<u8>, rank: u8, start: nat)
+    requires list.len() == 256, (rank as nat) < start <= 256,
+    ensures forall|i: int| start <= i < 256
+        ==> #[trigger] mtf_move_front(list, rank)[i] == list[i],
+{
+}
+
+proof fn mtf_final_list_preserves_suffix(ranks: Seq<u8>, list: Seq<u8>, start: nat)
+    requires
+        list.len() == 256,
+        start <= 256,
+        forall|j: int| 0 <= j < ranks.len() ==> (ranks[j] as nat) < start,
+    ensures forall|i: int| start <= i < 256
+        ==> #[trigger] mtf_final_list(ranks, list)[i] == list[i],
+    decreases ranks.len(),
+{
+    if ranks.len() > 0 {
+        mtf_move_front_preserves_suffix(list, ranks[0], start);
+        assert forall|j: int| 0 <= j < ranks.skip(1).len()
+            implies (ranks.skip(1)[j] as nat) < start by {}
+        mtf_final_list_preserves_suffix(ranks.skip(1), mtf_move_front(list, ranks[0]), start);
+        reveal_with_fuel(mtf_final_list, 2);
+        assert forall|i: int| start <= i < 256 implies
+            #[trigger] mtf_final_list(ranks, list)[i] == list[i] by {
+            assert(mtf_final_list(
+                ranks.skip(1),
+                mtf_move_front(list, ranks[0]),
+            )[i] == mtf_move_front(list, ranks[0])[i]);
+            assert(mtf_move_front(list, ranks[0])[i] == list[i]);
+        }
+    } else {
+        reveal_with_fuel(mtf_final_list, 2);
+    }
+}
+
+#[verifier::bit_vector]
+proof fn mtf_rank_below_returned_boundary(rank: u8, combined: u8)
+    requires rank | combined == combined,
+    ensures (rank as nat) < 4 * ((combined >> 2) as nat + 1),
+{
+}
+
+#[verifier::bit_vector]
+proof fn mtf_returned_bound_is_valid(combined: u8)
+    ensures (combined >> 2) <= 63,
+{
+}
+
+spec fn mtf_prefix_bounded(list: Seq<u8>, num_htrees: u16) -> bool {
+    &&& list.len() == 256
+    &&& 1 <= num_htrees <= 256
+    &&& forall|i: int| 0 <= i < num_htrees ==> list[i] < num_htrees
+}
+
+proof fn mtf_identity_prefix_bounded(num_htrees: u16)
+    requires 1 <= num_htrees <= 256,
+    ensures mtf_prefix_bounded(mtf_identity(), num_htrees),
+{
+    reveal(mtf_prefix_bounded);
+}
+
+proof fn mtf_move_front_prefix_bounded(list: Seq<u8>, rank: u8, num_htrees: u16)
+    requires mtf_prefix_bounded(list, num_htrees), rank < num_htrees,
+    ensures mtf_prefix_bounded(mtf_move_front(list, rank), num_htrees),
+{
+    reveal(mtf_prefix_bounded);
+    assert forall|i: int| 0 <= i < num_htrees implies
+        #[trigger] mtf_move_front(list, rank)[i] < num_htrees by {
+        if i == 0 {
+        } else if i <= rank {
+            assert(0 <= i - 1 < num_htrees);
+        }
+    }
+}
+
+proof fn mtf_output_stays_bounded(ranks: Seq<u8>, list: Seq<u8>, num_htrees: u16)
+    requires
+        mtf_prefix_bounded(list, num_htrees),
+        forall|i: int| 0 <= i < ranks.len() ==> ranks[i] < num_htrees,
+    ensures
+        forall|i: int| 0 <= i < mtf_output_values(ranks, list).len()
+            ==> #[trigger] mtf_output_values(ranks, list)[i] < num_htrees,
+        mtf_prefix_bounded(mtf_final_list(ranks, list), num_htrees),
+    decreases ranks.len(),
+{
+    if ranks.len() > 0 {
+        mtf_move_front_prefix_bounded(list, ranks[0], num_htrees);
+        assert forall|i: int| 0 <= i < ranks.skip(1).len()
+            implies ranks.skip(1)[i] < num_htrees by {}
+        mtf_output_stays_bounded(
+            ranks.skip(1),
+            mtf_move_front(list, ranks[0]),
+            num_htrees,
+        );
+        reveal_with_fuel(mtf_output_values, 2);
+        reveal_with_fuel(mtf_final_list, 2);
+        assert(list[ranks[0] as int] < num_htrees);
+        assert forall|i: int| 0 <= i < mtf_output_values(ranks, list).len()
+            implies #[trigger] mtf_output_values(ranks, list)[i] < num_htrees by {
+            if i > 0 {
+                assert(mtf_output_values(ranks, list)[i]
+                    == mtf_output_values(
+                        ranks.skip(1),
+                        mtf_move_front(list, ranks[0]),
+                    )[i - 1]);
+            }
+        }
+    }
+}
+
+pub(crate) fn inverse_mtf_context_map(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    kind: ContextMapKind,
+    active_len: u16,
+    num_htrees: u16,
+    mtf_upper_bound: u8,
+) -> (r: Result<(u8, u64), WorkspaceError>)
+    requires
+        active_len <= context_map_capacity(kind),
+        1 <= num_htrees <= 256,
+        window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= old(workspace)@.len(),
+        forall|i: int| 0 <= i < active_len
+            ==> #[trigger] old(workspace)@[
+                context_entry_at(window_bytes, kind, i as u16) as int
+            ] < num_htrees,
+        mtf_upper_bound <= 63,
+        mtf_upper_bound == 63
+            || mtf_reusable(mtf_list_values(old(workspace)@, window_bytes), mtf_upper_bound),
+    ensures
+        r.is_ok() ==> {
+            let ranks = context_map_values(old(workspace)@, window_bytes, kind, active_len);
+            let next_bound = mtf_rank_or(ranks) >> 2;
+            &&& r.unwrap().0 == next_bound
+            &&& r.unwrap().1 as nat
+                == 4 * (mtf_upper_bound as nat + 1) + mtf_rank_work(ranks)
+            &&& context_map_values(final(workspace)@, window_bytes, kind, active_len)
+                == mtf_output_values(ranks, mtf_identity())
+            &&& forall|i: int| 0 <= i < active_len
+                ==> #[trigger] final(workspace)@[
+                    context_entry_at(window_bytes, kind, i as u16) as int
+                ] < num_htrees
+            &&& mtf_list_values(final(workspace)@, window_bytes)
+                == mtf_final_list(ranks, mtf_identity())
+            &&& mtf_reusable(
+                mtf_list_values(final(workspace)@, window_bytes),
+                next_bound,
+            )
+            &&& mtf_workspace_frame(
+                old(workspace)@,
+                final(workspace)@,
+                window_bytes,
+                kind,
+                active_len,
+            )
+        },
+        r.is_err() ==> final(workspace)@ == old(workspace)@,
+{
+    if window_bytes > 16_777_216 {
+        return Err(WorkspaceError::InvalidWindowBits);
+    }
+    let ghost original_workspace = workspace@;
+    let ghost ranks = context_map_values(original_workspace, window_bytes, kind, active_len);
+    let list_base = (window_bytes + MTF_LIST_OFFSET) as usize;
+    let init_limit: u16 = 4 * (mtf_upper_bound as u16 + 1);
+    proof {
+        assert(mtf_upper_bound <= 63);
+        assert(init_limit as nat == 4 * (mtf_upper_bound as nat + 1));
+        assert(init_limit <= 256);
+        fixed_layout_is_exact();
+        assert(list_base as nat == window_bytes as nat + MTF_LIST_OFFSET as nat);
+        assert(list_base as nat + 256
+            == window_bytes as nat + MTF_OFFSET as nat + MTF_BYTES as nat);
+        assert(list_base + 256 <= workspace@.len());
+        if mtf_upper_bound < 63 {
+            reveal(mtf_reusable);
+            reveal(mtf_list_values);
+            assert forall|i: int| init_limit <= i < 256 implies
+                #[trigger] workspace@[(list_base + i) as int] == i as u8 by {
+                mtf_list_values_index(original_workspace, window_bytes, i as u16);
+            }
+        } else {
+            assert(init_limit == 256);
+        }
+        assert(mtf_workspace_frame(
+            original_workspace,
+            workspace@,
+            window_bytes,
+            kind,
+            active_len,
+        ));
+        assert(mtf_region_frame(original_workspace, workspace@, window_bytes));
+    }
+    let mut init: u16 = 0;
+    while init < init_limit
+        invariant
+            init <= init_limit <= 256,
+            init_limit == 4 * (mtf_upper_bound as u16 + 1),
+            mtf_upper_bound <= 63,
+            workspace@.len() == original_workspace.len(),
+            list_base + 256 <= workspace@.len(),
+            list_base as nat == window_bytes as nat + MTF_LIST_OFFSET as nat,
+            list_base as nat + 256
+                == window_bytes as nat + MTF_OFFSET as nat + MTF_BYTES as nat,
+            window_bytes <= 16_777_216,
+            window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= workspace@.len(),
+            forall|i: int| 0 <= i < init
+                ==> #[trigger] workspace@[(list_base + i) as int] == i as u8,
+            forall|i: int| init_limit <= i < 256
+                ==> #[trigger] workspace@[(list_base + i) as int] == i as u8,
+            mtf_workspace_frame(
+                original_workspace,
+                workspace@,
+                window_bytes,
+                kind,
+                active_len,
+            ),
+            mtf_region_frame(original_workspace, workspace@, window_bytes),
+        decreases init_limit - init,
+    {
+        let ghost before_init_write = workspace@;
+        workspace[list_base + init as usize] = init as u8;
+        init = init + 1;
+        proof {
+            let dest_at = (list_base + init as usize - 1) as int;
+            let mtf_end = window_bytes as int + MTF_OFFSET as int + MTF_BYTES as int;
+            assert((mtf_scratch_at(window_bytes) as int) <= dest_at);
+            assert(dest_at < mtf_end);
+            mtf_region_frame_after_update(
+                original_workspace,
+                before_init_write,
+                workspace@,
+                window_bytes,
+                (list_base + init as usize - 1) as int,
+                (init - 1) as u8,
+            );
+            mtf_workspace_frame_after_update(
+                original_workspace,
+                before_init_write,
+                workspace@,
+                window_bytes,
+                kind,
+                active_len,
+                (list_base + init as usize - 1) as int,
+                (init - 1) as u8,
+            );
+        }
+    }
+    proof {
+        assert(mtf_list_values(workspace@, window_bytes) =~= mtf_identity());
+        mtf_identity_distinct();
+        assert(ranks.len() == active_len);
+        assert forall|i: int| 0 <= i < active_len implies
+            #[trigger] workspace@[
+                context_entry_at(window_bytes, kind, i as u16) as int
+            ] == ranks[i] by {
+            context_map_values_index(original_workspace, window_bytes, kind, active_len, i as u16);
+            assert(workspace@[
+                context_entry_at(window_bytes, kind, i as u16) as int
+            ] == original_workspace[
+                context_entry_at(window_bytes, kind, i as u16) as int
+            ]);
+        }
+        assert(context_map_suffix_matches(
+            workspace@,
+            window_bytes,
+            kind,
+            ranks,
+            0,
+        ));
+    }
+    let ghost initialized_workspace = workspace@;
+    let mut index: u16 = 0;
+    let mut rank_or: u8 = 0;
+    let mut work: u64 = init_limit as u64;
+    while index < active_len
+        invariant
+            index <= active_len,
+            active_len <= context_map_capacity(kind),
+            ranks.len() == active_len,
+            init_limit <= 256,
+            workspace@.len() == original_workspace.len(),
+            window_bytes <= 16_777_216,
+            window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= workspace@.len(),
+            context_map_values(workspace@, window_bytes, kind, index)
+                == mtf_output_values(ranks.take(index as int), mtf_identity()),
+            context_map_suffix_matches(
+                workspace@,
+                window_bytes,
+                kind,
+                ranks,
+                index as nat,
+            ),
+            mtf_list_values(workspace@, window_bytes)
+                == mtf_final_list(ranks.take(index as int), mtf_identity()),
+            rank_or == mtf_prefix_or(ranks, index as nat),
+            work as nat == init_limit as nat + mtf_rank_work(ranks.take(index as int)),
+            work <= init_limit as u64 + 516 * index as u64,
+            work <= 8_454_400,
+            mtf_workspace_frame(
+                original_workspace,
+                workspace@,
+                window_bytes,
+                kind,
+                active_len,
+            ),
+        decreases active_len - index,
+    {
+        let ghost old_index = index;
+        let ghost before_move = workspace@;
+        let map_at = match context_entry_offset(window_bytes, kind, index) {
+            Ok(value) => value,
+            Err(error) => return Err(error),
+        };
+        let rank = workspace[map_at];
+        proof {
+            assert(index < active_len);
+            assert((index as int) < ranks.len());
+            context_map_values_index(original_workspace, window_bytes, kind, active_len, index);
+            reveal(context_map_suffix_matches);
+            context_map_suffix_index(
+                workspace@,
+                window_bytes,
+                kind,
+                ranks,
+                index as nat,
+                index as int,
+            );
+            assert(workspace@[
+                context_entry_at(window_bytes, kind, index) as int
+            ] == ranks[index as int]);
+            assert(map_at as nat == context_entry_at(window_bytes, kind, index));
+            assert(rank == ranks[index as int]);
+        }
+        let value = mtf_move_rank(workspace, window_bytes, rank);
+        let ghost after_move = workspace@;
+        proof {
+            mtf_workspace_frame_after_mtf_region(
+                original_workspace,
+                before_move,
+                after_move,
+                window_bytes,
+                kind,
+                active_len,
+            );
+        }
+        workspace[map_at] = value;
+        proof {
+            mtf_workspace_frame_after_update(
+                original_workspace,
+                after_move,
+                workspace@,
+                window_bytes,
+                kind,
+                active_len,
+                map_at as int,
+                value,
+            );
+            assert(context_map_suffix_matches(
+                workspace@,
+                window_bytes,
+                kind,
+                ranks,
+                index as nat + 1,
+            ));
+        }
+        rank_or = rank_or | rank;
+        work = work + 2 * rank as u64 + 6;
+        index = index + 1;
+        proof {
+            assert(old_index < ranks.len());
+            mtf_append_one(ranks.take(old_index as int), mtf_identity(), rank);
+            assert(ranks.take(index as int).len() == index);
+            assert(ranks.take(index as int)
+                =~= ranks.take(old_index as int) + seq![rank]);
+            assert(context_map_values(workspace@, window_bytes, kind, index)
+                == mtf_output_values(ranks.take(index as int), mtf_identity()));
+            assert(mtf_list_values(workspace@, window_bytes)
+                == mtf_final_list(ranks.take(index as int), mtf_identity()));
+            reveal_with_fuel(mtf_prefix_or, 2);
+            assert(rank_or == mtf_prefix_or(ranks, index as nat));
+            assert(work as nat
+                == init_limit as nat + mtf_rank_work(ranks.take(index as int)));
+            assert(work <= init_limit as u64 + 516 * index as u64);
+            assert(init_limit <= 256);
+            assert(active_len <= 16_384);
+            assert(work <= 8_454_400);
+            assert(mtf_workspace_frame(
+                original_workspace,
+                before_move,
+                window_bytes,
+                kind,
+                active_len,
+            ));
+        }
+    }
+    let next_bound = rank_or >> 2;
+    proof {
+        assert(ranks.take(index as int) =~= ranks);
+        assert(index as nat == ranks.len());
+        assert(rank_or == mtf_rank_or(ranks));
+        mtf_identity_prefix_bounded(num_htrees);
+        assert forall|i: int| 0 <= i < ranks.len() implies ranks[i] < num_htrees by {
+            context_map_values_index(
+                original_workspace,
+                window_bytes,
+                kind,
+                active_len,
+                i as u16,
+            );
+        }
+        mtf_output_stays_bounded(ranks, mtf_identity(), num_htrees);
+        mtf_final_list_distinct(ranks, mtf_identity());
+        mtf_returned_bound_is_valid(rank_or);
+        assert(next_bound <= 63);
+        assert forall|j: int| 0 <= j < ranks.len() implies
+            (ranks[j] as nat) < 4 * (next_bound as nat + 1) by {
+            mtf_or_contains_rank(ranks, j);
+            mtf_rank_below_returned_boundary(ranks[j], mtf_rank_or(ranks));
+        }
+        mtf_final_list_preserves_suffix(
+            ranks,
+            mtf_identity(),
+            4 * (next_bound as nat + 1),
+        );
+        assert(mtf_reusable(mtf_list_values(workspace@, window_bytes), next_bound));
+        assert forall|i: int| 0 <= i < active_len implies
+            #[trigger] workspace@[
+                context_entry_at(window_bytes, kind, i as u16) as int
+            ] < num_htrees by {
+            context_map_values_index(workspace@, window_bytes, kind, active_len, i as u16);
+            assert(context_map_values(workspace@, window_bytes, kind, active_len)[i]
+                == mtf_output_values(ranks, mtf_identity())[i]);
+        }
+    }
+    Ok((next_bound, work))
 }
 
 pub(crate) fn write_next_tree_record(
@@ -2357,6 +4651,16 @@ pub(crate) fn install_builder_canonical_tree(
 ) -> (r: Result<(), WorkspaceError>)
     requires old(meta).valid_for(region),
     ensures
+        canonical_installer_frame(
+            old(workspace)@,
+            final(workspace)@,
+            window_bytes,
+            region,
+            tree,
+            old(meta).symbols,
+        ),
+        (tree as nat) >= tree_region_count(region)
+            ==> final(workspace)@ == old(workspace)@,
         r.is_ok() ==> {
             let lengths = builder_length_sequence(
                 old(workspace)@,
@@ -2364,6 +4668,8 @@ pub(crate) fn install_builder_canonical_tree(
                 old(meta).symbols,
             );
             &&& valid_builder_lengths(lengths)
+            &&& (tree as nat) < tree_region_count(region)
+            &&& (old(meta).symbols as nat) <= tree_region_symbols(region)
             &&& lengths_initialized == old(meta).symbols
             &&& final(meta).valid_for(region)
             &&& final(meta).symbols == old(meta).symbols
@@ -2428,6 +4734,9 @@ pub(crate) fn install_builder_canonical_tree(
     let ghost mut used: nat = 0;
     while symbol < symbols
         invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
             workspace@ == original_workspace,
             original_workspace.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat,
@@ -2521,6 +4830,9 @@ pub(crate) fn install_builder_canonical_tree(
     let mut count_initialized: u16 = 0;
     while count_initialized < BUILDER_COUNTS
         invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
             count_initialized <= BUILDER_COUNTS,
             symbols <= BUILDER_CODE_LENGTHS,
             window_bytes <= 16_777_216,
@@ -2558,6 +4870,9 @@ pub(crate) fn install_builder_canonical_tree(
         let mut count: u16 = 0;
         while scan < symbols
             invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
                 scan <= symbols <= BUILDER_CODE_LENGTHS,
                 count <= scan,
                 count as nat == count_length(
@@ -2690,6 +5005,9 @@ pub(crate) fn install_builder_canonical_tree(
     let mut chain_initialized: u16 = 0;
     while chain_initialized < BUILDER_SYMBOL_CHAIN_ENTRIES
         invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
             chain_initialized <= BUILDER_SYMBOL_CHAIN_ENTRIES,
             symbols <= BUILDER_CODE_LENGTHS,
             window_bytes <= 16_777_216,
@@ -2733,6 +5051,9 @@ pub(crate) fn install_builder_canonical_tree(
     let mut chain_length: u16 = 1;
     while chain_length <= MAX_BITS as u16
         invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
             1 <= chain_length <= MAX_BITS as u16 + 1,
             symbols <= BUILDER_CODE_LENGTHS,
             window_bytes <= 16_777_216,
@@ -2766,6 +5087,9 @@ pub(crate) fn install_builder_canonical_tree(
         let mut scan: u16 = 0;
         while scan < symbols
             invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
                 scan <= symbols <= BUILDER_CODE_LENGTHS,
                 1 <= chain_length <= MAX_BITS as u16,
                 previous < BUILDER_SYMBOL_CHAIN_ENTRIES,
@@ -2849,6 +5173,9 @@ pub(crate) fn install_builder_canonical_tree(
     let mut code: u64 = 0;
     while next_initialized < BUILDER_NEXT_CODES
         invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
             1 <= next_initialized <= BUILDER_NEXT_CODES,
             code <= u32::MAX as u64,
             window_bytes <= 16_777_216,
@@ -2977,6 +5304,9 @@ pub(crate) fn install_builder_canonical_tree(
     symbol = 0;
     while symbol < symbols
         invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
             symbol <= symbols <= BUILDER_CODE_LENGTHS,
             window_bytes <= 16_777_216,
             workspace@.len() == original_workspace.len(),
@@ -3055,6 +5385,9 @@ pub(crate) fn install_builder_canonical_tree(
             let mut rank: u16 = 0;
             while scan < symbol
                 invariant
+            original_workspace == old(workspace)@,
+            symbols == old(meta).symbols,
+            (tree as nat) < tree_region_count(region),
                     scan <= symbol < symbols <= BUILDER_CODE_LENGTHS,
                     rank <= scan,
                     rank as nat == count_length(
@@ -3708,5 +6041,85 @@ mod tests {
         }
         assert_eq!(workspace[first - 1], before_tree);
         assert_eq!(workspace[first + 4 * 3], after_tree);
+    }
+
+    #[test]
+    fn b3b_inverse_mtf_is_atomic_reusable_and_exactly_charged() {
+        let window = 1u32 << 10;
+        let required = required_workspace_bytes(10).unwrap() as usize;
+        let mut workspace = vec![0xa5u8; required];
+
+        let ranks = [2u8, 0, 1, 1];
+        let mut initialized = 0u16;
+        for rank in ranks {
+            initialized = write_next_context_entry(
+                &mut workspace,
+                window,
+                ContextMapKind::Distance,
+                ranks.len() as u16,
+                initialized,
+                rank,
+                4,
+            )
+            .unwrap();
+        }
+        let map_start = context_entry_offset(window, ContextMapKind::Distance, 0).unwrap();
+        let before_map = workspace[map_start..map_start + ranks.len()].to_vec();
+        let outside_map = workspace[map_start + ranks.len()];
+
+        let (next_bound, work) = inverse_mtf_context_map(
+            &mut workspace,
+            window,
+            ContextMapKind::Distance,
+            ranks.len() as u16,
+            4,
+            63,
+        )
+        .unwrap();
+        assert_eq!(before_map, ranks);
+        assert_eq!(next_bound, 0);
+        assert_eq!(work, 4 * 64 + (2 * 2 + 6) + 6 + (2 + 6) + (2 + 6));
+        assert_eq!(
+            &workspace[map_start..map_start + ranks.len()],
+            &[2, 2, 0, 2],
+        );
+        assert_eq!(workspace[map_start + ranks.len()], outside_map);
+
+        let list_start = (window + MTF_LIST_OFFSET) as usize;
+        assert_eq!(&workspace[list_start..list_start + 4], &[2, 0, 1, 3]);
+        for i in 4..256 {
+            assert_eq!(workspace[list_start + i], i as u8);
+        }
+
+        let second_ranks = [3u8, 0];
+        initialized = 0;
+        for rank in second_ranks {
+            initialized = write_next_context_entry(
+                &mut workspace,
+                window,
+                ContextMapKind::Distance,
+                second_ranks.len() as u16,
+                initialized,
+                rank,
+                4,
+            )
+            .unwrap();
+        }
+        let (second_bound, second_work) = inverse_mtf_context_map(
+            &mut workspace,
+            window,
+            ContextMapKind::Distance,
+            second_ranks.len() as u16,
+            4,
+            next_bound,
+        )
+        .unwrap();
+        assert_eq!(second_bound, 0);
+        assert_eq!(second_work, 4 + (2 * 3 + 6) + 6);
+        assert_eq!(&workspace[map_start..map_start + 2], &[3, 3]);
+        assert_eq!(&workspace[list_start..list_start + 4], &[3, 0, 1, 2]);
+        for i in 4..256 {
+            assert_eq!(workspace[list_start + i], i as u8);
+        }
     }
 }

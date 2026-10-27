@@ -60,6 +60,14 @@ refactoring rule that E1 did not enumerate. The human approved Candidate E2
 exactly as written on 2026-10-26. Implement only that adapter/decoder/rule;
 other new cross-module APIs remain unapproved.
 
+The checked B3b result is recorded in `BROTLI_B3B.md` and
+`evidence/brotli-b3b.json`. It covers private compressed-header orchestration,
+serialized state, context maps, inverse MTF, RFC coverage, tree groups,
+streaming exhaustion/truncation, sticky terminal failures and the initial B2
+Ready handoff. It is not a complete decoder or supported API. An
+exhaustion-triggered call from the body decoder into the checked B2 adapter is
+B3c work and must not be claimed as B3b integration.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

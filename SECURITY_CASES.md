@@ -128,20 +128,29 @@ mathematical functions. See [TABLE_ITERATIONS.md](TABLE_ITERATIONS.md).
 The [Brotli roadmap entry](ROADMAP.md) records the upstream disclosure and fix.
 Its generalized obligations are pending-buffer bounds, a correct distinction
 between permanent format failure and genuine input exhaustion, and preservation
-of those properties over every permitted streaming call sequence. They are
-now **proved for the private B1 bit queue/window-header driver and the B2
-prefix/block-switch core**. B2 proves the corrected integration rule shared by
-literal, command and distance switches: one declared type makes a switch a
-permanent zero-field error before prefix parsing. Complete-stream status
-propagation remains unproved because the Rust code does not parse a full
-meta-block or emit output.
+of those properties over every permitted streaming call sequence. The
+applicable obligation fragments are now **proved for each admitted call and
+state of the private B1, B2, B3a and B3b components**. B3b
+proves bounded serialized compressed-header state, exact nonfinal suspension
+versus final truncation, sticky terminal errors, and an exact initial B2 `Ready`
+snapshot across context maps and tree groups. B2 proves the corrected rule
+shared by literal, command and distance switches: one declared type makes a
+switch a permanent zero-field error before prefix parsing. The E2 adapter proves
+exact mapping of B2 ready, suspended and failed outcomes. Body execution does
+not yet call that adapter when a category is exhausted, so complete-stream
+status propagation remains unproved B3c/B4 work. The Rust code does not yet
+decode a complete meta-block or emit Brotli output.
 
 The approved native R1 replay checks Node's 22-byte witness at fixed input
 chunks 1 through 22. The fix and v1.2.1 return permanent error `-17`; the
 pre-fix parent returns later format error `-9`. All harness guards remain intact
 and no ASan diagnostic occurred, so no memory overwrite reproduction is claimed.
 See [BROTLI_B2.md](BROTLI_B2.md) and
-[the raw structured record](evidence/brotli-r1.json).
+[the raw structured record](evidence/brotli-r1.json). The
+[B3b report](BROTLI_B3B.md) and [control record](evidence/brotli-b3b-controls.json)
+retain the component proof boundary, runtime cases and 58 deliberate semantic
+defects. These component results do not substitute for the future integrated
+multi-call regression in the body decoder.
 
 ## Reproduce
 

@@ -1,9 +1,9 @@
 {
   "project": "Proven Primitives",
   "license": "Apache-2.0",
-  "verified_utc": "2026-10-26T04:35:03.792429+00:00",
+  "verified_utc": "2026-10-27T03:28:20.366141+00:00",
   "claim": "Proven secure against the specified per-call bounds, output-integrity and prior-destination-disclosure threats for every admitted input and modeled execution under the published contracts and trusted base.",
-  "source_tree_sha256": "03c3fa4128b8bd649181a41bdcd661fa5e27dbc476c5034b3b2dff2281e9e1ed",
+  "source_tree_sha256": "66b7c8d6632d08e33fac38b40690fb1b7cc0d75dedc8068fa26c75f6f47ae050",
   "source_sha256": {
     "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
     "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
@@ -12,14 +12,14 @@
     "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
     "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
     "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
-    "src/brotli_input.rs": "11ed78e6750d2aac5a45e08551f22a880a62e0f71770a58b3a3d8ea80e75d7bb",
-    "src/brotli_prefix.rs": "f58cfcd1960a9e472ffd83fb8797a749c694cdaed5b269a63d11f72d148f795b",
-    "src/brotli_block.rs": "4a5b692f7a0c9a729f7e16c257a6b8f93a73f4c1504491b8e7655230d11b6875",
+    "src/brotli_input.rs": "b9a19b8d41b81a94566e8f74b9c9676e9f751668953427900935a1fe6b739517",
+    "src/brotli_prefix.rs": "b0ae2907d08787d6680cba90d81edf49131ff6530d8a87993390183774c05287",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
     "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9"
   },
   "validation_source_sha256": {
     "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
-    "tests/proof_rejection.rs": "667b43c94002286c7a29338c5f29c3598cb7a8ba32559101d0616d91196b80df",
+    "tests/proof_rejection.rs": "45116aea4fb52afa8799a3e8ba881b59170f653a4bd72bc3771a8df4be8253db",
     "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
     "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
     "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
@@ -29,6 +29,7 @@
   "verifier": {
     "profile": "release",
     "version": "0.2026.10.18.7d82994",
+    "binary_sha256": "483703c79cf57530a9864de2e69326740ee69162dd98b853aedb8273c74a06f6",
     "platform": {
       "os": "macos",
       "arch": "aarch64"
@@ -40,7 +41,7 @@
     "encountered-error": false,
     "encountered-vir-error": false,
     "success": true,
-    "verified": 350,
+    "verified": 738,
     "errors": 0,
     "is-verifying-entire-crate": true
   },
@@ -62,13 +63,18 @@
     "standard_primitive_test_groups_passed": 9,
     "proof_source_audit_passed": true,
     "proof_rejection_test_passed": true,
-    "semantic_mutations_rejected": 53,
-    "unchanged_positive_control_verified": 350,
+    "semantic_mutations_rejected": 111,
+    "unchanged_positive_control_verified": 738,
     "large_input_bytes": 262144,
     "upstream_comparison_test_passed": true,
     "brotli_b1_test_groups_passed": 4,
-    "private_rust_test_groups_passed": 31,
-    "pipeline_gate_test_groups_passed": 15
+    "private_rust_test_groups_passed": 40,
+    "pipeline_gate_test_groups_passed": 15,
+    "current_b3b_semantic_mutations_rejected": 58,
+    "historical_semantic_mutations_rejected": 53,
+    "new_b3b_test_groups_passed": 5,
+    "new_b3b_scenarios_passed": 64,
+    "upstream_comparison_group_passed": true
   },
   "public_apis": [
     "base64::encode_into",
@@ -162,6 +168,22 @@
       "zero-length unused records remain distinct from single-symbol zero-bit trees",
       "canonical installation frames every byte outside builder bookkeeping and the selected tree",
       "width-limited reversal connects natural auxiliary canonical codes to raw least-significant-bit-first stream values"
+    ],
+    "brotli_b3b_private_component": [
+      "exact approved serialized scalar, metadata, context-map, MTF, coverage, builder and tree-region ownership",
+      "exact compressed-header field and literal, command and distance category order",
+      "stored raw-plus-one counts, one-type tree elision and implicit 1 << 24 initial block length",
+      "literal context extent 64 times the literal block-type count and distance extent 4 times the distance block-type count",
+      "all one-to-sixteen-bit context-map zero-run suffix widths, direct values, exact-fill acceptance and overflow rejection",
+      "exact suspension state on nonfinal exhaustion and terminal truncation on final exhaustion",
+      "source-linked inverse MTF list reuse and bounded cell work",
+      "RFC coverage of every advertised context tree",
+      "installed-tree decoding against width-reversed on-wire canonical codes",
+      "literal, command and distance tree-group order, counts, alphabets and complete metadata",
+      "pending builder spans are drained exactly once",
+      "exact initial active trees and serialized B2 Ready snapshot",
+      "sticky terminal failures consume no later input and preserve state",
+      "the E2 adapter maps B2 ready, suspended and failed states exactly"
     ]
   },
   "trusted_base": [
@@ -172,9 +194,8 @@
     "operating system and hardware execution"
   ],
   "not_claimed": [
-    "Brotli output, dictionary, context-map, LZ77 or complete streaming correctness",
-    "Brotli output, dictionary, meta-block or streaming decompression correctness",
-    "CVE-2026-111497 block-switch integration proof or historical replay",
+    "Brotli body decoding, output, LZ77, dictionary or complete streaming correctness",
+    "CVE-2026-111497 exhaustion-triggered body-to-B2 integration or complete-stream historical replay in Rust",
     "LZ4 frame, dictionary or streaming correctness",
     "Rust replay of the complete CVE-2026-111497 witness",
     "absence of every conceivable defect",
@@ -186,9 +207,8 @@
     "practical service-wide denial-of-service resistance",
     "verification of an upstream crate's entire API",
     "verification of arbitrary caller composition",
-    "verified arbitrary caller/streaming/concurrent call sequences",
-    "verified compiler/OS/hardware or concrete stack-byte capacity",
-    "Brotli tree-group orchestration, context maps, command execution, output or complete streaming correctness"
+    "verified arbitrary caller, complete-stream or concurrent call sequences beyond the named components",
+    "verified compiler, operating system, hardware or concrete stack-byte capacity"
   ],
   "benchmarks": {
     "host": {
@@ -199,8 +219,8 @@
     },
     "report": "evidence/validation.json",
     "sha256": "c283f563519399927ab56eb09bc74484e58d0e794f23f9966d23423e9e0c1655",
-    "note": "Fresh baseline and candidate, three process runs each; warm host batch averages with all raw samples retained. The current B3a code is private and not on any measured public path; all public executable functions and specifications remain source-identical to the measured G revision. Historical public-routine measurements remain tied to their recorded revision.",
-    "source_bridge": "evidence/brotli-b3a.json"
+    "note": "Fresh baseline and candidate, three process runs each; warm host batch averages with all raw samples retained. The current B3b code is private and not on any measured public path; all public executable functions and specifications remain source-identical to the measured G revision. Historical public-routine measurements remain tied to their recorded revision.",
+    "source_bridge": "evidence/brotli-b3b.json"
   },
   "publication": {
     "github_repository_created": true,
@@ -223,9 +243,9 @@
   },
   "security_contract_assessment": {
     "report": "SECURITY_CONTRACTS.md",
-    "sha256": "208ce618c401aab570608d6bd6deac4e21f1b8244f5a5051af0fe7652baeec0e",
-    "evidence": "evidence/brotli-b3a.json",
-    "evidence_sha256": "79af74a0ed00a679e9edec8c28c5e560039eaec5c3a69fa0b65bedba5994a425"
+    "sha256": "03de5ca136608d59223fd629064deacd4308623ad275297c8168462f03bbcd32",
+    "evidence": "evidence/brotli-b3b.json",
+    "evidence_sha256": "909aba16b7f90ed939df5b5e3203fc88bc5ef0d3c7385815af0658e5d9ca825e"
   },
   "brotli_b1": {
     "status": "checked private component; not a complete decoder",
@@ -247,7 +267,16 @@
     "evidence_sha256": "79af74a0ed00a679e9edec8c28c5e560039eaec5c3a69fa0b65bedba5994a425"
   },
   "verification_evidence": {
-    "path": "evidence/brotli-b3a-verification.json",
-    "sha256": "a866e2fd5365166b523005122a68c0b3c5b17be87053149f917e219ba6192e26"
+    "path": "evidence/brotli-b3b-verification.json",
+    "sha256": "1a5221e7023c0347002846ccad5123e1b7898fb8d4e397f3293d9083cf5f3bed"
+  },
+  "brotli_b3b": {
+    "status": "checked B3b component; not a complete decoder or supported API",
+    "report": "BROTLI_B3B.md",
+    "report_sha256": "30b9a4e47f44ce42c775e7bfab5f2e1e97aa2d025df8ff2c51670d52aa73ad92",
+    "evidence": "evidence/brotli-b3b.json",
+    "evidence_sha256": "909aba16b7f90ed939df5b5e3203fc88bc5ef0d3c7385815af0658e5d9ca825e",
+    "controls": "evidence/brotli-b3b-controls.json",
+    "controls_sha256": "15b7363bc9f6d60d913694982e7367145da6ee578482a78ab0e55bac13876f4c"
   }
 }

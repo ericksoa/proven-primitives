@@ -171,6 +171,29 @@ the builder bookkeeping and selected tree. Tree groups, context maps and all
 complete decoder work remain outside this B3a claim. See
 [BROTLI_B3A.md](BROTLI_B3A.md).
 
+## Private Brotli B3b compressed-header component
+
+`brotli_input::CompressedMetaBlockDecoder` continues from the checked B3a
+handoff using the approved caller-owned serialized state. Its root contracts
+cover the exact compressed-header field and category order, stored count
+semantics, one-type tree elision, literal and distance context-map extents,
+all context RLE widths, exact-fill and overflow behavior, and the distinction
+between nonfinal exhaustion and terminal final truncation.
+
+The installed-tree decoder connects least-significant-bit-first input to the
+width-reversed natural canonical codes already installed by B3a. The inverse
+move-to-front transition proves exact list reuse and bounded cell work. Context
+coverage proves that every advertised tree is present before tree-group parsing
+continues. Tree-group contracts bind literal, command and distance order,
+alphabets, counts and destination metadata, including the exact initial active
+trees and B2 `Ready` snapshot.
+
+Terminal failures are sticky and preserve the serialized state while consuming
+no further input. Pending builder spans are drained exactly once. The E2 adapter
+proves exact B2 ready, suspended and failed outcome mapping. B3b does not execute
+literal, command or distance bodies and does not call B2 when one of those body
+categories is exhausted; that remains B3c. See [BROTLI_B3B.md](BROTLI_B3B.md).
+
 ## C1 exact caller composition
 
 `composition_demo::DecodeCaller::decode` proves exact Base64-to-percent stage

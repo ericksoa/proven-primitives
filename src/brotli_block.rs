@@ -94,6 +94,233 @@ struct BlockSwitchCore {
     phase: SwitchPhase,
 }
 
+// Approved B3b E2 adapter. This is the only crate-private boundary that exposes
+// the logical B2 switch state; the original B2 types remain module-private.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum B3bSwitchFailure {
+    InvalidDeclaration,
+    InvalidBlockSwitch,
+    InvalidPrefixSymbol,
+    InvalidBlockLength,
+    InvalidSequence,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum B3bSwitchPhase {
+    Ready,
+    AwaitLength { kind: u8, block_type: u16 },
+    Failed(B3bSwitchFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct B3bSwitchState {
+    pub(crate) num_types: [u16; 3],
+    pub(crate) ring: [u16; 6],
+    pub(crate) remaining: [u32; 3],
+    pub(crate) phase: B3bSwitchPhase,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum B3bSwitchOutcome {
+    NeedInput,
+    Complete { kind: u8, block_type: u16, block_length: u32 },
+    Failed(B3bSwitchFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct B3bSwitchResult {
+    pub(crate) state: B3bSwitchState,
+    pub(crate) consumed_fields: u8,
+    pub(crate) outcome: B3bSwitchOutcome,
+}
+
+impl B3bSwitchState {
+    pub(crate) open spec fn valid(&self) -> bool {
+        &&& 1 <= self.num_types@[0] <= 256
+        &&& 1 <= self.num_types@[1] <= 256
+        &&& 1 <= self.num_types@[2] <= 256
+        &&& self.ring@[1] < self.num_types@[0]
+        &&& self.ring@[3] < self.num_types@[1]
+        &&& self.ring@[5] < self.num_types@[2]
+        &&& self.ring@[0] <= self.num_types@[0]
+        &&& self.ring@[2] <= self.num_types@[1]
+        &&& self.ring@[4] <= self.num_types@[2]
+        &&& (self.num_types@[0] > 1 ==> self.ring@[0] < self.num_types@[0])
+        &&& (self.num_types@[1] > 1 ==> self.ring@[2] < self.num_types@[1])
+        &&& (self.num_types@[2] > 1 ==> self.ring@[4] < self.num_types@[2])
+        &&& match self.phase {
+            B3bSwitchPhase::AwaitLength { kind, block_type } => {
+                &&& kind < 3
+                &&& self.num_types@[kind as int] > 1
+                &&& block_type < self.num_types@[kind as int]
+                &&& self.remaining@[kind as int] == 0
+            },
+            _ => true,
+        }
+    }
+}
+
+fn b3b_failure_to_b2(error: B3bSwitchFailure) -> (r: BlockSwitchError)
+    ensures match error {
+        B3bSwitchFailure::InvalidDeclaration => r == BlockSwitchError::InvalidDeclaration,
+        B3bSwitchFailure::InvalidBlockSwitch => r == BlockSwitchError::InvalidBlockSwitch,
+        B3bSwitchFailure::InvalidPrefixSymbol => r == BlockSwitchError::InvalidPrefixSymbol,
+        B3bSwitchFailure::InvalidBlockLength => r == BlockSwitchError::InvalidBlockLength,
+        B3bSwitchFailure::InvalidSequence => r == BlockSwitchError::InvalidSequence,
+    },
+{
+    match error {
+        B3bSwitchFailure::InvalidDeclaration => BlockSwitchError::InvalidDeclaration,
+        B3bSwitchFailure::InvalidBlockSwitch => BlockSwitchError::InvalidBlockSwitch,
+        B3bSwitchFailure::InvalidPrefixSymbol => BlockSwitchError::InvalidPrefixSymbol,
+        B3bSwitchFailure::InvalidBlockLength => BlockSwitchError::InvalidBlockLength,
+        B3bSwitchFailure::InvalidSequence => BlockSwitchError::InvalidSequence,
+    }
+}
+
+fn b2_failure_to_b3b(error: BlockSwitchError) -> (r: B3bSwitchFailure)
+    ensures match error {
+        BlockSwitchError::InvalidDeclaration => r == B3bSwitchFailure::InvalidDeclaration,
+        BlockSwitchError::InvalidBlockSwitch => r == B3bSwitchFailure::InvalidBlockSwitch,
+        BlockSwitchError::InvalidPrefixSymbol => r == B3bSwitchFailure::InvalidPrefixSymbol,
+        BlockSwitchError::InvalidBlockLength => r == B3bSwitchFailure::InvalidBlockLength,
+        BlockSwitchError::InvalidSequence => r == B3bSwitchFailure::InvalidSequence,
+    },
+{
+    match error {
+        BlockSwitchError::InvalidDeclaration => B3bSwitchFailure::InvalidDeclaration,
+        BlockSwitchError::InvalidBlockSwitch => B3bSwitchFailure::InvalidBlockSwitch,
+        BlockSwitchError::InvalidPrefixSymbol => B3bSwitchFailure::InvalidPrefixSymbol,
+        BlockSwitchError::InvalidBlockLength => B3bSwitchFailure::InvalidBlockLength,
+        BlockSwitchError::InvalidSequence => B3bSwitchFailure::InvalidSequence,
+    }
+}
+
+fn b3b_kind_to_b2(kind: u8) -> (r: BlockKind)
+    requires kind < 3,
+    ensures r.index() == kind as int,
+{
+    if kind == 0 {
+        BlockKind::Literal
+    } else if kind == 1 {
+        BlockKind::Command
+    } else {
+        BlockKind::Distance
+    }
+}
+
+fn b2_kind_to_b3b(kind: BlockKind) -> (r: u8)
+    ensures r < 3, r as int == kind.index(),
+{
+    match kind {
+        BlockKind::Literal => 0,
+        BlockKind::Command => 1,
+        BlockKind::Distance => 2,
+    }
+}
+
+fn restore_b3b_switch(state: B3bSwitchState) -> (r: BlockSwitchCore)
+    requires state.valid(),
+    ensures r.valid(), r.num_types == state.num_types,
+        r.ring == state.ring, r.remaining == state.remaining,
+        match state.phase {
+            B3bSwitchPhase::Ready => r.phase == SwitchPhase::Ready,
+            B3bSwitchPhase::AwaitLength { kind, block_type } => {
+                &&& kind < 3
+                &&& match r.phase {
+                    SwitchPhase::AwaitLength { kind: restored, block_type: restored_type } => {
+                        &&& restored.index() == kind as int
+                        &&& restored_type == block_type
+                    },
+                    _ => false,
+                }
+            },
+            B3bSwitchPhase::Failed(error) => match r.phase {
+                SwitchPhase::Failed(restored) => match error {
+                    B3bSwitchFailure::InvalidDeclaration =>
+                        restored == BlockSwitchError::InvalidDeclaration,
+                    B3bSwitchFailure::InvalidBlockSwitch =>
+                        restored == BlockSwitchError::InvalidBlockSwitch,
+                    B3bSwitchFailure::InvalidPrefixSymbol =>
+                        restored == BlockSwitchError::InvalidPrefixSymbol,
+                    B3bSwitchFailure::InvalidBlockLength =>
+                        restored == BlockSwitchError::InvalidBlockLength,
+                    B3bSwitchFailure::InvalidSequence =>
+                        restored == BlockSwitchError::InvalidSequence,
+                },
+                _ => false,
+            },
+        },
+{
+    let phase = match state.phase {
+        B3bSwitchPhase::Ready => SwitchPhase::Ready,
+        B3bSwitchPhase::AwaitLength { kind, block_type } => {
+            let decoded = b3b_kind_to_b2(kind);
+            SwitchPhase::AwaitLength { kind: decoded, block_type }
+        }
+        B3bSwitchPhase::Failed(error) => {
+            SwitchPhase::Failed(b3b_failure_to_b2(error))
+        }
+    };
+    BlockSwitchCore {
+        num_types: state.num_types,
+        ring: state.ring,
+        remaining: state.remaining,
+        phase,
+    }
+}
+
+fn snapshot_b3b_switch(core: BlockSwitchCore) -> (r: B3bSwitchState)
+    requires core.valid(),
+    ensures r.valid(), r.num_types == core.num_types,
+        r.ring == core.ring, r.remaining == core.remaining,
+        match core.phase {
+            SwitchPhase::Ready => r.phase == B3bSwitchPhase::Ready,
+            SwitchPhase::AwaitLength { kind, block_type } => match r.phase {
+                B3bSwitchPhase::AwaitLength {
+                    kind: stored,
+                    block_type: stored_type,
+                } => {
+                    &&& stored as int == kind.index()
+                    &&& stored_type == block_type
+                },
+                _ => false,
+            },
+            SwitchPhase::Failed(error) => match r.phase {
+                B3bSwitchPhase::Failed(stored) => match error {
+                    BlockSwitchError::InvalidDeclaration =>
+                        stored == B3bSwitchFailure::InvalidDeclaration,
+                    BlockSwitchError::InvalidBlockSwitch =>
+                        stored == B3bSwitchFailure::InvalidBlockSwitch,
+                    BlockSwitchError::InvalidPrefixSymbol =>
+                        stored == B3bSwitchFailure::InvalidPrefixSymbol,
+                    BlockSwitchError::InvalidBlockLength =>
+                        stored == B3bSwitchFailure::InvalidBlockLength,
+                    BlockSwitchError::InvalidSequence =>
+                        stored == B3bSwitchFailure::InvalidSequence,
+                },
+                _ => false,
+            },
+        },
+{
+    let phase = match core.phase {
+        SwitchPhase::Ready => B3bSwitchPhase::Ready,
+        SwitchPhase::AwaitLength { kind, block_type } => {
+            B3bSwitchPhase::AwaitLength {
+                kind: b2_kind_to_b3b(kind),
+                block_type,
+            }
+        }
+        SwitchPhase::Failed(error) => B3bSwitchPhase::Failed(b2_failure_to_b3b(error)),
+    };
+    B3bSwitchState {
+        num_types: core.num_types,
+        ring: core.ring,
+        remaining: core.remaining,
+        phase,
+    }
+}
+
 spec fn declarations_valid(num_types: Seq<u16>) -> bool {
     num_types.len() == 3
         && 1 <= num_types[0] <= 256
@@ -125,6 +352,330 @@ fn resolve_type(previous: u16, current: u16, max_type: u16, symbol: u16) -> (r: 
         symbol - 2
     };
     if raw >= max_type { raw - max_type } else { raw }
+}
+
+spec fn switch_arrays_unchanged(old: BlockSwitchCore, next: BlockSwitchCore) -> bool {
+    &&& next.num_types == old.num_types
+    &&& next.ring == old.ring
+    &&& next.remaining == old.remaining
+}
+
+spec fn switch_updated(
+    old: BlockSwitchCore,
+    next: BlockSwitchCore,
+    kind: BlockKind,
+    block_type: u16,
+    block_length: u32,
+) -> bool {
+    let k = kind.index();
+    &&& next.num_types == old.num_types
+    &&& next.phase == SwitchPhase::Ready
+    &&& next.remaining@ == old.remaining@.update(k, block_length)
+    &&& next.ring@ == old.ring@
+        .update(2 * k, old.ring@[2 * k + 1])
+        .update(2 * k + 1, block_type)
+}
+
+spec fn switch_transition_holds(
+    old: BlockSwitchCore,
+    kind: BlockKind,
+    type_symbol: Option<u16>,
+    block_length: Option<u32>,
+    next: BlockSwitchCore,
+    step: SwitchStep,
+) -> bool {
+    let k = kind.index();
+    match old.phase {
+        SwitchPhase::Failed(error) => {
+            &&& next == old
+            &&& step == (SwitchStep {
+                consumed_fields: 0,
+                status: SwitchStatus::Failed(error),
+            })
+        },
+        SwitchPhase::AwaitLength { kind: waiting, block_type } => {
+            if waiting != kind {
+                &&& switch_arrays_unchanged(old, next)
+                &&& next.phase == SwitchPhase::Failed(BlockSwitchError::InvalidSequence)
+                &&& step == (SwitchStep {
+                    consumed_fields: 0,
+                    status: SwitchStatus::Failed(BlockSwitchError::InvalidSequence),
+                })
+            } else {
+                match block_length {
+                    None => {
+                        &&& next == old
+                        &&& step == (SwitchStep {
+                            consumed_fields: 0,
+                            status: SwitchStatus::NeedInput,
+                        })
+                    },
+                    Some(0) => {
+                        &&& switch_arrays_unchanged(old, next)
+                        &&& next.phase == SwitchPhase::Failed(
+                            BlockSwitchError::InvalidBlockLength,
+                        )
+                        &&& step == (SwitchStep {
+                            consumed_fields: 1,
+                            status: SwitchStatus::Failed(
+                                BlockSwitchError::InvalidBlockLength,
+                            ),
+                        })
+                    },
+                    Some(length) => {
+                        &&& switch_updated(old, next, kind, block_type, length)
+                        &&& step == (SwitchStep {
+                            consumed_fields: 1,
+                            status: SwitchStatus::Complete {
+                                kind,
+                                block_type,
+                                block_length: length,
+                            },
+                        })
+                    },
+                }
+            }
+        },
+        SwitchPhase::Ready => {
+            let max_type = old.num_types@[k];
+            if max_type <= 1 {
+                &&& switch_arrays_unchanged(old, next)
+                &&& next.phase == SwitchPhase::Failed(
+                    BlockSwitchError::InvalidBlockSwitch,
+                )
+                &&& step == (SwitchStep {
+                    consumed_fields: 0,
+                    status: SwitchStatus::Failed(BlockSwitchError::InvalidBlockSwitch),
+                })
+            } else {
+                match type_symbol {
+                    None => {
+                        &&& next == old
+                        &&& step == (SwitchStep {
+                            consumed_fields: 0,
+                            status: SwitchStatus::NeedInput,
+                        })
+                    },
+                    Some(symbol) => {
+                        if symbol >= max_type + 2 {
+                            &&& switch_arrays_unchanged(old, next)
+                            &&& next.phase == SwitchPhase::Failed(
+                                BlockSwitchError::InvalidPrefixSymbol,
+                            )
+                            &&& step == (SwitchStep {
+                                consumed_fields: 1,
+                                status: SwitchStatus::Failed(
+                                    BlockSwitchError::InvalidPrefixSymbol,
+                                ),
+                            })
+                        } else {
+                            let block_type = resolved_type(
+                                old.ring@[2 * k],
+                                old.ring@[2 * k + 1],
+                                max_type,
+                                symbol,
+                            );
+                            match block_length {
+                                None => {
+                                    &&& switch_arrays_unchanged(old, next)
+                                    &&& next.phase == SwitchPhase::AwaitLength {
+                                        kind,
+                                        block_type,
+                                    }
+                                    &&& step == (SwitchStep {
+                                        consumed_fields: 1,
+                                        status: SwitchStatus::NeedInput,
+                                    })
+                                },
+                                Some(0) => {
+                                    &&& switch_arrays_unchanged(old, next)
+                                    &&& next.phase == SwitchPhase::Failed(
+                                        BlockSwitchError::InvalidBlockLength,
+                                    )
+                                    &&& step == (SwitchStep {
+                                        consumed_fields: 2,
+                                        status: SwitchStatus::Failed(
+                                            BlockSwitchError::InvalidBlockLength,
+                                        ),
+                                    })
+                                },
+                                Some(length) => {
+                                    &&& switch_updated(old, next, kind, block_type, length)
+                                    &&& step == (SwitchStep {
+                                        consumed_fields: 2,
+                                        status: SwitchStatus::Complete {
+                                            kind,
+                                            block_type,
+                                            block_length: length,
+                                        },
+                                    })
+                                },
+                            }
+                        }
+                    },
+                }
+            }
+        },
+    }
+}
+
+spec fn b3b_arrays_unchanged(old: B3bSwitchState, next: B3bSwitchState) -> bool {
+    &&& next.num_types == old.num_types
+    &&& next.ring == old.ring
+    &&& next.remaining == old.remaining
+}
+
+spec fn b3b_updated(
+    old: B3bSwitchState,
+    next: B3bSwitchState,
+    kind: u8,
+    block_type: u16,
+    block_length: u32,
+) -> bool {
+    &&& next.num_types == old.num_types
+    &&& next.phase == B3bSwitchPhase::Ready
+    &&& next.remaining@ == old.remaining@.update(kind as int, block_length)
+    &&& next.ring@ == old.ring@
+        .update(2 * kind as int, old.ring@[2 * kind as int + 1])
+        .update(2 * kind as int + 1, block_type)
+}
+
+pub(crate) closed spec fn b3b_switch_transition_holds(
+    old: B3bSwitchState,
+    requested_kind: u8,
+    type_symbol: Option<u16>,
+    block_length: Option<u32>,
+    result: B3bSwitchResult,
+) -> bool {
+    let k = requested_kind as int;
+    match old.phase {
+        B3bSwitchPhase::Failed(error) => {
+            &&& result.state == old
+            &&& result.consumed_fields == 0
+            &&& result.outcome == B3bSwitchOutcome::Failed(error)
+        },
+        B3bSwitchPhase::AwaitLength { kind: waiting, block_type } => {
+            if waiting != requested_kind {
+                &&& b3b_arrays_unchanged(old, result.state)
+                &&& result.state.phase == B3bSwitchPhase::Failed(
+                    B3bSwitchFailure::InvalidSequence,
+                )
+                &&& result.consumed_fields == 0
+                &&& result.outcome == B3bSwitchOutcome::Failed(
+                    B3bSwitchFailure::InvalidSequence,
+                )
+            } else {
+                match block_length {
+                    None => {
+                        &&& result.state == old
+                        &&& result.consumed_fields == 0
+                        &&& result.outcome == B3bSwitchOutcome::NeedInput
+                    },
+                    Some(0) => {
+                        &&& b3b_arrays_unchanged(old, result.state)
+                        &&& result.state.phase == B3bSwitchPhase::Failed(
+                            B3bSwitchFailure::InvalidBlockLength,
+                        )
+                        &&& result.consumed_fields == 1
+                        &&& result.outcome == B3bSwitchOutcome::Failed(
+                            B3bSwitchFailure::InvalidBlockLength,
+                        )
+                    },
+                    Some(length) => {
+                        &&& b3b_updated(
+                            old,
+                            result.state,
+                            requested_kind,
+                            block_type,
+                            length,
+                        )
+                        &&& result.consumed_fields == 1
+                        &&& result.outcome == B3bSwitchOutcome::Complete {
+                            kind: requested_kind,
+                            block_type,
+                            block_length: length,
+                        }
+                    },
+                }
+            }
+        },
+        B3bSwitchPhase::Ready => {
+            let max_type = old.num_types@[k];
+            if max_type <= 1 {
+                &&& b3b_arrays_unchanged(old, result.state)
+                &&& result.state.phase == B3bSwitchPhase::Failed(
+                    B3bSwitchFailure::InvalidBlockSwitch,
+                )
+                &&& result.consumed_fields == 0
+                &&& result.outcome == B3bSwitchOutcome::Failed(
+                    B3bSwitchFailure::InvalidBlockSwitch,
+                )
+            } else {
+                match type_symbol {
+                    None => {
+                        &&& result.state == old
+                        &&& result.consumed_fields == 0
+                        &&& result.outcome == B3bSwitchOutcome::NeedInput
+                    },
+                    Some(symbol) => {
+                        if symbol >= max_type + 2 {
+                            &&& b3b_arrays_unchanged(old, result.state)
+                            &&& result.state.phase == B3bSwitchPhase::Failed(
+                                B3bSwitchFailure::InvalidPrefixSymbol,
+                            )
+                            &&& result.consumed_fields == 1
+                            &&& result.outcome == B3bSwitchOutcome::Failed(
+                                B3bSwitchFailure::InvalidPrefixSymbol,
+                            )
+                        } else {
+                            let block_type = resolved_type(
+                                old.ring@[2 * k],
+                                old.ring@[2 * k + 1],
+                                max_type,
+                                symbol,
+                            );
+                            match block_length {
+                                None => {
+                                    &&& b3b_arrays_unchanged(old, result.state)
+                                    &&& result.state.phase == B3bSwitchPhase::AwaitLength {
+                                        kind: requested_kind,
+                                        block_type,
+                                    }
+                                    &&& result.consumed_fields == 1
+                                    &&& result.outcome == B3bSwitchOutcome::NeedInput
+                                },
+                                Some(0) => {
+                                    &&& b3b_arrays_unchanged(old, result.state)
+                                    &&& result.state.phase == B3bSwitchPhase::Failed(
+                                        B3bSwitchFailure::InvalidBlockLength,
+                                    )
+                                    &&& result.consumed_fields == 2
+                                    &&& result.outcome == B3bSwitchOutcome::Failed(
+                                        B3bSwitchFailure::InvalidBlockLength,
+                                    )
+                                },
+                                Some(length) => {
+                                    &&& b3b_updated(
+                                        old,
+                                        result.state,
+                                        requested_kind,
+                                        block_type,
+                                        length,
+                                    )
+                                    &&& result.consumed_fields == 2
+                                    &&& result.outcome == B3bSwitchOutcome::Complete {
+                                        kind: requested_kind,
+                                        block_type,
+                                        block_length: length,
+                                    }
+                                },
+                            }
+                        }
+                    },
+                }
+            }
+        },
+    }
 }
 
 impl BlockSwitchCore {
@@ -206,6 +757,14 @@ impl BlockSwitchCore {
                 _ => true,
             },
         ensures final(self).valid(), r.consumed_fields <= 2,
+            switch_transition_holds(
+                *old(self),
+                kind,
+                type_symbol,
+                block_length,
+                *final(self),
+                r,
+            ),
             old(self).num_types == final(self).num_types,
             match old(self).phase {
                 SwitchPhase::Failed(error) => r == SwitchStep {
@@ -403,11 +962,171 @@ impl BlockSwitchCore {
     }
 }
 
+pub(crate) fn advance_b3b_switch(
+    state: B3bSwitchState,
+    requested_kind: u8,
+    type_symbol: Option<u16>,
+    block_length: Option<u32>,
+) -> (r: B3bSwitchResult)
+    requires state.valid(), requested_kind < 3,
+        state.phase == B3bSwitchPhase::Ready
+            ==> state.remaining@[requested_kind as int] == 0,
+    ensures
+        r.state.valid(),
+        r.consumed_fields <= 2,
+        b3b_switch_transition_holds(
+            state,
+            requested_kind,
+            type_symbol,
+            block_length,
+            r,
+        ),
+        r.state.num_types == state.num_types,
+        match state.phase {
+            B3bSwitchPhase::Failed(error) => {
+                &&& r.state == state
+                &&& r.consumed_fields == 0
+                &&& r.outcome == B3bSwitchOutcome::Failed(error)
+            },
+            _ => true,
+        },
+        state.phase == B3bSwitchPhase::Ready
+            && state.num_types@[requested_kind as int] <= 1
+            ==> {
+                &&& r.consumed_fields == 0
+                &&& r.outcome == B3bSwitchOutcome::Failed(
+                    B3bSwitchFailure::InvalidBlockSwitch,
+                )
+                &&& r.state.phase == B3bSwitchPhase::Failed(
+                    B3bSwitchFailure::InvalidBlockSwitch,
+                )
+                &&& r.state.ring == state.ring
+                &&& r.state.remaining == state.remaining
+            },
+        match r.outcome {
+            B3bSwitchOutcome::NeedInput => {
+                &&& state.num_types@[requested_kind as int] > 1
+                &&& match r.state.phase {
+                    B3bSwitchPhase::Failed(_) => false,
+                    _ => true,
+                }
+            },
+            B3bSwitchOutcome::Complete {
+                kind, block_type, block_length,
+            } => {
+                &&& kind == requested_kind
+                &&& block_length > 0
+                &&& block_type < r.state.num_types@[requested_kind as int]
+                &&& r.state.phase == B3bSwitchPhase::Ready
+                &&& r.state.remaining@[requested_kind as int] == block_length
+            },
+            B3bSwitchOutcome::Failed(error) => {
+                &&& r.state.phase == B3bSwitchPhase::Failed(error)
+            },
+        },
+{
+    if let B3bSwitchPhase::Failed(error) = state.phase {
+        return B3bSwitchResult {
+            state,
+            consumed_fields: 0,
+            outcome: B3bSwitchOutcome::Failed(error),
+        };
+    }
+    let requested = b3b_kind_to_b2(requested_kind);
+    let mut core = restore_b3b_switch(state);
+    proof {
+        match state.phase {
+            B3bSwitchPhase::Ready => {
+                assert(core.phase == SwitchPhase::Ready);
+                assert(core.remaining@[requested.index()]
+                    == state.remaining@[requested_kind as int]);
+            },
+            B3bSwitchPhase::AwaitLength { .. } => {},
+            B3bSwitchPhase::Failed(_) => { assert(false); },
+        }
+    }
+    let step = core.advance(requested, type_symbol, block_length);
+    let next_state = snapshot_b3b_switch(core);
+    let outcome = match step.status {
+        SwitchStatus::NeedInput => B3bSwitchOutcome::NeedInput,
+        SwitchStatus::Complete { kind, block_type, block_length } => {
+            B3bSwitchOutcome::Complete {
+                kind: b2_kind_to_b3b(kind),
+                block_type,
+                block_length,
+            }
+        }
+        SwitchStatus::Failed(error) => {
+            B3bSwitchOutcome::Failed(b2_failure_to_b3b(error))
+        }
+    };
+    B3bSwitchResult {
+        state: next_state,
+        consumed_fields: step.consumed_fields,
+        outcome,
+    }
+}
+
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn adapter_state(num_types: [u16; 3]) -> B3bSwitchState {
+        B3bSwitchState {
+            num_types,
+            ring: [1, 0, 1, 0, 1, 0],
+            remaining: [0, 0, 0],
+            phase: B3bSwitchPhase::Ready,
+        }
+    }
+
+    #[test]
+    fn b3b_adapter_preserves_switch_completion_suspension_and_failure() {
+        let completed = advance_b3b_switch(adapter_state([3, 4, 2]), 0, Some(1), Some(9));
+        assert_eq!(completed.consumed_fields, 2);
+        assert_eq!(
+            completed.outcome,
+            B3bSwitchOutcome::Complete {
+                kind: 0,
+                block_type: 1,
+                block_length: 9,
+            }
+        );
+        assert_eq!(completed.state.remaining[0], 9);
+        assert_eq!(completed.state.ring[..2], [0, 1]);
+
+        let waiting = advance_b3b_switch(adapter_state([3, 4, 2]), 1, Some(3), None);
+        assert_eq!(waiting.consumed_fields, 1);
+        assert_eq!(waiting.outcome, B3bSwitchOutcome::NeedInput);
+        assert_eq!(
+            waiting.state.phase,
+            B3bSwitchPhase::AwaitLength {
+                kind: 1,
+                block_type: 1,
+            }
+        );
+        let resumed = advance_b3b_switch(waiting.state, 1, None, Some(7));
+        assert_eq!(
+            resumed.outcome,
+            B3bSwitchOutcome::Complete {
+                kind: 1,
+                block_type: 1,
+                block_length: 7,
+            }
+        );
+
+        let failed = advance_b3b_switch(adapter_state([1, 4, 2]), 0, None, None);
+        assert_eq!(
+            failed.outcome,
+            B3bSwitchOutcome::Failed(B3bSwitchFailure::InvalidBlockSwitch)
+        );
+        let sticky = advance_b3b_switch(failed.state, 0, Some(0), Some(1));
+        assert_eq!(sticky.state, failed.state);
+        assert_eq!(sticky.consumed_fields, 0);
+        assert_eq!(sticky.outcome, failed.outcome);
+    }
 
     #[test]
     fn all_three_integration_paths_preserve_status() {

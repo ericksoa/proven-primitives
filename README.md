@@ -26,7 +26,7 @@ whole-application security are not established by these per-call proofs.
 | LZ4 raw block decoding | Output equals the block specification, including overlapping matches; valid backreferences and end conditions; checked linear byte-work accounting |
 | Private Brotli B1 input/header | Eight-byte pending bounds; exact retained bits; RFC normal-window result; truthful exhaustion/truncation/invalid status; sticky terminal states and reset; bounded source work |
 | Private Brotli B2 prefix/block-switch core | Bounded canonical code construction and exact matching; RFC block lengths; literal/command/distance switch invariants; permanent zero-field invalid switch for one declared type |
-| Private Brotli B3a front end | Exact fixed workspace and tree records; initialized-range and single-symbol confidentiality; exact meta-block headers; simple and complex code descriptions; RFC repeat-coded final lengths with exact space accounting; canonical installation from the fixed builder region |
+| Private Brotli B3a/B3b front end | B3a workspace, meta-block and code-description guarantees; exact serialized compressed-header order; literal/distance context maps; RLE and inverse MTF; RFC tree coverage; tree groups; sticky errors; exact initial active-tree and B2 Ready handoff |
 | Private C1 caller | Base64 decode into scratch followed by percent decode of only the current prefix; exact errors/effects, stale-length invalidation, confidentiality and combined bounds |
 | Every public routine | No out-of-bounds access or arithmetic overflow under the model; loop termination; correct error results; unchanged destination on error; unchanged destination suffix on success |
 
@@ -35,18 +35,18 @@ buffers, no heap allocation, no executable recursion, and no unsafe code in the
 implementation. The same annotated source is verified and compiled. There is
 no separately maintained unverified implementation behind the API.
 
-The current implementation passes **350 project verification checks** with
+The current implementation passes **738 project verification checks** with
 `--no-cheating`. See [the proof record](evidence/claims.json),
 [the contracts](CONTRACTS.md), and [the proof guide](PROOFS.md).
-The [current B3a record](evidence/brotli-b3a.json) binds the exact current
-source, checked private slice and controls. The earlier
-[B1 record](evidence/brotli-b1.json) and
+The [current B3b record](evidence/brotli-b3b.json) binds the exact current
+source, checked private compressed-header slice and controls. The earlier
+[B3a record](evidence/brotli-b3a.json), [B1 record](evidence/brotli-b1.json) and
 [security proof record](evidence/security.json) remain historical snapshots;
 the latter binds the checked corollaries and measured G executable.
 
 The [candidate roadmap](ROADMAP.md) includes Brotli decompression and the recent
-CVE-2026-111497 state-transition/buffer-overflow case. It is a research target;
-the current library does not implement a complete Brotli decoder.
+CVE-2026-111497 state-transition/buffer-overflow case. It remains a research
+target; the current library does not implement a complete Brotli decoder.
 The [checked B1 component](BROTLI_B1.md) proves the private streaming bit queue
 and RFC window header, without claiming a complete decoder or the CVE's actual
 block-switch integration.
@@ -56,9 +56,11 @@ failure. It still does not decode a complete stream.
 The [checked B3a slice](BROTLI_B3A.md) adds the exact caller-workspace layout,
 safe initialized tree records, source-linked meta-block headers, simple and
 complex code descriptions, RFC repeat-coded final lengths, and canonical
-installation from the fixed builder region. Tree groups, context maps,
-literal/command/distance execution, and the rest of B3 remain incomplete.
-The approved exact B3b metadata/state/MTF choices are in the
+installation from the fixed builder region. The [checked B3b slice](BROTLI_B3B.md)
+adds serialized compressed-header orchestration, context maps, inverse MTF,
+RFC coverage, tree groups, exact streaming errors and the initial B2 Ready
+handoff. Literal/command/distance body execution and the rest of B3 remain
+incomplete. The approved metadata/state/MTF choices are in the
 [B3b decision proposal](BROTLI_B3B_PROPOSAL.md).
 [P1](PIPELINE.md) implements fail-closed local evidence bookkeeping without
 adopting the draft security profile. The approved later proof scopes remain in
@@ -244,6 +246,13 @@ rejection for:
 51. Rejecting a repeat that exactly fills the selected alphabet.
 52. Undercharging repeated nonzero lengths against the 32,768-unit code space.
 53. Comparing raw auxiliary stream bits with an unreversed canonical code.
+
+The current B3b control record adds 58 deliberate compressed-header defects
+covering serialized layout and tags, field/category order, counts, map strides,
+all RLE widths, installed-code reversal, inverse MTF, coverage, tree groups,
+pending-span drain, temporary initialization, suspension/truncation, sticky
+terminal errors and the E2 adapter. All are rejected with the unchanged
+specifications. See [the exact transcripts](evidence/brotli-b3b-controls.json).
 
 The mathematical specifications stay unchanged. The percent-decoding and LZ4
 read mutations are semantic defects in otherwise memory-safe Rust. A successful

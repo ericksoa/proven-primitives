@@ -6,10 +6,9 @@ separate human approval before implementation. The approved Base64 G iteration
 is complete. Current Brotli work is format/source research and the
 already-approved [B1 input/header milestone](BROTLI_PROPOSAL.md).
 P1, B2/R1 and C1 are approved and implemented. The B3 and B4 architecture is
-approved. The B3a workspace, meta-header, simple and complex descriptions,
-repeat-coded final lengths, and canonical builder installation are checked,
-but no comprehensive security profile has been adopted and independent review
-remains pending.
+approved. B3a and B3b are checked private components through compressed-header
+orchestration, context maps and tree groups, but no comprehensive security
+profile has been adopted and independent review remains pending.
 
 B1 is now checked as a private component; see [BROTLI_B1.md](BROTLI_B1.md).
 It does not change Brotli's candidate/support status. The actual block-switch,
@@ -26,6 +25,7 @@ and canonical builder installation. The remaining approved implementation path i
 work in [BROTLI_B4_PROFILE_PROPOSAL.md](BROTLI_B4_PROFILE_PROPOSAL.md).
 The human approved exact B3b Candidate W1 on 2026-10-26; its private encodings
 and state ownership are fixed in [BROTLI_B3B_PROPOSAL.md](BROTLI_B3B_PROPOSAL.md).
+The checked result is recorded in [BROTLI_B3B.md](BROTLI_B3B.md).
 
 ## Compositional verification
 
@@ -54,8 +54,8 @@ C1 is now implemented and checked; see [COMPOSITION_C1.md](COMPOSITION_C1.md).
 ## Brotli decompression
 
 Added at the human's request on 2026-10-24. Status: candidate with checked B1,
-B2, and B3a private components; no complete Brotli decoder or supported public
-streaming implementation exists.
+B2, B3a and B3b private components; no complete Brotli decoder or supported
+public streaming implementation exists.
 
 ### Recent security evidence
 
@@ -98,9 +98,11 @@ Approved proof goals:
 
 The approved B3/B4 documents fix streaming scope, dictionary/window support,
 caller-buffer and error semantics, resource accounting, upstream identities,
-workspace layout and the quarantining caller. The disclosed failure concerns
-streaming state; a one-shot decoder alone would not demonstrate that its
-streaming transition invariants have been proved.
+workspace layout and the quarantining caller. B3b proves compressed-header
+suspension, truncation and sticky failure plus the initial B2 Ready handoff.
+Actual exhaustion-triggered B2 calls and body decoding remain B3c work. The
+disclosed failure concerns streaming state; a one-shot decoder alone would not
+demonstrate that its streaming transition invariants have been proved.
 
 The implementation retains the relevant regression input and negative proof
 controls, explains intentional differences from upstream, and will benchmark

@@ -61,6 +61,24 @@ contents. Current 0.14.0 rejected the zero offset. Our decoder rejected it and
 preserved the complete buffer. [SECURITY_CASES.md](SECURITY_CASES.md) connects
 this concrete replay to the checked input-only output property.
 
+## Brotli native comparison boundary
+
+The approved R1 harness replays CVE-2026-111497's 22-byte witness against the
+pinned native fix, its pre-fix parent and v1.2.1 for input chunks 1 through 22.
+The fixed versions return permanent error `-17`; the parent later returns `-9`.
+All guard bytes remain intact and AddressSanitizer reports no overwrite, so this
+is status-path evidence rather than a memory-corruption reproduction. See
+[the structured R1 record](evidence/brotli-r1.json).
+
+B3b runtime comparisons use the native decoder only where stream acceptance and
+status are observable. The native API does not expose its internal context-map,
+inverse-MTF or active-tree fields, so those values cannot be compared directly.
+The pinned native decoder accepts some context maps missing an advertised tree;
+the checked B3b component rejects them to enforce the RFC coverage requirement.
+That deliberate strict difference and the full 64-scenario runtime matrix are
+recorded in [the B3b report](BROTLI_B3B.md). Finite agreement does not establish
+universal equivalence, and no complete Rust Brotli decoder is claimed.
+
 ## Valid-input performance at 256 KiB
 
 Times are medians of 27 batch-average latency samples per configuration, across
