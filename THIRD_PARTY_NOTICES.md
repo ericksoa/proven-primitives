@@ -10,6 +10,7 @@ verified library.
 |---|---|---|---|
 | rust-base64 0.23.1 | 069bf7067b949f5c0a92b6ceb82492920502f2c2 | `tests/tests.rs::encode_engine_slice_error_when_buffer_too_small`; `tests/encode.rs::encode_all_bytes` | [MIT](third_party/licenses/base64-MIT.txt) |
 | lz4_flex 0.14.0 | 1bffdcbbf906a234b913937cb2f57c0245915038 | Non-dictionary raw-block assertions from `src/block/decompress_safe.rs::test`, including `all_literal`, `incomplete_input`, `offset_oob`, and `offset_0` | [MIT](third_party/licenses/lz4_flex-MIT.txt) |
+| google/brotli 1.2.1 | db24a98aed38a16de78cc05ca15cdd8dc2a0d92d | RFC dictionary, command/context/dictionary/transform tables, and the exact B3c comparison fixtures identified in `BROTLI_B3C_PROPOSAL.md` | [MIT](third_party/licenses/brotli-MIT.txt) |
 
 Reference packages are development dependencies with their own upstream
 licenses. Their complete test suites, development dependencies, frame APIs,

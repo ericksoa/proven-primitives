@@ -75,6 +75,24 @@ tags, immutable-data identities, terminal/call priority, four-unit escrow,
 425-unit initialization charge, algorithms, proof controls, fixtures and staged
 order. Alternatives C2 through C5 remain unapproved. B3d and B4 remain separate.
 
+The human approved Candidate A1 in
+`BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md` exactly as written on 2026-10-27.
+The additional checked crate-private scalar, raw-bit, LUT, dictionary-staging,
+and body-state helpers are part of the B3c implementation boundary. Candidate
+A2 remains unselected.
+
+The human approved Candidate F1 in `BROTLI_B3C_FIXTURE_ADDENDUM.md` exactly as
+written on 2026-10-27. Classify `quickfox_repeated` and `monkey` as intentional
+strict tree-coverage rejections and use the approved fixed `compression`
+dictionary-transform stream for successful B3c dictionary coverage.
+
+The human approved Candidate M1 in `BROTLI_B3C_METERING_ADDENDUM.md` exactly as
+written on 2026-10-29. Keep W1's exact private `step` interface unchanged;
+retain budget ownership in the B3c adapter; charge read-only planning actions;
+reserve each exact mutation formula before execution; and add exact plan/action
+refinement plus unchanged-specification undercharge controls. Candidate M2
+remains unselected.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

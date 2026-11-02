@@ -1,0 +1,187 @@
+{
+  "mutations": [
+    {
+      "name": "brotli-b3c-block-count-planning-bit-undercharge",
+      "published_transcript_sha256": "e5d0298a583201208ef1cd6050d1e8cf00ed3ee02cf814fa93ce77b8b34fb8d1",
+      "raw_transcript_sha256": "8b4540e1e314382883fdfef4e2d8a4c726ee7d9df1160d6461e66a6d56cfb466",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::plan_bit_read",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21524:9\n      |\n21524 | /         r.work as nat == r.consumed as nat\n21525 | |             + if r.complete { width as nat } else { 0nat },\n      | |__________________________________________________________^ failed this postcondition\n...\n21546 |       PlannedBitRead { consumed, work, complete }\n      |       ------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-block-count-base-write-undercharge",
+      "published_transcript_sha256": "fedb8a2ee3b0a764a1ba9259e4d551e6be8fccba28c925024aaf684717298206",
+      "raw_transcript_sha256": "74db5ff6ac6f94456f07883d4322b1d84f5e9484a52d23818142f55815c0d426",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::block_count_base_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21551:13\n      |\n21551 |     ensures r == read_work + 10 + 2 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21552 | {\n21553 |     read_work + 10 + 2\n      |     ------------------ at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-block-count-terminal-write-undercharge",
+      "published_transcript_sha256": "f214147116a841e0fe6598cf78feb2d590a7d409a69b14ef256b58a770839a32",
+      "raw_transcript_sha256": "7a5e20930ade4201c83c92b0f5e5ef6e7a61523338cdb1361764857abc49e0d8",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::block_count_truncated_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21558:13\n      |\n21558 |     ensures r == read_work + 10 + 2 + 1 + 4 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21559 | {\n21560 |     block_count_base_execution_work(read_work) + 4\n      |     ---------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-block-count-single-value-undercharge",
+      "published_transcript_sha256": "52636bd7a60c61c1a1150deab32b88ae843cf7799a3a80058b4e638b808fcbd5",
+      "raw_transcript_sha256": "5b0af1a0e629640413bc2625ae37224ab249718ea4c600d8f1d5c46ab3d42557",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::block_count_value_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21565:13\n      |\n21565 |       ensures r == read_work + 10 + 2 + 1\n      |  _____________^\n21566 | |         + if raw == 0 { 7 + 1 } else { 2 + 76 + 1 + 1 },\n      | |_______________________________________________________^ failed this postcondition\n...\n21569 | /     if raw == 0 {\n21570 | |         base + 7\n21571 | |     } else {\n21572 | |         base + 2 + 76 + 1 + 1\n21573 | |     }\n      | |_____- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-block-count-tree-start-undercharge",
+      "published_transcript_sha256": "457a6a0ee20452a378ed19da56a9b3cd6e0f6dc0eba0fd9adf076d63e4ac3aa2",
+      "raw_transcript_sha256": "9e4dd2e40c10dfe223d4f3b237c7db0d349f59e590da4ead6f52162f859216ed",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::block_count_value_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21565:13\n      |\n21565 |       ensures r == read_work + 10 + 2 + 1\n      |  _____________^\n21566 | |         + if raw == 0 { 7 + 1 } else { 2 + 76 + 1 + 1 },\n      | |_______________________________________________________^ failed this postcondition\n...\n21569 | /     if raw == 0 {\n21570 | |         base + 7 + 1\n21571 | |     } else {\n21572 | |         base + 2 + 75 + 1 + 1\n21573 | |     }\n      | |_____- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-distance-queue-write-undercharge",
+      "published_transcript_sha256": "4b8dc88e9e432c14cdbaad5d03cf954bee0570024153b7b16b1282ab1ff3987a",
+      "raw_transcript_sha256": "18ef623bfae34409385951d0be90b6fb8474eff3794d66d6856468d50d74e68f",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::distance_base_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21659:13\n      |\n21659 |     ensures r == read_work + 10 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21660 | {\n21661 |     read_work + 9 + 1\n      |     ----------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-distance-terminal-undercharge",
+      "published_transcript_sha256": "028d4c05c57605839f225fb3a07846ca56ea10bd36c1b01bbd85f399744bd731",
+      "raw_transcript_sha256": "78f0ce5bf3a10de7b36a8882b447a79b1bf8b76a35b04b97b425471619ffea09",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::distance_truncated_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21666:13\n      |\n21666 |     ensures r == read_work + 10 + 1 + 4 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21667 | {\n21668 |     distance_base_execution_work(read_work) + 4\n      |     ------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-distance-value-undercharge",
+      "published_transcript_sha256": "5a53c2f1fe9d9f5910ca386720d92048dcfc5a78f1564899a482a82825ddca14",
+      "raw_transcript_sha256": "b04f8afb46dea8a25b65f356c40f98974af8d1364a6d952bb27271564c588e46",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::distance_value_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21673:13\n      |\n21673 |     ensures r == read_work + 10 + 1 + 1 + 2 + 2 + 1 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21674 | {\n21675 |     distance_base_execution_work(read_work) + 1 + 2 + 2 + 1\n      |     ------------------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-context-mode-complete-undercharge",
+      "published_transcript_sha256": "2b0881c056fd888c5dda95779c3f452a3ca678d185aa4ed9729eadafe99af601",
+      "raw_transcript_sha256": "beaf5c3ed32e429007d0afcab935013cc1823f477dcc516fb6d27db94f904568",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::context_mode_complete_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21724:13\n      |\n21724 |     ensures r == 14 + 1 + 2,\n      |             ^^^^^^^^^^^^^^^ failed this postcondition\n21725 | {\n21726 |     13 + 1 + 2\n      |     ---------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-context-mode-queue-undercharge",
+      "published_transcript_sha256": "71099f8157ae0c772ff61ef47fd800ae1de1d74813b09855e3f06c79b0d42937",
+      "raw_transcript_sha256": "8265db0222e20f04549827b137ff41dae9d83b6002c22ffbd7c91ce02d87ef9c",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::context_mode_base_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21731:13\n      |\n21731 |     ensures r == read_work + 10 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21732 | {\n21733 |     read_work + 9 + 1\n      |     ----------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-context-mode-terminal-undercharge",
+      "published_transcript_sha256": "0bfefb5a946f7d93f552fb891cb9aaa0a4d8143e63b9858690ff92425226edf6",
+      "raw_transcript_sha256": "9010e71380011e80c1d82b2f94d87e56fcd951d782b0f8534d8d1e552a3c6a1b",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::context_mode_truncated_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21738:13\n      |\n21738 |     ensures r == read_work + 10 + 1 + 4 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21739 | {\n21740 |     context_mode_base_execution_work(read_work) + 4\n      |     ----------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-context-mode-value-undercharge",
+      "published_transcript_sha256": "6e24d571298b250b0ae1076c341784d7c3a015d96684dd221341b7062be32645",
+      "raw_transcript_sha256": "92bec73a69f325d4ccb37664afb61ef0d7c25a03c79e043a1a7f1d32483e229f",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::context_mode_value_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21745:13\n      |\n21745 |     ensures r == read_work + 10 + 1 + 1 + 2 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21746 | {\n21747 |     context_mode_base_execution_work(read_work) + 1 + 2\n      |     --------------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-planning-undercharge",
+      "published_transcript_sha256": "76aa42741e5f8ca08ac82e9a01b2e8eda2547c006df389dcd9ec3d055cf50cd1",
+      "raw_transcript_sha256": "a0738f1d022a575666a62f69f68c9e941313cfaaa20841e2f5185d07b9907aba",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::initial_suffix_planning_total",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21825:13\n      |\n21825 |     ensures r == read_work + 1,\n      |             ^^^^^^^^^^^^^^^^^^ failed this postcondition\n21826 | {\n21827 |     read_work\n      |     --------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-queue-undercharge",
+      "published_transcript_sha256": "9ac09b2f820274751f713fd19e786880182aa6f76686a8372f0b096c9d259234",
+      "raw_transcript_sha256": "bf93fa986e9055188bf6065a51490e609efd5db1216b0b178f6a773da5ce3ea0",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::initial_suffix_base_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21818:13\n      |\n21818 |     ensures r == read_work + 1 + 10 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21819 | {\n21820 |     read_work + 1 + 9 + 1\n      |     --------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-terminal-undercharge",
+      "published_transcript_sha256": "b6199265e35771f423713fdbe71d5aae746d9e1f1522c7d500b306dc6ae9df53",
+      "raw_transcript_sha256": "4bf00c2762421d1f674644d1dedff226a4087b57d2964898bbc377e42952c453",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::initial_suffix_truncated_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21832:13\n      |\n21832 |     ensures r == read_work + 1 + 10 + 1 + 4 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21833 | {\n21834 |     initial_suffix_base_execution_work(read_work) + 4\n      |     ------------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-value-undercharge",
+      "published_transcript_sha256": "7964c9edd1880c474703e0f122e2b1cff37705374538cf62424154a1c3fdf52e",
+      "raw_transcript_sha256": "d83cae2cdee921242c2297a934d89e5ea274d99d74062b2a4d5b6ae5316186c2",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::initial_suffix_value_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21839:13\n      |\n21839 |     ensures r == read_work + 1 + 10 + 1 + 4 + 1 + 1 + 1,\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n21840 | {\n21841 |     initial_suffix_base_execution_work(read_work) + 4 + 1 + 1\n      |     --------------------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-simple-install-formula-undercharge",
+      "published_transcript_sha256": "3910352fcb9743995069f2c44011a95022cddca889ba9eabe724f8da2b38d8e4",
+      "raw_transcript_sha256": "3dc136b09bd61123abab7cb8d25a3099bd6fe8e26822ae20a80dc79dbce4900d",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::simple_tree_install_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:22357:13\n      |\n22357 |     ensures r as nat == if selector == 0 { 5nat } else { 3 * alphabet as nat + 5 },\n      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n22358 | {\n22359 |     if selector == 0 { 4 } else { 3 * alphabet as u64 + 5 }\n      |     ------------------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-canonical-install-formula-undercharge",
+      "published_transcript_sha256": "a4fae5e346845a77dbdc7729c564f94dface372c9b68ab05e1f3e8d7f7e6316b",
+      "raw_transcript_sha256": "cfeae9750bc33609de5f5d522fe218c1a9ed8f6ee2ea82881b8bd41fc82c7184",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::canonical_tree_install_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:22368:13\n      |\n22368 |       ensures r == 36 * symbols as u64 + 6 * nonzero as u64\n      |  _____________^\n22369 | |         + nonzero_index_sum + 1_564 + 4 + 1,\n      | |___________________________________________^ failed this postcondition\n22370 |   {\n22371 |       36 * symbols as u64 + 6 * nonzero as u64 + nonzero_index_sum + 1_563 + 4 + 1\n      |       ---------------------------------------------------------------------------- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-repeat-serialization-formula-undercharge",
+      "published_transcript_sha256": "49c65f4dd626f09f9be5e9a9d3fbfe9fdab73a368150dad00ea07cbb6468a290",
+      "raw_transcript_sha256": "2b5dd29351660e42b34ea7bf6cd90b20a150f9c4e237630d18d28638fa65c017",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::code_description_payload_writes",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:22326:22\n      |\n22326 |       ensures r <= 35, r == code_description_payload_writes_spec(phase),\n      |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n22327 |   {\n22328 | /     match phase {\n22329 | |         CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize => 0,\n22330 | |         CodeDescriptionPhase::SimpleSymbols { .. } => 12,\n22331 | |         CodeDescriptionPhase::SimpleShape { .. }\n...     |\n22345 | |         CodeDescriptionPhase::Failed(_) => 1,\n22346 | |     }\n      | |_____- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-initial-symbol-formula-undercharge",
+      "published_transcript_sha256": "58ef66d0fa0721c178acc67083c0398fbbf7958921dd879661ea042b585d013a",
+      "raw_transcript_sha256": "c926166773f5e27d3e15779133d47f8acf4114eae4b9dbfc15cb8c2716dffd46",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::initial_symbol_execution_work",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:21928:9\n      |\n21928 | /         ({\n21929 | |             let amount: nat = planning_work as nat + 10 + 5 + 1\n21930 | |                 + match status {\n21931 | |                     InstalledSymbolStatus::Symbol(_) => 1nat + 3 + 1,\n...     |\n21936 | |             &&& r.is_ok() ==> r.unwrap() as nat == amount\n21937 | |         }),\n      | |__________^ failed this postcondition\n21938 | / {\n21939 | |     let base = checked_planned_work_add(planning_work, 10 + 4 + 1)?;\n21940 | |     match status {\n21941 | |         InstalledSymbolStatus::Symbol(_) => checked_planned_work_add(base, 1 + 3 + 1),\n...     |\n21947 | | }\n      | |_- at the end of the function body\n\nerror: aborting due to 1 previous error\n\n"
+    },
+    {
+      "name": "brotli-b3c-serialization-base-formula-undercharge",
+      "published_transcript_sha256": "11eb51dcc11507fb4237e08982b083b449f055fce742dc9b2fadea992fea7f52",
+      "raw_transcript_sha256": "0a79be48d9957e13270cfbb95228096b32b975f198b2b5257a5926b84bcc116e",
+      "result": "real proof rejection with unchanged arithmetic specifications",
+      "root": "lib::brotli_input::code_description_store_writes",
+      "transcript": "verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)\n\nnote: verifying module brotli_input (selected functions)\n\nWARNING: (45646,13): 'if' cannot be used in patterns.\nnote: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function\n     --> <CANARY_DIR>/src/brotli_input.rs:22349:1\n      |\n22349 | fn code_description_store_writes(phase: CodeDescriptionPhase) -> (r: u64)\n      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:22350:13\n      |\n22350 |     ensures 4 <= r <= 39, r == 4 + code_description_payload_writes_spec(phase),\n      |             ^^^^^^^^^^^^ failed this postcondition\n22351 | {\n22352 |     3 + code_description_payload_writes(phase)\n      |     ------------------------------------------ at the end of the function body\n\nerror: postcondition not satisfied\n     --> <CANARY_DIR>/src/brotli_input.rs:22350:27\n      |\n22350 |     ensures 4 <= r <= 39, r == 4 + code_description_payload_writes_spec(phase),\n      |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition\n22351 | {\n22352 |     3 + code_description_payload_writes(phase)\n      |     ------------------------------------------ at the end of the function body\n\nerror: aborting due to 2 previous errors\n\n"
+    }
+  ],
+  "positive_control": {
+    "errors": 0,
+    "path": "evidence/brotli-b3c-m1-verification.json",
+    "sha256": "e369a61ad163a2c9cb8b112be40ddce8b573d189ecfe8042d368601b4488d891",
+    "verified": 1058
+  },
+  "scope": "Arithmetic contracts only; full planner/action and exact resource coverage remain open.",
+  "suite_summary": {
+    "accepted_mutations": 0,
+    "elapsed_seconds": 74.17,
+    "semantic_rejections": 21,
+    "suites_failed": 0,
+    "suites_passed": 5,
+    "tool_failures": 0
+  }
+}

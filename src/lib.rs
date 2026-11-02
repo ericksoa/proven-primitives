@@ -117,7 +117,10 @@ pub(crate) fn copy_bytes(input: &[u8], output: &mut [u8], start: usize)
 }
 
 pub mod base64;
+pub mod brotli;
 mod brotli_block;
+mod brotli_data;
+mod brotli_dictionary;
 mod brotli_input;
 mod brotli_prefix;
 mod composition_demo;

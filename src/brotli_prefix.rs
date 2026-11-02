@@ -2602,6 +2602,7 @@ pub(crate) fn write_next_context_entry(
         1 <= num_htrees <= 256,
         (value as int) < num_htrees,
     ensures
+        final(workspace)@.len() == old(workspace)@.len(),
         r.is_ok() ==> {
             let at = context_entry_at(window_bytes, kind, initialized);
             &&& initialized < active_len

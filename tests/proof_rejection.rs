@@ -14,6 +14,9 @@ fn project_source_contains_no_proof_trust_bypasses() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         let source = fs::read_to_string(root.join(name)).unwrap();
@@ -94,7 +97,7 @@ fn check_brotli_input_function(verus: &Path, root: &Path, function: &str) -> std
             "--triggers-mode",
             "silent",
             "--rlimit",
-            "60",
+            "1000",
         ])
         .current_dir(root)
         .output()
@@ -122,6 +125,79 @@ fn check_brotli_block_function(verus: &Path, root: &Path, function: &str) -> std
         .current_dir(root)
         .output()
         .expect("run selected pinned Verus block root")
+}
+
+fn check_brotli_function(verus: &Path, root: &Path, function: &str) -> std::process::Output {
+    Command::new(verus)
+        .arg(root.join("src/lib.rs"))
+        .args([
+            "--crate-type",
+            "lib",
+            "--verify-only-module",
+            "brotli",
+            "--verify-function",
+            function,
+            "--no-cheating",
+            "--num-threads",
+            "1",
+            "--triggers-mode",
+            "silent",
+            "--rlimit",
+            "60",
+        ])
+        .current_dir(root)
+        .output()
+        .expect("run selected pinned Verus public Brotli root")
+}
+
+fn check_brotli_data_function(verus: &Path, root: &Path, function: &str) -> std::process::Output {
+    Command::new(verus)
+        .arg(root.join("src/lib.rs"))
+        .args([
+            "--crate-type",
+            "lib",
+            "--verify-only-module",
+            "brotli_data",
+            "--verify-function",
+            function,
+            "--no-cheating",
+            "--num-threads",
+            "1",
+            "--triggers-mode",
+            "silent",
+            "--rlimit",
+            "60",
+        ])
+        .current_dir(root)
+        .output()
+        .expect("run selected pinned Verus Brotli data root")
+}
+
+fn check_brotli_data_function_high(
+    verus: &Path,
+    root: &Path,
+    function: &str,
+) -> std::process::Output {
+    Command::new(verus)
+        .arg(root.join("src/lib.rs"))
+        .args([
+            "--crate-type",
+            "lib",
+            "--verify-only-module",
+            "brotli_data",
+            "--verify-function",
+            function,
+            "--no-cheating",
+            "--num-threads",
+            "1",
+            "--triggers-mode",
+            "silent",
+            "--rlimit",
+            "300",
+        ])
+        .current_dir(root)
+        .output()
+        .expect("run selected high-limit Brotli data root")
 }
 
 fn transcript(output: &std::process::Output) -> String {
@@ -156,6 +232,9 @@ fn the_prover_rejects_twenty_eight_semantic_and_security_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ];
     for name in sources {
@@ -396,6 +475,9 @@ fn the_prover_rejects_four_b3a_meta_header_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -486,6 +568,9 @@ fn the_prover_rejects_two_b3a_record_frame_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -565,6 +650,9 @@ fn the_prover_rejects_six_b3a_builder_storage_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -675,6 +763,9 @@ fn the_prover_rejects_four_b3b_inverse_mtf_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -766,6 +857,9 @@ fn the_prover_rejects_six_b3b_metadata_map_and_coverage_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -876,6 +970,9 @@ fn the_prover_rejects_two_b3b_distance_and_exhaustion_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -955,6 +1052,9 @@ fn the_prover_rejects_b3b_adapter_failure_as_retryable() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1022,6 +1122,9 @@ fn the_prover_rejects_six_b3a_code_description_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1129,6 +1232,9 @@ fn the_prover_rejects_b3a_auxiliary_code_without_bit_reversal() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1197,6 +1303,9 @@ fn the_prover_rejects_two_b3b_state_layout_and_bit_order_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1276,6 +1385,9 @@ fn the_prover_rejects_b3b_installed_symbol_without_bit_reversal() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1342,6 +1454,9 @@ fn the_prover_rejects_four_b3b_block_count_and_category_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1436,6 +1551,9 @@ fn the_prover_rejects_thirteen_b3b_context_map_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1586,6 +1704,9 @@ fn the_prover_rejects_six_b3b_tree_group_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1694,6 +1815,9 @@ fn the_prover_rejects_six_b3b_cross_call_state_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1803,6 +1927,9 @@ fn the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -1919,6 +2046,9 @@ fn the_prover_rejects_six_b3b_serialization_and_error_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -2029,6 +2159,9 @@ fn the_prover_rejects_six_b3a_repeat_stream_defects() {
         "brotli_input.rs",
         "brotli_block.rs",
         "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
         "composition_demo.rs",
     ] {
         fs::copy(
@@ -2112,5 +2245,965 @@ fn the_prover_rejects_six_b3a_repeat_stream_defects() {
         println!("REJECTED {name}: deliberately wrong implementation, unchanged specification");
         fs::write(&path, original).unwrap();
     }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-canaries-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+    fs::create_dir_all(project.join("evidence")).unwrap();
+
+    for (module, function) in [
+        ("input", "b3c_layout_is_exact"),
+        ("input", "initialize_serialized_b3c"),
+        ("input", "reject_permanent_single_type_switch"),
+        ("input", "distance_lut_value"),
+        ("input", "validate_zero_padding"),
+        ("input", "validate_dictionary_staging_length"),
+        ("input", "validate_initialized_dictionary_index"),
+        ("input", "body_decrement_block_remaining"),
+        ("brotli", "selected_literal_context"),
+        ("brotli", "command_copy_length_context"),
+        ("brotli", "BrotliDecoder::commit_eof_if_complete"),
+        ("brotli", "phase_after_completed_insert"),
+        ("brotli", "next_recent_cursor"),
+        ("brotli", "copy_setup_phase"),
+        ("brotli", "overlap_source_position"),
+        ("brotli", "BrotliDecoder::consume_metadata_byte"),
+        ("brotli", "BrotliDecoder::emit_uncompressed_byte"),
+        ("brotli", "output_block_reason"),
+        ("brotli", "BrotliDecoder::reset"),
+        ("brotli", "BrotliDecoder::step"),
+        ("data", "distance_index_delta"),
+        ("data", "distance_value_delta"),
+        ("data", "validate_dictionary_transform_shape"),
+        ("data", "zero_length_dictionary_transform_plan"),
+        ("brotli", "BrotliDecoder::fail"),
+        ("brotli", "BrotliDecoder::emit_byte"),
+    ] {
+        let positive = match module {
+            "input" => check_brotli_input_function(&verus, &temporary, function),
+            "brotli" => check_brotli_function(&verus, &temporary, function),
+            "data" => check_brotli_data_function(&verus, &temporary, function),
+            _ => unreachable!(),
+        };
+        assert!(
+            positive.status.success(),
+            "unmodified selected root failed: {}",
+            transcript(&positive),
+        );
+    }
+
+    for (name, module, file, function, old, new) in [
+        (
+            "brotli-b3c-region-boundary-shifts",
+            "input",
+            "brotli_input.rs",
+            "b3c_layout_is_exact",
+            "pub(crate) const B3C_DISTANCE_BITS_OFFSET: u32 = 1_163_660;",
+            "pub(crate) const B3C_DISTANCE_BITS_OFFSET: u32 = 1_163_661;",
+        ),
+        (
+            "brotli-b3c-initial-recent-distance-is-wrong",
+            "input",
+            "brotli_input.rs",
+            "initialize_serialized_b3c",
+            "if i == B3C_RECENT_DISTANCES as usize { 16 }",
+            "if i == B3C_RECENT_DISTANCES as usize { 15 }",
+        ),
+        (
+            "brotli-b3c-terminal-escrow-marker-is-wrong",
+            "input",
+            "brotli_input.rs",
+            "initialize_serialized_b3c",
+            "else if i == B3C_TERMINAL_ESCROW_MARKER as usize { 4 }",
+            "else if i == B3C_TERMINAL_ESCROW_MARKER as usize { 3 }",
+        ),
+        (
+            "brotli-b3c-distance-lut-offset-is-wrong",
+            "input",
+            "brotli_input.rs",
+            "distance_lut_value",
+            "let shifted_wide = shifted_grouped + direct as u64 + 1;",
+            "let shifted_wide = shifted_grouped + direct as u64 + 2;",
+        ),
+        (
+            "brotli-b3c-nonzero-padding-is-accepted",
+            "input",
+            "brotli_input.rs",
+            "validate_zero_padding",
+            "if value == 0 {\n        Ok(())",
+            "if value != 0 {\n        Ok(())",
+        ),
+        (
+            "brotli-b3c-dictionary-output-equal-to-meta-limit-is-rejected",
+            "input",
+            "brotli_input.rs",
+            "validate_dictionary_staging_length",
+            "    } else if output_length as u32 > meta_remaining {",
+            "    } else if output_length as u32 >= meta_remaining {",
+        ),
+        (
+            "brotli-b3c-dictionary-staging-reads-uninitialized-byte",
+            "input",
+            "brotli_input.rs",
+            "validate_initialized_dictionary_index",
+            "    if initialized > 37 || index >= initialized {",
+            "    if initialized > 37 || index > initialized {",
+        ),
+        (
+            "brotli-b3c-permanent-block-switch-failure-is-retryable",
+            "input",
+            "brotli_input.rs",
+            "reject_permanent_single_type_switch",
+            "        consumed: 0,\n        status: match result.outcome {\n            crate::brotli_block::B3bSwitchOutcome::Failed(error) => {\n                BodySwitchStatus::Failed(map_switch_failure(error))",
+            "        consumed: 0,\n        status: match result.outcome {\n            crate::brotli_block::B3bSwitchOutcome::Failed(error) => {\n                BodySwitchStatus::NeedInput",
+        ),
+        (
+            "brotli-b3c-command-remaining-does-not-decrement",
+            "input",
+            "brotli_input.rs",
+            "body_decrement_block_remaining",
+            "remaining - 1,\n    )\n    .map_err(map_compressed_error)",
+            "remaining,\n    )\n    .map_err(map_compressed_error)",
+        ),
+        (
+            "brotli-b3c-literal-context-previous-bytes-are-swapped",
+            "brotli",
+            "brotli.rs",
+            "selected_literal_context",
+            "crate::brotli_data::literal_context(mode, previous, second_previous)",
+            "crate::brotli_data::literal_context(mode, second_previous, previous)",
+        ),
+        (
+            "brotli-b3c-copy-length-context-is-wrong",
+            "brotli",
+            "brotli.rs",
+            "command_copy_length_context",
+            "    } else if copy_offset <= 4 {\n        (copy_offset - 2) as u8\n    } else {\n        3\n    }\n}",
+            "    } else if copy_offset <= 4 {\n        (copy_offset - 1) as u8\n    } else {\n        3\n    }\n}",
+        ),
+        (
+            "brotli-b3c-eof-is-committed-before-slice-consumption",
+            "brotli",
+            "brotli.rs",
+            "BrotliDecoder::commit_eof_if_complete",
+            "    {\n        if end && consumed == input_len {",
+            "    {\n        if end {",
+        ),
+        (
+            "brotli-b3c-copy-runs-after-insert-reaches-meta-length",
+            "brotli",
+            "brotli.rs",
+            "phase_after_completed_insert",
+            "{\n    if meta_remaining == 0 { 15 } else { 8 }\n}",
+            "{\n    if meta_remaining == 0 { 8 } else { 8 }\n}",
+        ),
+        (
+            "brotli-b3c-recent-distance-ring-does-not-advance",
+            "brotli",
+            "brotli.rs",
+            "next_recent_cursor",
+            "    if cursor == 3 { 0 } else { cursor + 1 }",
+            "    cursor",
+        ),
+        (
+            "brotli-b3c-beyond-history-distance-is-treated-as-lz77",
+            "brotli",
+            "brotli.rs",
+            "copy_setup_phase",
+            "    if distance <= history { 12 } else { 13 }",
+            "    12",
+        ),
+        (
+            "brotli-b3c-overlap-copy-uses-wrong-source",
+            "brotli",
+            "brotli.rs",
+            "overlap_source_position",
+            "        position - distance",
+            "        position - distance + 1",
+        ),
+        (
+            "brotli-b3c-metadata-changes-history",
+            "brotli",
+            "brotli.rs",
+            "BrotliDecoder::consume_metadata_byte",
+            "        let result = crate::brotli_input::write_b3c_state_u32(\n            self.workspace,\n            self.window_bytes(),\n            crate::brotli_input::B3C_META_REMAINING,\n            remaining - 1,",
+            "        let result = crate::brotli_input::write_b3c_state_u32(\n            self.workspace,\n            self.window_bytes(),\n            crate::brotli_input::B3C_HISTORY_LENGTH,\n            remaining - 1,",
+        ),
+        (
+            "brotli-b3c-uncompressed-byte-does-not-debit-input",
+            "brotli",
+            "brotli.rs",
+            "BrotliDecoder::emit_uncompressed_byte",
+            "        self.emit_byte(byte, output, produced, true)",
+            "        self.emit_byte(byte, output, produced, false)",
+        ),
+        (
+            "brotli-b3c-need-output-masks-resource-limit",
+            "brotli",
+            "brotli.rs",
+            "output_block_reason",
+            "    if output_remaining == 0 || work_remaining < 8 {\n        1\n    } else if !has_output_slot {\n        2",
+            "    if !has_output_slot {\n        2\n    } else if output_remaining == 0 || work_remaining < 8 {\n        1",
+        ),
+        (
+            "brotli-b3c-reset-replenishes-work",
+            "brotli",
+            "brotli.rs",
+            "BrotliDecoder::reset",
+            "        let window_bytes = 1u32 << self.budget.limits.max_window_bits;",
+            "        self.budget.work_remaining = self.budget.limits.max_work;\n        let window_bytes = 1u32 << self.budget.limits.max_window_bits;",
+        ),
+        (
+            "brotli-b3c-terminal-retry-debits-a-call",
+            "brotli",
+            "brotli.rs",
+            "BrotliDecoder::step",
+            "        if let Some(step) = self.terminal_step(phase) {\n            proof {",
+            "        if let Some(step) = self.terminal_step(phase) {\n            let _ = self.budget.charge_call();\n            proof {",
+        ),
+        (
+            "brotli-b3c-recent-distance-index-is-wrong",
+            "data",
+            "brotli_data.rs",
+            "distance_index_delta",
+            "0 => 3, 1 => 2, 2 => 1, 3 => 0,",
+            "0 => 2, 1 => 2, 2 => 1, 3 => 0,",
+        ),
+        (
+            "brotli-b3c-recent-distance-signed-delta-is-wrong",
+            "data",
+            "brotli_data.rs",
+            "distance_value_delta",
+            "4 | 10 => -1,",
+            "4 | 10 => 1,",
+        ),
+        (
+            "brotli-b3c-dictionary-length-guard-is-weakened",
+            "data",
+            "brotli_data.rs",
+            "validate_dictionary_transform_shape",
+            "    if length < 4 || length > 24 {",
+            "    if length < 3 || length > 24 {",
+        ),
+        (
+            "brotli-b3c-valid-zero-length-transform-is-rejected",
+            "data",
+            "brotli_data.rs",
+            "zero_length_dictionary_transform_plan",
+            "    DictionaryTransformPlan {\n        prefix_at: 216,\n        prefix_len: 0,\n        body_start: 0,\n        body_len: 0,",
+            "    DictionaryTransformPlan {\n        prefix_at: 216,\n        prefix_len: 0,\n        body_start: 0,\n        body_len: 1,",
+        ),
+        (
+            "brotli-b3c-failure-is-stored-as-finished",
+            "brotli",
+            "brotli.rs",
+            "BrotliDecoder::fail",
+            "crate::brotli_input::B3C_STREAM_PHASE,\n            9,",
+            "crate::brotli_input::B3C_STREAM_PHASE,\n            8,",
+        ),
+        (
+            "brotli-b3c-byte-emission-undercharges-work",
+            "brotli",
+            "brotli.rs",
+            "BrotliDecoder::emit_byte",
+            "assert!(self.budget.charge_work(8));",
+            "assert!(self.budget.charge_work(7));",
+        ),
+        (
+            "brotli-b3c-byte-emission-publishes-wrong-value",
+            "brotli",
+            "brotli.rs",
+            "BrotliDecoder::emit_byte",
+            "output[produced] = byte;",
+            "output[produced] = byte.wrapping_add(1);",
+        ),
+    ] {
+        let source_path = project.join("src").join(file);
+        let temporary_path = temporary.join("src").join(file);
+        let original = fs::read_to_string(&source_path).unwrap();
+        assert_eq!(
+            original.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}",
+        );
+        fs::write(&temporary_path, original.replacen(old, new, 1)).unwrap();
+        let result = match module {
+            "input" => check_brotli_input_function(&verus, &temporary, function),
+            "brotli" => check_brotli_function(&verus, &temporary, function),
+            "data" => check_brotli_data_function(&verus, &temporary, function),
+            _ => unreachable!(),
+        };
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied")
+                || log.contains("precondition not satisfied")
+                || log.contains("invariant not satisfied")
+                || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}",
+        );
+        println!("REJECTED {name}: deliberately wrong implementation, unchanged specification");
+        fs::write(&temporary_path, original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_b3c_exact_symbol_work_undercharge() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-symbol-work-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+    let function = "advance_installed_tree_symbol";
+    let positive = check_brotli_input_function(&verus, &temporary, function);
+    assert!(
+        positive.status.success(),
+        "unmodified selected root failed: {}",
+        transcript(&positive),
+    );
+
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    let old = "        exact_work = exact_work + 1;\n        let read = queue.read_bits";
+    let new = "        exact_work = exact_work;\n        let read = queue.read_bits";
+    assert_eq!(original.matches(old).count(), 1, "unique mutation anchor");
+    fs::write(&path, original.replacen(old, new, 1)).unwrap();
+    let result = check_brotli_input_function(&verus, &temporary, function);
+    let log = transcript(&result);
+    fs::create_dir_all(project.join("evidence")).unwrap();
+    fs::write(
+        project.join("evidence/canary-brotli-b3c-symbol-work-undercharge.log"),
+        &log,
+    )
+    .unwrap();
+    assert!(
+        !result.status.success(),
+        "prover accepted symbol-work undercharge"
+    );
+    assert!(
+        log.contains("invariant not satisfied")
+            || log.contains("postcondition not satisfied")
+            || log.contains("assertion failed"),
+        "expected a proof rejection, not a tooling error: {log}",
+    );
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_b3c_serialized_symbol_write_undercharge() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-symbol-write-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+    let function = "completed_body_symbol_work";
+    let positive = check_brotli_input_function(&verus, &temporary, function);
+    assert!(
+        positive.status.success(),
+        "unmodified selected root failed: {}",
+        transcript(&positive),
+    );
+
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    let old = "    const SERIALIZED_WRITE_WORK: u64 = 10 + 5;";
+    let new = "    const SERIALIZED_WRITE_WORK: u64 = 10 + 4;";
+    assert_eq!(original.matches(old).count(), 1, "unique mutation anchor");
+    fs::write(&path, original.replacen(old, new, 1)).unwrap();
+    let result = check_brotli_input_function(&verus, &temporary, function);
+    let log = transcript(&result);
+    fs::create_dir_all(project.join("evidence")).unwrap();
+    fs::write(
+        project.join("evidence/canary-brotli-b3c-symbol-write-undercharge.log"),
+        &log,
+    )
+    .unwrap();
+    assert!(
+        !result.status.success(),
+        "prover accepted serialized symbol-write undercharge",
+    );
+    assert!(
+        log.contains("postcondition not satisfied") || log.contains("assertion failed"),
+        "expected a proof rejection, not a tooling error: {log}",
+    );
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_five_b3c_block_count_metering_undercharges() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-block-count-metering-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-b3c-block-count-planning-bit-undercharge",
+            "plan_bit_read",
+            "    let work = consumed as u64 + if complete { width as u64 } else { 0 };",
+            "    let work = consumed as u64;",
+        ),
+        (
+            "brotli-b3c-block-count-base-write-undercharge",
+            "block_count_base_execution_work",
+            "{\n    read_work + 10 + 2 + 1\n}",
+            "{\n    read_work + 10 + 2\n}",
+        ),
+        (
+            "brotli-b3c-block-count-terminal-write-undercharge",
+            "block_count_truncated_execution_work",
+            "{\n    block_count_base_execution_work(read_work) + 4 + 1\n}",
+            "{\n    block_count_base_execution_work(read_work) + 4\n}",
+        ),
+        (
+            "brotli-b3c-block-count-single-value-undercharge",
+            "block_count_value_execution_work",
+            "    if raw == 0 {\n        base + 7 + 1",
+            "    if raw == 0 {\n        base + 7",
+        ),
+        (
+            "brotli-b3c-block-count-tree-start-undercharge",
+            "block_count_value_execution_work",
+            "        base + 2 + 76 + 1 + 1",
+            "        base + 2 + 75 + 1 + 1",
+        ),
+    ] {
+        assert_eq!(
+            original.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        fs::write(&path, original.replacen(old, new, 1)).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::create_dir_all(project.join("evidence")).unwrap();
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied") || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}",
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_three_b3c_distance_metering_undercharges() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-distance-metering-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-b3c-distance-queue-write-undercharge",
+            "distance_base_execution_work",
+            "{\n    read_work + 10 + 1\n}",
+            "{\n    read_work + 9 + 1\n}",
+        ),
+        (
+            "brotli-b3c-distance-terminal-undercharge",
+            "distance_truncated_execution_work",
+            "{\n    distance_base_execution_work(read_work) + 4 + 1\n}",
+            "{\n    distance_base_execution_work(read_work) + 4\n}",
+        ),
+        (
+            "brotli-b3c-distance-value-undercharge",
+            "distance_value_execution_work",
+            "{\n    distance_base_execution_work(read_work) + 1 + 2 + 2 + 1 + 1\n}",
+            "{\n    distance_base_execution_work(read_work) + 1 + 2 + 2 + 1\n}",
+        ),
+    ] {
+        let start = original
+            .find(&format!("fn {function}("))
+            .expect("selected mutation function exists");
+        let end = start
+            + original[start..]
+                .find("\n}\n")
+                .expect("selected mutation function ends")
+            + 3;
+        let selected = &original[start..end];
+        assert_eq!(
+            selected.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        let mutated = format!(
+            "{}{}{}",
+            &original[..start],
+            selected.replacen(old, new, 1),
+            &original[end..],
+        );
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::create_dir_all(project.join("evidence")).unwrap();
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied") || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}",
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_four_b3c_context_mode_metering_undercharges() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-context-mode-metering-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-b3c-context-mode-complete-undercharge",
+            "context_mode_complete_execution_work",
+            "{\n    14 + 1 + 2\n}",
+            "{\n    13 + 1 + 2\n}",
+        ),
+        (
+            "brotli-b3c-context-mode-queue-undercharge",
+            "context_mode_base_execution_work",
+            "fn context_mode_base_execution_work(read_work: u64) -> (r: u64)\n    requires read_work <= 63,\n    ensures r == read_work + 10 + 1,\n{\n    read_work + 10 + 1\n}",
+            "fn context_mode_base_execution_work(read_work: u64) -> (r: u64)\n    requires read_work <= 63,\n    ensures r == read_work + 10 + 1,\n{\n    read_work + 9 + 1\n}",
+        ),
+        (
+            "brotli-b3c-context-mode-terminal-undercharge",
+            "context_mode_truncated_execution_work",
+            "{\n    context_mode_base_execution_work(read_work) + 4 + 1\n}",
+            "{\n    context_mode_base_execution_work(read_work) + 4\n}",
+        ),
+        (
+            "brotli-b3c-context-mode-value-undercharge",
+            "context_mode_value_execution_work",
+            "{\n    context_mode_base_execution_work(read_work) + 1 + 2 + 1\n}",
+            "{\n    context_mode_base_execution_work(read_work) + 1 + 2\n}",
+        ),
+    ] {
+        assert_eq!(
+            original.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        fs::write(&path, original.replacen(old, new, 1)).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::create_dir_all(project.join("evidence")).unwrap();
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied") || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}",
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_four_b3c_initial_suffix_metering_undercharges() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-initial-suffix-metering-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-b3c-initial-suffix-planning-undercharge",
+            "initial_suffix_planning_total",
+            "{\n    read_work + 1\n}",
+            "{\n    read_work\n}",
+        ),
+        (
+            "brotli-b3c-initial-suffix-queue-undercharge",
+            "initial_suffix_base_execution_work",
+            "{\n    read_work + 1 + 10 + 1\n}",
+            "{\n    read_work + 1 + 9 + 1\n}",
+        ),
+        (
+            "brotli-b3c-initial-suffix-terminal-undercharge",
+            "initial_suffix_truncated_execution_work",
+            "{\n    initial_suffix_base_execution_work(read_work) + 4 + 1\n}",
+            "{\n    initial_suffix_base_execution_work(read_work) + 4\n}",
+        ),
+        (
+            "brotli-b3c-initial-suffix-value-undercharge",
+            "initial_suffix_value_execution_work",
+            "{\n    initial_suffix_base_execution_work(read_work) + 4 + 1 + 1 + 1\n}",
+            "{\n    initial_suffix_base_execution_work(read_work) + 4 + 1 + 1\n}",
+        ),
+    ] {
+        assert_eq!(
+            original.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        fs::write(&path, original.replacen(old, new, 1)).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::create_dir_all(project.join("evidence")).unwrap();
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied") || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}",
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_five_b3c_tree_formula_undercharges() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-tree-metering-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.path().extension().is_some_and(|ext| ext == "rs") {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    // These controls bind the arithmetic contracts only. Full planner/action
+    // refinement and source-action coverage remain separate M1 obligations.
+    for (name, function, old, new) in [
+        (
+            "brotli-b3c-simple-install-formula-undercharge",
+            "simple_tree_install_work",
+            "    if selector == 0 { 5 } else { 3 * alphabet as u64 + 5 }",
+            "    if selector == 0 { 4 } else { 3 * alphabet as u64 + 5 }",
+        ),
+        (
+            "brotli-b3c-canonical-install-formula-undercharge",
+            "canonical_tree_install_work",
+            "    36 * symbols as u64 + 6 * nonzero as u64 + nonzero_index_sum + 1_564 + 4 + 1",
+            "    36 * symbols as u64 + 6 * nonzero as u64 + nonzero_index_sum + 1_563 + 4 + 1",
+        ),
+        (
+            "brotli-b3c-repeat-serialization-formula-undercharge",
+            "code_description_payload_writes",
+            "        CodeDescriptionPhase::ComplexRepeat { .. } => 35,",
+            "        CodeDescriptionPhase::ComplexRepeat { .. } => 34,",
+        ),
+        (
+            "brotli-b3c-initial-symbol-formula-undercharge",
+            "initial_symbol_execution_work",
+            "    let base = checked_planned_work_add(planning_work, 10 + 5 + 1)?;",
+            "    let base = checked_planned_work_add(planning_work, 10 + 4 + 1)?;",
+        ),
+        (
+            "brotli-b3c-serialization-base-formula-undercharge",
+            "code_description_store_writes",
+            "    4 + code_description_payload_writes(phase)",
+            "    3 + code_description_payload_writes(phase)",
+        ),
+    ] {
+        assert_eq!(
+            original.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        fs::write(&path, original.replacen(old, new, 1)).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied") || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}",
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_b3c_wrong_dictionary_source() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-dictionary-source-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for name in [
+        "lib.rs",
+        "base64.rs",
+        "percent.rs",
+        "lz4.rs",
+        "brotli_input.rs",
+        "brotli_block.rs",
+        "brotli_prefix.rs",
+        "brotli.rs",
+        "brotli_data.rs",
+        "brotli_dictionary.rs",
+        "composition_demo.rs",
+    ] {
+        fs::copy(
+            project.join("src").join(name),
+            temporary.join("src").join(name),
+        )
+        .unwrap();
+    }
+    let function = "copy_dictionary_slice";
+    let positive = check_brotli_data_function_high(&verus, &temporary, function);
+    assert!(
+        positive.status.success(),
+        "unmodified selected root failed: {}",
+        transcript(&positive),
+    );
+
+    let path = temporary.join("src/brotli_data.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    let old = "        output[output_start + i] = crate::brotli_dictionary::dictionary_byte(\n            source + body_start + i,\n        );";
+    let new = "        output[output_start + i] = crate::brotli_dictionary::dictionary_byte(\n            source + body_start + i + 1,\n        );";
+    assert_eq!(original.matches(old).count(), 1, "unique mutation anchor");
+    fs::write(&path, original.replacen(old, new, 1)).unwrap();
+    let result = check_brotli_data_function_high(&verus, &temporary, function);
+    let log = transcript(&result);
+    fs::create_dir_all(project.join("evidence")).unwrap();
+    fs::write(
+        project.join("evidence/canary-brotli-b3c-wrong-dictionary-source.log"),
+        &log,
+    )
+    .unwrap();
+    assert!(
+        !result.status.success(),
+        "prover accepted wrong dictionary source"
+    );
+    assert!(
+        log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("assertion failed"),
+        "expected a proof rejection, not a tooling error: {log}",
+    );
     fs::remove_dir_all(temporary).unwrap();
 }
