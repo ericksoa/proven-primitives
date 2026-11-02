@@ -3143,6 +3143,69 @@ fn the_prover_rejects_five_b3c_tree_formula_undercharges() {
 
 #[test]
 #[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_thirteen_b3c_context_tree_count_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-context-count-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.path().extension().is_some_and(|ext| ext == "rs") {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-b3c-context-count-queue-write-undercharge","context_tree_count_execution_work","    let base = read_work + 10 + 2 + 1;","    let base = read_work + 9 + 2 + 1;"),
+        ("brotli-b3c-context-count-var-write-undercharge","context_tree_count_execution_work","    let base = read_work + 10 + 2 + 1;","    let base = read_work + 10 + 1 + 1;"),
+        ("brotli-b3c-context-count-map-cell-undercharge","context_tree_count_execution_work","            active_len as u64 + 4 + 1 + 1","            active_len as u64 / 2 + 4 + 1 + 1"),
+        ("brotli-b3c-context-count-map-progress-undercharge","context_tree_count_execution_work","            active_len as u64 + 4 + 1 + 1","            active_len as u64 + 3 + 1 + 1"),
+        ("brotli-b3c-context-count-tree-count-undercharge","context_tree_count_execution_work","        VarUint8Status::Value(raw) => base + 2 + if raw == 0 {","        VarUint8Status::Value(raw) => base + 1 + if raw == 0 {"),
+        ("brotli-b3c-context-count-phase-transition-undercharge","context_tree_count_execution_work","            1 + 1\n        },","            1\n        },"),
+        ("brotli-b3c-context-count-terminal-undercharge","context_tree_count_execution_work","        VarUint8Status::Truncated => base + 4 + 1,","        VarUint8Status::Truncated => base + 4,"),
+        ("brotli-b3c-context-count-planning-debit-omitted","plan_context_tree_count_action","    if !budget.charge_work(read.work) {","    if !budget.charge_work(0) {"),
+        ("brotli-b3c-context-count-execution-debit-undercharge","execute_planned_context_tree_count","    if !budget.charge_work(plan.execution_work) {","    if !budget.charge_work(plan.execution_work - 1) {"),
+        ("brotli-b3c-context-count-execution-reserved-after-writes","execute_planned_context_tree_count","    if !budget.charge_work(plan.execution_work) {\n        return Err(CompressedStep {\n            consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit),\n        });\n    }\n",""),
+        ("brotli-b3c-context-count-wrong-decoded-count","advance_context_tree_count_phase","                        let num_trees = raw + 1;","                        let num_trees = raw + 2;"),
+        ("brotli-b3c-context-count-wrong-zero-map-value","advance_context_tree_count_phase","                                    kind,\n                                    active_len,\n                                    initialized,\n                                    0,\n                                    1,","                                    kind,\n                                    active_len,\n                                    initialized,\n                                    1,\n                                    1,"),
+        ("brotli-b3c-context-count-progress-writes-map-size","store_context_map_progress","    match put_state_u16(workspace, window_bytes, B3B_MAP_INDEX, progress) {","    match put_state_u16(workspace, window_bytes, B3B_MAP_SIZE, progress) {"),
+    ] {
+        let start = original.find(&format!("fn {function}("))
+            .expect("selected function exists");
+        let end = start + original[start..].find("\n}\n")
+            .expect("selected function ends") + 3;
+        let selected = &original[start..end];
+        assert_eq!(selected.matches(old).count(), 1, "unique mutation anchor for {name}");
+        let mut changed = selected.replacen(old, new, 1);
+        if name == "brotli-b3c-context-count-execution-reserved-after-writes" {
+            let call = "    let (used, status) = advance_context_tree_count_phase(\n        workspace, window_bytes, kind_tag, kind, active_len, input, end_of_input,\n    );";
+            assert_eq!(changed.matches(call).count(), 1, "unique execution site");
+            changed = changed.replacen(call, &format!("{call}\n{old}"), 1);
+        }
+        let mutated = format!("{}{}{}", &original[..start], changed, &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
 fn the_prover_rejects_b3c_wrong_dictionary_source() {
     let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
     let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });

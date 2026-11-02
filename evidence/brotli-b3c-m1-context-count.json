@@ -1,0 +1,184 @@
+{
+  "approval_and_document_sha256": {
+    "AGENTS.md": "caca2807bddf0cf6af97ded4a76e56f11db498ccc713269038ab005eef1b9b4e",
+    "BROTLI_B3C_FIXTURE_ADDENDUM.md": "2d2c0c35915b69b702c8a84e8362406515d51dcf8e1a690c475c4407dff6faa8",
+    "BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md": "f084bbeb2d1d2432bb6e2c55d6d090bd900259b6432a14cfb25203eb3d456827",
+    "BROTLI_B3C_METERING_ADDENDUM.md": "3beb8b882b47806a603d15bd2519587945abd9b0872ad2277a884da8b840a151",
+    "BROTLI_B3C_PROPOSAL.md": "2ee3344863a50465bcd1d820468537f1dce391c2bf26af67ee29e9566537974a"
+  },
+  "base_commit": "c43e7a5df0d0562790857cbbc12a36e246006104",
+  "checked_roots": [
+    "lib::brotli_input::context_tree_count_execution_work",
+    "lib::brotli_input::plan_context_tree_count_action",
+    "lib::brotli_input::serialized_var_uint8_starts_agree",
+    "lib::brotli_input::var_uint8_steps_agree",
+    "lib::brotli_input::single_context_tree_map_is_zero",
+    "lib::brotli_input::context_tree_count_plan_matches_action",
+    "lib::brotli_input::execute_planned_context_tree_count",
+    "lib::brotli_input::advance_planned_context_tree_count",
+    "lib::brotli_input::advance_context_tree_count_phase",
+    "lib::brotli_input::store_b3b_queue",
+    "lib::brotli_input::store_var_uint8_phase",
+    "lib::brotli_input::store_context_map_progress",
+    "lib::brotli_input::store_terminal_error",
+    "lib::brotli_input::load_b3b_queue",
+    "lib::brotli_input::load_var_uint8_phase",
+    "lib::brotli_input::map_compressed_error"
+  ],
+  "claim": "The new B3c phase-0 path plans the existing W1 tree-count action, charges planning reads and reserves its work formula before mutation. Checked contracts cover logical plan/action correspondence, single-tree zero-map contents, phase-category workspace framing, input/work debit and no workspace or credit changes on failed execution reservation.",
+  "compiled_artifact": {
+    "note": "Ordinary Cargo release library built from the bound annotated source; Rust and LLVM remain trusted. This is not a source-to-binary correctness proof.",
+    "path": "target/release/libproven_primitives.rlib",
+    "sha256": "38dffe2c5321dd654d0a709cf9e59c41828026b62fdd51104b3adcf3e12276a1"
+  },
+  "component": "Brotli B3c M1 context-tree-count continuation",
+  "execution_environment": {
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+    "RUSTUP_TOOLCHAIN": "1.99.1",
+    "cargo_profile": "release",
+    "target": "aarch64-apple-darwin"
+  },
+  "format_check": {
+    "command": [
+      "cargo",
+      "+1.99.1",
+      "fmt",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  "generated_utc": "2026-11-02T20:08:16.022340+00:00",
+  "locked_dependencies": {
+    "path": "Cargo.lock",
+    "sha256": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7"
+  },
+  "negative_controls": {
+    "order": "Unchanged whole-crate positive completed before all deliberate mutations.",
+    "path": "evidence/brotli-b3c-m1-context-count-controls.json",
+    "rejected_mutations": 34,
+    "sha256": "3d9a59d3e50cae69a32a3b8ffa69e09fbca9acf79a2633525b50a965625e815f",
+    "suites_passed": 6
+  },
+  "release_gate": "No supported-decoder or completed-M1 claim; no release gate promoted.",
+  "remaining_obligations": [
+    "Replace conservative context phases 1 through 6 and complete/failed W1 observation; the fallback can still traverse later phase-0 actions internally.",
+    "Bind the complete source-operation ledger, including all remaining paths and older planners; exact reservation/debit of the computed formula does not establish that every source operation is counted.",
+    "Prove smaller per-status write footprints and byte-for-byte plan equality inside the serialized cursor; this slice proves logical cursor equivalence and a phase-category frame.",
+    "Complete remaining B3c public refinement, confidentiality, resource coverage, control mapping, independent specification review and release gates. B3d and B4 remain separate."
+  ],
+  "report": {
+    "path": "BROTLI_B3C_METERING_ADDENDUM.md",
+    "sha256": "3beb8b882b47806a603d15bd2519587945abd9b0872ad2277a884da8b840a151"
+  },
+  "runtime_tests": {
+    "command": [
+      "cargo",
+      "+1.99.1",
+      "test",
+      "--all-targets",
+      "--release"
+    ],
+    "failed": 0,
+    "library_tests_passed": 70,
+    "log": {
+      "path": "evidence/m1-context-count-release-tests.log",
+      "sha256": "4c37f389c3508957ff3b9cff25ee17b7debd86796520f12dfc65151ca8af9272"
+    },
+    "new_matrix_action_configurations": 192,
+    "new_matrix_execution_cases": 384,
+    "note": "Finite tests compare entire workspace images with W1 and exercise exact/one-short work, empty input, EOF, input credit and public adapter dispatch. They do not replace unproved obligations.",
+    "primitive_tests_passed": 9,
+    "source_trust_scan_tests_passed": 1,
+    "total_tests_passed": 81,
+    "upstream_comparison_tests_passed": 1
+  },
+  "source_sha256": {
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "c7911f5c4a8c039f5595bc8e89534ab7768e0624419444620e0e8e30ab0fa4cc",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/brotli_data.rs": "188030151158d62799924dfb7b78879462e6f8410e1391fa773b02c63bbed54b",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "2683650a4b86f6d14d9ae80be19c766bffc50f95f81c8383c6d31c6ddc720067",
+    "src/brotli_prefix.rs": "389159aeffce1aa09a3ed31d04f4f60815db6c7f9aebda9b5946519d4d9d5ab1",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+  },
+  "source_tree_sha256": "1ca8d7c12d3f030dc07d26ee1037e6e1bc096996587db514f0971717b7a9bc64",
+  "status": "checked tree-count planning and prepaid execution slice; M1 and B3c remain incomplete",
+  "validation_source_sha256": {
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "examples/buffers.rs": "fc0e8f2809c73f4f29461d63277e79726f7ba2c700194bd107bc147a9dd526bf",
+    "tests/fixtures/brotli/corpus/10x10y": "41bd4c895e9fb36d74bc97db5092872a24267e3b0455ff6152b0d262faa00d49",
+    "tests/fixtures/brotli/corpus/10x10y.compressed": "d666afc0f6c35d8d7796175aa9a68f16ba59afedee946d4bce9167f6c86e0b84",
+    "tests/fixtures/brotli/corpus/64x": "be4d3ed1fc5f5cfa00735b28605a975f3293fa235d23abb1d9dea380fba0fb87",
+    "tests/fixtures/brotli/corpus/64x.compressed": "f0273c38c6a55c1d9ccb047da04bacdc4bb07acc44ff83871e6b3490dfc2c313",
+    "tests/fixtures/brotli/corpus/compression": "d18f849bb8c5ffef9e1b9b8719e3bcbba35f100655be40f035aeace790dec16b",
+    "tests/fixtures/brotli/corpus/compression.compressed": "a87bcbc0f45a2f793c075b26baec65ff9cd551e057c8cdef508231004ba4abf5",
+    "tests/fixtures/brotli/corpus/empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/fixtures/brotli/corpus/empty.compressed": "67586e98fad27da0b9968bc039a1ef34c939b9b8e523a8bef89d478608c5ecf6",
+    "tests/fixtures/brotli/corpus/monkey": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99",
+    "tests/fixtures/brotli/corpus/monkey.compressed": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9",
+    "tests/fixtures/brotli/corpus/quickfox_repeated": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82",
+    "tests/fixtures/brotli/corpus/quickfox_repeated.compressed": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a",
+    "tests/fixtures/brotli/corpus/x": "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015",
+    "tests/fixtures/brotli/corpus/x.compressed": "cd094a625b695542a1d37b3a11ea849d8db9584a2f9df4e60cf6158bb39bbf61",
+    "tests/fixtures/brotli/corpus/xyzzy": "7609128715518308672067aab169e24944ead24e3d732aab8a8f0b7013a65564",
+    "tests/fixtures/brotli/corpus/xyzzy.compressed": "c3f042a6be42887f842324d0e39dabd0d873e1676cd3dd2d7e2824242b318f14",
+    "tests/fixtures/brotli/corpus/zeros": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+    "tests/fixtures/brotli/corpus/zeros.compressed": "d1236d7fdab24209a747aa471f1bf33765b27adfd676355d4b4b310195dca49f",
+    "tests/fixtures/brotli/reference/command.bin": "fdbc5d5f207a43d34b26441e29b7024f4f3d00be66502d8a73233bcbe9f6c1b4",
+    "tests/fixtures/brotli/reference/context.bin": "0e4abc034ef46244934d117f15876cd477d0fb2ac94a023093338e72e37f7ad9",
+    "tests/fixtures/brotli/reference/dictionary-meta.bin": "1bce8bd7b829f177214697683c3216e836ada1e254bde7582a9111316d9fd0b9",
+    "tests/fixtures/brotli/reference/dictionary.bin": "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70",
+    "tests/fixtures/brotli/reference/transforms.bin": "7682bbd9a2901334c2b47d83aaca99e6d9fc65a2921a7c88180dde12ec3cd6b6",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "0bfcc4982d3f321901ed5fbdd72e24197a895e404ccd77f0d97355c61c7b414f",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39"
+  },
+  "verification_configuration_note": "The source annotates body_decrement_block_remaining with the pinned verifier spinoff_prover attribute. This isolates that proof query; no functions or properties are skipped.",
+  "verification_elapsed_seconds": 3404.887,
+  "verification_evidence": {
+    "path": "evidence/brotli-b3c-m1-context-count-verification.json",
+    "sha256": "e96ca23baecd5802c1f34bc7b7a7bcb16b12d29c441684481ab1d5636ed14950"
+  },
+  "verification_options": [
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "4",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "300",
+    "--trace",
+    "--time",
+    "--output-json"
+  ],
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "errors": 0,
+    "is-verifying-entire-crate": true,
+    "success": true,
+    "verified": 1067
+  },
+  "verifier": {
+    "binary_sha256": "483703c79cf57530a9864de2e69326740ee69162dd98b853aedb8273c74a06f6",
+    "commit": "7d829946231d6413a398f6e4160cdfe951261dad",
+    "platform": {
+      "arch": "aarch64",
+      "os": "macos"
+    },
+    "profile": "release",
+    "toolchain": "1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)",
+    "version": "0.2026.10.18.7d82994"
+  }
+}

@@ -96,7 +96,7 @@ reservation fixture also initializes the block counts that precede its phase.
 Five additional deliberate-defect controls cover the simple/canonical install,
 repeat-serialization, initial-symbol and serialization-base arithmetic
 contracts. These controls do not establish full planner/action refinement.
-Current source-bound verification and runtime results are recorded in
+The preceding checkpoint's source-bound verification and runtime results are recorded in
 `evidence/brotli-b3c-m1-checkpoint.json` and
 `evidence/brotli-b3c-m1-verification.json`.
 
@@ -109,12 +109,57 @@ are scoped to their named function so a repeated formula in another helper
 cannot redirect the control. Full checker output, source identities and the
 retained rejection transcripts are bound in the checkpoint evidence.
 
+### Context-tree-count continuation
+
+The B3c dispatch boundary now plans and prepays context-map phase 0 as a
+separate existing W1 action. The plan charges its input-byte and bit reads
+before parsing. It reserves queue and variable-integer serialization, the
+decoded tree count, phase transitions, and the full zero-map initialization
+when the count is one. EOF reserves the existing four terminal bytes and its
+transition before recording `Truncated`.
+
+Checked contracts bind planned consumption, logical queue bits, variable-integer
+phase, tree count and next context phase to the existing W1 transition. The
+single-tree case proves every initialized map cell is zero. Additional frame
+contracts preserve every workspace byte outside the action's scalar fields and
+active map. A failed execution reservation preserves the complete workspace and
+all remaining credits; successful execution debits its reserved work and input
+exactly. Workspace/encoding failures from cursor loading are distinguished from
+input truncation.
+
+The runtime matrix compares entire workspace images with W1 for both map kinds,
+minimum/intermediate/maximum map lengths, old-byte patterns, queued and supplied
+bits, integer phases, and exact/one-short work limits. It also checks empty
+input, EOF, input-credit exhaustion and entry through the B3c dispatch loop.
+Thirteen additional defect controls cover work formulas, planning/execution
+debits, late reservation, decoded count, zero-map values and progress framing.
+Fresh whole-crate and control results for this continuation are recorded in
+`evidence/brotli-b3c-m1-context-count.json`.
+
+The continuation's whole-crate run passed **1,067 verified, 0 errors** with
+`--no-cheating`. All **81 release tests** passed: 70 library tests, nine
+primitive tests, the source trust-bypass check and the upstream comparison.
+The **13 new controls** and **21 existing metering controls** rejected all
+deliberate defects after that unchanged whole-crate positive control. The
+counter-update proof uses the pinned checker's per-function solver isolation;
+all functions remain checked, with no assumptions or trust shortcuts added.
+
+This slice proves the named logical-state, frame and quota properties. It does
+not close the remaining proof that every source action matches the complete
+work ledger, or byte-for-byte plan equality inside the serialized cursor.
+The frame uses the union of phase-0 write regions; smaller per-status write
+footprints remain a separate obligation.
+The conservative W1 fallback can still traverse later context tree counts
+after entering an unsupported phase; full M1 coverage requires replacing that
+fallback as well.
+
 Remaining M1 obligations:
 
-- Context phases 0 through 6 still use the conservative driver: tree-count
-  parsing, RLE-prefix selection, temporary-tree construction, context symbols,
-  repeat suffixes/expansion and MTF enablement. Complete/failed W1 observations
-  also retain that driver. Both conservative constants remain reachable.
+- Context phases 1 through 6 still enter the conservative driver: RLE-prefix
+  selection, temporary-tree construction, context symbols, repeat
+  suffixes/expansion and MTF enablement. That driver can traverse later phase-0
+  actions internally. Complete/failed W1 observations also retain it. Both
+  conservative constants remain reachable.
 - Prove complete plan/action state and frame refinement. Current executor
   checks compare consumption and status; they do not compare every successful
   symbol, serialized byte or source action.

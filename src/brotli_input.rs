@@ -8757,7 +8757,9 @@ fn load_b3b_queue(
     workspace: &[u8],
     window_bytes: u32,
 ) -> (r: Result<BitQueue, CompressedHeaderError>)
-    ensures r.is_ok() ==> serialized_b3b_queue(workspace@, window_bytes, r.unwrap()),
+    ensures
+        r.is_ok() ==> serialized_b3b_queue(workspace@, window_bytes, r.unwrap()),
+        r.is_err() ==> r.unwrap_err() != CompressedHeaderError::Truncated,
 {
     let len = match read_b3b_state_byte(workspace, window_bytes, B3B_QUEUE_LEN) {
         Ok(value) => value as usize,
@@ -8829,6 +8831,10 @@ fn store_b3b_queue(
     requires queue.valid(),
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
+        forall|index: int| 0 <= index < old(workspace)@.len()
+            && !(b3b_scalar_base(window_bytes) <= index
+                < b3b_scalar_base(window_bytes) + 10)
+            ==> #[trigger] final(workspace)@[index] == old(workspace)@[index],
         r.is_err() ==> final(workspace)@ == old(workspace)@,
         serialized_context_data_ok(old(workspace)@, window_bytes)
             ==> serialized_context_data_ok(final(workspace)@, window_bytes),
@@ -8905,6 +8911,10 @@ fn store_b3b_queue(
         invariant i <= 8,
             original == old(workspace)@,
             workspace@.len() == original.len(),
+            forall|index: int| 0 <= index < original.len()
+                && !(b3b_scalar_base(window_bytes) <= index
+                    < b3b_scalar_base(window_bytes) + 8)
+                ==> #[trigger] workspace@[index] == original[index],
             i == 0 ==> workspace@ == original,
             i > 0 ==> b3b_workspace_shape(workspace@.len() as nat, window_bytes),
             b3b_workspace_shape(original.len() as nat, window_bytes)
@@ -9113,11 +9123,11 @@ fn load_var_uint8_phase(
     workspace: &[u8],
     window_bytes: u32,
 ) -> (r: Result<VarUint8Phase, CompressedHeaderError>)
-    ensures r.is_ok() ==> serialized_var_uint8_phase(
-        workspace@,
-        window_bytes,
-        r.unwrap(),
-    ),
+    ensures
+        r.is_ok() ==> serialized_var_uint8_phase(
+            workspace@, window_bytes, r.unwrap(),
+        ),
+        r.is_err() ==> r.unwrap_err() != CompressedHeaderError::Truncated,
 {
     let tag = match read_b3b_state_tag(workspace, window_bytes, B3B_VAR_PHASE, 3) {
         Ok(value) => value,
@@ -9145,6 +9155,10 @@ fn store_var_uint8_phase(
     requires phase.valid(),
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
+        forall|index: int| 0 <= index < old(workspace)@.len()
+            && !(b3b_scalar_base(window_bytes) + B3B_VAR_PHASE as int <= index
+                < b3b_scalar_base(window_bytes) + B3B_VAR_WIDTH as int + 1)
+            ==> #[trigger] final(workspace)@[index] == old(workspace)@[index],
         serialized_context_data_ok(old(workspace)@, window_bytes)
             ==> serialized_context_data_ok(final(workspace)@, window_bytes),
         serialized_context_state_ok(old(workspace)@, window_bytes)
@@ -9360,6 +9374,12 @@ fn store_terminal_error(
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
+        forall|index: int| 0 <= index < old(workspace)@.len()
+            && index != b3b_scalar_base(window_bytes) + B3B_OUTER_PHASE as int
+            && index != b3b_scalar_base(window_bytes) + B3B_TERMINAL_ERROR as int
+            && !(b3b_scalar_base(window_bytes) + B3B_ERROR_DETAIL as int <= index
+                < b3b_scalar_base(window_bytes) + B3B_ERROR_DETAIL as int + 2)
+            ==> #[trigger] final(workspace)@[index] == old(workspace)@[index],
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
         b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes)
@@ -12321,6 +12341,7 @@ fn store_context_map_progress(
                     ))
             },
     ensures
+        r.is_ok(),
         final(workspace)@.len() == old(workspace)@.len(),
         b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_CONTEXT_KIND)
             == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_KIND),
@@ -12346,13 +12367,14 @@ fn store_context_map_progress(
             && !(B3B_MAP_INITIALIZED <= i < B3B_MAP_INITIALIZED + 2) ==> #[trigger]
             final(workspace)@[b3b_scalar_base(window_bytes) + i]
                 == old(workspace)@[b3b_scalar_base(window_bytes) + i],
-        r.is_ok() ==> forall|i: int| 0 <= i < old(workspace)@.len()
+        forall|i: int| 0 <= i < old(workspace)@.len()
             && !(b3b_scalar_base(window_bytes) + B3B_MAP_INDEX as int
                 <= i < b3b_scalar_base(window_bytes) + B3B_MAP_INDEX as int + 2)
             && !(b3b_scalar_base(window_bytes) + B3B_MAP_INITIALIZED as int
                 <= i < b3b_scalar_base(window_bytes) + B3B_MAP_INITIALIZED as int + 2)
             ==> #[trigger] final(workspace)@[i] == old(workspace)@[i],
 {
+    reveal(serialized_context_data_ok);
     match put_state_u16(workspace, window_bytes, B3B_MAP_INDEX, progress) {
         Ok(()) => {}
         Err(error) => return Err(error),
@@ -12770,7 +12792,8 @@ spec fn context_tree_count_phase_refines(
     status: Option<ContextAdvanceStatus>,
 ) -> bool {
     if match status {
-        Some(ContextAdvanceStatus::Failed(_)) => true,
+        Some(ContextAdvanceStatus::Failed(error)) =>
+            error != CompressedHeaderError::Truncated,
         _ => false,
     } {
         true
@@ -12907,10 +12930,9 @@ proof fn establish_context_tree_count_refinement(
         )
         &&& match witness_status {
             VarUint8Status::NeedInput => status == Some(ContextAdvanceStatus::NeedInput),
-            VarUint8Status::Truncated => match status {
-                Some(ContextAdvanceStatus::Failed(_)) => true,
-                _ => false,
-            },
+            VarUint8Status::Truncated => status == Some(
+                ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated),
+            ),
             VarUint8Status::Progress => {
                 &&& status.is_none()
                 &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_PHASE) == 0
@@ -14857,6 +14879,29 @@ fn advance_context_bits_phase(
                 result
 }
 
+spec fn context_tree_count_write_at(
+    window_bytes: u32, kind: crate::brotli_prefix::ContextMapKind,
+    active_len: u16, index: int,
+) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    let map = crate::brotli_prefix::context_entry_at(window_bytes, kind, 0) as int;
+    ||| base <= index < base + 10
+    ||| base + B3B_VAR_PHASE as int <= index < base + B3B_CONTEXT_PHASE as int + 1
+    ||| base + B3B_MAP_TREES as int <= index < base + B3B_MAP_TREES as int + 2
+    ||| base + B3B_MAP_INDEX as int <= index < base + B3B_MAP_INITIALIZED as int + 2
+    ||| map <= index < map + active_len as int
+}
+
+spec fn context_tree_count_frame(
+    before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    kind: crate::brotli_prefix::ContextMapKind, active_len: u16,
+) -> bool {
+    &&& after.len() == before.len()
+    &&& forall|index: int| 0 <= index < before.len()
+        && !context_tree_count_write_at(window_bytes, kind, active_len, index)
+        ==> #[trigger] after[index] == before[index]
+}
+
 fn advance_context_tree_count_phase(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -14879,6 +14924,9 @@ fn advance_context_tree_count_phase(
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
+        context_tree_count_frame(
+            old(workspace)@, final(workspace)@, window_bytes, kind, active_len,
+        ),
         b3b_workspace_shape(final(workspace)@.len() as nat, window_bytes),
         r.0 <= input.len(),
         r.1.is_none() ==> {
@@ -14893,6 +14941,8 @@ fn advance_context_tree_count_phase(
             &&& r.0 == input.len()
             &&& serialized_context_state_ok(final(workspace)@, window_bytes)
         },
+        r.1 == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated))
+            ==> serialized_context_state_ok(final(workspace)@, window_bytes),
         match r.1 {
             Some(ContextAdvanceStatus::Complete { .. }) => false,
             _ => true,
@@ -14909,6 +14959,8 @@ fn advance_context_tree_count_phase(
 {
     let ghost original = workspace@;
     proof { assert(original == old(workspace)@); }
+    reveal(context_tree_count_frame);
+    reveal(context_tree_count_write_at);
     let mut consumed: usize = 0;
 
                 let mut queue = match load_b3b_queue(workspace, window_bytes) {
@@ -14991,7 +15043,19 @@ fn advance_context_tree_count_phase(
                         }
                         return result;
                     }
-                    VarUint8Status::Truncated => return (consumed, Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated),)),
+                    VarUint8Status::Truncated => {
+                        let result = (consumed, Some(ContextAdvanceStatus::Failed(
+                            CompressedHeaderError::Truncated,
+                        )));
+                        proof {
+                            establish_context_tree_count_refinement(
+                                original, workspace@, window_bytes, input@, end_of_input,
+                                consumed, result.1, start_queue, queue, start_phase,
+                                var_phase, step.status,
+                            );
+                        }
+                        return result;
+                    },
                     VarUint8Status::Progress => {
                         proof {
                             assert(b3b_scalar_byte_at(
@@ -15049,6 +15113,10 @@ fn advance_context_tree_count_phase(
                                 invariant initialized <= active_len,
                                     original == old(workspace)@,
                                     workspace@.len() == original.len(),
+                                    forall|index: int| 0 <= index < original.len()
+                                        && !context_tree_count_write_at(
+                                            window_bytes, kind, active_len, index,
+                                        ) ==> #[trigger] workspace@[index] == original[index],
                                     active_len as nat
                                         <= crate::brotli_prefix::context_map_capacity(kind),
                                     consumed <= input.len(),
@@ -20717,7 +20785,9 @@ fn map_meta_error(error: MetaBlockError) -> CoreFailure {
     }
 }
 
-fn map_compressed_error(error: CompressedHeaderError) -> CoreFailure {
+fn map_compressed_error(error: CompressedHeaderError) -> (r: CoreFailure)
+    ensures (r == CoreFailure::Truncated) == (error == CompressedHeaderError::Truncated),
+{
     match error {
         CompressedHeaderError::Truncated => CoreFailure::Truncated,
         CompressedHeaderError::UnsupportedMode => CoreFailure::UnsupportedMode,
@@ -23201,6 +23271,550 @@ fn advance_conservative_compressed_header(
     CompressedStep { consumed: step.consumed, status }
 }
 
+spec fn context_tree_count_work_spec(
+    read_work: nat,
+    active_len: nat,
+    status: VarUint8Status,
+) -> nat {
+    read_work + 10 + 2 + 1 + match status {
+        VarUint8Status::Value(raw) => 2 + if raw == 0 {
+            active_len + 4 + 1 + 1
+        } else {
+            1nat + 1
+        },
+        VarUint8Status::Truncated => 4nat + 1,
+        _ => 0nat,
+    }
+}
+
+fn context_tree_count_execution_work(
+    read_work: u64,
+    active_len: u16,
+    status: VarUint8Status,
+) -> (r: u64)
+    requires read_work <= 63, active_len <= 16_384,
+    ensures
+        r as nat == context_tree_count_work_spec(
+            read_work as nat, active_len as nat, status,
+        ),
+        r <= 16_468,
+{
+    let base = read_work + 10 + 2 + 1;
+    match status {
+        VarUint8Status::Value(raw) => base + 2 + if raw == 0 {
+            active_len as u64 + 4 + 1 + 1
+        } else {
+            1 + 1
+        },
+        VarUint8Status::Truncated => base + 4 + 1,
+        _ => base,
+    }
+}
+
+// Local planning values only: none of these fields survives the adapter call.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct ContextTreeCountPlan {
+    start_queue: BitQueue,
+    start_phase: VarUint8Phase,
+    end_queue: BitQueue,
+    end_phase: VarUint8Phase,
+    status: VarUint8Status,
+    consumed: usize,
+    read_work: u64,
+    execution_work: u64,
+}
+
+spec fn context_tree_count_plan_valid(
+    workspace: Seq<u8>,
+    window_bytes: u32,
+    input: Seq<u8>,
+    end_of_input: bool,
+    plan: ContextTreeCountPlan,
+) -> bool {
+    &&& serialized_b3b_queue(workspace, window_bytes, plan.start_queue)
+    &&& serialized_var_uint8_phase(workspace, window_bytes, plan.start_phase)
+    &&& plan.end_queue.valid()
+    &&& plan.end_phase.valid()
+    &&& plan.consumed <= input.len()
+    &&& var_uint8_exact_step(
+        plan.start_queue, plan.start_phase, input, end_of_input,
+        plan.consumed, plan.end_queue, plan.end_phase, plan.status,
+    )
+    &&& plan.read_work <= 63
+    &&& plan.read_work as nat == plan.consumed as nat + match plan.status {
+        VarUint8Status::NeedInput | VarUint8Status::Truncated => 0nat,
+        _ => var_uint8_width(plan.start_phase),
+    }
+    &&& plan.execution_work as nat == context_tree_count_work_spec(
+        plan.read_work as nat,
+        b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_SIZE),
+        plan.status,
+    )
+}
+
+fn plan_context_tree_count_action(
+    workspace: &[u8],
+    window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget,
+    input: &[u8],
+    end_of_input: bool,
+) -> (r: Result<ContextTreeCountPlan, CoreFailure>)
+    requires old(budget).valid(),
+    ensures
+        final(budget).valid(),
+        final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() ==> {
+            &&& context_tree_count_plan_valid(
+                workspace@, window_bytes, input@, end_of_input, r.unwrap(),
+            )
+            &&& final(budget).work_remaining
+                == old(budget).work_remaining - r.unwrap().read_work
+        },
+{
+    let active_len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
+        Ok(value) if 1 <= value && value <= 16_384 => value,
+        _ => return Err(core_state_failure()),
+    };
+    let mut queue = match load_b3b_queue(workspace, window_bytes) {
+        Ok(value) => value,
+        Err(_) => return Err(core_state_failure()),
+    };
+    let mut phase = match load_var_uint8_phase(workspace, window_bytes) {
+        Ok(value) => value,
+        Err(_) => return Err(core_state_failure()),
+    };
+    let start_queue = queue;
+    let start_phase = phase;
+    let width = match phase {
+        VarUint8Phase::First => 1usize,
+        VarUint8Phase::Short => 3usize,
+        VarUint8Phase::Long { width } => width as usize,
+    };
+    let read = plan_bit_read(queue, width, input.len());
+    if !budget.charge_work(read.work) {
+        return Err(CoreFailure::ResourceLimit);
+    }
+    let step = advance_var_uint8(&mut queue, &mut phase, input, end_of_input);
+    if step.consumed != read.consumed {
+        return Err(core_state_failure());
+    }
+    proof {
+        reveal(var_uint8_exact_step);
+        reveal(var_uint8_transition);
+        assert(read.complete == match step.status {
+            VarUint8Status::NeedInput | VarUint8Status::Truncated => false,
+            _ => true,
+        });
+    }
+    let execution_work = context_tree_count_execution_work(read.work, active_len, step.status);
+    Ok(ContextTreeCountPlan {
+        start_queue, start_phase, end_queue: queue, end_phase: phase,
+        status: step.status, consumed: step.consumed,
+        read_work: read.work, execution_work,
+    })
+}
+
+proof fn serialized_var_uint8_starts_agree(
+    workspace: Seq<u8>, window_bytes: u32,
+    left: BitQueue, right: BitQueue,
+    left_phase: VarUint8Phase, right_phase: VarUint8Phase,
+)
+    requires
+        serialized_b3b_queue(workspace, window_bytes, left),
+        serialized_b3b_queue(workspace, window_bytes, right),
+        serialized_var_uint8_phase(workspace, window_bytes, left_phase),
+        serialized_var_uint8_phase(workspace, window_bytes, right_phase),
+    ensures left.bits() == right.bits(), left_phase == right_phase,
+{
+    reveal(serialized_b3b_queue);
+    reveal(serialized_var_uint8_phase);
+    reveal(var_uint8_phase_tag);
+    reveal(var_uint8_phase_width);
+    match (left_phase, right_phase) {
+        (VarUint8Phase::First, VarUint8Phase::First)
+        | (VarUint8Phase::Short, VarUint8Phase::Short) => {},
+        (VarUint8Phase::Long { .. }, VarUint8Phase::Long { .. }) => {},
+        _ => { assert(false); },
+    }
+    assert(left.len == right.len && left.offset == right.offset);
+    assert forall|i: int| 0 <= i < left.bits().len() implies
+        #[trigger] left.bits()[i] == right.bits()[i] by {
+        let at = (left.offset as int + i) / 8;
+        assert(0 <= at < left.len);
+        assert(left.pending@[at] == right.pending@[at]);
+    }
+    assert(left.bits() =~= right.bits());
+}
+
+proof fn var_uint8_steps_agree(
+    left: BitQueue, right: BitQueue, phase: VarUint8Phase,
+    input: Seq<u8>, end_of_input: bool,
+    left_used: usize, right_used: usize,
+    left_end: BitQueue, right_end: BitQueue,
+    left_phase: VarUint8Phase, right_phase: VarUint8Phase,
+    left_status: VarUint8Status, right_status: VarUint8Status,
+)
+    requires
+        left.bits() == right.bits(),
+        var_uint8_exact_step(left, phase, input, end_of_input,
+            left_used, left_end, left_phase, left_status),
+        var_uint8_exact_step(right, phase, input, end_of_input,
+            right_used, right_end, right_phase, right_status),
+    ensures
+        left_used == right_used,
+        left_phase == right_phase,
+        left_status == right_status,
+        left_end.bits() == right_end.bits(),
+{
+    reveal(var_uint8_exact_step);
+    reveal(var_uint8_transition);
+    assert(left_used == right_used);
+    let source = left.bits() + bytes_bits(input.take(left_used as int));
+    if source.len() >= var_uint8_width(phase) {
+        match phase {
+            VarUint8Phase::First => {},
+            VarUint8Phase::Short => {},
+            VarUint8Phase::Long { .. } => {},
+        }
+    }
+}
+
+spec fn context_tree_count_zero_map(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let kind = if b3b_scalar_byte_at(workspace, window_bytes, B3B_CONTEXT_KIND) == 0 {
+        crate::brotli_prefix::ContextMapKind::Literal
+    } else { crate::brotli_prefix::ContextMapKind::Distance };
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_INITIALIZED)
+        == b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_SIZE)
+    &&& forall|index: u16| (index as nat)
+        < b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_SIZE) ==> #[trigger]
+        workspace[crate::brotli_prefix::context_entry_at(
+            window_bytes, kind, index,
+        ) as int] == 0
+}
+
+proof fn single_context_tree_map_is_zero(workspace: Seq<u8>, window_bytes: u32)
+    requires
+        serialized_context_state_ok(workspace, window_bytes),
+        b3b_scalar_byte_at(workspace, window_bytes, B3B_CONTEXT_PHASE) == 9,
+        b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_TREES) == 1,
+    ensures context_tree_count_zero_map(workspace, window_bytes),
+{
+    reveal(serialized_context_state_ok);
+    reveal(serialized_context_phase_payload_ok);
+    reveal(serialized_context_data_ok);
+    reveal(context_tree_count_zero_map);
+    let kind = if b3b_scalar_byte_at(workspace, window_bytes, B3B_CONTEXT_KIND) == 0 {
+        crate::brotli_prefix::ContextMapKind::Literal
+    } else { crate::brotli_prefix::ContextMapKind::Distance };
+    assert forall|index: u16| (index as nat)
+        < b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_SIZE) implies
+        #[trigger] workspace[crate::brotli_prefix::context_entry_at(
+            window_bytes, kind, index,
+        ) as int] == 0
+    by {
+        serialized_context_prefix_value_bound(workspace, window_bytes, index as int);
+    }
+}
+
+spec fn context_tree_count_effect_matches(
+    workspace: Seq<u8>, window_bytes: u32, plan: ContextTreeCountPlan,
+) -> bool {
+    &&& serialized_var_uint8_phase(workspace, window_bytes, plan.end_phase)
+    &&& exists|queue: BitQueue| {
+        &&& serialized_b3b_queue(workspace, window_bytes, queue)
+        &&& queue.bits() == plan.end_queue.bits()
+    }
+    &&& match plan.status {
+        VarUint8Status::Progress =>
+            b3b_scalar_byte_at(workspace, window_bytes, B3B_CONTEXT_PHASE) == 0,
+        VarUint8Status::Value(raw) => {
+            &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_TREES) == raw as nat + 1
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_CONTEXT_PHASE)
+                == if raw == 0 { 9u8 } else { 1u8 }
+            &&& (raw == 0 ==> context_tree_count_zero_map(workspace, window_bytes))
+        },
+        VarUint8Status::NeedInput => true,
+        VarUint8Status::Truncated => true,
+    }
+}
+
+proof fn context_tree_count_plan_matches_action(
+    before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end_of_input: bool, plan: ContextTreeCountPlan,
+    used: usize, status: Option<ContextAdvanceStatus>,
+)
+    requires
+        context_tree_count_plan_valid(before, window_bytes, input, end_of_input, plan),
+        context_tree_count_phase_refines(
+            before, after, window_bytes, input, end_of_input, used, status,
+        ),
+        status.is_none() || status == Some(ContextAdvanceStatus::NeedInput)
+            || status == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+        serialized_context_state_ok(after, window_bytes),
+    ensures
+        used == plan.consumed,
+        context_tree_count_effect_matches(after, window_bytes, plan),
+        status == match plan.status {
+            VarUint8Status::NeedInput => Some(ContextAdvanceStatus::NeedInput),
+            VarUint8Status::Truncated => Some(ContextAdvanceStatus::Failed(
+                CompressedHeaderError::Truncated,
+            )),
+            _ => None,
+        },
+{
+    reveal(context_tree_count_phase_refines);
+    let (start_queue, end_queue, start_phase, end_phase, var_status) = choose
+        |sq: BitQueue, eq: BitQueue, sp: VarUint8Phase, ep: VarUint8Phase,
+            vs: VarUint8Status| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& serialized_var_uint8_phase(before, window_bytes, sp)
+        &&& serialized_b3b_queue(after, window_bytes, eq)
+        &&& serialized_var_uint8_phase(after, window_bytes, ep)
+        &&& var_uint8_exact_step(sq, sp, input, end_of_input, used, eq, ep, vs)
+        &&& match vs {
+            VarUint8Status::NeedInput => status == Some(ContextAdvanceStatus::NeedInput),
+            VarUint8Status::Truncated => status == Some(ContextAdvanceStatus::Failed(
+                CompressedHeaderError::Truncated,
+            )),
+            VarUint8Status::Progress => {
+                &&& status.is_none()
+                &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_PHASE) == 0
+            },
+            VarUint8Status::Value(raw) => {
+                &&& status.is_none()
+                &&& b3b_scalar_u16_at(after, window_bytes, B3B_MAP_TREES) == raw as nat + 1
+                &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_PHASE)
+                    == if raw == 0 { 9u8 } else { 1u8 }
+            },
+        }
+    };
+    serialized_var_uint8_starts_agree(before, window_bytes,
+        start_queue, plan.start_queue, start_phase, plan.start_phase);
+    var_uint8_steps_agree(start_queue, plan.start_queue, start_phase,
+        input, end_of_input, used, plan.consumed, end_queue, plan.end_queue,
+        end_phase, plan.end_phase, var_status, plan.status);
+    assert(exists|queue: BitQueue| {
+        &&& serialized_b3b_queue(after, window_bytes, queue)
+        &&& queue.bits() == plan.end_queue.bits()
+    });
+    if plan.status == VarUint8Status::Value(0) {
+        single_context_tree_map_is_zero(after, window_bytes);
+    }
+}
+
+fn execute_planned_context_tree_count(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget,
+    input: &[u8],
+    end_of_input: bool,
+    input_was_limited: bool,
+    plan: ContextTreeCountPlan,
+) -> (r: Result<usize, CompressedStep>)
+    requires
+        old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE) == 0,
+        context_tree_count_plan_valid(
+            old(workspace)@, window_bytes, input@, end_of_input, plan,
+        ),
+        plan.consumed as u64 <= old(budget).input_remaining,
+    ensures
+        final(budget).valid(),
+        final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        old(budget).work_remaining >= plan.execution_work ==>
+            final(budget).work_remaining == old(budget).work_remaining - plan.execution_work,
+        final(workspace)@.len() == old(workspace)@.len(),
+        old(budget).work_remaining < plan.execution_work ==> {
+            &&& final(workspace)@ == old(workspace)@
+            &&& *final(budget) == *old(budget)
+            &&& r == Err(CompressedStep {
+                consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
+            })
+        },
+        match r {
+            Ok(used) => {
+                &&& used <= input.len()
+                &&& compressed_decoder_state_ok(final(workspace)@, window_bytes)
+                &&& used == plan.consumed
+                &&& context_tree_count_effect_matches(final(workspace)@, window_bytes, plan)
+                &&& final(budget).input_remaining
+                    == old(budget).input_remaining - plan.consumed as u64
+                &&& context_tree_count_frame(old(workspace)@, final(workspace)@,
+                    window_bytes, if b3b_scalar_byte_at(old(workspace)@,
+                        window_bytes, B3B_CONTEXT_KIND) == 0 {
+                        crate::brotli_prefix::ContextMapKind::Literal
+                    } else { crate::brotli_prefix::ContextMapKind::Distance },
+                    b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) as u16)
+            },
+            Err(step) => {
+                &&& step.consumed <= input.len()
+                &&& (!matches!(step.status, CompressedStatus::Failed(_)) ==>
+                    compressed_decoder_state_ok(final(workspace)@, window_bytes))
+                &&& (step.status == CompressedStatus::NeedInput ==>
+                    context_tree_count_effect_matches(final(workspace)@, window_bytes, plan))
+                &&& (step.status == CompressedStatus::Failed(CoreFailure::Truncated) ==> {
+                    &&& step.consumed == plan.consumed
+                    &&& plan.status == VarUint8Status::Truncated
+                    &&& serialized_terminal_error(final(workspace)@, window_bytes,
+                        CompressedHeaderError::Truncated)
+                })
+            },
+        },
+{
+    if !budget.charge_work(plan.execution_work) {
+        return Err(CompressedStep {
+            consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
+        });
+    }
+    let kind_tag = match state_byte(workspace, window_bytes, B3B_CONTEXT_KIND) {
+        Ok(value) => value,
+        Err(_) => return Err(CompressedStep { consumed: 0,
+            status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    let kind = if kind_tag == 0 {
+        crate::brotli_prefix::ContextMapKind::Literal
+    } else {
+        crate::brotli_prefix::ContextMapKind::Distance
+    };
+    let active_len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
+        Ok(value) => value,
+        Err(_) => return Err(CompressedStep { consumed: 0,
+            status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    proof {
+        reveal(compressed_decoder_state_ok);
+        reveal(serialized_context_state_ok);
+        reveal(serialized_context_data_ok);
+        reveal(serialized_context_map_prefix_ok);
+    }
+    let ghost before_action = workspace@;
+    let (used, status) = advance_context_tree_count_phase(
+        workspace, window_bytes, kind_tag, kind, active_len, input, end_of_input,
+    );
+    let expected = match plan.status {
+        VarUint8Status::NeedInput => Some(ContextAdvanceStatus::NeedInput),
+        VarUint8Status::Truncated => Some(ContextAdvanceStatus::Failed(
+            CompressedHeaderError::Truncated,
+        )),
+        _ => None,
+    };
+    if used != plan.consumed || status != expected {
+        return Err(CompressedStep { consumed: used,
+            status: CompressedStatus::Failed(core_state_failure()) });
+    }
+    proof {
+        if status.is_none() || status == Some(ContextAdvanceStatus::NeedInput)
+            || status == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated))
+        {
+            context_tree_count_plan_matches_action(
+                before_action, workspace@, window_bytes, input@, end_of_input,
+                plan, used, status,
+            );
+        }
+    }
+    if used > 0 && !budget.charge_input(used as u64) {
+        return Err(CompressedStep { consumed: used,
+            status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    match status {
+        Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)) => {
+            proof {
+                assert(plan.status == VarUint8Status::Truncated);
+            }
+            if store_terminal_error(workspace, window_bytes,
+                CompressedHeaderError::Truncated).is_err() {
+                return Err(CompressedStep { consumed: used,
+                    status: CompressedStatus::Failed(core_state_failure()) });
+            }
+            Err(CompressedStep { consumed: used,
+                status: CompressedStatus::Failed(map_compressed_error(
+                    CompressedHeaderError::Truncated)) })
+        }
+        Some(ContextAdvanceStatus::NeedInput) => {
+            proof {
+                reveal(context_tree_count_phase_refines);
+                reveal(serialized_context_state_ok);
+                reveal(serialized_context_data_ok);
+                reveal(compressed_decoder_state_ok);
+            }
+            Err(CompressedStep { consumed: used, status: if input_was_limited {
+                CompressedStatus::Failed(CoreFailure::ResourceLimit)
+            } else { CompressedStatus::NeedInput } })
+        }
+        None => {
+            proof {
+                reveal(context_tree_count_phase_refines);
+                reveal(serialized_context_state_ok);
+                reveal(serialized_context_data_ok);
+                reveal(compressed_decoder_state_ok);
+            }
+            Ok(used)
+        }
+        _ => Err(CompressedStep { consumed: used,
+            status: CompressedStatus::Failed(core_state_failure()) }),
+    }
+}
+
+fn advance_planned_context_tree_count(
+    workspace: &mut [u8],
+    window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget,
+    input: &[u8],
+    end_of_input: bool,
+) -> (r: Result<usize, CompressedStep>)
+    requires
+        old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE) == 0,
+    ensures
+        final(budget).valid(),
+        final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(workspace)@.len() == old(workspace)@.len(),
+        match r {
+            Ok(used) => {
+                &&& used <= input.len()
+                &&& compressed_decoder_state_ok(final(workspace)@, window_bytes)
+            },
+            Err(step) => {
+                &&& step.consumed <= input.len()
+                &&& (!matches!(step.status, CompressedStatus::Failed(_)) ==>
+                    compressed_decoder_state_ok(final(workspace)@, window_bytes))
+            },
+        },
+{
+    let allowed = if budget.input_remaining > usize::MAX as u64 {
+        input.len()
+    } else { input.len().min(budget.input_remaining as usize) };
+    let plan = match plan_context_tree_count_action(
+        workspace, window_bytes, budget, &input[..allowed],
+        end_of_input && allowed == input.len(),
+    ) {
+        Ok(value) => value,
+        Err(error) => return Err(CompressedStep { consumed: 0,
+            status: CompressedStatus::Failed(error) }),
+    };
+    execute_planned_context_tree_count(
+        workspace, window_bytes, budget, &input[..allowed],
+        end_of_input && allowed == input.len(), allowed < input.len(), plan,
+    )
+}
+
 fn plan_context_map_tail(
     workspace: &[u8],
     window_bytes: u32,
@@ -23854,6 +24468,18 @@ fn advance_planned_compressed_action(
             Ok(used) => already_consumed = used,
             Err(step) => return Err(step),
         }
+    } else if (initial_outer == 6 || initial_outer == 7) && initial_context_phase == 0 {
+        proof {
+            assert(6 <= b3b_scalar_byte_at(
+                workspace@, window_bytes, B3B_OUTER_PHASE,
+            ) <= 7);
+        }
+        match advance_planned_context_tree_count(
+            workspace, window_bytes, budget, input, end_of_input,
+        ) {
+            Ok(used) => already_consumed = used,
+            Err(step) => return Err(step),
+        }
     } else if (initial_outer == 6 || initial_outer == 7)
         && 7 <= initial_context_phase && initial_context_phase <= 9
     {
@@ -24471,7 +25097,9 @@ pub(crate) fn body_block_remaining(
         .map_err(map_compressed_error)
 }
 
+// Isolate this counter proof from the parser's accumulated solver context.
 #[verifier::rlimit(1000)]
+#[verifier::spinoff_prover]
 pub(crate) fn body_decrement_block_remaining(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -27122,6 +27750,267 @@ mod tests {
             false,
         );
         assert_eq!(repeated, first);
+    }
+
+    #[test]
+    fn b3c_context_tree_count_plans_match_w1_and_reserve_before_writes() {
+        let budget = |input, work| {
+            crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: input,
+                max_output: 0,
+                max_work: work,
+                max_calls: 0,
+                max_initializations: 0,
+                max_window_bits: 16,
+            })
+            .unwrap()
+        };
+        let cases = [
+            (VarUint8Phase::First, vec![0], VarUint8Status::Value(0)),
+            (VarUint8Phase::First, vec![1], VarUint8Status::Progress),
+            (
+                VarUint8Phase::Short,
+                vec![0, 0, 0],
+                VarUint8Status::Value(1),
+            ),
+            (
+                VarUint8Phase::Short,
+                vec![1, 0, 0],
+                VarUint8Status::Progress,
+            ),
+            (
+                VarUint8Phase::Short,
+                vec![1, 1, 1],
+                VarUint8Status::Progress,
+            ),
+            (
+                VarUint8Phase::Long { width: 1 },
+                vec![0],
+                VarUint8Status::Value(2),
+            ),
+            (
+                VarUint8Phase::Long { width: 1 },
+                vec![1],
+                VarUint8Status::Value(3),
+            ),
+            (
+                VarUint8Phase::Long { width: 7 },
+                vec![1; 7],
+                VarUint8Status::Value(255),
+            ),
+        ];
+        for (kind, len) in [
+            (crate::brotli_prefix::ContextMapKind::Literal, 64u16),
+            (crate::brotli_prefix::ContextMapKind::Literal, 128),
+            (crate::brotli_prefix::ContextMapKind::Literal, 16_384),
+            (crate::brotli_prefix::ContextMapKind::Distance, 4),
+            (crate::brotli_prefix::ContextMapKind::Distance, 8),
+            (crate::brotli_prefix::ContextMapKind::Distance, 1_024),
+        ] {
+            let tag = if kind == crate::brotli_prefix::ContextMapKind::Literal {
+                0
+            } else {
+                1
+            };
+            for poison in [0xa5, 0xff] {
+                for (phase, bits, expected_status) in &cases {
+                    for queued in [false, true] {
+                        let (mut initial, window) = fresh_b3b_workspace();
+                        initial.fill(poison);
+                        initialize_serialized_b3c(&mut initial, window).unwrap();
+                        write_b3b_state_tag(&mut initial, window, B3B_OUTER_PHASE, 13, 6 + tag)
+                            .unwrap();
+                        start_context_map(&mut initial, window, kind, len).unwrap();
+                        store_var_uint8_phase(&mut initial, window, *phase).unwrap();
+                        let bytes = pack_lsb_bits(bits);
+                        if queued {
+                            let mut queue = BitQueue::new();
+                            queue.append_byte(bytes[0]);
+                            store_b3b_queue(&mut initial, window, &queue).unwrap();
+                        }
+                        let input = if queued { &[][..] } else { &bytes[..] };
+                        let mut planning_budget = budget(input.len() as u64, u64::MAX);
+                        let plan = plan_context_tree_count_action(
+                            &initial,
+                            window,
+                            &mut planning_budget,
+                            input,
+                            false,
+                        )
+                        .unwrap();
+                        assert_eq!(plan.status, *expected_status);
+                        assert_eq!(
+                            plan.read_work,
+                            bits.len() as u64 + if queued { 0 } else { 1 }
+                        );
+                        let extra = match expected_status {
+                            VarUint8Status::Value(raw) => {
+                                2 + if *raw == 0 { len as u64 + 6 } else { 2 }
+                            }
+                            _ => 0,
+                        };
+                        assert_eq!(plan.execution_work, plan.read_work + 13 + extra);
+
+                        let mut reference = initial.clone();
+                        let expected = advance_context_tree_count_phase(
+                            &mut reference,
+                            window,
+                            tag,
+                            kind,
+                            len,
+                            input,
+                            false,
+                        );
+                        assert_eq!(expected.0, plan.consumed);
+                        assert_eq!(expected.1, None);
+                        for short in [true, false] {
+                            let mut actual = initial.clone();
+                            let mut request = budget(
+                                input.len() as u64,
+                                plan.read_work + plan.execution_work - u64::from(short),
+                            );
+                            let replay = plan_context_tree_count_action(
+                                &actual,
+                                window,
+                                &mut request,
+                                input,
+                                false,
+                            )
+                            .unwrap();
+                            assert_eq!(actual, initial, "read-only planning changed workspace");
+                            let prepaid = request;
+                            let result = execute_planned_context_tree_count(
+                                &mut actual,
+                                window,
+                                &mut request,
+                                input,
+                                false,
+                                false,
+                                replay,
+                            );
+                            if short {
+                                assert_eq!(
+                                    result,
+                                    Err(CompressedStep {
+                                        consumed: 0,
+                                        status: CompressedStatus::Failed(
+                                            CoreFailure::ResourceLimit
+                                        )
+                                    })
+                                );
+                                assert_eq!(actual, initial);
+                                assert_eq!(request, prepaid);
+                            } else {
+                                assert_eq!(result, Ok(expected.0));
+                                assert_eq!(actual, reference, "planned action differs from W1");
+                                assert_eq!(request.work_remaining, 0);
+                                assert_eq!(
+                                    request.input_remaining,
+                                    input.len() as u64 - expected.0 as u64
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn b3c_context_tree_count_handles_empty_eof_and_input_credit() {
+        let budget = |input, work| {
+            crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: input,
+                max_output: 0,
+                max_work: work,
+                max_calls: 0,
+                max_initializations: 0,
+                max_window_bits: 16,
+            })
+            .unwrap()
+        };
+        let (mut initial, window) = fresh_b3b_workspace();
+        initialize_serialized_b3c(&mut initial, window).unwrap();
+        write_b3b_state_tag(&mut initial, window, B3B_OUTER_PHASE, 13, 6).unwrap();
+        start_context_map(
+            &mut initial,
+            window,
+            crate::brotli_prefix::ContextMapKind::Literal,
+            64,
+        )
+        .unwrap();
+        for (input, end, work, expected) in [
+            (
+                &[][..],
+                false,
+                12,
+                CompressedStatus::Failed(CoreFailure::ResourceLimit),
+            ),
+            (&[][..], false, 13, CompressedStatus::NeedInput),
+            (
+                &[][..],
+                true,
+                17,
+                CompressedStatus::Failed(CoreFailure::ResourceLimit),
+            ),
+            (
+                &[][..],
+                true,
+                18,
+                CompressedStatus::Failed(CoreFailure::Truncated),
+            ),
+            (
+                &[0u8][..],
+                true,
+                13,
+                CompressedStatus::Failed(CoreFailure::ResourceLimit),
+            ),
+        ] {
+            let mut workspace = initial.clone();
+            let mut request = budget(0, work);
+            let step = advance_serialized_compressed_header(
+                &mut workspace,
+                window,
+                &mut request,
+                input,
+                end,
+            );
+            assert_eq!(step.consumed, 0);
+            assert_eq!(step.status, expected);
+            assert_eq!(request.input_remaining, 0);
+            if expected == CompressedStatus::Failed(CoreFailure::Truncated) {
+                assert_eq!(
+                    load_terminal_error(&workspace, window).unwrap(),
+                    CompressedHeaderError::Truncated
+                );
+            } else {
+                assert_eq!(workspace, initial);
+            }
+        }
+        let mut workspace = initial.clone();
+        let mut request = budget(1, 64 + 25);
+        let step =
+            advance_serialized_compressed_header(&mut workspace, window, &mut request, &[0], false);
+        assert_eq!(step.consumed, 1);
+        assert_eq!(
+            step.status,
+            CompressedStatus::Failed(CoreFailure::ResourceLimit)
+        );
+        assert_eq!(request.work_remaining, 0);
+        assert_eq!(state_u16(&workspace, window, B3B_MAP_TREES).unwrap(), 1);
+        assert_eq!(
+            state_byte(&workspace, window, B3B_CONTEXT_PHASE).unwrap(),
+            9
+        );
+        assert_eq!(
+            context_map_bytes(
+                &workspace,
+                window,
+                crate::brotli_prefix::ContextMapKind::Literal,
+                64
+            ),
+            vec![0; 64]
+        );
     }
 
     #[test]
