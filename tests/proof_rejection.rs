@@ -98,6 +98,8 @@ fn check_brotli_input_function(verus: &Path, root: &Path, function: &str) -> std
             "silent",
             "--rlimit",
             "1000",
+            "--multiple-errors",
+            "0",
         ])
         .current_dir(root)
         .output()
@@ -3185,6 +3187,73 @@ fn the_prover_rejects_thirteen_b3c_context_tree_count_defects() {
         let mut changed = selected.replacen(old, new, 1);
         if name == "brotli-b3c-context-count-execution-reserved-after-writes" {
             let call = "    let (used, status) = advance_context_tree_count_phase(\n        workspace, window_bytes, kind_tag, kind, active_len, input, end_of_input,\n    );";
+            assert_eq!(changed.matches(call).count(), 1, "unique execution site");
+            changed = changed.replacen(call, &format!("{call}\n{old}"), 1);
+        }
+        let mutated = format!("{}{}{}", &original[..start], changed, &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_seventeen_b3c_context_bits_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-context-bits-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.path().extension().is_some_and(|ext| ext == "rs") {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-b3c-context-bits-queue-undercharge", "context_bits_execution_work", "    let base = read_work + 10 + 1;", "    let base = read_work + 9 + 1;"),
+        ("brotli-b3c-context-bits-start-undercharge", "context_bits_execution_work", "{ 76 + 1 + 1 + 1 + 1 }", "{ 75 + 1 + 1 + 1 + 1 }"),
+        ("brotli-b3c-context-bits-prefix-undercharge", "context_bits_execution_work", "{ 76 + 1 + 1 + 1 + 1 }", "{ 76 + 1 + 0 + 1 + 1 }"),
+        ("brotli-b3c-context-bits-map-undercharge", "context_bits_execution_work", "repeat as u64 + 4 + 1 + 1 + 1", "repeat as u64 / 2 + 4 + 1 + 1 + 1"),
+        ("brotli-b3c-context-bits-progress-undercharge", "context_bits_execution_work", "repeat as u64 + 4 + 1 + 1 + 1", "repeat as u64 + 3 + 1 + 1 + 1"),
+        ("brotli-b3c-context-bits-reset-undercharge", "context_bits_execution_work", "repeat as u64 + 4 + 1 + 1 + 1", "repeat as u64 + 4 + 0 + 1 + 1"),
+        ("brotli-b3c-context-bits-phase-undercharge", "context_bits_execution_work", "} else { 1 + 1 }", "} else { 1 }"),
+        ("brotli-b3c-context-bits-terminal-undercharge", "context_bits_execution_work", "BitReadStatus::Truncated => 4 + 1,", "BitReadStatus::Truncated => 4,"),
+        ("brotli-b3c-context-bits-planning-debit-omitted", "plan_context_bits_action", "if !budget.charge_work(read.work)", "if !budget.charge_work(0)"),
+        ("brotli-b3c-context-bits-execution-debit-undercharge", "execute_planned_context_bits", "if !budget.charge_work(plan.execution_work)", "if !budget.charge_work(plan.execution_work - 1)"),
+        ("brotli-b3c-context-bits-execution-reserved-after-writes", "execute_planned_context_bits", "    if !budget.charge_work(plan.execution_work) {\n        return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });\n    }\n", ""),
+        ("brotli-b3c-context-bits-wrong-prefix", "advance_context_bits_phase", "let max_run = value as u8 + 1;", "let max_run = value as u8 + 2;"),
+        ("brotli-b3c-context-bits-wrong-zero", "advance_context_bits_phase", "initialized, 0, num_trees);", "initialized, 1, num_trees);"),
+        ("brotli-b3c-context-bits-start-writes-unrelated-byte", "initialize_code_description_state", "B3B_PENDING_SPAN_LENGTH, 0)", "B3B_GROUP_KIND, 0)"),
+        ("brotli-b3c-context-bits-overshoot-terminal-undercharge", "context_bits_execution_work", "if repeat > remaining as u32 { 4 + 1 }", "if repeat > remaining as u32 { 4 }"),
+        ("brotli-b3c-context-bits-skips-overshoot-check", "advance_context_bits_phase", "if index as u32 + repeat > active_len as u32 {", "if false {"),
+        ("brotli-b3c-context-bits-reads-wrong-width", "advance_context_bits_phase", "let read = queue.read_bits(width, remaining, end_of_input);", "let read = queue.read_bits(width - 1, remaining, end_of_input);"),
+    ] {
+        let start = original.find(&format!("fn {function}("))
+            .expect("selected function exists");
+        let end = start + original[start..].find("\n}\n")
+            .expect("selected function ends") + 3;
+        let selected = &original[start..end];
+        assert_eq!(selected.matches(old).count(), 1, "unique mutation anchor for {name}");
+        let mut changed = selected.replacen(old, new, 1);
+        if name == "brotli-b3c-context-bits-execution-reserved-after-writes" {
+            let call = "    let (used, status) = advance_context_bits_phase(workspace, window_bytes, plan.phase,\n        kind_tag, kind, active_len, input, end_of_input);";
             assert_eq!(changed.matches(call).count(), 1, "unique execution site");
             changed = changed.replacen(call, &format!("{call}\n{old}"), 1);
         }

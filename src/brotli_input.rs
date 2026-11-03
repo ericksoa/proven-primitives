@@ -8760,6 +8760,8 @@ fn load_b3b_queue(
     ensures
         r.is_ok() ==> serialized_b3b_queue(workspace@, window_bytes, r.unwrap()),
         r.is_err() ==> r.unwrap_err() != CompressedHeaderError::Truncated,
+        r.is_err() ==> r.unwrap_err() != CompressedHeaderError::InvalidFormat(
+            CompressedFormatError::ContextMapRepeat),
 {
     let len = match read_b3b_state_byte(workspace, window_bytes, B3B_QUEUE_LEN) {
         Ok(value) => value as usize,
@@ -9554,6 +9556,15 @@ fn decode_code_description_error(tag: u8) -> (r: Option<CodeDescriptionError>)
     }
 }
 
+spec fn context_tree_start_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
+    &&& after.len() == before.len()
+    &&& forall|i: int| 0 <= i < before.len()
+        && !(b3b_scalar_base(window_bytes) + B3B_CODE_PHASE as int
+            <= i < b3b_scalar_base(window_bytes) + B3B_BLOCK_LENGTH_PHASE as int)
+        && i != b3b_scalar_base(window_bytes) + B3B_PENDING_SPAN_LENGTH as int
+        ==> #[trigger] after[i] == before[i]
+}
+
 fn initialize_code_description_state(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -9564,6 +9575,7 @@ fn initialize_code_description_state(
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
+        context_tree_start_frame(old(workspace)@, final(workspace)@, window_bytes),
         b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes)
             && 1 <= alphabet_limit <= alphabet_max <= 704 ==> r.is_ok(),
         r.is_ok() ==> b3b_scalar_byte_at(
@@ -9623,6 +9635,7 @@ fn initialize_code_description_state(
 {
     let ghost original = workspace@;
     proof { assert(original == old(workspace)@); }
+    reveal(context_tree_start_frame);
     if alphabet_max == 0 || alphabet_max > 704
         || alphabet_limit == 0 || alphabet_limit > alphabet_max {
         return Err(CompressedHeaderError::InvalidFormat(
@@ -9632,6 +9645,11 @@ fn initialize_code_description_state(
     let mut relative = B3B_CODE_PHASE;
     while relative < B3B_BLOCK_LENGTH_PHASE
         invariant B3B_CODE_PHASE <= relative <= B3B_BLOCK_LENGTH_PHASE,
+            forall|i: int| 0 <= i < original.len()
+                && !(b3b_scalar_base(window_bytes) + B3B_CODE_PHASE as int
+                    <= i < b3b_scalar_base(window_bytes) + B3B_BLOCK_LENGTH_PHASE as int)
+                && i != b3b_scalar_base(window_bytes) + B3B_PENDING_SPAN_LENGTH as int
+                ==> #[trigger] workspace@[i] == original[i],
             original == old(workspace)@,
             workspace@.len() == original.len(),
             b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_KIND)
@@ -11428,6 +11446,7 @@ fn start_serialized_tree(
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
+        context_tree_start_frame(old(workspace)@, final(workspace)@, window_bytes),
         b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes)
             && 1 <= alphabet_limit <= alphabet_max <= 704 ==> r.is_ok(),
         r.is_ok() ==> b3b_scalar_byte_at(
@@ -11486,6 +11505,7 @@ fn start_serialized_tree(
             final(workspace)@[b3b_scalar_base(window_bytes) + i]
                 == old(workspace)@[b3b_scalar_base(window_bytes) + i],
 {
+    reveal(context_tree_start_frame);
     match initialize_code_description_state(
         workspace,
         window_bytes,
@@ -13035,6 +13055,11 @@ spec fn context_bits_value_result(
             == num_trees + value as nat + 1
     } else if phase == 5 {
         let repeat = pow2(pending as nat) + value as nat;
+        if initialized + repeat > b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE) {
+            status == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(
+                CompressedFormatError::ContextMapRepeat,
+            )))
+        } else {
         &&& status.is_none()
         &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_PHASE) == 4
         &&& b3b_scalar_byte_at(after, window_bytes, B3B_PENDING_RUN) == 255
@@ -13046,6 +13071,7 @@ spec fn context_bits_value_result(
                 kind,
                 i as u16,
             ) as int] == 0
+        }
     } else {
         &&& status.is_none()
         &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_PHASE)
@@ -13064,7 +13090,9 @@ spec fn context_bits_phase_refines(
     status: Option<ContextAdvanceStatus>,
 ) -> bool {
     if match status {
-        Some(ContextAdvanceStatus::Failed(_)) => true,
+        Some(ContextAdvanceStatus::Failed(error)) =>
+            error != CompressedHeaderError::Truncated
+                && error != CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat),
         _ => false,
     } {
         true
@@ -14245,6 +14273,31 @@ fn advance_context_symbol_phase(
                 }
 }
 
+spec fn context_bits_write_at(
+    window_bytes: u32, kind: crate::brotli_prefix::ContextMapKind,
+    active_len: u16, index: int,
+) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    let map = crate::brotli_prefix::context_entry_at(window_bytes, kind, 0) as int;
+    ||| base <= index < base + 10
+    ||| index == base + B3B_CONTEXT_PHASE as int
+    ||| base + B3B_MAP_INDEX as int <= index < base + B3B_MAP_INITIALIZED as int + 2
+    ||| base + B3B_MAX_RUN_PREFIX as int <= index < base + B3B_PENDING_RUN as int + 1
+    ||| base + B3B_CODE_PHASE as int <= index < base + B3B_BLOCK_LENGTH_PHASE as int
+    ||| index == base + B3B_PENDING_SPAN_LENGTH as int
+    ||| map <= index < map + active_len as int
+}
+
+spec fn context_bits_frame(
+    before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    kind: crate::brotli_prefix::ContextMapKind, active_len: u16,
+) -> bool {
+    &&& after.len() == before.len()
+    &&& forall|index: int| 0 <= index < before.len()
+        && !context_bits_write_at(window_bytes, kind, active_len, index)
+        ==> #[trigger] after[index] == before[index]
+}
+
 fn advance_context_bits_phase(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -14269,6 +14322,9 @@ fn advance_context_bits_phase(
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
+        context_bits_frame(old(workspace)@, final(workspace)@, window_bytes, kind, active_len),
+        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_OUTER_PHASE)
+            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE),
         b3b_workspace_shape(final(workspace)@.len() as nat, window_bytes),
         r.0 <= input.len(),
         r.1.is_none() ==> {
@@ -14301,6 +14357,9 @@ fn advance_context_bits_phase(
     let ghost original = workspace@;
     proof { assert(original == old(workspace)@); }
     proof { b3b_scalar_layout_is_exact(); }
+    reveal(context_bits_frame);
+    reveal(context_bits_write_at);
+    reveal(context_tree_start_frame);
     let mut consumed: usize = 0;
 
                 let (width, pending_symbol) = if phase == 1 {
@@ -14377,7 +14436,13 @@ fn advance_context_bits_phase(
                         }
                         return result;
                     }
-                    BitReadStatus::Truncated => return (consumed, Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated),)),
+                    BitReadStatus::Truncated => {
+                        let result = (consumed, Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)));
+                        proof { establish_context_bits_refinement(original, workspace@,
+                            window_bytes, phase, input@, end_of_input, result.0, result.1,
+                            start_queue, queue, read.status); }
+                        return result;
+                    },
                     BitReadStatus::Value(value) => {
                         if phase == 1 {
                             if value == 0 {
@@ -14505,9 +14570,15 @@ fn advance_context_bits_phase(
                                 proof {
                                     assert(index as u32 + repeat > active_len as u32);
                                 }
-                                return (consumed, Some(ContextAdvanceStatus::Failed(
-                                        CompressedHeaderError::InvalidFormat(
-                                            CompressedFormatError::ContextMapRepeat)),));
+                                let result = (consumed, Some(ContextAdvanceStatus::Failed(
+                                    CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat))));
+                                proof {
+                                    reveal(context_bits_value_result);
+                                    establish_context_bits_refinement(original, workspace@,
+                                        window_bytes, phase, input@, end_of_input, result.0, result.1,
+                                        start_queue, queue, read.status);
+                                }
+                                return result;
                             }
                             let num_trees = match state_u16(workspace, window_bytes, B3B_MAP_TREES) {
                                 Ok(value) => value,
@@ -14594,6 +14665,9 @@ fn advance_context_bits_phase(
                             let target = index + repeat as u16;
                             while initialized < target
                                 invariant initialized <= target <= active_len,
+                                    forall|i: int| 0 <= i < original.len()
+                                        && !context_bits_write_at(window_bytes, kind, active_len, i)
+                                        ==> #[trigger] workspace@[i] == original[i],
                                     original == old(workspace)@,
                                     active_len as nat
                                         <= crate::brotli_prefix::context_map_capacity(kind),
@@ -23815,6 +23889,406 @@ fn advance_planned_context_tree_count(
     )
 }
 
+spec fn context_bits_work_spec(read_work: nat, phase: u8, status: BitReadStatus,
+    repeat: nat, remaining: nat) -> nat {
+    read_work + 10 + 1 + match status {
+        BitReadStatus::NeedInput => 0nat,
+        BitReadStatus::Truncated => 4nat + 1,
+        BitReadStatus::Value(value) => {
+            if phase == 1 && value == 0 || phase == 2 { 76nat + 1 + 1 + 1 + 1 }
+            else if phase == 5 {
+                if repeat > remaining { 4nat + 1 }
+                else { repeat + 4 + 1 + 1 + 1 }
+            } else { 1nat + 1 }
+        },
+    }
+}
+
+fn context_bits_execution_work(read_work: u64, phase: u8, status: BitReadStatus,
+    repeat: u32, remaining: u16) -> (r: u64)
+    requires read_work <= 63, repeat <= 131_071,
+    ensures r as nat == context_bits_work_spec(read_work as nat, phase, status,
+        repeat as nat, remaining as nat), r <= 131_148,
+{
+    let base = read_work + 10 + 1;
+    base + match status {
+        BitReadStatus::NeedInput => 0,
+        BitReadStatus::Truncated => 4 + 1,
+        BitReadStatus::Value(value) => {
+            if phase == 1 && value == 0 || phase == 2 { 76 + 1 + 1 + 1 + 1 }
+            else if phase == 5 {
+                if repeat > remaining as u32 { 4 + 1 }
+                else { repeat as u64 + 4 + 1 + 1 + 1 }
+            } else { 1 + 1 }
+        },
+    }
+}
+
+// Transient B3c planning data; W1 stores no budget or shadow parser state.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct ContextBitsPlan {
+    phase: u8,
+    start_queue: BitQueue,
+    end_queue: BitQueue,
+    status: BitReadStatus,
+    consumed: usize,
+    repeat: u32,
+    read_work: u64,
+    execution_work: u64,
+}
+
+spec fn context_bits_plan_valid(workspace: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end_of_input: bool, plan: ContextBitsPlan) -> bool {
+    &&& plan.phase == b3b_scalar_byte_at(workspace, window_bytes, B3B_CONTEXT_PHASE)
+    &&& (plan.phase == 1 || plan.phase == 2 || plan.phase == 5 || plan.phase == 6)
+    &&& serialized_b3b_queue(workspace, window_bytes, plan.start_queue)
+    &&& plan.end_queue.valid()
+    &&& plan.repeat <= 131_071
+    &&& plan.consumed <= input.len()
+    &&& bit_read_exact_step(plan.start_queue, input, end_of_input,
+        context_bits_width(workspace, window_bytes, plan.phase),
+        plan.consumed, plan.end_queue, plan.status)
+    &&& plan.repeat as nat == match plan.status {
+        BitReadStatus::Value(value) => if plan.phase == 5 {
+            pow2(context_bits_width(workspace, window_bytes, plan.phase)) + value as nat
+        } else { 0nat },
+        _ => 0nat,
+    }
+    &&& plan.read_work <= 63
+    &&& plan.read_work as nat == plan.consumed as nat + match plan.status {
+        BitReadStatus::Value(_) => context_bits_width(workspace, window_bytes, plan.phase),
+        _ => 0nat,
+    }
+    &&& plan.execution_work as nat == context_bits_work_spec(plan.read_work as nat,
+        plan.phase, plan.status, plan.repeat as nat,
+        (b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_SIZE)
+            - b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_INITIALIZED)) as nat)
+}
+
+fn plan_context_bits_action(workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: Result<ContextBitsPlan, CoreFailure>)
+    requires old(budget).valid(),
+    ensures
+        final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() ==> {
+            &&& context_bits_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap())
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().read_work
+        },
+{
+    let phase = match state_byte(workspace, window_bytes, B3B_CONTEXT_PHASE) {
+        Ok(value) if value == 1 || value == 2 || value == 5 || value == 6 => value,
+        _ => return Err(core_state_failure()),
+    };
+    let active_len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
+        Ok(value) => value, _ => return Err(core_state_failure()),
+    };
+    let initialized = match state_u16(workspace, window_bytes, B3B_MAP_INITIALIZED) {
+        Ok(value) if value <= active_len => value, _ => return Err(core_state_failure()),
+    };
+    let width = if phase == 2 { 4usize } else if phase == 5 {
+        match state_byte(workspace, window_bytes, B3B_PENDING_RUN) {
+            Ok(value) if 1 <= value && value <= 16 => value as usize,
+            _ => return Err(core_state_failure()),
+        }
+    } else { 1usize };
+    let mut queue = match load_b3b_queue(workspace, window_bytes) {
+        Ok(value) => value, _ => return Err(core_state_failure()),
+    };
+    let start_queue = queue;
+    proof { assert(width as nat == context_bits_width(workspace@, window_bytes, phase)); }
+    let read = plan_bit_read(queue, width, input.len());
+    if !budget.charge_work(read.work) { return Err(CoreFailure::ResourceLimit); }
+    let step = queue.read_bits(width, input, end_of_input);
+    let repeat = match step.status {
+        BitReadStatus::Value(value) if phase == 5 => {
+            proof {
+                lemma2_to64();
+                if width < 16 { lemma_pow2_strictly_increases(width as nat, 16); }
+                assert(value < 65_536);
+                bounded_u64_fits_u16(value);
+                pow2_matches_context_repeat_shift(width as u8);
+                assert((value as u16 as u32) < (1u32 << (width as u8)));
+            }
+            context_zero_repeat_exec(width as u8, value as u16)
+        },
+        _ => 0u32,
+    };
+    proof {
+        assert(bit_read_exact_step(start_queue, input@, end_of_input, width as nat,
+            step.consumed, queue, step.status));
+        reveal(bit_read_exact_step);
+        assert(step.consumed == read.consumed);
+        bytes_bits_len(input@.take(step.consumed as int));
+        bytes_bits_len(input@);
+        assert(input@.take(input@.len() as int) =~= input@);
+        let source = start_queue.bits() + bytes_bits(input@.take(step.consumed as int));
+        assert(source.len() == start_queue.bits().len() + 8 * step.consumed);
+        assert(read.complete == match step.status {
+            BitReadStatus::Value(_) => true, _ => false,
+        });
+    }
+    let execution_work = context_bits_execution_work(read.work, phase, step.status,
+        repeat, active_len - initialized);
+    Ok(ContextBitsPlan { phase, start_queue, end_queue: queue, status: step.status,
+        consumed: step.consumed, repeat, read_work: read.work, execution_work })
+}
+
+proof fn serialized_bit_queues_agree(workspace: Seq<u8>, window_bytes: u32,
+    left: BitQueue, right: BitQueue)
+    requires serialized_b3b_queue(workspace, window_bytes, left),
+        serialized_b3b_queue(workspace, window_bytes, right),
+    ensures left.bits() == right.bits(),
+{
+    reveal(serialized_b3b_queue);
+    assert(left.len == right.len && left.offset == right.offset);
+    assert forall|i: int| 0 <= i < left.bits().len() implies
+        #[trigger] left.bits()[i] == right.bits()[i] by {
+        let at = (left.offset as int + i) / 8;
+        assert(0 <= at < left.len);
+        assert(left.pending@[at] == right.pending@[at]);
+    }
+    assert(left.bits() =~= right.bits());
+}
+
+proof fn bit_read_steps_agree(left: BitQueue, right: BitQueue,
+    input: Seq<u8>, end: bool, width: nat,
+    left_used: usize, right_used: usize, left_end: BitQueue, right_end: BitQueue,
+    left_status: BitReadStatus, right_status: BitReadStatus)
+    requires left.bits() == right.bits(),
+        bit_read_exact_step(left, input, end, width, left_used, left_end, left_status),
+        bit_read_exact_step(right, input, end, width, right_used, right_end, right_status),
+    ensures left_used == right_used, left_status == right_status,
+        left_end.bits() == right_end.bits(),
+{
+    reveal(bit_read_exact_step);
+    assert(left_used == right_used);
+    assert(left_used <= input.len());
+    bytes_bits_len(input.take(left_used as int));
+    bytes_bits_len(input);
+    assert(input.take(input.len() as int) =~= input);
+    let source = left.bits() + bytes_bits(input.take(left_used as int));
+    assert(source.len() == left.bits().len() + 8 * left_used);
+    match (left_status, right_status) {
+        (BitReadStatus::Value(_), BitReadStatus::Value(_)) => {},
+        (BitReadStatus::NeedInput, BitReadStatus::NeedInput)
+        | (BitReadStatus::Truncated, BitReadStatus::Truncated) => {},
+        _ => {
+            assert(left_used == input.len());
+            assert(source.len() == left.bits().len() + 8 * input.len());
+            assert(false);
+        },
+    }
+}
+
+spec fn context_bits_expected_status(before: Seq<u8>, window_bytes: u32,
+    plan: ContextBitsPlan) -> Option<ContextAdvanceStatus> {
+    match plan.status {
+        BitReadStatus::NeedInput => Some(ContextAdvanceStatus::NeedInput),
+        BitReadStatus::Truncated => Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+        BitReadStatus::Value(_) => if plan.phase == 5 && plan.repeat as nat
+            + b3b_scalar_u16_at(before, window_bytes, B3B_MAP_INITIALIZED)
+            > b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE) {
+            Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(
+                CompressedFormatError::ContextMapRepeat)))
+        } else { None },
+    }
+}
+
+spec fn context_bits_effect_matches(before: Seq<u8>, after: Seq<u8>,
+    window_bytes: u32, plan: ContextBitsPlan) -> bool {
+    &&& exists|queue: BitQueue| serialized_b3b_queue(after, window_bytes, queue)
+        && queue.bits() == plan.end_queue.bits()
+    &&& match plan.status {
+        BitReadStatus::Value(value) => context_bits_value_result(before, after,
+            window_bytes, plan.phase, value, context_bits_expected_status(before, window_bytes, plan)),
+        _ => true,
+    }
+}
+
+proof fn context_bits_plan_matches_action(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: ContextBitsPlan, used: usize,
+    status: Option<ContextAdvanceStatus>)
+    requires context_bits_plan_valid(before, window_bytes, input, end, plan),
+        context_bits_phase_refines(before, after, window_bytes, plan.phase, input, end, used, status),
+        status == context_bits_expected_status(before, window_bytes, plan),
+    ensures used == plan.consumed, context_bits_effect_matches(before, after, window_bytes, plan),
+{
+    reveal(context_bits_phase_refines);
+    let (sq, eq, rs) = choose|sq: BitQueue, eq: BitQueue, rs: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& serialized_b3b_queue(after, window_bytes, eq)
+        &&& bit_read_exact_step(sq, input, end, context_bits_width(before, window_bytes, plan.phase),
+            used, eq, rs)
+        &&& match rs {
+            BitReadStatus::NeedInput => status == Some(ContextAdvanceStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => context_bits_value_result(before, after, window_bytes, plan.phase, value, status),
+        }
+    };
+    serialized_bit_queues_agree(before, window_bytes, sq, plan.start_queue);
+    bit_read_steps_agree(sq, plan.start_queue, input, end,
+        context_bits_width(before, window_bytes, plan.phase), used, plan.consumed,
+        eq, plan.end_queue, rs, plan.status);
+    assert(exists|queue: BitQueue| serialized_b3b_queue(after, window_bytes, queue)
+        && queue.bits() == plan.end_queue.bits());
+}
+
+fn execute_planned_context_bits(workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+    input_was_limited: bool, plan: ContextBitsPlan,
+) -> (r: Result<usize, CompressedStep>)
+    requires old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+        context_bits_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan),
+        plan.consumed as u64 <= old(budget).input_remaining,
+    ensures
+        final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        old(budget).work_remaining >= plan.execution_work ==>
+            final(budget).work_remaining == old(budget).work_remaining - plan.execution_work,
+        final(workspace)@.len() == old(workspace)@.len(),
+        old(budget).work_remaining < plan.execution_work ==> {
+            &&& final(workspace)@ == old(workspace)@
+            &&& *final(budget) == *old(budget)
+            &&& r == Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+        },
+        match r {
+            Ok(used) => {
+                &&& used <= input.len()
+                &&& compressed_decoder_state_ok(final(workspace)@, window_bytes)
+                &&& used == plan.consumed
+                &&& context_bits_effect_matches(old(workspace)@, final(workspace)@, window_bytes, plan)
+                &&& context_bits_frame(old(workspace)@, final(workspace)@, window_bytes,
+                    if b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_KIND) == 0 {
+                        crate::brotli_prefix::ContextMapKind::Literal
+                    } else { crate::brotli_prefix::ContextMapKind::Distance },
+                    b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) as u16)
+                &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+            },
+            Err(step) => {
+                &&& step.consumed <= input.len()
+                &&& (!matches!(step.status, CompressedStatus::Failed(_)) ==>
+                    compressed_decoder_state_ok(final(workspace)@, window_bytes))
+                &&& (step.status == CompressedStatus::NeedInput ==>
+                    context_bits_effect_matches(old(workspace)@, final(workspace)@, window_bytes, plan))
+            },
+        },
+{
+    if !budget.charge_work(plan.execution_work) {
+        return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    let kind_tag = match state_byte(workspace, window_bytes, B3B_CONTEXT_KIND) {
+        Ok(value) => value, _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    let kind = if kind_tag == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+        else { crate::brotli_prefix::ContextMapKind::Distance };
+    let active_len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
+        Ok(value) => value, _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    let initialized = match state_u16(workspace, window_bytes, B3B_MAP_INITIALIZED) {
+        Ok(value) => value, _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    let expected = match plan.status {
+        BitReadStatus::NeedInput => Some(ContextAdvanceStatus::NeedInput),
+        BitReadStatus::Truncated => Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+        BitReadStatus::Value(_) => if plan.phase == 5 && initialized as u32 + plan.repeat > active_len as u32 {
+            Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat)))
+        } else { None },
+    };
+    proof {
+        reveal(context_bits_expected_status);
+        assert(expected == context_bits_expected_status(workspace@, window_bytes, plan));
+    }
+    proof {
+        reveal(compressed_decoder_state_ok); reveal(serialized_context_state_ok);
+        reveal(serialized_context_data_ok); reveal(serialized_context_map_prefix_ok);
+    }
+    let ghost before_action = workspace@;
+    let (used, status) = advance_context_bits_phase(workspace, window_bytes, plan.phase,
+        kind_tag, kind, active_len, input, end_of_input);
+    let status_matches = match (status, expected) {
+        (None, None) => true,
+        (Some(ContextAdvanceStatus::NeedInput), Some(ContextAdvanceStatus::NeedInput)) => true,
+        (Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+            Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated))) => true,
+        (Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat))),
+            Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat)))) => true,
+        _ => false,
+    };
+    if used != plan.consumed || !status_matches {
+        return Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) });
+    }
+    proof {
+        assert(expected == context_bits_expected_status(before_action, window_bytes, plan));
+        assert(status == expected);
+        context_bits_plan_matches_action(before_action, workspace@, window_bytes,
+            input@, end_of_input, plan, used, status);
+    }
+    if used > 0 && !budget.charge_input(used as u64) {
+        return Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    match status {
+        Some(ContextAdvanceStatus::Failed(error)) => {
+            if store_terminal_error(workspace, window_bytes, error).is_err() {
+                return Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) });
+            }
+            Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(map_compressed_error(error)) })
+        },
+        Some(ContextAdvanceStatus::NeedInput) => {
+            proof { reveal(compressed_decoder_state_ok); }
+            Err(CompressedStep { consumed: used, status: if input_was_limited {
+                CompressedStatus::Failed(CoreFailure::ResourceLimit)
+            } else { CompressedStatus::NeedInput } })
+        },
+        None => {
+            proof { reveal(compressed_decoder_state_ok); }
+            Ok(used)
+        },
+        _ => Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) }),
+    }
+}
+
+fn advance_planned_context_bits(workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: Result<usize, CompressedStep>)
+    requires old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+        ({ let phase = b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE);
+            phase == 1 || phase == 2 || phase == 5 || phase == 6 }),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(workspace)@.len() == old(workspace)@.len(),
+        match r {
+            Ok(used) => used <= input.len() && compressed_decoder_state_ok(final(workspace)@, window_bytes),
+            Err(step) => step.consumed <= input.len() && (!matches!(step.status, CompressedStatus::Failed(_)) ==>
+                compressed_decoder_state_ok(final(workspace)@, window_bytes)),
+        },
+{
+    let allowed = if budget.input_remaining > usize::MAX as u64 { input.len() }
+        else { input.len().min(budget.input_remaining as usize) };
+    let plan = match plan_context_bits_action(workspace, window_bytes, budget, &input[..allowed],
+        end_of_input && allowed == input.len()) {
+        Ok(value) => value,
+        Err(error) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+    };
+    execute_planned_context_bits(workspace, window_bytes, budget, &input[..allowed],
+        end_of_input && allowed == input.len(), allowed < input.len(), plan)
+}
+
 fn plan_context_map_tail(
     workspace: &[u8],
     window_bytes: u32,
@@ -24477,6 +24951,14 @@ fn advance_planned_compressed_action(
         match advance_planned_context_tree_count(
             workspace, window_bytes, budget, input, end_of_input,
         ) {
+            Ok(used) => already_consumed = used,
+            Err(step) => return Err(step),
+        }
+    } else if (initial_outer == 6 || initial_outer == 7)
+        && (initial_context_phase == 1 || initial_context_phase == 2
+            || initial_context_phase == 5 || initial_context_phase == 6)
+    {
+        match advance_planned_context_bits(workspace, window_bytes, budget, input, end_of_input) {
             Ok(used) => already_consumed = used,
             Err(step) => return Err(step),
         }
@@ -28011,6 +28493,365 @@ mod tests {
             ),
             vec![0; 64]
         );
+    }
+
+    #[test]
+    fn b3c_context_bits_plans_match_w1_and_reserve_before_writes() {
+        let budget = |input, work| {
+            crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: input,
+                max_output: 7,
+                max_work: work,
+                max_calls: 3,
+                max_initializations: 2,
+                max_window_bits: 16,
+            })
+            .unwrap()
+        };
+        let mut configurations = 0;
+        for kind in [
+            crate::brotli_prefix::ContextMapKind::Literal,
+            crate::brotli_prefix::ContextMapKind::Distance,
+        ] {
+            let tag = if kind == crate::brotli_prefix::ContextMapKind::Literal {
+                0
+            } else {
+                1
+            };
+            let capacity = if tag == 0 { 16_384u16 } else { 1_024u16 };
+            let mut fields = vec![
+                (1u8, 1u8, 0u16),
+                (1, 1, 1),
+                (2, 4, 0),
+                (2, 4, 15),
+                (6, 1, 0),
+                (6, 1, 1),
+            ];
+            for width in 1..=16 {
+                fields.extend([(5, width, 0), (5, width, ((1u32 << width) - 1) as u16)]);
+            }
+            for poison in [0u8, 0xa5, 0xff] {
+                for &(phase, width, value) in &fields {
+                    for queued in [0usize, 1, 5, 8] {
+                        let (mut initial, window) = fresh_b3b_workspace();
+                        initial.fill(poison);
+                        initialize_serialized_b3c(&mut initial, window).unwrap();
+                        write_b3b_state_tag(&mut initial, window, B3B_OUTER_PHASE, 13, 6 + tag)
+                            .unwrap();
+                        start_context_map(&mut initial, window, kind, capacity).unwrap();
+                        put_state_u16(&mut initial, window, B3B_MAP_TREES, 256).unwrap();
+                        let initialized = if phase == 6 {
+                            capacity
+                        } else if phase == 5 {
+                            3
+                        } else {
+                            0
+                        };
+                        for i in 0..initialized {
+                            crate::brotli_prefix::write_next_context_entry(
+                                &mut initial,
+                                window,
+                                kind,
+                                capacity,
+                                i,
+                                (i % 256) as u8,
+                                256,
+                            )
+                            .unwrap();
+                        }
+                        store_context_map_progress(&mut initial, window, initialized).unwrap();
+                        if phase == 5 {
+                            put_state_byte(&mut initial, window, B3B_PENDING_RUN, width).unwrap();
+                        }
+                        store_context_phase(&mut initial, window, phase).unwrap();
+                        let mut bits = Vec::new();
+                        push_bits(&mut bits, value, width);
+                        // Keep trailing bits so queue comparisons detect accidental consumption.
+                        bits.extend([1, 0, 1, 1, 0, 0, 1, 0]);
+                        let queue_bits = queued.min(width as usize);
+                        let mut queue = BitQueue::new();
+                        if queue_bits > 0 {
+                            let offset = 8 - queue_bits;
+                            let byte = (value as u8) << offset;
+                            queue.append_byte(byte);
+                            queue.offset = offset;
+                            store_b3b_queue(&mut initial, window, &queue).unwrap();
+                        }
+                        let bytes = pack_lsb_bits(&bits[queue_bits..]);
+                        for split in 0..=bytes.len() {
+                            for end in [false, true] {
+                                let input = &bytes[..split];
+                                let mut planning = budget(input.len() as u64, u64::MAX);
+                                let plan = plan_context_bits_action(
+                                    &initial,
+                                    window,
+                                    &mut planning,
+                                    input,
+                                    end,
+                                )
+                                .unwrap();
+                                assert_eq!(u64::MAX - planning.work_remaining, plan.read_work);
+                                assert_eq!(
+                                    plan.read_work,
+                                    plan.consumed as u64
+                                        + if matches!(plan.status, BitReadStatus::Value(_)) {
+                                            width as u64
+                                        } else {
+                                            0
+                                        }
+                                );
+                                let mut reference = initial.clone();
+                                let expected = advance_context_bits_phase(
+                                    &mut reference,
+                                    window,
+                                    phase,
+                                    tag,
+                                    kind,
+                                    capacity,
+                                    input,
+                                    end,
+                                );
+                                assert_eq!(expected.0, plan.consumed);
+                                if let Some(ContextAdvanceStatus::Failed(error)) = expected.1 {
+                                    store_terminal_error(&mut reference, window, error).unwrap();
+                                }
+                                for short in [true, false] {
+                                    let mut actual = initial.clone();
+                                    let mut request = budget(
+                                        input.len() as u64,
+                                        plan.read_work + plan.execution_work - u64::from(short),
+                                    );
+                                    let replay = plan_context_bits_action(
+                                        &actual,
+                                        window,
+                                        &mut request,
+                                        input,
+                                        end,
+                                    )
+                                    .unwrap();
+                                    assert_eq!(actual, initial);
+                                    let prepaid = request;
+                                    let result = execute_planned_context_bits(
+                                        &mut actual,
+                                        window,
+                                        &mut request,
+                                        input,
+                                        end,
+                                        false,
+                                        replay,
+                                    );
+                                    if short {
+                                        assert_eq!(
+                                            result,
+                                            Err(CompressedStep {
+                                                consumed: 0,
+                                                status: CompressedStatus::Failed(
+                                                    CoreFailure::ResourceLimit
+                                                )
+                                            })
+                                        );
+                                        assert_eq!(actual, initial);
+                                        assert_eq!(request, prepaid);
+                                    } else {
+                                        let expected_result = match expected.1 {
+                                            None => Ok(expected.0),
+                                            Some(ContextAdvanceStatus::NeedInput) => {
+                                                Err(CompressedStep {
+                                                    consumed: expected.0,
+                                                    status: CompressedStatus::NeedInput,
+                                                })
+                                            }
+                                            Some(ContextAdvanceStatus::Failed(error)) => {
+                                                Err(CompressedStep {
+                                                    consumed: expected.0,
+                                                    status: CompressedStatus::Failed(
+                                                        map_compressed_error(error),
+                                                    ),
+                                                })
+                                            }
+                                            _ => unreachable!(),
+                                        };
+                                        assert_eq!(
+                                            result, expected_result,
+                                            "phase={phase} width={width} split={split} end={end}"
+                                        );
+                                        assert_eq!(actual, reference, "phase={phase} width={width} queued={queued} split={split} end={end}");
+                                        assert_eq!(request.work_remaining, 0);
+                                        assert_eq!(
+                                            request.input_remaining,
+                                            input.len() as u64 - expected.0 as u64
+                                        );
+                                        assert_eq!(
+                                            request.output_remaining,
+                                            prepaid.output_remaining
+                                        );
+                                        assert_eq!(
+                                            request.calls_remaining,
+                                            prepaid.calls_remaining
+                                        );
+                                        assert_eq!(
+                                            request.initializations_remaining,
+                                            prepaid.initializations_remaining
+                                        );
+                                    }
+                                }
+                                configurations += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(configurations, 5_376);
+    }
+
+    #[test]
+    fn b3c_context_repeat_resumes_partial_suffix_and_checks_boundary() {
+        let budget = |input, work| {
+            crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: input,
+                max_output: 0,
+                max_work: work,
+                max_calls: 0,
+                max_initializations: 0,
+                max_window_bits: 16,
+            })
+            .unwrap()
+        };
+        // Widths 9..13 admit valid multi-byte repeats within the literal map.
+        for width in 9..=13 {
+            let repeat = (1u16 << width) + 1;
+            let (mut initial, window) = setup_rle_phase(width, repeat);
+            write_b3b_state_tag(&mut initial, window, B3B_OUTER_PHASE, 13, 6).unwrap();
+            let bytes = [1u8, 0u8];
+            let mut actual = initial.clone();
+            let mut request = budget(2, u64::MAX);
+            let first =
+                advance_planned_context_bits(&mut actual, window, &mut request, &bytes[..1], false);
+            assert_eq!(
+                first,
+                Err(CompressedStep {
+                    consumed: 1,
+                    status: CompressedStatus::NeedInput
+                })
+            );
+            // The consumed byte is retained in the serialized queue, not discarded.
+            assert_eq!(load_b3b_queue(&actual, window).unwrap().len, 1);
+            let second =
+                advance_planned_context_bits(&mut actual, window, &mut request, &bytes[1..], true);
+            assert_eq!(second, Ok(1));
+            assert_eq!(
+                state_u16(&actual, window, B3B_MAP_INITIALIZED).unwrap(),
+                repeat
+            );
+            assert_eq!(
+                context_map_bytes(
+                    &actual,
+                    window,
+                    crate::brotli_prefix::ContextMapKind::Literal,
+                    repeat
+                ),
+                vec![0; repeat as usize]
+            );
+            let mut reference = initial.clone();
+            advance_context_bits_phase(
+                &mut reference,
+                window,
+                5,
+                0,
+                crate::brotli_prefix::ContextMapKind::Literal,
+                repeat,
+                &bytes[..1],
+                false,
+            );
+            advance_context_bits_phase(
+                &mut reference,
+                window,
+                5,
+                0,
+                crate::brotli_prefix::ContextMapKind::Literal,
+                repeat,
+                &bytes[1..],
+                true,
+            );
+            assert_eq!(actual, reference);
+        }
+        let (mut overshoot, window) = setup_rle_phase(9, 512);
+        write_b3b_state_tag(&mut overshoot, window, B3B_OUTER_PHASE, 13, 6).unwrap();
+        let map_before = context_map_bytes(
+            &overshoot,
+            window,
+            crate::brotli_prefix::ContextMapKind::Literal,
+            512,
+        );
+        let mut request = budget(2, u64::MAX);
+        assert_eq!(
+            advance_planned_context_bits(&mut overshoot, window, &mut request, &[1, 0], true),
+            Err(CompressedStep {
+                consumed: 2,
+                status: CompressedStatus::Failed(map_compressed_error(
+                    CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat)
+                ))
+            })
+        );
+        assert_eq!(
+            context_map_bytes(
+                &overshoot,
+                window,
+                crate::brotli_prefix::ContextMapKind::Literal,
+                512
+            ),
+            map_before
+        );
+        assert_eq!(
+            load_terminal_error(&overshoot, window).unwrap(),
+            CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat)
+        );
+        // Input-credit exhaustion is not EOF, even when the supplied input is final.
+        let (initial, window) = setup_rle_phase(9, 1_024);
+        let mut initial = initial;
+        write_b3b_state_tag(&mut initial, window, B3B_OUTER_PHASE, 13, 6).unwrap();
+        let mut actual = initial.clone();
+        let mut empty_work = budget(2, 0);
+        let before = empty_work;
+        assert_eq!(
+            plan_context_bits_action(&actual, window, &mut empty_work, &[0, 0], false),
+            Err(CoreFailure::ResourceLimit)
+        );
+        assert_eq!(empty_work, before);
+        assert_eq!(actual, initial);
+        for credit in [0u64, 1] {
+            let mut actual = initial.clone();
+            let mut request = budget(credit, u64::MAX);
+            let result =
+                advance_planned_context_bits(&mut actual, window, &mut request, &[0, 0], true);
+            assert_eq!(
+                result,
+                Err(CompressedStep {
+                    consumed: credit as usize,
+                    status: CompressedStatus::Failed(CoreFailure::ResourceLimit)
+                })
+            );
+            assert_eq!(state_byte(&actual, window, B3B_OUTER_PHASE).unwrap(), 6);
+            assert_eq!(state_u16(&actual, window, B3B_MAP_INITIALIZED).unwrap(), 0);
+            assert_eq!(
+                load_b3b_queue(&actual, window).unwrap().len,
+                credit as usize
+            );
+        }
+        // Dispatch must enter the new bit planner instead of the conservative driver.
+        let mut actual = initial.clone();
+        let mut request = budget(1, 13);
+        let step =
+            advance_serialized_compressed_header(&mut actual, window, &mut request, &[0], false);
+        assert_eq!(
+            step,
+            CompressedStep {
+                consumed: 1,
+                status: CompressedStatus::NeedInput
+            }
+        );
+        assert_eq!(request.work_remaining, 0);
     }
 
     #[test]

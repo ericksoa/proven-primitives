@@ -153,12 +153,85 @@ The conservative W1 fallback can still traverse later context tree counts
 after entering an unsupported phase; full M1 coverage requires replacing that
 fallback as well.
 
+### Context-bit continuation
+
+The B3c dispatch boundary now also plans and prepays the existing W1 context
+bit actions in phases 1, 2, 5 and 6: RLE selection, RLE prefix width, repeat
+suffix/zero expansion, and MTF enablement. The plan charges input-byte and
+completed-field bit reads before replay. It keeps the budget in B3c and invokes
+`advance_context_bits_phase` only after reserving the execution formula.
+W1's `step` interface and serialized state remain unchanged.
+
+The bit-action formula is:
+
+```text
+read_work + 10 queue writes + 1 bit-action transition
++ NeedInput: 0
++ Truncated: 4 terminal writes + 1 terminal transition
++ Value:
+    phase 1, zero / phase 2:
+        76 tree-start writes + 1 tree-start transition
+        + 1 max-run write + 1 context-phase write + 1 context transition
+    phase 5, valid repeat:
+        repeat map writes + 4 progress writes + 1 pending-run reset
+        + 1 context-phase write + 1 context transition
+    phase 5, overshoot:
+        4 terminal writes + 1 terminal transition
+    phase 1, nonzero / phase 6:
+        1 context-phase write + 1 context transition
+```
+
+The tree-start writes comprise 66 scalar clears, one pending-span clear, one
+region write, six tree/alphabet bytes and two builder-initialized bytes. The
+formula's equality and exact debit are checked separately from the still-open
+complete source-operation ledger binding.
+
+The strengthened W1 bit-transition contract now includes EOF and repeat
+overshoot. Checked plan/action relations bind consumption, logical unread bits,
+next context phase, tree-start fields, repeat extent and newly zeroed map cells.
+The existing tree-start helpers now expose their byte frames. The bit-action
+frame preserves every byte outside its phase-category scalar/map regions.
+Execution reservation failure preserves the entire workspace and all remaining
+credits; planning charges remain spent. Input-credit exhaustion preserves the
+advanced partial queue and is distinguished from final input truncation.
+
+The runtime matrix compares complete workspace images with W1 for **5,376**
+configurations, each with exact and one-short execution work. It covers both
+map kinds, maximum map sizes, three old-byte patterns, all repeat widths 1–16,
+queued/supplied bits, every input split and both EOF settings. Separate cases
+check multi-call suffix resumption, exact map-end expansion, one-cell overshoot,
+planning-credit failure, input-credit exhaustion and B3c dispatch. Seventeen new
+unchanged-specification controls target formulas, debits, reservation order,
+next-state values and unrelated-byte preservation.
+
+The negative-test runner now requests `--multiple-errors 0` from the same
+pinned checker: one reported contract failure is sufficient to reject a
+mutant. This avoids extended searches for additional reports after a defect
+has already been detected. It changes error reporting only; no source
+contract, admitted input or production verifier input is changed.
+
+The fresh whole-crate run passed **1,075 verified, 0 errors** with
+`--no-cheating`. All **83 release tests** passed: 72 library tests, nine
+primitive tests, the source trust-bypass check and the upstream comparison.
+All **51 deliberate defects** were rejected after that unchanged whole-crate
+positive: 17 new bit-action controls, 13 tree-count controls and 21 arithmetic
+metering controls. The only later harness change limits additional error
+reports; every production verifier input remains identical.
+
+Validation for this continuation is recorded in
+`evidence/brotli-b3c-m1-context-bits.json`. M1 and B3c remain incomplete.
+Logical queue agreement does not prove byte-for-byte equality of every local
+queue representation. The byte frame is a union of phase write regions;
+minimal per-status write footprints and a complete ledger remain open.
+Executor correspondence is conditioned on its explicit predicted-status check;
+a universal no-mismatch theorem remains open.
+
 Remaining M1 obligations:
 
-- Context phases 1 through 6 still enter the conservative driver: RLE-prefix
-  selection, temporary-tree construction, context symbols, repeat
-  suffixes/expansion and MTF enablement. That driver can traverse later phase-0
-  actions internally. Complete/failed W1 observations also retain it. Both
+- Context phases 3 and 4 still enter the conservative driver: temporary-tree
+  construction and installed-tree context symbols/direct values/run setup.
+  That driver can traverse later planned phases internally without returning
+  to B3c dispatch. Complete/failed W1 observations also retain it. Both
   conservative constants remain reachable.
 - Prove complete plan/action state and frame refinement. Current executor
   checks compare consumption and status; they do not compare every successful
