@@ -1,0 +1,111 @@
+note: preparing crate for verification
+
+note: verifying root module
+
+note: verifying module base64
+
+note: verifying module brotli
+
+note: verifying module brotli_block
+
+note: done with root module
+
+note: verifying module brotli_data
+
+note: done with module brotli_block
+
+note: verifying module brotli_dictionary
+
+note: done with module brotli_dictionary
+
+note: verifying module brotli_input
+
+WARNING: (52555,13): 'if' cannot be used in patterns.
+WARNING: (57926,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+note: done with module base64
+
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: verifying module brotli_prefix
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: done with module brotli_prefix
+
+note: verifying module composition_demo
+
+note: done with module composition_demo
+
+note: verifying module lz4
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: done with module lz4
+
+note: verifying module percent
+
+note: done with module percent
+
+note: verifying module brotli_input, function lib::brotli_input::body_decrement_block_remaining
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::body_decrement_block_remaining
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: done with module brotli
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+error: postcondition not satisfied
+     --> src/brotli_input.rs:27220:13
+      |
+27217 |   proof fn serialized_queue_has_valid_encoding(workspace: Seq<u8>, window_bytes: u32,
+      |  _______-
+27218 | |     queue: BitQueue)
+      | |____________________- at the end of the function body
+27219 |       requires serialized_b3b_queue(workspace, window_bytes, queue),
+27220 |       ensures b3b_queue_encoding_valid(workspace, window_bytes),
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+
+note: done with module brotli_input
+

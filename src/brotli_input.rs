@@ -144,6 +144,72 @@ struct BitQueue {
     offset: usize,
 }
 
+spec fn bit_queue_read_image(start: BitQueue, input: Seq<u8>, consumed: usize,
+    used: nat, after: BitQueue) -> bool {
+    let bytes = start.pending@.take(start.len as int) + input.take(consumed as int);
+    let drop = (start.offset as nat + used) / 8;
+    let offset = (start.offset as nat + used) % 8;
+    &&& start.valid()
+    &&& after.valid()
+    &&& consumed <= input.len()
+    &&& used <= start.bits().len() + 8 * consumed
+    &&& drop <= bytes.len()
+    &&& after.len as nat == bytes.len() - drop
+    &&& after.offset as nat == if after.len == 0 { 0nat } else { offset }
+    &&& forall|i: int| 0 <= i < after.len ==> #[trigger]
+        after.pending@[i] == bytes[drop as int + i]
+}
+
+proof fn bit_queue_read_images_compose(start: BitQueue, input: Seq<u8>,
+    first_bytes: usize, first_bits: nat, mid: BitQueue,
+    next_bytes: usize, next_bits: nat, after: BitQueue)
+    requires
+        first_bytes <= input.len(),
+        bit_queue_read_image(start, input, first_bytes, first_bits, mid),
+        bit_queue_read_image(mid, input.skip(first_bytes as int), next_bytes, next_bits, after),
+        first_bytes as nat + next_bytes as nat <= usize::MAX as nat,
+    ensures bit_queue_read_image(start, input, (first_bytes + next_bytes) as usize,
+        first_bits + next_bits, after),
+{
+    reveal(bit_queue_read_image);
+    let d1 = (start.offset as int + first_bits as int) / 8;
+    let o1 = (start.offset as int + first_bits as int) % 8;
+    assert(start.offset as int + first_bits as int == 8 * d1 + o1);
+    assert(0 <= o1 < 8);
+    if mid.len == 0 {
+        assert(first_bits == start.bits().len() + 8 * first_bytes);
+        assert(o1 == 0);
+    }
+    assert(mid.offset == o1);
+    let d2 = (mid.offset as int + next_bits as int) / 8;
+    let off2 = (mid.offset as int + next_bits as int) % 8;
+    assert(mid.offset as int + next_bits as int == 8 * d2 + off2);
+    assert(0 <= off2 < 8);
+    assert((start.offset as int + first_bits as int + next_bits as int) / 8 == d1 + d2);
+    assert((start.offset as int + first_bits as int + next_bits as int) % 8 == off2);
+    assert(mid.bits().len() as int == start.bits().len() as int
+        + 8 * first_bytes as int - first_bits as int);
+    let initial_bytes = start.pending@.take(start.len as int) + input.take(first_bytes as int);
+    let replay_bytes = mid.pending@.take(mid.len as int)
+        + input.skip(first_bytes as int).take(next_bytes as int);
+    let total = first_bytes as int + next_bytes as int;
+    let all_bytes = start.pending@.take(start.len as int) + input.take(total);
+    assert(replay_bytes.len() == all_bytes.len() - d1);
+    assert forall|j: int| 0 <= j < replay_bytes.len() implies #[trigger]
+        replay_bytes[j] == all_bytes[d1 + j] by {
+        if j < mid.len {
+            assert(mid.pending@[j] == initial_bytes[d1 + j]);
+            if d1 + j < start.len {} else {}
+        } else {
+            assert(d1 + mid.len == start.len + first_bytes);
+        }
+    }
+    assert forall|j: int| 0 <= j < after.len implies #[trigger]
+        after.pending@[j] == all_bytes[d1 + d2 + j] by {
+        assert(after.pending@[j] == replay_bytes[d2 + j]);
+    }
+}
+
 impl BitQueue {
     spec fn valid(&self) -> bool {
         self.len <= 8 && self.offset < 8 && (self.len == 0 ==> self.offset == 0)
@@ -184,6 +250,7 @@ impl BitQueue {
     fn append_byte(&mut self, byte: u8)
         requires old(self).valid(), old(self).len < 8,
         ensures final(self).valid(),
+            final(self).pending@ == old(self).pending@.update(old(self).len as int, byte),
             final(self).len == old(self).len + 1,
             final(self).offset == old(self).offset,
             final(self).bits() == old(self).bits() + byte_bits(byte),
@@ -216,6 +283,12 @@ impl BitQueue {
         requires old(self).valid(), consumed_bits <= old(self).bits().len(),
         ensures final(self).valid(),
             final(self).bits() == old(self).bits().skip(consumed_bits as int),
+            final(self).len == old(self).len - (old(self).offset + consumed_bits) / 8,
+            final(self).offset == if final(self).len == 0 { 0int }
+                else { (old(self).offset + consumed_bits) % 8 },
+            forall|j: int| 0 <= j < final(self).len ==> #[trigger]
+                final(self).pending@[j] == old(self).pending@[
+                    (old(self).offset as int + consumed_bits as int) / 8 + j],
     {
         let total = self.offset + consumed_bits;
         let drop = total / 8;
@@ -285,6 +358,9 @@ impl BitQueue {
     ) -> (r: BitRead)
         requires old(self).valid(), width <= 56,
         ensures final(self).valid(), r.consumed <= input.len(),
+            bit_queue_read_image(*old(self), input@, r.consumed,
+                if matches!(r.status, BitReadStatus::Value(_)) { width as nat } else { 0nat },
+                *final(self)),
             r.consumed as nat
                 == input_bytes_taken(old(self).bits().len(), width as nat, input.len() as nat),
             match r.status {
@@ -310,6 +386,8 @@ impl BitQueue {
                 },
             },
     {
+        let ghost start_image = *self;
+        proof { reveal(bit_queue_read_image); }
         let ghost before = self.bits();
         let ghost old_len = self.len;
         let ghost old_offset = self.offset;
@@ -334,6 +412,9 @@ impl BitQueue {
                 take <= needed, old_len + take <= 8,
                 self.len == old_len + consumed, self.offset == old_offset,
                 self.bits() == before + bytes_bits(input@.take(consumed as int)),
+                forall|j: int| 0 <= j < self.len ==> #[trigger] self.pending@[j]
+                    == if j < old_len { start_image.pending@[j] }
+                        else { input@[j - old_len as int] },
                 append_work == consumed,
             decreases take - consumed,
         {
@@ -413,7 +494,17 @@ impl BitQueue {
             bits_value_bound(available.take(width as int));
             assert((value as nat) < pow2(width as nat));
         }
+        let ghost before_compact = *self;
         self.compact_after(width);
+        proof {
+            let bytes = start_image.pending@.take(start_image.len as int)
+                + input@.take(consumed as int);
+            let drop = (start_image.offset as int + width as int) / 8;
+            assert forall|j: int| 0 <= j < self.len implies #[trigger]
+                self.pending@[j] == bytes[drop + j] by {
+                assert(self.pending@[j] == before_compact.pending@[drop + j]);
+            }
+        }
         BitRead { consumed, status: BitReadStatus::Value(value as u64) }
     }
 }
@@ -1807,6 +1898,7 @@ fn decode_auxiliary_symbol(
         r.is_some() ==> {
             &&& r.unwrap() < 18
             &&& auxiliary_symbol_match(*code, bits, width, r.unwrap())
+            &&& forall|earlier: u8| earlier < r.unwrap() ==> !auxiliary_symbol_match(*code, bits, width, earlier)
         },
         r.is_none() ==> forall|symbol: u8| !auxiliary_symbol_match(
             *code, bits, width, symbol),
@@ -1837,9 +1929,30 @@ fn decode_auxiliary_symbol(
     None
 }
 
+spec fn auxiliary_unique_nonzero(code: ComplexCodeLengthAlphabet, symbol: u8) -> bool {
+    &&& symbol < 18
+    &&& code.lengths@[symbol as int] != 0
+    &&& forall|i: int| 0 <= i < 18 && i != symbol ==> code.lengths@[i] == 0
+}
+
+spec fn auxiliary_singleton_value(code: ComplexCodeLengthAlphabet) -> u8 {
+    if exists|symbol: u8| auxiliary_unique_nonzero(code, symbol) {
+        choose|symbol: u8| auxiliary_unique_nonzero(code, symbol)
+    } else { 18 }
+}
+
+proof fn auxiliary_unique_nonzero_agrees(code: ComplexCodeLengthAlphabet, left: u8, right: u8)
+    requires auxiliary_unique_nonzero(code, left), auxiliary_unique_nonzero(code, right),
+    ensures left == right,
+{
+    if left != right { assert(code.lengths@[left as int] == 0); }
+}
+
 fn auxiliary_singleton(code: &ComplexCodeLengthAlphabet) -> (r: Option<u8>)
     requires code.valid(),
     ensures
+        r.is_none() ==> !(exists|symbol: u8| auxiliary_unique_nonzero(*code, symbol)),
+        r.is_some() ==> auxiliary_unique_nonzero(*code, r.unwrap()),
         r.is_some() ==> {
             &&& r.unwrap() < 18
             &&& code.lengths@[r.unwrap() as int] != 0
@@ -1852,6 +1965,9 @@ fn auxiliary_singleton(code: &ComplexCodeLengthAlphabet) -> (r: Option<u8>)
     let mut i: usize = 0;
     while i < 18
         invariant i <= 18, found <= 18,
+            found == 18 ==> forall|j: int| 0 <= j < i ==> code.lengths@[j] == 0,
+            multiple ==> exists|a: int, b: int| 0 <= a < b < i
+                && code.lengths@[a] != 0 && code.lengths@[b] != 0,
             found < 18 ==> {
                 &&& code.lengths@[found as int] != 0
                 &&& found < i
@@ -1864,12 +1980,30 @@ fn auxiliary_singleton(code: &ComplexCodeLengthAlphabet) -> (r: Option<u8>)
             if found == 18 {
                 found = i as u8;
             } else {
+                proof { assert(exists|a: int, b: int| a == found && b == i
+                    && 0 <= a < b < i + 1 && code.lengths@[a] != 0 && code.lengths@[b] != 0); }
                 multiple = true;
             }
         }
         i = i + 1;
     }
-    if found < 18 && !multiple { Some(found) } else { None }
+    proof { reveal(auxiliary_unique_nonzero); }
+    if found < 18 && !multiple { Some(found) } else {
+        proof {
+            assert forall|symbol: u8| !(auxiliary_unique_nonzero(*code, symbol)) by {
+                if auxiliary_unique_nonzero(*code, symbol) {
+                    if found == 18 { assert(code.lengths@[symbol as int] == 0); }
+                    else {
+                        let (a, b) = choose|a: int, b: int| 0 <= a < b < 18
+                            && code.lengths@[a] != 0 && code.lengths@[b] != 0;
+                        if symbol as int != a { assert(code.lengths@[a] == 0); }
+                        else { assert(code.lengths@[b] == 0); }
+                    }
+                }
+            }
+        }
+        None
+    }
 }
 
 fn start_complex_symbol_progress(
@@ -1888,12 +2022,21 @@ fn start_complex_symbol_progress(
         r.prefix_width == 0,
         r.prefix_bits == 0,
         r.singleton <= 18,
+        r.singleton == auxiliary_singleton_value(code),
 {
     let singleton = auxiliary_singleton(&code);
     let singleton_value = match singleton {
         Some(symbol) => symbol,
         None => 18,
     };
+    proof {
+        reveal(auxiliary_singleton_value); reveal(auxiliary_unique_nonzero);
+        if let Some(only) = singleton {
+            let expected = choose|symbol: u8| auxiliary_unique_nonzero(code, symbol);
+            auxiliary_unique_nonzero_agrees(code, only, expected);
+        }
+        assert(singleton_value == auxiliary_singleton_value(code));
+    }
     let progress = ComplexSymbolProgress {
         code,
         symbol: 0,
@@ -2181,6 +2324,7 @@ spec fn complex_symbol_transition_holds(
         if exists|symbol: u8| auxiliary_symbol_match(old.code, next_bits, next_width, symbol) {
             exists|symbol: u8| {
                 &&& auxiliary_symbol_match(old.code, next_bits, next_width, symbol)
+                &&& forall|earlier: u8| earlier < symbol ==> !auxiliary_symbol_match(old.code, next_bits, next_width, earlier)
                 &&& if symbol < 16 {
                     direct_symbol_transition_holds(old, symbol, alphabet_limit, phase, status)
                 } else {
@@ -2395,6 +2539,7 @@ spec fn code_transition_holds(
                 &&& next.space == 32_768
                 &&& next.prefix_width == 0
                 &&& next.prefix_bits == 0
+                &&& next.singleton == auxiliary_singleton_value(code)
                 &&& status == CodeDescriptionStatus::Progress
             },
             _ => false,
@@ -2844,6 +2989,197 @@ fn complex_after_symbol(
     }
 }
 
+proof fn complex_after_span_deterministic(old: ComplexSymbolProgress, next_symbol: u16,
+    next_space: u32, next_prev: u8, next_repeat: u32, next_repeat_code_len: u8,
+    limit: u16, left: ComplexAfterSpan, right: ComplexAfterSpan)
+    requires complex_after_span_holds(old, next_symbol, next_space, next_prev, next_repeat, next_repeat_code_len, limit, left),
+        complex_after_span_holds(old, next_symbol, next_space, next_prev, next_repeat, next_repeat_code_len, limit, right),
+    ensures left == right,
+{
+    reveal(complex_after_span_holds);
+    match (left, right) {
+        (ComplexAfterSpan::Symbol(_), ComplexAfterSpan::Symbol(_)) => {},
+        (ComplexAfterSpan::TrailingZeros { .. }, ComplexAfterSpan::TrailingZeros { .. }) => {},
+        (ComplexAfterSpan::Complete { .. }, ComplexAfterSpan::Complete { .. }) => {},
+        _ => { assert(false); },
+    }
+}
+
+proof fn complex_process_deterministic(old: ComplexProgress, value: u8,
+    left: CodeDescriptionPhase, ls: CodeDescriptionStatus,
+    right: CodeDescriptionPhase, rs: CodeDescriptionStatus)
+    requires complex_process_holds(old, value, left, ls), complex_process_holds(old, value, right, rs),
+    ensures left == right, ls == rs,
+{
+    reveal(complex_process_holds);
+    match (left, right) {
+        (CodeDescriptionPhase::ComplexPrefix2(a), CodeDescriptionPhase::ComplexPrefix2(b)) => {
+            assert(a.lengths@ == b.lengths@); assert(a.lengths == b.lengths);
+        },
+        (CodeDescriptionPhase::CompleteComplexAlphabet(a), CodeDescriptionPhase::CompleteComplexAlphabet(b)) => {
+            assert(a.lengths@ == b.lengths@); assert(a.lengths == b.lengths);
+        },
+        (CodeDescriptionPhase::Failed(_), CodeDescriptionPhase::Failed(_)) => {},
+        _ => { assert(false); },
+    }
+}
+
+proof fn direct_symbol_deterministic(old: ComplexSymbolProgress, length: u8, limit: u16,
+    left: CodeDescriptionPhase, ls: CodeDescriptionStatus,
+    right: CodeDescriptionPhase, rs: CodeDescriptionStatus)
+    requires direct_symbol_transition_holds(old, length, limit, left, ls),
+        direct_symbol_transition_holds(old, length, limit, right, rs),
+    ensures left == right, ls == rs,
+{
+    reveal(direct_symbol_transition_holds);
+    match (left, right) {
+        (CodeDescriptionPhase::ComplexPendingSpan { after: a, .. },
+            CodeDescriptionPhase::ComplexPendingSpan { after: b, .. }) => {
+            let amount = symbol_code_length_weight(length);
+            complex_after_span_deterministic(old, (old.symbol as nat + 1) as u16,
+                (old.space as nat - amount) as u32, if length == 0 { old.prev_code_len } else { length },
+                0, old.repeat_code_len, limit, a, b);
+        },
+        (CodeDescriptionPhase::Failed(_), CodeDescriptionPhase::Failed(_)) => {},
+        _ => { assert(false); },
+    }
+}
+
+proof fn repeated_symbol_deterministic(old: ComplexSymbolProgress, length: u8, extra: u8,
+    suffix: u8, limit: u16, left: CodeDescriptionPhase, ls: CodeDescriptionStatus,
+    right: CodeDescriptionPhase, rs: CodeDescriptionStatus)
+    requires repeated_symbol_transition_holds(old, length, extra, suffix, limit, left, ls),
+        repeated_symbol_transition_holds(old, length, extra, suffix, limit, right, rs),
+    ensures left == right, ls == rs,
+{
+    reveal(repeated_symbol_transition_holds);
+    match (left, right) {
+        (CodeDescriptionPhase::ComplexPendingSpan { after: a, .. },
+            CodeDescriptionPhase::ComplexPendingSpan { after: b, .. }) => {
+            let reset: nat = if old.repeat_code_len == length { old.repeat as nat } else { 0nat };
+            let base: nat = if reset > 0 { (reset - 2) as nat * if extra == 2 { 4nat } else { 8nat } } else { 0nat };
+            let repeat = base + suffix as nat + 3;
+            let delta = repeat - reset;
+            let amount = delta * symbol_code_length_weight(length);
+            complex_after_span_deterministic(old, (old.symbol as nat + delta) as u16,
+                (old.space as nat - amount) as u32, old.prev_code_len, repeat as u32, length, limit, a, b);
+        },
+        (CodeDescriptionPhase::Failed(_), CodeDescriptionPhase::Failed(_)) => {},
+        _ => { assert(false); },
+    }
+}
+
+proof fn auxiliary_first_matches_agree(code: ComplexCodeLengthAlphabet, bits: u8, width: u8,
+    left: u8, right: u8)
+    requires auxiliary_symbol_match(code, bits, width, left), auxiliary_symbol_match(code, bits, width, right),
+        forall|earlier: u8| earlier < left ==> !auxiliary_symbol_match(code, bits, width, earlier),
+        forall|earlier: u8| earlier < right ==> !auxiliary_symbol_match(code, bits, width, earlier),
+    ensures left == right,
+{
+    if left < right { assert(!auxiliary_symbol_match(code, bits, width, left)); }
+    if right < left { assert(!auxiliary_symbol_match(code, bits, width, right)); }
+}
+
+proof fn complex_symbol_deterministic(old: ComplexSymbolProgress, field: nat, limit: u16,
+    left: CodeDescriptionPhase, ls: CodeDescriptionStatus, right: CodeDescriptionPhase, rs: CodeDescriptionStatus)
+    requires complex_symbol_transition_holds(old, field, limit, left, ls),
+        complex_symbol_transition_holds(old, field, limit, right, rs),
+    ensures left == right, ls == rs,
+{
+    reveal(complex_symbol_transition_holds);
+    if old.singleton < 18 {
+        if old.singleton < 16 { direct_symbol_deterministic(old, old.singleton, limit, left, ls, right, rs); }
+    } else {
+        let bits = old.prefix_bits | ((field as u8) << old.prefix_width);
+        let width = (old.prefix_width + 1) as u8;
+        if exists|symbol: u8| auxiliary_symbol_match(old.code, bits, width, symbol) {
+            let l = choose|symbol: u8| {
+                &&& auxiliary_symbol_match(old.code, bits, width, symbol)
+                &&& forall|earlier: u8| earlier < symbol ==> !auxiliary_symbol_match(old.code, bits, width, earlier)
+                &&& if symbol < 16 { direct_symbol_transition_holds(old, symbol, limit, left, ls) }
+                    else { left == CodeDescriptionPhase::ComplexRepeat {
+                        progress: ComplexSymbolProgress { prefix_width: 0, prefix_bits: 0, ..old },
+                        length: if symbol == 16 { old.prev_code_len } else { 0 },
+                        extra_bits: if symbol == 16 { 2 } else { 3 } } && ls == CodeDescriptionStatus::Progress }
+            };
+            let r = choose|symbol: u8| {
+                &&& auxiliary_symbol_match(old.code, bits, width, symbol)
+                &&& forall|earlier: u8| earlier < symbol ==> !auxiliary_symbol_match(old.code, bits, width, earlier)
+                &&& if symbol < 16 { direct_symbol_transition_holds(old, symbol, limit, right, rs) }
+                    else { right == CodeDescriptionPhase::ComplexRepeat {
+                        progress: ComplexSymbolProgress { prefix_width: 0, prefix_bits: 0, ..old },
+                        length: if symbol == 16 { old.prev_code_len } else { 0 },
+                        extra_bits: if symbol == 16 { 2 } else { 3 } } && rs == CodeDescriptionStatus::Progress }
+            };
+            auxiliary_first_matches_agree(old.code, bits, width, l, r);
+            if l < 16 { direct_symbol_deterministic(old, l, limit, left, ls, right, rs); }
+        }
+    }
+}
+
+proof fn code_transition_deterministic(old: CodeDescriptionPhase, field: nat, maximum: u16, limit: u16,
+    left: CodeDescriptionPhase, ls: CodeDescriptionStatus, right: CodeDescriptionPhase, rs: CodeDescriptionStatus)
+    requires code_transition_holds(old, field, maximum, limit, left, ls),
+        code_transition_holds(old, field, maximum, limit, right, rs),
+    ensures left == right, ls == rs,
+{
+    reveal(code_transition_holds);
+    match old {
+        CodeDescriptionPhase::Selector => {
+            if field != 1 {
+                match (left, right) {
+                    (CodeDescriptionPhase::ComplexPrefix2(a), CodeDescriptionPhase::ComplexPrefix2(b)) => {
+                        assert(a.lengths@ == b.lengths@);
+                        assert(a.lengths == b.lengths);
+                    },
+                    _ => { assert(false); },
+                }
+            }
+        },
+        CodeDescriptionPhase::SimpleSize => {
+            match (left, right) {
+                (CodeDescriptionPhase::SimpleSymbols { symbols: a, .. },
+                    CodeDescriptionPhase::SimpleSymbols { symbols: b, .. }) => {
+                    assert(a@ == b@); assert(a == b);
+                },
+                _ => { assert(false); },
+            }
+        },
+        CodeDescriptionPhase::SimpleSymbols { .. } => {
+            match (left, right) {
+                (CodeDescriptionPhase::SimpleSymbols { symbols: a, .. },
+                    CodeDescriptionPhase::SimpleSymbols { symbols: b, .. }) => {
+                    assert(a@ == b@); assert(a == b);
+                },
+                (CodeDescriptionPhase::SimpleShape { symbols: a },
+                    CodeDescriptionPhase::SimpleShape { symbols: b }) => {
+                    assert(a@ == b@); assert(a == b);
+                },
+                (CodeDescriptionPhase::CompleteSimple(a), CodeDescriptionPhase::CompleteSimple(b)) => {
+                    assert(a.symbols@ == b.symbols@); assert(a.symbols == b.symbols);
+                },
+                _ => {},
+            }
+        },
+        CodeDescriptionPhase::ComplexPrefix2(p) => {
+            if field == 0 { complex_process_deterministic(p, 0, left, ls, right, rs); }
+            else if field == 1 { complex_process_deterministic(p, 4, left, ls, right, rs); }
+            else if field == 2 { complex_process_deterministic(p, 3, left, ls, right, rs); }
+        },
+        CodeDescriptionPhase::ComplexPrefix3(p) => if field == 0 {
+            complex_process_deterministic(p, 2, left, ls, right, rs);
+        },
+        CodeDescriptionPhase::ComplexPrefix4(p) => {
+            complex_process_deterministic(p, if field == 0 { 1 } else { 5 }, left, ls, right, rs);
+        },
+        CodeDescriptionPhase::ComplexSymbol(p) => complex_symbol_deterministic(p, field, limit, left, ls, right, rs),
+        CodeDescriptionPhase::ComplexRepeat { progress, length, extra_bits } =>
+            repeated_symbol_deterministic(progress, length, extra_bits, field as u8, limit, left, ls, right, rs),
+        CodeDescriptionPhase::ComplexPendingSpan { .. } => { reveal(pending_span_transition_holds); },
+        _ => {},
+    }
+}
+
 fn process_direct_symbol_length(
     progress: ComplexSymbolProgress,
     length: u8,
@@ -3071,6 +3407,43 @@ fn process_repeated_symbol_length(
     result
 }
 
+spec fn code_field_step_refines(before: CodeDescriptionDecoder, input: Seq<u8>,
+    end_of_input: bool, after: CodeDescriptionDecoder, step: CodeDescriptionStep) -> bool {
+    &&& after.alphabet_max == before.alphabet_max
+    &&& after.alphabet_limit == before.alphabet_limit
+    &&& step.consumed <= input.len()
+    &&& if code_phase_terminal(before.phase) {
+        &&& after == before
+        &&& step.consumed == 0
+        &&& match before.phase {
+            CodeDescriptionPhase::CompleteSimple(code) => step.status == CodeDescriptionStatus::Simple(code),
+            CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } =>
+                step.status == CodeDescriptionStatus::ComplexComplete { symbols: decoded_symbols },
+            CodeDescriptionPhase::Failed(error) => step.status == CodeDescriptionStatus::Failed(error),
+            _ => false,
+        }
+    } else {
+        let width = code_phase_width(before.phase, before.alphabet_max);
+        let available = before.queue.bits() + bytes_bits(input.take(step.consumed as int));
+        let used = if available.len() >= width { width } else { 0nat };
+        &&& step.consumed as nat == input_bytes_taken(before.queue.bits().len(), width, input.len())
+        &&& bit_queue_read_image(before.queue, input, step.consumed, used, after.queue)
+        &&& after.queue.bits() == available.skip(used as int)
+        &&& if available.len() >= width {
+            code_transition_holds(before.phase, bits_value(available.take(width as int)),
+                before.alphabet_max, before.alphabet_limit, after.phase, step.status)
+        } else {
+            &&& step.consumed == input.len()
+            &&& after.phase == if end_of_input {
+                CodeDescriptionPhase::Failed(CodeDescriptionError::Truncated)
+            } else { before.phase }
+            &&& step.status == if end_of_input {
+                CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)
+            } else { CodeDescriptionStatus::NeedInput }
+        }
+    }
+}
+
 impl CodeDescriptionDecoder {
     spec fn valid(&self) -> bool {
         &&& self.queue.valid()
@@ -3161,6 +3534,7 @@ impl CodeDescriptionDecoder {
     ) -> (r: CodeDescriptionStep)
         requires old(self).valid(),
         ensures final(self).valid(), r.consumed <= input.len(),
+            code_field_step_refines(*old(self), input@, end_of_input, *final(self), r),
             final(self).alphabet_max == old(self).alphabet_max,
             final(self).alphabet_limit == old(self).alphabet_limit,
             match old(self).phase {
@@ -3227,6 +3601,8 @@ impl CodeDescriptionDecoder {
                 )
             },
     {
+        let ghost before_field = *self;
+        proof { reveal(code_field_step_refines); }
         let phase = self.phase;
         match phase {
             CodeDescriptionPhase::CompleteSimple(code) => {
@@ -3251,6 +3627,7 @@ impl CodeDescriptionDecoder {
         }
 
         if let CodeDescriptionPhase::ComplexPendingSpan { after, .. } = phase {
+            proof { reveal(bit_queue_read_image); }
             self.phase = match after {
                 ComplexAfterSpan::Symbol(progress) => CodeDescriptionPhase::ComplexSymbol(progress),
                 ComplexAfterSpan::TrailingZeros { code, start } => {
@@ -3289,14 +3666,42 @@ impl CodeDescriptionDecoder {
                 _ => CodeDescriptionStatus::Progress,
             };
             assert(self.valid());
+            proof {
+                assert(self.queue == before_field.queue);
+                assert(code_phase_width(before_field.phase, before_field.alphabet_max) == 0);
+                assert(input@.take(0) =~= Seq::<u8>::empty());
+                reveal(bytes_bits); reveal(bits_value);
+                assert(0nat == input_bytes_taken(before_field.queue.bits().len(), 0, input@.len()));
+                assert(self.queue.bits() == (before_field.queue.bits() + bytes_bits(input@.take(0))).skip(0));
+                assert(bit_queue_read_image(before_field.queue, input@, 0, 0, self.queue));
+                assert(pending_span_transition_holds(after, self.alphabet_limit, self.phase, status));
+                assert(code_transition_holds(before_field.phase, 0, self.alphabet_max,
+                    self.alphabet_limit, self.phase, status));
+                assert(code_field_step_refines(before_field, input@, end_of_input,
+                    *self, CodeDescriptionStep { consumed: 0, status }));
+            }
             return CodeDescriptionStep { consumed: 0, status };
         }
 
         if let CodeDescriptionPhase::CompleteComplexAlphabet(code) = phase {
+            proof { reveal(bit_queue_read_image); }
             let progress = start_complex_symbol_progress(code, self.alphabet_limit);
             self.phase = CodeDescriptionPhase::ComplexSymbol(progress);
             let status = CodeDescriptionStatus::Progress;
             assert(self.valid());
+            proof {
+                assert(self.queue == before_field.queue);
+                assert(code_phase_width(before_field.phase, before_field.alphabet_max) == 0);
+                assert(input@.take(0) =~= Seq::<u8>::empty());
+                reveal(bytes_bits); reveal(bits_value);
+                assert(0nat == input_bytes_taken(before_field.queue.bits().len(), 0, input@.len()));
+                assert(self.queue.bits() == (before_field.queue.bits() + bytes_bits(input@.take(0))).skip(0));
+                assert(bit_queue_read_image(before_field.queue, input@, 0, 0, self.queue));
+                assert(code_transition_holds(before_field.phase, 0, self.alphabet_max,
+                    self.alphabet_limit, self.phase, status));
+                assert(code_field_step_refines(before_field, input@, end_of_input,
+                    *self, CodeDescriptionStep { consumed: 0, status }));
+            }
             return CodeDescriptionStep { consumed: 0, status };
         }
 
@@ -3332,6 +3737,14 @@ impl CodeDescriptionDecoder {
                     assert(read.consumed == input.len());
                     assert(input@.take(read.consumed as int) =~= input@);
                     assert((queue_before + bytes_bits(input@)).len() < width);
+                    assert(self.phase == before_field.phase);
+                    assert(bit_queue_read_image(before_field.queue, input@, read.consumed, 0, self.queue));
+                    assert(self.queue.bits() == before_field.queue.bits() + bytes_bits(input@.take(read.consumed as int)));
+                    assert(read.consumed as nat == input_bytes_taken(before_field.queue.bits().len(), width as nat, input@.len()));
+                    assert(self.queue.bits() =~= self.queue.bits().skip(0));
+                    reveal(code_field_step_refines);
+                    assert(code_field_step_refines(before_field, input@, end_of_input,
+                        *self, CodeDescriptionStep { consumed: read.consumed, status: CodeDescriptionStatus::NeedInput }));
                 }
                 return CodeDescriptionStep {
                     consumed: read.consumed,
@@ -3345,6 +3758,15 @@ impl CodeDescriptionDecoder {
                     assert((queue_before + bytes_bits(input@)).len() < width);
                 }
                 self.phase = CodeDescriptionPhase::Failed(CodeDescriptionError::Truncated);
+                proof {
+                    assert(bit_queue_read_image(before_field.queue, input@, read.consumed, 0, self.queue));
+                    assert(read.consumed as nat == input_bytes_taken(before_field.queue.bits().len(), width as nat, input@.len()));
+                    assert(self.queue.bits() =~= self.queue.bits().skip(0));
+                    reveal(code_field_step_refines);
+                    assert(code_field_step_refines(before_field, input@, end_of_input,
+                        *self, CodeDescriptionStep { consumed: read.consumed,
+                            status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated) }));
+                }
                 return CodeDescriptionStep {
                     consumed: read.consumed,
                     status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),
@@ -3695,6 +4117,34 @@ impl CodeDescriptionDecoder {
         } }
         assert(self.valid());
         CodeDescriptionStep { consumed: read.consumed, status }
+    }
+}
+
+proof fn code_field_steps_agree(before: CodeDescriptionDecoder, input: Seq<u8>,
+    end_of_input: bool, left: CodeDescriptionDecoder, ls: CodeDescriptionStep,
+    right: CodeDescriptionDecoder, rs: CodeDescriptionStep)
+    requires before.valid(),
+        code_field_step_refines(before, input, end_of_input, left, ls),
+        code_field_step_refines(before, input, end_of_input, right, rs),
+    ensures ls == rs, left.phase == right.phase,
+        left.alphabet_max == right.alphabet_max,
+        left.alphabet_limit == right.alphabet_limit,
+        left.queue.bits() == right.queue.bits(),
+        left.queue.len == right.queue.len,
+        left.queue.offset == right.queue.offset,
+        forall|i: int| 0 <= i < left.queue.len ==>
+            #[trigger] left.queue.pending@[i] == right.queue.pending@[i],
+{
+    reveal(code_field_step_refines);
+    if !code_phase_terminal(before.phase) {
+        let width = code_phase_width(before.phase, before.alphabet_max);
+        let available = before.queue.bits() + bytes_bits(input.take(ls.consumed as int));
+        if available.len() >= width {
+            code_transition_deterministic(before.phase, bits_value(available.take(width as int)),
+                before.alphabet_max, before.alphabet_limit,
+                left.phase, ls.status, right.phase, rs.status);
+        }
+        reveal(bit_queue_read_image);
     }
 }
 
@@ -4057,7 +4507,6 @@ enum InstalledSymbolStatus {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct InstalledSymbolStep {
     consumed: usize,
-    work: u64,
     status: InstalledSymbolStatus,
 }
 
@@ -4103,31 +4552,135 @@ proof fn installed_reverse_combine_fits(bit: u16, width: u8, rest: u16)
         bit * (1u16 << ((width - 1) as u8)) + rest < (1u16 << width),
 {}
 
+proof fn reversed_installed_code_unfold(value: u16, width: u8)
+    requires 1 <= width <= 15, (value as nat) < pow2(width as nat),
+    ensures reversed_installed_code(value as nat, width)
+        == (value % 2) as nat * pow2((width - 1) as nat)
+            + reversed_installed_code((value / 2) as nat, (width - 1) as u8),
+{
+    reveal_with_fuel(reversed_installed_code, 2);
+    assert((value % 2) as nat == value as nat % 2);
+    assert((value / 2) as nat == value as nat / 2);
+    if width == 1 {
+        pow2_matches_installed_shift(0);
+        pow2_matches_installed_shift(1);
+        assert((1u16 << 0) == 1) by (bit_vector);
+        assert((1u16 << 1) == 2) by (bit_vector);
+        assert(pow2(1) == 2);
+        assert(value < 2);
+        assert(value / 2 == 0);
+        assert(pow2(0) == 1);
+        assert(reversed_installed_code(0, 0) == 0);
+        assert(reversed_installed_code(value as nat, width) == value as nat % 2);
+        assert(reversed_installed_code((value / 2) as nat, (width - 1) as u8) == 0);
+        assert(pow2((width - 1) as nat) == 1);
+        assert((value % 2) as nat * pow2((width - 1) as nat) == (value % 2) as nat)
+            by (nonlinear_arith)
+            requires pow2((width - 1) as nat) == 1;
+        assert((value % 2) as nat * pow2((width - 1) as nat)
+            + reversed_installed_code((value / 2) as nat, (width - 1) as u8)
+            == value as nat % 2);
+        reveal_with_fuel(reversed_installed_code, 2);
+        assert(reversed_installed_code(value as nat, width)
+            == (value % 2) as nat * pow2((width - 1) as nat)
+                + reversed_installed_code((value / 2) as nat, (width - 1) as u8));
+    } else {
+        reveal(reversed_installed_code);
+        assert(reversed_installed_code(value as nat, width)
+            == (value as nat % 2) * pow2((width - 1) as nat)
+                + reversed_installed_code(value as nat / 2, (width - 1) as u8));
+        assert(reversed_installed_code(value as nat, width)
+            == (value % 2) as nat * pow2((width - 1) as nat)
+                + reversed_installed_code((value / 2) as nat, (width - 1) as u8));
+    }
+}
+
 fn reverse_installed_code(value: u16, width: u8) -> (r: u16)
     requires 1 <= width <= 15, (value as nat) < pow2(width as nat),
     ensures
         r as nat == reversed_installed_code(value as nat, width),
         (r as nat) < pow2(width as nat),
-    decreases width,
+
 {
-    if width == 1 {
-        value % 2
-    } else {
+    let source_value = value;
+    let mut remaining = width;
+    let mut current_value = value;
+    let mut reversed = 0u16;
+    proof { lemma2_to64(); }
+    while remaining > 0
+        invariant source_value == value,
+            remaining <= width <= 15,
+            1 <= width,
+            (current_value as nat) < pow2(remaining as nat),
+            (reversed as nat) < pow2((width - remaining) as nat),
+            reversed_installed_code(source_value as nat, width)
+                == reversed as nat * pow2(remaining as nat)
+                    + reversed_installed_code(current_value as nat, remaining),
+        decreases remaining,
+    {
+        let bit = current_value % 2;
+        let next = current_value / 2;
         proof {
             lemma2_to64();
-            lemma_pow2_unfold((width - 1) as nat);
-            assert((value as nat) / 2 < pow2((width - 1) as nat));
+            lemma_pow2_unfold(remaining as nat);
+            assert(current_value as nat == 2 * next as nat + bit as nat);
+            assert((next as nat) < pow2((remaining - 1) as nat));
+            reversed_installed_code_unfold(current_value, remaining);
+            reveal_with_fuel(reversed_installed_code, 2);
+            assert(current_value as nat / 2 == next as nat);
+            assert(current_value as nat % 2 == bit as nat);
+            if remaining == 1 {
+                assert(next == 0);
+                reveal(reversed_installed_code);
+            } else { reveal(reversed_installed_code); }
+            assert(reversed_installed_code(current_value as nat, remaining)
+                == bit as nat * pow2((remaining - 1) as nat)
+                    + reversed_installed_code(next as nat, (remaining - 1) as u8));
+            lemma_pow2_unfold((width - remaining + 1) as nat);
+            assert((2 * reversed as nat + bit as nat) < pow2((width - remaining + 1) as nat));
+            if width - remaining + 1 < 15 {
+                lemma_pow2_strictly_increases((width - remaining + 1) as nat, 15);
+            }
+            pow2_matches_installed_shift(15);
+            assert(pow2(15) == 32_768);
+            assert(2 * reversed as nat + bit as nat <= 32_767);
         }
-        let bit = value % 2;
-        let rest = reverse_installed_code(value / 2, width - 1);
+        let next_reversed = 2 * reversed + bit;
         proof {
-            pow2_matches_installed_shift((width - 1) as u8);
-            pow2_matches_installed_shift(width);
-            assert(rest < (1u16 << ((width - 1) as u8)));
-            installed_reverse_combine_fits(bit, width, rest);
+            assert(next_reversed as nat == 2 * reversed as nat + bit as nat);
+            assert(reversed_installed_code(source_value as nat, width)
+                == next_reversed as nat * pow2((remaining - 1) as nat)
+                    + reversed_installed_code(next as nat, (remaining - 1) as u8)) by (nonlinear_arith)
+                requires
+                    reversed_installed_code(source_value as nat, width)
+                        == reversed as nat * pow2(remaining as nat)
+                            + reversed_installed_code(current_value as nat, remaining),
+                    reversed_installed_code(current_value as nat, remaining)
+                        == bit as nat * pow2((remaining - 1) as nat)
+                            + reversed_installed_code(next as nat, (remaining - 1) as u8),
+                    pow2(remaining as nat) == 2 * pow2((remaining - 1) as nat),
+                    next_reversed as nat == 2 * reversed as nat + bit as nat;
         }
-        bit * (1u16 << ((width - 1) as u8)) + rest
+        reversed = next_reversed;
+        current_value = next;
+        remaining -= 1;
     }
+    proof {
+        lemma2_to64();
+        assert(reversed_installed_code(source_value as nat, width)
+            == reversed as nat * pow2(remaining as nat)
+                + reversed_installed_code(current_value as nat, remaining));
+        assert(remaining == 0);
+        assert(current_value == 0);
+        assert(pow2(0) == 1);
+        reveal(reversed_installed_code);
+        assert(reversed_installed_code(0, 0) == 0);
+        assert(reversed_installed_code(current_value as nat, remaining) == 0);
+        assert(pow2(remaining as nat) == 1);
+        assert(reversed as nat * pow2(remaining as nat) == reversed as nat);
+        assert(reversed as nat == reversed_installed_code(source_value as nat, width));
+    }
+    reversed
 }
 
 #[verifier::bit_vector]
@@ -4513,6 +5066,523 @@ spec fn installed_symbol_progress(
     )
 }
 
+spec fn installed_record_readable(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, symbol: int) -> bool {
+    &&& window_bytes <= 16_777_216
+    &&& workspace.len() >= window_bytes as nat + crate::brotli_prefix::FIXED_SCRATCH_BYTES as nat
+    &&& (tree as nat) < crate::brotli_prefix::tree_region_count(region)
+    &&& 0 <= symbol < meta.symbols
+    &&& match meta.storage {
+        crate::brotli_prefix::TreeStorageState::Canonical { initialized } => symbol < initialized,
+        _ => false,
+    }
+}
+
+spec fn installed_record_bad(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, width: u8, symbol: int) -> bool {
+    let at = crate::brotli_prefix::tree_record_at(window_bytes, region, tree, symbol as u16);
+    !installed_record_readable(workspace, window_bytes, region, tree, meta, symbol)
+        || (at + 3 <= workspace.len() && workspace[at as int] == width
+            && crate::brotli_prefix::little_u16_at(workspace, at + 1) >= pow2(width as nat))
+}
+
+spec fn installed_record_stops(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, width: u8, bits: nat, symbol: int) -> bool {
+    installed_record_bad(workspace, window_bytes, region, tree, meta, width, symbol)
+        || installed_record_matches(workspace, window_bytes, region, tree, meta, width, bits, symbol)
+}
+
+spec fn installed_scan_no_stop(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, width: u8, bits: nat, before: int) -> bool {
+    forall|symbol: int| 0 <= symbol < before ==> !#[trigger] installed_record_stops(
+        workspace, window_bytes, region, tree, meta, width, bits, symbol)
+}
+
+spec fn installed_no_earlier_stop(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start: InstalledPrefixState,
+    accepted: Seq<u8>, before: int) -> bool {
+    forall|used: int| 1 <= used < before ==> installed_scan_no_stop(
+        workspace, window_bytes, region, tree, meta, (start.width as int + used) as u8,
+        installed_prefix_value(start, accepted.take(used)), meta.symbols as int)
+}
+
+// A complete first-stop relation, including malformed records. The read total
+// counts accepted input-byte reads, inspected bits and visited prefix records.
+spec fn installed_canonical_trace_case(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    step: InstalledSymbolStep, final_queue: BitQueue, final_prefix: InstalledPrefixState,
+    read_units: nat, used: int) -> bool {
+        let source = start_queue.bits() + bytes_bits(input.take(step.consumed as int));
+        let width = (start.width as int + used) as u8;
+        let bits = installed_prefix_value(start, source.take(used));
+        &&& 0 <= used <= 15 - start.width
+        &&& used <= source.len()
+        &&& step.consumed <= input.len()
+        &&& step.consumed as nat == input_bytes_taken(start_queue.bits().len(), used as nat, input.len())
+        &&& final_queue.bits() == source.skip(used)
+        &&& bit_queue_read_image(start_queue, input, step.consumed, used as nat, final_queue)
+        &&& match step.status {
+            InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated => {
+                &&& used < 15 - start.width
+                &&& step.consumed == input.len()
+                &&& source.len() == used
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta,
+                    start, source, used + 1)
+                &&& read_units == step.consumed as nat + used as nat * (meta.symbols as nat + 1)
+                &&& if step.status == InstalledSymbolStatus::NeedInput {
+                    &&& !end
+                    &&& final_prefix.width as int == start.width as int + used
+                    &&& final_prefix.bits as nat == bits
+                    &&& final_prefix.scan == 0
+                } else {
+                    &&& end
+                    &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                }
+            },
+            InstalledSymbolStatus::InvalidPrefixCode => {
+                &&& used == 15 - start.width
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta,
+                    start, source, used + 1)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& read_units == step.consumed as nat + used as nat * (meta.symbols as nat + 1)
+            },
+            InstalledSymbolStatus::Symbol(symbol) => {
+                &&& used >= 1
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta,
+                    start, source, used)
+                &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta,
+                    width, bits, symbol as int)
+                &&& !installed_record_bad(workspace, window_bytes, region, tree, meta, width, symbol as int)
+                &&& installed_record_matches(workspace, window_bytes, region, tree, meta, width, bits, symbol as int)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& read_units as int == step.consumed as int
+                    + (used - 1) * (meta.symbols as int + 1) + symbol as int + 2
+            },
+            InstalledSymbolStatus::InternalState => {
+                &&& used >= 1
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta,
+                    start, source, used)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& exists|symbol: int| {
+                    &&& 0 <= symbol < meta.symbols
+                    &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, symbol)
+                    &&& installed_record_bad(workspace, window_bytes, region, tree, meta, width, symbol)
+                    &&& read_units as int == step.consumed as int
+                        + (used - 1) * (meta.symbols as int + 1) + symbol + 2
+                }
+            },
+        }
+
+}
+
+spec fn installed_canonical_trace(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    step: InstalledSymbolStep, final_queue: BitQueue, final_prefix: InstalledPrefixState,
+    read_units: nat) -> bool {
+    exists|used: int| #[trigger] installed_canonical_trace_case(workspace, window_bytes,
+        region, tree, meta, start_queue, start, input, end, step, final_queue, final_prefix, read_units, used)
+}
+
+proof fn installed_stop_prefix_extend(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start: InstalledPrefixState,
+    prefix: Seq<u8>, whole: Seq<u8>, before: int)
+    requires
+        prefix.len() <= whole.len(), whole.take(prefix.len() as int) == prefix,
+        before <= prefix.len() as int + 1,
+        installed_no_earlier_stop(workspace, window_bytes, region, tree, meta, start, prefix, before),
+    ensures installed_no_earlier_stop(workspace, window_bytes, region, tree, meta, start, whole, before),
+{
+    reveal(installed_no_earlier_stop);
+    assert forall|used: int| 1 <= used < before implies installed_scan_no_stop(
+        workspace, window_bytes, region, tree, meta, (start.width as int + used) as u8,
+        installed_prefix_value(start, whole.take(used)), meta.symbols as int) by {
+        assert(whole.take(used) =~= prefix.take(used));
+    }
+}
+
+proof fn installed_full_scan_sum(iterations: nat, symbols: nat, work: nat)
+    requires work == iterations * (symbols + 1) + 1 + symbols,
+    ensures work == (iterations + 1) * (symbols + 1),
+{
+    assert(work == (iterations + 1) * (symbols + 1)) by (nonlinear_arith)
+        requires work == iterations * (symbols + 1) + 1 + symbols;
+}
+
+spec fn installed_read_units(attempt_work: u64, consumed: usize, status: InstalledSymbolStatus) -> nat {
+    (attempt_work as nat + consumed as nat - match status {
+        InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated => 1nat,
+        _ => 0nat,
+    }) as nat
+}
+
+proof fn establish_installed_canonical_trace(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    step: InstalledSymbolStep, final_queue: BitQueue, final_prefix: InstalledPrefixState,
+    accepted: Seq<u8>, stop: u16, read_units: nat)
+    requires
+        accepted.len() <= 15 - start.width,
+        bit_queue_read_image(start_queue, input, step.consumed, accepted.len(), final_queue),
+        step.consumed <= input.len(),
+        start_queue.bits() + bytes_bits(input.take(step.consumed as int))
+            == accepted + final_queue.bits(),
+        step.consumed as nat == input_bytes_taken(start_queue.bits().len(), accepted.len(), input.len()),
+        match step.status {
+            InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated => {
+                &&& accepted.len() < 15 - start.width
+                &&& step.consumed == input.len()
+                &&& final_queue.bits().len() == 0
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta,
+                    start, accepted, accepted.len() as int + 1)
+                &&& read_units == step.consumed as nat + accepted.len() * (meta.symbols as nat + 1)
+                &&& if step.status == InstalledSymbolStatus::NeedInput {
+                    &&& !end
+                    &&& final_prefix.width as nat == start.width as nat + accepted.len()
+                    &&& final_prefix.bits as nat == installed_prefix_value(start, accepted)
+                    &&& final_prefix.scan == 0
+                } else {
+                    &&& end
+                    &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                }
+            },
+            InstalledSymbolStatus::InvalidPrefixCode => {
+                &&& accepted.len() == 15 - start.width
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta,
+                    start, accepted, accepted.len() as int + 1)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& read_units == step.consumed as nat + accepted.len() * (meta.symbols as nat + 1)
+            },
+            InstalledSymbolStatus::Symbol(symbol) => {
+                let width = (start.width as nat + accepted.len()) as u8;
+                let bits = installed_prefix_value(start, accepted);
+                &&& accepted.len() >= 1
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta,
+                    start, accepted, accepted.len() as int)
+                &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, symbol as int)
+                &&& !installed_record_bad(workspace, window_bytes, region, tree, meta, width, symbol as int)
+                &&& installed_record_matches(workspace, window_bytes, region, tree, meta, width, bits, symbol as int)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& read_units as int == step.consumed as int
+                    + (accepted.len() as int - 1) * (meta.symbols as int + 1) + symbol as int + 2
+            },
+            InstalledSymbolStatus::InternalState => {
+                let width = (start.width as nat + accepted.len()) as u8;
+                let bits = installed_prefix_value(start, accepted);
+                &&& accepted.len() >= 1
+                &&& stop < meta.symbols
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta,
+                    start, accepted, accepted.len() as int)
+                &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, stop as int)
+                &&& installed_record_bad(workspace, window_bytes, region, tree, meta, width, stop as int)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& read_units as int == step.consumed as int
+                    + (accepted.len() as int - 1) * (meta.symbols as int + 1) + stop as int + 2
+            },
+        },
+    ensures installed_canonical_trace(workspace, window_bytes, region, tree, meta,
+        start_queue, start, input, end, step, final_queue, final_prefix, read_units),
+{
+    reveal(installed_canonical_trace);
+    reveal(installed_canonical_trace_case);
+    let source = start_queue.bits() + bytes_bits(input.take(step.consumed as int));
+    assert(source.take(accepted.len() as int) =~= accepted);
+    assert(source.skip(accepted.len() as int) =~= final_queue.bits());
+    let before = match step.status {
+        InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated
+            | InstalledSymbolStatus::InvalidPrefixCode => accepted.len() as int + 1,
+        _ => accepted.len() as int,
+    };
+    installed_stop_prefix_extend(workspace, window_bytes, region, tree, meta,
+        start, accepted, source, before);
+    if step.status == InstalledSymbolStatus::InternalState {
+        let width = (start.width as nat + accepted.len()) as u8;
+        let bits = installed_prefix_value(start, accepted);
+        assert(exists|symbol: int| {
+            &&& 0 <= symbol < meta.symbols
+            &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, symbol)
+            &&& installed_record_bad(workspace, window_bytes, region, tree, meta, width, symbol)
+            &&& read_units as int == step.consumed as int
+                + (accepted.len() as int - 1) * (meta.symbols as int + 1) + symbol + 2
+        });
+    }
+    assert(installed_canonical_trace_case(workspace, window_bytes, region, tree, meta,
+        start_queue, start, input, end, step, final_queue, final_prefix, read_units, accepted.len() as int));
+    assert(exists|used: int| #![trigger installed_prefix_value(start, source.take(used))]
+        used == accepted.len() as int && {
+        let width = (start.width as int + used) as u8;
+        let bits = installed_prefix_value(start, source.take(used));
+        &&& 0 <= used <= 15 - start.width
+        &&& used <= source.len()
+        &&& step.consumed <= input.len()
+        &&& step.consumed as nat == input_bytes_taken(start_queue.bits().len(), used as nat, input.len())
+        &&& final_queue.bits() == source.skip(used)
+        &&& match step.status {
+            InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated => {
+                &&& used < 15 - start.width && step.consumed == input.len() && source.len() == used
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta, start, source, used + 1)
+                &&& read_units == step.consumed as nat + used as nat * (meta.symbols as nat + 1)
+                &&& if step.status == InstalledSymbolStatus::NeedInput {
+                    &&& !end && final_prefix.width as int == start.width as int + used
+                    &&& final_prefix.bits as nat == bits && final_prefix.scan == 0
+                } else { end && final_prefix == (InstalledPrefixState { width: 0, bits: 0, scan: 0 }) }
+            },
+            InstalledSymbolStatus::InvalidPrefixCode => {
+                &&& used == 15 - start.width
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta, start, source, used + 1)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& read_units == step.consumed as nat + used as nat * (meta.symbols as nat + 1)
+            },
+            InstalledSymbolStatus::Symbol(symbol) => {
+                &&& used >= 1
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta, start, source, used)
+                &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, symbol as int)
+                &&& !installed_record_bad(workspace, window_bytes, region, tree, meta, width, symbol as int)
+                &&& installed_record_matches(workspace, window_bytes, region, tree, meta, width, bits, symbol as int)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& read_units as int == step.consumed as int + (used - 1) * (meta.symbols as int + 1) + symbol as int + 2
+            },
+            InstalledSymbolStatus::InternalState => {
+                &&& used >= 1
+                &&& installed_no_earlier_stop(workspace, window_bytes, region, tree, meta, start, source, used)
+                &&& final_prefix == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+                &&& exists|symbol: int| {
+                    &&& 0 <= symbol < meta.symbols
+                    &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, symbol)
+                    &&& installed_record_bad(workspace, window_bytes, region, tree, meta, width, symbol)
+                    &&& read_units as int == step.consumed as int + (used - 1) * (meta.symbols as int + 1) + symbol + 2
+                }
+            },
+        }
+    });
+}
+
+spec fn installed_symbol_full_step(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    step: InstalledSymbolStep, final_queue: BitQueue, final_prefix: InstalledPrefixState,
+    read_units: nat) -> bool {
+    &&& installed_tree_step_refines(workspace, window_bytes, region, tree, meta,
+        start_queue, start, input, end, step, final_queue, final_prefix)
+    &&& if meta.storage == (crate::brotli_prefix::TreeStorageState::Canonical { initialized: meta.symbols }) {
+        installed_canonical_trace(workspace, window_bytes, region, tree, meta,
+            start_queue, start, input, end, step, final_queue, final_prefix, read_units)
+    } else { read_units == 0 }
+}
+
+proof fn establish_installed_full_step(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    step: InstalledSymbolStep, final_queue: BitQueue, final_prefix: InstalledPrefixState,
+    read_units: nat)
+    requires
+        installed_tree_step_refines(workspace, window_bytes, region, tree, meta,
+            start_queue, start, input, end, step, final_queue, final_prefix),
+        if meta.storage == (crate::brotli_prefix::TreeStorageState::Canonical { initialized: meta.symbols }) {
+            installed_canonical_trace(workspace, window_bytes, region, tree, meta,
+                start_queue, start, input, end, step, final_queue, final_prefix, read_units)
+        } else { read_units == 0 },
+        read_units <= 10_575 + step.consumed as nat,
+    ensures
+        installed_symbol_full_step(workspace, window_bytes, region, tree, meta,
+            start_queue, start, input, end, step, final_queue, final_prefix, read_units),
+        exists|cost: nat| {
+            &&& installed_symbol_full_step(workspace, window_bytes, region, tree, meta,
+                start_queue, start, input, end, step, final_queue, final_prefix, cost)
+            &&& cost <= 10_575 + step.consumed as nat
+        },
+{
+    reveal(installed_symbol_full_step);
+    assert(installed_symbol_full_step(workspace, window_bytes, region, tree, meta,
+        start_queue, start, input, end, step, final_queue, final_prefix, read_units));
+}
+
+proof fn installed_input_prefix_agrees(queue_bits: Seq<u8>, input: Seq<u8>, consumed: usize, used: int)
+    requires consumed <= input.len(),
+        0 <= used <= (queue_bits + bytes_bits(input.take(consumed as int))).len(),
+    ensures (queue_bits + bytes_bits(input.take(consumed as int))).take(used)
+        == (queue_bits + bytes_bits(input)).take(used),
+{
+    assert(input =~= input.take(consumed as int) + input.skip(consumed as int));
+    bytes_bits_concat(input.take(consumed as int), input.skip(consumed as int));
+    let prefix = queue_bits + bytes_bits(input.take(consumed as int));
+    assert(queue_bits + bytes_bits(input) =~= prefix + bytes_bits(input.skip(consumed as int)));
+    assert((prefix + bytes_bits(input.skip(consumed as int))).take(used) =~= prefix.take(used));
+}
+
+proof fn installed_trace_stop(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    step: InstalledSymbolStep, final_queue: BitQueue, final_prefix: InstalledPrefixState,
+    read_units: nat, used: int) -> (stop: int)
+    requires installed_canonical_trace_case(workspace, window_bytes, region, tree, meta,
+        start_queue, start, input, end, step, final_queue, final_prefix, read_units, used),
+        matches!(step.status, InstalledSymbolStatus::Symbol(_)) || step.status == InstalledSymbolStatus::InternalState,
+    ensures ({
+        let source = start_queue.bits() + bytes_bits(input.take(step.consumed as int));
+        let width = (start.width as int + used) as u8;
+        let bits = installed_prefix_value(start, source.take(used));
+        &&& used >= 1
+        &&& 0 <= stop < meta.symbols
+        &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, stop)
+        &&& installed_record_stops(workspace, window_bytes, region, tree, meta, width, bits, stop)
+        &&& read_units as int == step.consumed as int + (used - 1) * (meta.symbols as int + 1) + stop + 2
+        &&& match step.status {
+            InstalledSymbolStatus::Symbol(symbol) => stop == symbol as int
+                && !installed_record_bad(workspace, window_bytes, region, tree, meta, width, stop),
+            _ => installed_record_bad(workspace, window_bytes, region, tree, meta, width, stop),
+        }
+    }),
+{
+    reveal(installed_canonical_trace_case);
+    reveal(installed_record_stops);
+    let source = start_queue.bits() + bytes_bits(input.take(step.consumed as int));
+    let width = (start.width as int + used) as u8;
+    let bits = installed_prefix_value(start, source.take(used));
+    match step.status {
+        InstalledSymbolStatus::Symbol(symbol) => {
+            reveal(installed_record_matches);
+            symbol as int
+        },
+        _ => choose|symbol: int| {
+            &&& 0 <= symbol < meta.symbols
+            &&& installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, symbol)
+            &&& installed_record_bad(workspace, window_bytes, region, tree, meta, width, symbol)
+            &&& read_units as int == step.consumed as int + (used - 1) * (meta.symbols as int + 1) + symbol + 2
+        },
+    }
+}
+
+proof fn installed_trace_used_not_less(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    left: InstalledSymbolStep, left_queue: BitQueue, left_prefix: InstalledPrefixState,
+    left_work: nat, left_used: int,
+    right: InstalledSymbolStep, right_queue: BitQueue, right_prefix: InstalledPrefixState,
+    right_work: nat, right_used: int)
+    requires
+        installed_canonical_trace_case(workspace, window_bytes, region, tree, meta,
+            start_queue, start, input, end, left, left_queue, left_prefix, left_work, left_used),
+        installed_canonical_trace_case(workspace, window_bytes, region, tree, meta,
+            start_queue, start, input, end, right, right_queue, right_prefix, right_work, right_used),
+    ensures left_used >= right_used,
+{
+    reveal(installed_canonical_trace_case);
+    if left_used < right_used {
+        let ls = start_queue.bits() + bytes_bits(input.take(left.consumed as int));
+        let rs = start_queue.bits() + bytes_bits(input.take(right.consumed as int));
+        installed_input_prefix_agrees(start_queue.bits(), input, left.consumed, left_used);
+        installed_input_prefix_agrees(start_queue.bits(), input, right.consumed, left_used);
+        assert(ls.take(left_used) == rs.take(left_used));
+        match left.status {
+            InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated => {
+                assert(input.take(left.consumed as int) =~= input);
+                installed_input_prefix_agrees(start_queue.bits(), input, right.consumed, right_used);
+                assert((rs.take(right_used)).len() == right_used);
+                assert((start_queue.bits() + bytes_bits(input)).len() == left_used);
+                assert(false);
+            },
+            InstalledSymbolStatus::InvalidPrefixCode => { assert(false); },
+            _ => {
+                let stop = installed_trace_stop(workspace, window_bytes, region, tree, meta,
+                    start_queue, start, input, end, left, left_queue, left_prefix, left_work, left_used);
+                let width = (start.width as int + left_used) as u8;
+                let bits = installed_prefix_value(start, ls.take(left_used));
+                reveal(installed_no_earlier_stop); reveal(installed_scan_no_stop);
+                assert(installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, meta.symbols as int));
+                assert(!installed_record_stops(workspace, window_bytes, region, tree, meta, width, bits, stop));
+                assert(false);
+            },
+        }
+    }
+}
+
+proof fn installed_canonical_traces_agree(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    left: InstalledSymbolStep, left_queue: BitQueue, left_prefix: InstalledPrefixState, left_work: nat,
+    right: InstalledSymbolStep, right_queue: BitQueue, right_prefix: InstalledPrefixState, right_work: nat)
+    requires
+        installed_canonical_trace(workspace, window_bytes, region, tree, meta,
+            start_queue, start, input, end, left, left_queue, left_prefix, left_work),
+        installed_canonical_trace(workspace, window_bytes, region, tree, meta,
+            start_queue, start, input, end, right, right_queue, right_prefix, right_work),
+    ensures left.consumed == right.consumed, left.status == right.status,
+        left_queue.bits() == right_queue.bits(), left_prefix == right_prefix,
+        left_queue.len == right_queue.len, left_queue.offset == right_queue.offset,
+        forall|i: int| 0 <= i < left_queue.len ==> #[trigger] left_queue.pending@[i] == right_queue.pending@[i],
+        left_work == right_work,
+{
+    reveal(installed_canonical_trace);
+    let lu = choose|used: int| installed_canonical_trace_case(workspace, window_bytes, region, tree, meta,
+        start_queue, start, input, end, left, left_queue, left_prefix, left_work, used);
+    let ru = choose|used: int| installed_canonical_trace_case(workspace, window_bytes, region, tree, meta,
+        start_queue, start, input, end, right, right_queue, right_prefix, right_work, used);
+    installed_trace_used_not_less(workspace, window_bytes, region, tree, meta, start_queue, start, input, end,
+        left, left_queue, left_prefix, left_work, lu, right, right_queue, right_prefix, right_work, ru);
+    installed_trace_used_not_less(workspace, window_bytes, region, tree, meta, start_queue, start, input, end,
+        right, right_queue, right_prefix, right_work, ru, left, left_queue, left_prefix, left_work, lu);
+    assert(lu == ru);
+    reveal(installed_canonical_trace_case);
+    assert(left.consumed == right.consumed);
+    let source = start_queue.bits() + bytes_bits(input.take(left.consumed as int));
+    let width = (start.width as int + lu) as u8;
+    let bits = installed_prefix_value(start, source.take(lu));
+    let lstop = match left.status { InstalledSymbolStatus::Symbol(_) | InstalledSymbolStatus::InternalState => true, _ => false };
+    let rstop = match right.status { InstalledSymbolStatus::Symbol(_) | InstalledSymbolStatus::InternalState => true, _ => false };
+    if lstop && rstop {
+        let l = installed_trace_stop(workspace, window_bytes, region, tree, meta, start_queue, start, input, end,
+            left, left_queue, left_prefix, left_work, lu);
+        let r = installed_trace_stop(workspace, window_bytes, region, tree, meta, start_queue, start, input, end,
+            right, right_queue, right_prefix, right_work, ru);
+        reveal(installed_scan_no_stop);
+        if l < r { assert(false); }
+        if r < l { assert(false); }
+        assert(l == r);
+        match (left.status, right.status) {
+            (InstalledSymbolStatus::Symbol(l), InstalledSymbolStatus::Symbol(r)) => {},
+            (InstalledSymbolStatus::InternalState, InstalledSymbolStatus::InternalState) => {},
+            _ => { assert(false); },
+        }
+    } else if lstop || rstop {
+        let step = if lstop { left } else { right };
+        let queue = if lstop { left_queue } else { right_queue };
+        let prefix = if lstop { left_prefix } else { right_prefix };
+        let work = if lstop { left_work } else { right_work };
+        let s = installed_trace_stop(workspace, window_bytes, region, tree, meta, start_queue, start, input, end,
+            step, queue, prefix, work, lu);
+        reveal(installed_no_earlier_stop); reveal(installed_scan_no_stop);
+        assert(installed_scan_no_stop(workspace, window_bytes, region, tree, meta, width, bits, meta.symbols as int));
+        assert(false);
+    } else {
+        match (left.status, right.status) {
+            (InstalledSymbolStatus::NeedInput, InstalledSymbolStatus::NeedInput)
+            | (InstalledSymbolStatus::Truncated, InstalledSymbolStatus::Truncated)
+            | (InstalledSymbolStatus::InvalidPrefixCode, InstalledSymbolStatus::InvalidPrefixCode) => {},
+            _ => { assert(false); },
+        }
+    }
+    reveal(bit_queue_read_image);
+    assert forall|i: int| 0 <= i < left_queue.len implies #[trigger]
+        left_queue.pending@[i] == right_queue.pending@[i] by {}
+    assert(left_prefix == right_prefix);
+}
+
 spec fn installed_canonical_step(
     workspace: Seq<u8>,
     window_bytes: u32,
@@ -4713,7 +5783,7 @@ fn advance_installed_tree_symbol(
 ) -> (r: InstalledSymbolStep)
     requires old(queue).valid(), old(prefix).valid(), meta.valid_for(region),
     ensures final(queue).valid(), final(prefix).valid(), r.consumed <= input.len(),
-        r.work <= 10_575,
+
         r.status == InstalledSymbolStatus::NeedInput ==> {
             &&& !end_of_input
             &&& r.consumed == input.len()
@@ -4731,14 +5801,14 @@ fn advance_installed_tree_symbol(
         },
         meta.storage == crate::brotli_prefix::TreeStorageState::Unused ==> {
             &&& r.consumed == 0
-            &&& r.work == 0
+
             &&& r.status == InstalledSymbolStatus::InternalState
             &&& *final(queue) == *old(queue)
         },
         match meta.storage {
             crate::brotli_prefix::TreeStorageState::Single { symbol } => {
                 &&& r.consumed == 0
-                &&& r.work == 0
+
                 &&& *final(queue) == *old(queue)
                 &&& if old(prefix).width == 0
                     && old(prefix).bits == 0
@@ -4755,7 +5825,7 @@ fn advance_installed_tree_symbol(
             crate::brotli_prefix::TreeStorageState::Canonical { initialized } => {
                 &&& (initialized != meta.symbols ==> {
                     &&& r.consumed == 0
-                    &&& r.work == 0
+
                     &&& r.status == InstalledSymbolStatus::InternalState
                     &&& *final(queue) == *old(queue)
                 })
@@ -4790,38 +5860,59 @@ fn advance_installed_tree_symbol(
             *final(queue),
             *final(prefix),
         ),
+        exists|read_units: nat| {
+            &&& installed_symbol_full_step(workspace@, window_bytes, region, tree, meta,
+                *old(queue), *old(prefix), input@, end_of_input, r, *final(queue), *final(prefix), read_units)
+            &&& read_units <= 10_575 + r.consumed as nat
+        },
+
 {
+    reveal(installed_symbol_full_step);
     let ghost start_queue = *queue;
     let ghost start_prefix = *prefix;
     match meta.storage {
         crate::brotli_prefix::TreeStorageState::Unused => {
             *prefix = InstalledPrefixState::initial();
-            return InstalledSymbolStep { consumed: 0, work: 0, status: InstalledSymbolStatus::InternalState };
+            let result = InstalledSymbolStep { consumed: 0, status: InstalledSymbolStatus::InternalState };
+            proof { establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix, 0); }
+            return result;
         }
         crate::brotli_prefix::TreeStorageState::Single { symbol } => {
             if prefix.width != 0 || prefix.bits != 0 || prefix.scan != 0
                 || symbol >= meta.symbols {
                 *prefix = InstalledPrefixState::initial();
-                return InstalledSymbolStep { consumed: 0, work: 0, status: InstalledSymbolStatus::InternalState };
+                let result = InstalledSymbolStep { consumed: 0, status: InstalledSymbolStatus::InternalState };
+            proof { establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix, 0); }
+            return result;
             }
-            return InstalledSymbolStep { consumed: 0, work: 0, status: InstalledSymbolStatus::Symbol(symbol) };
+            let result = InstalledSymbolStep { consumed: 0, status: InstalledSymbolStatus::Symbol(symbol) };
+            proof { establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix, 0); }
+            return result;
         }
         crate::brotli_prefix::TreeStorageState::Canonical { initialized } => {
             if initialized != meta.symbols {
                 *prefix = InstalledPrefixState::initial();
-                return InstalledSymbolStep { consumed: 0, work: 0, status: InstalledSymbolStatus::InternalState };
+                let result = InstalledSymbolStep { consumed: 0, status: InstalledSymbolStatus::InternalState };
+            proof { establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix, 0); }
+            return result;
             }
         }
     }
 
     let mut consumed: usize = 0;
     let mut iterations: u8 = 0;
-    let mut exact_work: u64 = 0;
+    let ghost mut exact_work: u64 = 0;
     let ghost mut accepted = Seq::<u8>::empty();
     proof {
         reveal(installed_symbol_progress);
+        reveal(bit_queue_read_image);
         reveal(installed_prefix_value);
         reveal(installed_no_earlier_match);
+        reveal(installed_no_earlier_stop);
         reveal(input_bytes_taken);
         reveal(input_bytes_needed);
         assert(input@.take(0) =~= Seq::<u8>::empty());
@@ -4863,6 +5954,10 @@ fn advance_installed_tree_symbol(
             *prefix,
         ));
     }
+    proof {
+        assert(exact_work == iterations as u64 * (meta.symbols as u64 + 1)) by (nonlinear_arith)
+            requires exact_work == 0, iterations == 0;
+    }
     while iterations < 15
         invariant consumed <= input.len(), iterations <= 15,
             exact_work == iterations as u64 * (meta.symbols as u64 + 1),
@@ -4876,6 +5971,9 @@ fn advance_installed_tree_symbol(
             start_queue.valid(), start_prefix.valid(),
             start_prefix.width as nat + iterations as nat <= 15,
             accepted.len() == iterations,
+            bit_queue_read_image(start_queue, input@, consumed, accepted.len(), *queue),
+            installed_no_earlier_stop(workspace@, window_bytes, region, tree, meta,
+                start_prefix, accepted, accepted.len() as int + 1),
             forall|i: int| 0 <= i < accepted.len() ==> accepted[i] <= 1,
             installed_symbol_progress(
                 workspace@,
@@ -4904,8 +6002,13 @@ fn advance_installed_tree_symbol(
                 exact_work == iterations as u64 * (meta.symbols as u64 + 1),
                 iterations < 15,
                 meta.symbols <= 704;
-        exact_work = exact_work + 1;
+        proof { exact_work = (exact_work + 1) as u64; }
         let read = queue.read_bits(1, remaining_input, end_of_input);
+        proof {
+            bit_queue_read_images_compose(start_queue, input@, old_consumed,
+                before_accepted.len(), before_queue, read.consumed,
+                if matches!(read.status, BitReadStatus::Value(_)) { 1nat } else { 0nat }, *queue);
+        }
         let bit = match read.status {
             BitReadStatus::Value(value) => {
                 proof {
@@ -4961,7 +6064,6 @@ fn advance_installed_tree_symbol(
                 }
                 let result = InstalledSymbolStep {
                     consumed: consumed + read.consumed,
-                    work: exact_work,
                     status: InstalledSymbolStatus::NeedInput,
                 };
                 proof {
@@ -4980,6 +6082,26 @@ fn advance_installed_tree_symbol(
                         *queue,
                         *prefix,
                     ));
+                }
+                proof {
+                    reveal(installed_scan_no_stop); reveal(installed_record_bad);
+                    reveal(installed_record_readable);
+                    if let InstalledSymbolStatus::Symbol(selected) = result.status {
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + selected as int + 2);
+                    }
+                    if result.status == InstalledSymbolStatus::InvalidPrefixCode {
+                        installed_full_scan_sum(iterations as nat, meta.symbols as nat, exact_work as nat);
+                        assert(exact_work as nat == accepted.len() * (meta.symbols as nat + 1));
+                    }
+                    establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+                }
+                proof {
+                    establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        installed_read_units(exact_work, result.consumed, result.status));
                 }
                 return result;
             },
@@ -5029,7 +6151,6 @@ fn advance_installed_tree_symbol(
                 *prefix = InstalledPrefixState::initial();
                 let result = InstalledSymbolStep {
                     consumed: consumed + read.consumed,
-                    work: exact_work,
                     status: InstalledSymbolStatus::Truncated,
                 };
                 proof {
@@ -5047,6 +6168,26 @@ fn advance_installed_tree_symbol(
                         *queue,
                         *prefix,
                     ));
+                }
+                proof {
+                    reveal(installed_scan_no_stop); reveal(installed_record_bad);
+                    reveal(installed_record_readable);
+                    if let InstalledSymbolStatus::Symbol(selected) = result.status {
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + selected as int + 2);
+                    }
+                    if result.status == InstalledSymbolStatus::InvalidPrefixCode {
+                        installed_full_scan_sum(iterations as nat, meta.symbols as nat, exact_work as nat);
+                        assert(exact_work as nat == accepted.len() * (meta.symbols as nat + 1));
+                    }
+                    establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+                }
+                proof {
+                    establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        installed_read_units(exact_work, result.consumed, result.status));
                 }
                 return result;
             }
@@ -5143,6 +6284,9 @@ fn advance_installed_tree_symbol(
                 before_accepted + seq![bit as u8],
             ));
             accepted = before_accepted + seq![bit as u8];
+            assert(accepted.take(before_accepted.len() as int) =~= before_accepted);
+            installed_stop_prefix_extend(workspace@, window_bytes, region, tree, meta,
+                start_prefix, before_accepted, accepted, accepted.len() as int);
             reveal(installed_no_earlier_match);
             assert(installed_no_earlier_match(
                 workspace@,
@@ -5184,6 +6328,12 @@ fn advance_installed_tree_symbol(
                 1 <= next_width <= 15,
                 next_bits < (1u16 << next_width),
                 accepted.len() == iterations as nat + 1,
+                bit_queue_read_image(start_queue, input@, consumed, accepted.len(), *queue),
+                installed_no_earlier_stop(workspace@, window_bytes, region, tree, meta,
+                    start_prefix, accepted, accepted.len() as int),
+                forall|earlier: int| 0 <= earlier < symbol ==> !#[trigger]
+                    installed_record_stops(workspace@, window_bytes, region, tree, meta,
+                        next_width, next_bits as nat, earlier),
                 forall|i: int| 0 <= i < accepted.len() ==> accepted[i] <= 1,
                 start_queue.bits() + bytes_bits(input@.take(consumed as int))
                     == accepted + queue.bits(),
@@ -5224,7 +6374,7 @@ fn advance_installed_tree_symbol(
                     iterations < 15,
                     symbol < meta.symbols,
                     meta.symbols <= 704;
-            exact_work = exact_work + 1;
+            proof { exact_work = (exact_work + 1) as u64; }
             let record = match crate::brotli_prefix::read_tree_record(
                 workspace,
                 window_bytes,
@@ -5236,21 +6386,47 @@ fn advance_installed_tree_symbol(
                 Ok(value) => value,
                 Err(_) => {
                     *prefix = InstalledPrefixState::initial();
-                    return InstalledSymbolStep {
-                        consumed,
-                        work: exact_work,
-                        status: InstalledSymbolStatus::InternalState,
-                    };
+                    let result = InstalledSymbolStep { consumed, status: InstalledSymbolStatus::InternalState };
+                    proof {
+                        reveal(installed_record_bad); reveal(installed_record_readable);
+                        reveal(installed_scan_no_stop);
+                        pow2_matches_installed_shift(next_width);
+                        assert(installed_record_bad(workspace@, window_bytes, region, tree, meta, next_width, symbol as int));
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + symbol as int + 2);
+                        establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                            start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                            accepted, symbol, installed_read_units(exact_work, consumed, result.status));
+                    }
+                    proof {
+                    establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        installed_read_units(exact_work, result.consumed, result.status));
+                }
+                return result;
                 }
             };
             if record.length == next_width && record.length != 0 {
                 if record.code >= (1u16 << next_width) {
                     *prefix = InstalledPrefixState::initial();
-                    return InstalledSymbolStep {
-                        consumed,
-                        work: exact_work,
-                        status: InstalledSymbolStatus::InternalState,
-                    };
+                    let result = InstalledSymbolStep { consumed, status: InstalledSymbolStatus::InternalState };
+                    proof {
+                        reveal(installed_record_bad); reveal(installed_record_readable);
+                        reveal(installed_scan_no_stop);
+                        pow2_matches_installed_shift(next_width);
+                        assert(installed_record_bad(workspace@, window_bytes, region, tree, meta, next_width, symbol as int));
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + symbol as int + 2);
+                        establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                            start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                            accepted, symbol, installed_read_units(exact_work, consumed, result.status));
+                    }
+                    proof {
+                    establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        installed_read_units(exact_work, result.consumed, result.status));
+                }
+                return result;
                 }
                 proof { pow2_matches_installed_shift(next_width); }
                 let reversed = reverse_installed_code(record.code, next_width);
@@ -5408,7 +6584,6 @@ fn advance_installed_tree_symbol(
                     }
                     let result = InstalledSymbolStep {
                         consumed,
-                        work: exact_work,
                         status: InstalledSymbolStatus::Symbol(symbol),
                     };
                     proof {
@@ -5428,7 +6603,27 @@ fn advance_installed_tree_symbol(
                             *prefix,
                         ));
                     }
-                    return result;
+                    proof {
+                    reveal(installed_scan_no_stop); reveal(installed_record_bad);
+                    reveal(installed_record_readable);
+                    if let InstalledSymbolStatus::Symbol(selected) = result.status {
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + selected as int + 2);
+                    }
+                    if result.status == InstalledSymbolStatus::InvalidPrefixCode {
+                        installed_full_scan_sum(iterations as nat, meta.symbols as nat, exact_work as nat);
+                        assert(exact_work as nat == accepted.len() * (meta.symbols as nat + 1));
+                    }
+                    establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+                }
+                proof {
+                    establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        installed_read_units(exact_work, result.consumed, result.status));
+                }
+                return result;
                 }
                 proof {
                     reveal(installed_record_matches);
@@ -5473,6 +6668,12 @@ fn advance_installed_tree_symbol(
                     ) == false);
                 }
             }
+            proof {
+                reveal(installed_record_stops); reveal(installed_record_bad);
+                reveal(installed_record_readable);
+                assert(!installed_record_bad(workspace@, window_bytes, region, tree, meta, next_width, symbol as int));
+                assert(!installed_record_stops(workspace@, window_bytes, region, tree, meta, next_width, next_bits as nat, symbol as int));
+            }
             symbol = symbol + 1;
         }
         proof {
@@ -5514,6 +6715,18 @@ fn advance_installed_tree_symbol(
                         assert((start_prefix.width as int + used) as u8 == next_width);
                         assert(installed_prefix_value(start_prefix, accepted) == next_bits as nat);
                     }
+                }
+            }
+        }
+        proof {
+            reveal(installed_scan_no_stop); reveal(installed_no_earlier_stop);
+            assert(installed_scan_no_stop(workspace@, window_bytes, region, tree, meta,
+                next_width, next_bits as nat, meta.symbols as int));
+            assert forall|used: int| 1 <= used < accepted.len() + 1 implies installed_scan_no_stop(
+                workspace@, window_bytes, region, tree, meta, (start_prefix.width as int + used) as u8,
+                installed_prefix_value(start_prefix, accepted.take(used)), meta.symbols as int) by {
+                if used == accepted.len() {
+                    assert(accepted.take(used) =~= accepted);
                 }
             }
         }
@@ -5575,7 +6788,6 @@ fn advance_installed_tree_symbol(
             *prefix = InstalledPrefixState::initial();
             let result = InstalledSymbolStep {
                 consumed,
-                work: exact_work,
                 status: InstalledSymbolStatus::InvalidPrefixCode,
             };
             proof {
@@ -5595,7 +6807,27 @@ fn advance_installed_tree_symbol(
                     *prefix,
                 ));
             }
-            return result;
+            proof {
+                    reveal(installed_scan_no_stop); reveal(installed_record_bad);
+                    reveal(installed_record_readable);
+                    if let InstalledSymbolStatus::Symbol(selected) = result.status {
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + selected as int + 2);
+                    }
+                    if result.status == InstalledSymbolStatus::InvalidPrefixCode {
+                        installed_full_scan_sum(iterations as nat, meta.symbols as nat, exact_work as nat);
+                        assert(exact_work as nat == accepted.len() * (meta.symbols as nat + 1));
+                    }
+                    establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+                }
+                proof {
+                    establish_installed_full_step(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        installed_read_units(exact_work, result.consumed, result.status));
+                }
+                return result;
         }
         prefix.width = next_width;
         prefix.bits = next_bits;
@@ -5612,9 +6844,9 @@ fn advance_installed_tree_symbol(
         iterations = iterations + 1;
     }
     *prefix = InstalledPrefixState::initial();
+    proof { assert(false); }
     InstalledSymbolStep {
         consumed,
-        work: exact_work,
         status: InstalledSymbolStatus::InternalState,
     }
 }
@@ -8753,16 +9985,39 @@ proof fn b3b_scalar_u32_from_frame(
     reveal(b3b_scalar_u32_at);
 }
 
+spec fn b3b_queue_encoding_valid(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let len = b3b_scalar_byte_at(workspace, window_bytes, B3B_QUEUE_LEN) as int;
+    let offset = b3b_scalar_byte_at(workspace, window_bytes, B3B_QUEUE_OFFSET_BYTE) as int;
+    &&& b3b_workspace_shape(workspace.len() as nat, window_bytes)
+    &&& len <= 8
+    &&& offset < 8
+    &&& (len == 0 ==> offset == 0)
+    &&& forall|i: int| len <= i < 8 ==> #[trigger]
+        workspace[b3b_scalar_base(window_bytes) + i] == 0
+}
+
+spec fn installed_prefix_encoding_valid(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let width = b3b_scalar_byte_at(workspace, window_bytes, B3B_INSTALLED_PREFIX_WIDTH);
+    &&& b3b_workspace_shape(workspace.len() as nat, window_bytes)
+    &&& width <= 14
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_INSTALLED_PREFIX_BITS) < pow2(width as nat)
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_INSTALLED_SCAN) == 0
+}
+
 fn load_b3b_queue(
     workspace: &[u8],
     window_bytes: u32,
 ) -> (r: Result<BitQueue, CompressedHeaderError>)
     ensures
+        r.is_ok() == b3b_queue_encoding_valid(workspace@, window_bytes),
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes) && r.is_err()
+            ==> r == Err(CompressedHeaderError::InternalState),
         r.is_ok() ==> serialized_b3b_queue(workspace@, window_bytes, r.unwrap()),
         r.is_err() ==> r.unwrap_err() != CompressedHeaderError::Truncated,
         r.is_err() ==> r.unwrap_err() != CompressedHeaderError::InvalidFormat(
             CompressedFormatError::ContextMapRepeat),
 {
+    reveal(b3b_queue_encoding_valid);
     let len = match read_b3b_state_byte(workspace, window_bytes, B3B_QUEUE_LEN) {
         Ok(value) => value as usize,
         Err(error) => return Err(CompressedHeaderError::Workspace(error)),
@@ -8821,6 +10076,13 @@ fn load_b3b_queue(
             assert(queue.pending@[j] == 0);
         }
         assert(serialized_b3b_queue(workspace@, window_bytes, queue));
+        reveal(b3b_queue_encoding_valid);
+        b3b_scalar_layout_is_exact();
+        assert forall|j: int| len <= j < 8 implies #[trigger]
+            workspace@[b3b_scalar_base(window_bytes) + j] == 0 by {
+            assert(queue.pending@[j] == 0);
+        }
+        assert(b3b_queue_encoding_valid(workspace@, window_bytes));
     }
     Ok(queue)
 }
@@ -9121,16 +10383,25 @@ fn store_b3b_queue(
     Ok(())
 }
 
+spec fn var_uint8_encoding_valid(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let tag = b3b_scalar_byte_at(workspace, window_bytes, B3B_VAR_PHASE);
+    let width = b3b_scalar_byte_at(workspace, window_bytes, B3B_VAR_WIDTH);
+    &&& b3b_workspace_shape(workspace.len() as nat, window_bytes)
+    &&& ((tag <= 1 && width == 0) || (tag == 2 && 1 <= width <= 7))
+}
+
 fn load_var_uint8_phase(
     workspace: &[u8],
     window_bytes: u32,
 ) -> (r: Result<VarUint8Phase, CompressedHeaderError>)
     ensures
+        r.is_ok() == var_uint8_encoding_valid(workspace@, window_bytes),
         r.is_ok() ==> serialized_var_uint8_phase(
             workspace@, window_bytes, r.unwrap(),
         ),
         r.is_err() ==> r.unwrap_err() != CompressedHeaderError::Truncated,
 {
+    reveal(var_uint8_encoding_valid);
     let tag = match read_b3b_state_tag(workspace, window_bytes, B3B_VAR_PHASE, 3) {
         Ok(value) => value,
         Err(crate::brotli_prefix::WorkspaceError::InvalidSymbol) =>
@@ -9367,6 +10638,16 @@ spec fn serialized_terminal_error(
     &&& workspace[base + B3B_ERROR_DETAIL as int] as nat
         + 256 * workspace[base + B3B_ERROR_DETAIL as int + 1] as nat
         == compressed_header_error_detail(error)
+}
+
+spec fn terminal_error_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
+    &&& before.len() == after.len()
+    &&& forall|index: int| 0 <= index < before.len()
+        && index != b3b_scalar_base(window_bytes) + B3B_OUTER_PHASE as int
+        && index != b3b_scalar_base(window_bytes) + B3B_TERMINAL_ERROR as int
+        && !(b3b_scalar_base(window_bytes) + B3B_ERROR_DETAIL as int <= index
+            < b3b_scalar_base(window_bytes) + B3B_ERROR_DETAIL as int + 2)
+        ==> #[trigger] after[index] == before[index]
 }
 
 fn store_terminal_error(
@@ -10229,7 +11510,12 @@ fn load_installed_prefix_state(
     window_bytes: u32,
 ) -> (r: Result<InstalledPrefixState, CompressedHeaderError>)
     ensures r.is_ok() ==> r.unwrap().valid(),
+        r.is_ok() ==> serialized_installed_prefix(workspace@, window_bytes, r.unwrap()),
+        r.is_ok() == installed_prefix_encoding_valid(workspace@, window_bytes),
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes) && r.is_err()
+            ==> r == Err(CompressedHeaderError::InternalState),
 {
+    reveal(installed_prefix_encoding_valid);
     let width = match state_byte(workspace, window_bytes, B3B_INSTALLED_PREFIX_WIDTH) {
         Ok(value) => value,
         Err(error) => return Err(error),
@@ -10242,11 +11528,16 @@ fn load_installed_prefix_state(
         Ok(value) => value,
         Err(error) => return Err(error),
     };
+    proof { if width <= 14 { pow2_matches_installed_shift(width); } }
     if width > 14 || scan != 0 || bits >= (1u16 << width) {
         return Err(CompressedHeaderError::InternalState);
     }
     let prefix = InstalledPrefixState { width, bits, scan };
     assert(prefix.valid());
+    proof {
+        reveal(serialized_installed_prefix);
+        if width <= 14 { pow2_matches_installed_shift(width); }
+    }
     Ok(prefix)
 }
 
@@ -10257,6 +11548,7 @@ fn store_installed_prefix_state(
 ) -> (r: Result<(), CompressedHeaderError>)
     requires prefix.valid(),
     ensures
+        b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes) ==> r.is_ok(),
         final(workspace)@.len() == old(workspace)@.len(),
         r.is_ok() ==> serialized_installed_prefix(
             final(workspace)@,
@@ -11743,22 +13035,50 @@ fn install_completed_simple_tree(
                     + tree as nat * 4);
             }
             crate::brotli_prefix::TreeRegion::BlockType => {
+                assert(tree < 3 && alphabet_limit <= 258);
+                assert(record_start == window_bytes as nat
+                    + crate::brotli_prefix::BLOCK_TYPE_TREES_OFFSET as nat
+                    + tree as nat * 258 * 3);
                 assert(record_end <= window_bytes as nat
-                    + crate::brotli_prefix::BLOCK_LENGTH_TREES_OFFSET as nat);
+                    + crate::brotli_prefix::BLOCK_LENGTH_TREES_OFFSET as nat)
+                    by (nonlinear_arith)
+                    requires tree < 3, alphabet_limit <= 258,
+                        record_start == window_bytes as nat
+                            + crate::brotli_prefix::BLOCK_TYPE_TREES_OFFSET as nat
+                            + tree as nat * 258 * 3,
+                        record_end == record_start + alphabet_limit as nat * 3;
                 assert(metadata_at == window_bytes as nat
                     + crate::brotli_prefix::BLOCK_TYPE_METADATA_OFFSET as nat
                     + tree as nat * 4);
             }
             crate::brotli_prefix::TreeRegion::BlockLength => {
+                assert(tree < 3 && alphabet_limit <= 26);
+                assert(record_start == window_bytes as nat
+                    + crate::brotli_prefix::BLOCK_LENGTH_TREES_OFFSET as nat
+                    + tree as nat * 26 * 3);
                 assert(record_end <= window_bytes as nat
-                    + crate::brotli_prefix::BUILDER_OFFSET as nat);
+                    + crate::brotli_prefix::BUILDER_OFFSET as nat)
+                    by (nonlinear_arith)
+                    requires tree < 3, alphabet_limit <= 26,
+                        record_start == window_bytes as nat
+                            + crate::brotli_prefix::BLOCK_LENGTH_TREES_OFFSET as nat
+                            + tree as nat * 26 * 3,
+                        record_end == record_start + alphabet_limit as nat * 3;
                 assert(metadata_at == window_bytes as nat
                     + crate::brotli_prefix::BLOCK_LENGTH_METADATA_OFFSET as nat
                     + tree as nat * 4);
             }
             crate::brotli_prefix::TreeRegion::TemporaryContext => {
+                assert(tree == 0 && alphabet_limit <= 272);
+                assert(record_start == window_bytes as nat
+                    + crate::brotli_prefix::TEMP_CONTEXT_TREE_OFFSET as nat);
                 assert(record_end <= window_bytes as nat
-                    + crate::brotli_prefix::MTF_OFFSET as nat);
+                    + crate::brotli_prefix::MTF_OFFSET as nat)
+                    by (nonlinear_arith)
+                    requires alphabet_limit <= 272,
+                        record_start == window_bytes as nat
+                            + crate::brotli_prefix::TEMP_CONTEXT_TREE_OFFSET as nat,
+                        record_end == record_start + alphabet_limit as nat * 3;
                 assert(metadata_at == window_bytes as nat
                     + crate::brotli_prefix::TEMP_CONTEXT_METADATA_OFFSET as nat);
             }
@@ -12412,6 +13732,8 @@ fn store_context_phase(
         serialized_context_data_ok(old(workspace)@, window_bytes),
         serialized_context_phase_payload_ok(old(workspace)@, window_bytes, next_phase),
     ensures
+        r.is_ok() ==> final(workspace)@ == old(workspace)@.update(
+            b3b_scalar_base(window_bytes) + B3B_CONTEXT_PHASE as int, next_phase),
         final(workspace)@.len() == old(workspace)@.len(),
         b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes)
             ==> r.is_ok(),
@@ -13223,6 +14545,71 @@ proof fn establish_context_bits_refinement(
     });
 }
 
+spec fn tree_metadata_value_matches(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata) -> bool {
+    let at = crate::brotli_prefix::tree_metadata_at(window_bytes, region, tree);
+    &&& meta.valid_for(region)
+    &&& at + 4 <= workspace.len()
+    &&& meta.symbols as nat == crate::brotli_prefix::little_u16_at(workspace, at)
+    &&& crate::brotli_prefix::tree_metadata_descriptor(meta)
+        == crate::brotli_prefix::little_u16_at(workspace, at + 2)
+}
+
+spec fn tree_metadata_encoding_valid(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16) -> bool {
+    let at = crate::brotli_prefix::tree_metadata_at(window_bytes, region, tree);
+    let symbols = crate::brotli_prefix::little_u16_at(workspace, at);
+    let descriptor = crate::brotli_prefix::little_u16_at(workspace, at + 2);
+    &&& at + 4 <= workspace.len()
+    &&& symbols <= crate::brotli_prefix::tree_region_symbols(region)
+    &&& if symbols == 0 { descriptor == 0 }
+        else { descriptor <= symbols || 0x8000 <= descriptor && descriptor - 0x8000 < symbols }
+}
+
+proof fn tree_metadata_values_agree(region: crate::brotli_prefix::TreeRegion,
+    left: crate::brotli_prefix::TreeMetadata, right: crate::brotli_prefix::TreeMetadata)
+    requires left.valid_for(region), right.valid_for(region), left.symbols == right.symbols,
+        crate::brotli_prefix::tree_metadata_descriptor(left) == crate::brotli_prefix::tree_metadata_descriptor(right),
+    ensures left == right,
+{
+    assert(crate::brotli_prefix::tree_region_symbols(region) <= 704) by {
+        match region {
+            crate::brotli_prefix::TreeRegion::Literal
+            | crate::brotli_prefix::TreeRegion::Command
+            | crate::brotli_prefix::TreeRegion::Distance
+            | crate::brotli_prefix::TreeRegion::BlockType
+            | crate::brotli_prefix::TreeRegion::BlockLength
+            | crate::brotli_prefix::TreeRegion::TemporaryContext => {},
+        }
+    }
+    match (left.storage, right.storage) {
+        (crate::brotli_prefix::TreeStorageState::Unused, crate::brotli_prefix::TreeStorageState::Unused) => {},
+        (crate::brotli_prefix::TreeStorageState::Single { .. }, crate::brotli_prefix::TreeStorageState::Single { .. }) => {},
+        (crate::brotli_prefix::TreeStorageState::Canonical { .. }, crate::brotli_prefix::TreeStorageState::Canonical { .. }) => {},
+        _ => { assert(false); },
+    }
+}
+
+proof fn tree_metadata_encoding_has_value(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16)
+    requires tree_metadata_encoding_valid(workspace, window_bytes, region, tree),
+    ensures exists|meta: crate::brotli_prefix::TreeMetadata|
+        tree_metadata_value_matches(workspace, window_bytes, region, tree, meta),
+{
+    let at = crate::brotli_prefix::tree_metadata_at(window_bytes, region, tree);
+    let symbols = crate::brotli_prefix::little_u16_at(workspace, at);
+    let descriptor = crate::brotli_prefix::little_u16_at(workspace, at + 2);
+    assert(symbols <= 65_535 && descriptor <= 65_535);
+    let storage = if symbols == 0 { crate::brotli_prefix::TreeStorageState::Unused }
+        else if descriptor >= 0x8000 {
+            crate::brotli_prefix::TreeStorageState::Single { symbol: (descriptor - 0x8000) as u16 }
+        } else { crate::brotli_prefix::TreeStorageState::Canonical { initialized: descriptor as u16 } };
+    let meta = crate::brotli_prefix::TreeMetadata { symbols: symbols as u16, storage };
+    assert(meta.valid_for(region));
+    assert(tree_metadata_value_matches(workspace, window_bytes, region, tree, meta));
+}
+
 spec fn temporary_tree_metadata_matches(
     workspace: Seq<u8>,
     window_bytes: u32,
@@ -13281,6 +14668,127 @@ spec fn context_symbol_value_result(
             initialized as u16,
         ) as int] == value as u8
     }
+}
+
+spec fn context_symbol_early_error(workspace: Seq<u8>, window_bytes: u32) -> Option<CompressedHeaderError> {
+    if b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_INITIALIZED)
+        == b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_SIZE) { None }
+    else if !tree_metadata_encoding_valid(workspace, window_bytes,
+        crate::brotli_prefix::TreeRegion::TemporaryContext, 0) {
+        Some(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidMetadata))
+    } else if !b3b_queue_encoding_valid(workspace, window_bytes)
+        || !installed_prefix_encoding_valid(workspace, window_bytes) {
+        Some(CompressedHeaderError::InternalState)
+    } else { None }
+}
+
+spec fn context_symbol_value_total(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    symbol: u16, status: Option<ContextAdvanceStatus>) -> bool {
+    let max_run = b3b_scalar_byte_at(before, window_bytes, B3B_MAX_RUN_PREFIX);
+    let trees = b3b_scalar_u16_at(before, window_bytes, B3B_MAP_TREES);
+    if symbol > max_run && (symbol as nat - max_run as nat) >= trees {
+        &&& status == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapValue)))
+        &&& b3b_scalar_u16_at(after, window_bytes, B3B_MAP_INITIALIZED)
+            == b3b_scalar_u16_at(before, window_bytes, B3B_MAP_INITIALIZED)
+        &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_PHASE) == 4
+    } else { context_symbol_value_result(before, after, window_bytes, symbol, status) }
+}
+
+spec fn context_symbol_result_total(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    symbol_status: InstalledSymbolStatus, status: Option<ContextAdvanceStatus>) -> bool {
+    match symbol_status {
+        InstalledSymbolStatus::NeedInput => status == Some(ContextAdvanceStatus::NeedInput),
+        InstalledSymbolStatus::Truncated => status == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+        InstalledSymbolStatus::InternalState => status == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InternalState)),
+        InstalledSymbolStatus::InvalidPrefixCode => status == Some(ContextAdvanceStatus::Failed(
+            CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode))),
+        InstalledSymbolStatus::Symbol(symbol) => context_symbol_value_total(before, after, window_bytes, symbol, status),
+    }
+}
+
+spec fn context_symbol_full_refines(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<ContextAdvanceStatus>) -> bool {
+    if b3b_scalar_u16_at(before, window_bytes, B3B_MAP_INITIALIZED)
+        == b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE) {
+        &&& used == 0 && status.is_none()
+        &&& after == before.update(b3b_scalar_base(window_bytes) + B3B_CONTEXT_PHASE as int, 6)
+    } else {
+        match context_symbol_early_error(before, window_bytes) {
+            Some(error) => used == 0 && after == before && status == Some(ContextAdvanceStatus::Failed(error)),
+            None => exists|meta: crate::brotli_prefix::TreeMetadata, sq: BitQueue, sp: InstalledPrefixState,
+                eq: BitQueue, ep: InstalledPrefixState, step: InstalledSymbolStep, reads: nat| {
+                &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta)
+                &&& serialized_b3b_queue(before, window_bytes, sq)
+                &&& serialized_installed_prefix(before, window_bytes, sp)
+                &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+                    0, meta, sq, sp, input, end, step, eq, ep, reads)
+                &&& serialized_b3b_queue(after, window_bytes, eq)
+                &&& serialized_installed_prefix(after, window_bytes, ep)
+                &&& used == step.consumed
+                &&& context_symbol_result_total(before, after, window_bytes, step.status, status)
+            },
+        }
+    }
+}
+
+proof fn establish_context_symbol_full(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<ContextAdvanceStatus>,
+    meta: crate::brotli_prefix::TreeMetadata, sq: BitQueue, sp: InstalledPrefixState,
+    eq: BitQueue, ep: InstalledPrefixState, step: InstalledSymbolStep, reads: nat)
+    requires
+        b3b_scalar_u16_at(before, window_bytes, B3B_MAP_INITIALIZED) != b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE),
+        context_symbol_early_error(before, window_bytes).is_none(),
+        tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta),
+        serialized_b3b_queue(before, window_bytes, sq), serialized_installed_prefix(before, window_bytes, sp),
+        installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+            0, meta, sq, sp, input, end, step, eq, ep, reads),
+        serialized_b3b_queue(after, window_bytes, eq), serialized_installed_prefix(after, window_bytes, ep),
+        used == step.consumed, context_symbol_result_total(before, after, window_bytes, step.status, status),
+    ensures context_symbol_full_refines(before, after, window_bytes, input, end, used, status),
+{
+    reveal(context_symbol_full_refines);
+    assert(exists|m: crate::brotli_prefix::TreeMetadata, a: BitQueue, b: InstalledPrefixState,
+        c: BitQueue, d: InstalledPrefixState, ss: InstalledSymbolStep, work: nat| {
+        &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext, 0, m)
+        &&& serialized_b3b_queue(before, window_bytes, a)
+        &&& serialized_installed_prefix(before, window_bytes, b)
+        &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+            0, m, a, b, input, end, ss, c, d, work)
+        &&& serialized_b3b_queue(after, window_bytes, c)
+        &&& serialized_installed_prefix(after, window_bytes, d)
+        &&& used == ss.consumed
+        &&& context_symbol_result_total(before, after, window_bytes, ss.status, status)
+    });
+}
+
+spec fn context_symbol_action_write_at(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    index: int, status: Option<ContextAdvanceStatus>) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    let initialized = b3b_scalar_u16_at(before, window_bytes, B3B_MAP_INITIALIZED);
+    if initialized == b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE) {
+        index == base + B3B_CONTEXT_PHASE as int
+    } else if context_symbol_early_error(before, window_bytes).is_some() { false }
+    else {
+        ||| base <= index < base + 10
+        ||| index == base + B3B_INSTALLED_PREFIX_WIDTH as int
+        ||| base + B3B_INSTALLED_PREFIX_BITS as int <= index < base + B3B_INSTALLED_SCAN as int + 2
+        ||| status.is_none() && {
+            if b3b_scalar_u16_at(after, window_bytes, B3B_MAP_INITIALIZED) == initialized + 1 {
+                let kind = if b3b_scalar_byte_at(before, window_bytes, B3B_CONTEXT_KIND) == 0 {
+                    crate::brotli_prefix::ContextMapKind::Literal
+                } else { crate::brotli_prefix::ContextMapKind::Distance };
+                index == crate::brotli_prefix::context_entry_at(window_bytes, kind, initialized as u16) as int
+                    || base + B3B_MAP_INDEX as int <= index < base + B3B_MAP_INITIALIZED as int + 2
+            } else { index == base + B3B_PENDING_RUN as int || index == base + B3B_CONTEXT_PHASE as int }
+        }
+    }
+}
+
+spec fn context_symbol_action_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    status: Option<ContextAdvanceStatus>) -> bool {
+    &&& before.len() == after.len()
+    &&& forall|i: int| 0 <= i < before.len() && !context_symbol_action_write_at(before, after, window_bytes, i, status)
+        ==> #[trigger] after[i] == before[i]
 }
 
 spec fn context_symbol_phase_refines(
@@ -13478,6 +14986,23 @@ proof fn establish_context_symbol_refinement(
     });
 }
 
+spec fn context_symbol_store_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, symbol: u16) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    let max_run = b3b_scalar_byte_at(before, window_bytes, B3B_MAX_RUN_PREFIX);
+    let kind = if b3b_scalar_byte_at(before, window_bytes, B3B_CONTEXT_KIND) == 0 {
+        crate::brotli_prefix::ContextMapKind::Literal
+    } else { crate::brotli_prefix::ContextMapKind::Distance };
+    let entry = crate::brotli_prefix::context_entry_at(window_bytes, kind,
+        b3b_scalar_u16_at(before, window_bytes, B3B_MAP_INITIALIZED) as u16) as int;
+    &&& before.len() == after.len()
+    &&& forall|i: int| 0 <= i < before.len()
+        && !(if 1 <= symbol <= max_run {
+            i == base + B3B_PENDING_RUN as int || i == base + B3B_CONTEXT_PHASE as int
+        } else {
+            i == entry || base + B3B_MAP_INDEX as int <= i < base + B3B_MAP_INITIALIZED as int + 2
+        }) ==> #[trigger] after[i] == before[i]
+}
+
 spec fn context_symbol_store_holds(
     before: Seq<u8>,
     after: Seq<u8>,
@@ -13485,6 +15010,7 @@ spec fn context_symbol_store_holds(
     symbol: u16,
 ) -> bool {
     &&& after.len() == before.len()
+    &&& context_symbol_store_frame(before, after, window_bytes, symbol)
     &&& serialized_context_state_ok(after, window_bytes)
     &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_KIND)
         == b3b_scalar_byte_at(before, window_bytes, B3B_CONTEXT_KIND)
@@ -13532,6 +15058,7 @@ fn store_context_zero_symbol(
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
         1 <= num_trees <= 256,
     ensures
+        r.is_ok(),
         final(workspace)@.len() == old(workspace)@.len(),
         b3b_workspace_shape(final(workspace)@.len() as nat, window_bytes),
         r.is_ok() ==> context_symbol_store_holds(
@@ -13541,6 +15068,8 @@ fn store_context_zero_symbol(
             0,
         ),
 {
+    reveal(context_symbol_store_frame);
+    proof { reveal(serialized_context_state_ok); reveal(serialized_context_data_ok); reveal(b3b_workspace_shape); }
     let ghost original = workspace@;
     let next = match crate::brotli_prefix::write_next_context_entry(
         workspace,
@@ -13608,6 +15137,7 @@ fn store_context_pending_run_symbol(
         _initialized < _active_len,
         1 <= symbol <= _max_run as u16,
     ensures
+        r.is_ok(),
         final(workspace)@.len() == old(workspace)@.len(),
         b3b_workspace_shape(final(workspace)@.len() as nat, window_bytes),
         r.is_ok() ==> context_symbol_store_holds(
@@ -13617,6 +15147,7 @@ fn store_context_pending_run_symbol(
             symbol,
         ),
 {
+    reveal(context_symbol_store_frame);
     match put_state_byte(
         workspace,
         window_bytes,
@@ -13679,6 +15210,7 @@ fn store_context_direct_symbol(
         1 <= num_trees <= 256,
         direct_context_symbol_valid(symbol, max_run, num_trees),
     ensures
+        r.is_ok(),
         final(workspace)@.len() == old(workspace)@.len(),
         b3b_workspace_shape(final(workspace)@.len() as nat, window_bytes),
         r.is_ok() ==> context_symbol_store_holds(
@@ -13688,6 +15220,8 @@ fn store_context_direct_symbol(
             symbol,
         ),
 {
+    reveal(context_symbol_store_frame);
+    proof { reveal(serialized_context_state_ok); reveal(serialized_context_data_ok); reveal(b3b_workspace_shape); }
     let value = symbol - max_run as u16;
     proof { bounded_u16_fits_u8(value); }
     let ghost original = workspace@;
@@ -13770,6 +15304,18 @@ fn handle_context_installed_symbol_status(
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
         1 <= num_trees <= 256,
     ensures
+        match symbol_status {
+            InstalledSymbolStatus::Symbol(symbol) => {
+                if symbol > max_run && (symbol as nat - max_run as nat) >= num_trees {
+                    &&& r == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapValue)))
+                    &&& final(workspace)@ == old(workspace)@
+                } else {
+                    &&& r.is_none()
+                    &&& context_symbol_value_total(old(workspace)@, final(workspace)@, window_bytes, symbol, r)
+                }
+            },
+            _ => true,
+        },
         final(workspace)@.len() == old(workspace)@.len(),
         b3b_workspace_shape(final(workspace)@.len() as nat, window_bytes),
         match symbol_status {
@@ -13809,6 +15355,7 @@ fn handle_context_installed_symbol_status(
             },
         },
 {
+    reveal(context_symbol_value_total);
     match symbol_status {
         InstalledSymbolStatus::NeedInput => Some(ContextAdvanceStatus::NeedInput),
         InstalledSymbolStatus::Truncated => Some(ContextAdvanceStatus::Failed(
@@ -13893,6 +15440,9 @@ fn advance_context_symbol_phase(
         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) == active_len,
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
     ensures
+        context_symbol_action_frame(old(workspace)@, final(workspace)@, window_bytes, r.1),
+        context_symbol_full_refines(old(workspace)@, final(workspace)@, window_bytes,
+            input@, end_of_input, r.0, r.1),
         final(workspace)@.len() == old(workspace)@.len(),
         b3b_workspace_shape(final(workspace)@.len() as nat, window_bytes),
         match r.1 {
@@ -13928,8 +15478,9 @@ fn advance_context_symbol_phase(
         ),
 {
     let ghost original = workspace@;
+    proof { reveal(context_symbol_action_frame); reveal(context_symbol_action_write_at); reveal(context_symbol_store_frame); }
     proof { assert(original == old(workspace)@); }
-    proof { b3b_scalar_layout_is_exact(); }
+    proof { b3b_scalar_layout_is_exact(); reveal(context_symbol_full_refines); reveal(context_symbol_early_error); }
     let mut consumed: usize = 0;
 
                 let initialized = match state_u16(workspace, window_bytes, B3B_MAP_INITIALIZED) {
@@ -14000,23 +15551,10 @@ fn advance_context_symbol_phase(
                         Err(error) => return (consumed, Some(ContextAdvanceStatus::Failed(error))),
                     };
                     let ghost start_queue = queue;
-                    let width = match state_byte(workspace, window_bytes, B3B_INSTALLED_PREFIX_WIDTH) {
+                    let mut prefix = match load_installed_prefix_state(workspace, window_bytes) {
                         Ok(value) => value,
                         Err(error) => return (consumed, Some(ContextAdvanceStatus::Failed(error))),
                     };
-                    let bits = match state_u16(workspace, window_bytes, B3B_INSTALLED_PREFIX_BITS) {
-                        Ok(value) => value,
-                        Err(error) => return (consumed, Some(ContextAdvanceStatus::Failed(error))),
-                    };
-                    let scan = match state_u16(workspace, window_bytes, B3B_INSTALLED_SCAN) {
-                        Ok(value) => value,
-                        Err(error) => return (consumed, Some(ContextAdvanceStatus::Failed(error))),
-                    };
-                    if width > 14 || scan != 0 || bits >= (1u16 << width) {
-                        return (consumed, Some(ContextAdvanceStatus::Failed(
-                            CompressedHeaderError::InternalState)));
-                    }
-                    let mut prefix = InstalledPrefixState { width, bits, scan };
                     let ghost start_prefix = prefix;
                     proof {
                         reveal(serialized_installed_prefix);
@@ -14030,6 +15568,14 @@ fn advance_context_symbol_phase(
                     proof {
                         assert(remaining@ == input@);
                         assert(workspace@ == original);
+                    }
+                    proof {
+                        assert(tree_metadata_value_matches(original, window_bytes,
+                            crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta));
+                        tree_metadata_match_is_valid_encoding(original, window_bytes,
+                            crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta);
+                        serialized_cursor_has_valid_encoding(original, window_bytes, queue, prefix);
+                        assert(context_symbol_early_error(original, window_bytes).is_none());
                     }
                     let symbol_step = advance_installed_tree_symbol(
                         workspace,
@@ -14058,6 +15604,12 @@ fn advance_context_symbol_phase(
                             prefix,
                         ));
                     }
+                    let ghost full_read_units = choose|cost: nat| {
+                        &&& #[trigger] installed_symbol_full_step(original, window_bytes,
+                            crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta,
+                            start_queue, start_prefix, input@, end_of_input, symbol_step, queue, prefix, cost)
+                        &&& cost <= 10_575 + symbol_step.consumed as nat
+                    };
                     consumed = consumed + symbol_step.consumed;
                     if let Err(error) = store_b3b_queue(workspace, window_bytes, &queue) {
                         return (consumed, Some(ContextAdvanceStatus::Failed(error)));
@@ -14123,6 +15675,12 @@ fn advance_context_symbol_phase(
                         Some(status) => {
                             let result = (consumed, Some(status));
                             proof {
+                                reveal(context_symbol_result_total); reveal(context_symbol_value_total);
+                                assert(context_symbol_result_total(original, workspace@, window_bytes, symbol_step.status, result.1));
+                                establish_context_symbol_full(original, workspace@, window_bytes, input@, end_of_input,
+                                    result.0, result.1, meta, start_queue, start_prefix, queue, prefix, symbol_step, full_read_units);
+                            }
+                            proof {
                                 match status {
                                     ContextAdvanceStatus::NeedInput => {
                                         establish_context_symbol_refinement(
@@ -14168,6 +15726,12 @@ fn advance_context_symbol_phase(
                         ) == active_len);
                     }
                     let result = (consumed, None);
+                    proof {
+                        reveal(context_symbol_result_total); reveal(context_symbol_value_total);
+                        assert(context_symbol_result_total(original, workspace@, window_bytes, symbol_step.status, result.1));
+                        establish_context_symbol_full(original, workspace@, window_bytes, input@, end_of_input,
+                            result.0, result.1, meta, start_queue, start_prefix, queue, prefix, symbol_step, full_read_units);
+                    }
                 proof {
                     reveal(context_symbol_store_holds);
                     assert forall|i: int| 0 <= i < B3B_QUEUE_OFFSET_BYTE + 1 implies #[trigger]
@@ -14321,6 +15885,12 @@ fn advance_context_bits_phase(
         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) == active_len,
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
     ensures
+        b3b_queue_encoding_valid(old(workspace)@, window_bytes) ==> match r.1 {
+            Some(ContextAdvanceStatus::Failed(error)) => error == CompressedHeaderError::Truncated
+                || error == CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat),
+            Some(ContextAdvanceStatus::Complete { .. }) => false,
+            _ => true,
+        },
         final(workspace)@.len() == old(workspace)@.len(),
         context_bits_frame(old(workspace)@, final(workspace)@, window_bytes, kind, active_len),
         b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_OUTER_PHASE)
@@ -14357,6 +15927,12 @@ fn advance_context_bits_phase(
     let ghost original = workspace@;
     proof { assert(original == old(workspace)@); }
     proof { b3b_scalar_layout_is_exact(); }
+    proof {
+        reveal(serialized_context_state_ok);
+        reveal(serialized_context_data_ok);
+        reveal(serialized_context_phase_payload_ok);
+        reveal(b3b_workspace_shape);
+    }
     reveal(context_bits_frame);
     reveal(context_bits_write_at);
     reveal(context_tree_start_frame);
@@ -14997,6 +16573,12 @@ fn advance_context_tree_count_phase(
         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) == active_len,
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
     ensures
+        b3b_queue_encoding_valid(old(workspace)@, window_bytes)
+            && var_uint8_encoding_valid(old(workspace)@, window_bytes) ==> {
+            &&& (r.1.is_none() || r.1 == Some(ContextAdvanceStatus::NeedInput)
+                || r.1 == Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)))
+            &&& serialized_context_state_ok(final(workspace)@, window_bytes)
+        },
         final(workspace)@.len() == old(workspace)@.len(),
         context_tree_count_frame(
             old(workspace)@, final(workspace)@, window_bytes, kind, active_len,
@@ -15035,6 +16617,10 @@ fn advance_context_tree_count_phase(
     proof { assert(original == old(workspace)@); }
     reveal(context_tree_count_frame);
     reveal(context_tree_count_write_at);
+    proof {
+        reveal(serialized_context_state_ok); reveal(serialized_context_data_ok);
+        reveal(serialized_context_phase_payload_ok); reveal(b3b_workspace_shape);
+    }
     let mut consumed: usize = 0;
 
                 let mut queue = match load_b3b_queue(workspace, window_bytes) {
@@ -17371,6 +18957,8 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
             old(self).window_bytes,
         ),
         ensures
+            terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes),
+            r == (CompressedHeaderStep { consumed, status: CompressedHeaderStatus::Failed(error) }),
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -17387,6 +18975,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _ => false,
             },
     {
+        reveal(terminal_error_frame);
         proof {
             assert(final(old(self).workspace)@ == final(self.workspace)@);
         }
@@ -17447,6 +19036,10 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
 
     fn load_installed_prefix(&self) -> (r: Result<InstalledPrefixState, CompressedHeaderError>)
         ensures r.is_ok() ==> r.unwrap().valid(),
+            r.is_ok() ==> serialized_installed_prefix(old(self.workspace)@, self.window_bytes, r.unwrap()),
+            r.is_ok() == installed_prefix_encoding_valid(old(self.workspace)@, self.window_bytes),
+            b3b_workspace_shape(old(self.workspace)@.len() as nat, self.window_bytes) && r.is_err()
+                ==> r == Err(CompressedHeaderError::InternalState),
     {
         load_installed_prefix_state(self.workspace, self.window_bytes)
     }
@@ -17456,6 +19049,9 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
         prefix: InstalledPrefixState,
     ) -> (r: Result<(), CompressedHeaderError>)
         ensures
+            r.is_ok() ==> serialized_installed_prefix(final(self).workspace@, final(self).window_bytes, prefix),
+            b3b_workspace_shape(old(self).workspace@.len() as nat, old(self).window_bytes) && prefix.valid()
+                ==> r.is_ok(),
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -17491,6 +19087,8 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 old(self).window_bytes,
             ),
         ensures
+            terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes),
+            r == (consumed, Some(CompressedHeaderStatus::Failed(error))),
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -17504,6 +19102,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _ => false,
             },
     {
+        reveal(terminal_error_frame);
         let step = self.fail(consumed, error);
         proof {
             match step.status {
@@ -18140,6 +19739,11 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_BLOCK_LENGTH_PHASE) == 0
+                ==> initial_symbol_action_refines(old(self).workspace@, final(self).workspace@,
+                    old(self).window_bytes, input@, end_of_input, r.0, r.1),
+            b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_BLOCK_LENGTH_PHASE) == 0
+                ==> initial_symbol_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1),
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -18166,6 +19770,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _ => true,
             },
     {
+        reveal(initial_symbol_action_refines); reveal(initial_symbol_early_error);
         let mut consumed: usize = 0;
 
                     let kind = match state_byte(self.workspace, self.window_bytes, B3B_CURRENT_KIND) {
@@ -18181,82 +19786,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                         Err(error) => return self.fail_phase(consumed, error),
                     };
                     if subphase == 0 {
-                        let meta = match crate::brotli_prefix::read_tree_metadata(
-                            self.workspace,
-                            self.window_bytes,
-                            crate::brotli_prefix::TreeRegion::BlockLength,
-                            3,
-                            kind as u16,
-                        ) {
-                            Ok(value) => value,
-                            Err(crate::brotli_prefix::MetadataReadError::InvalidEncoding) =>
-                                return self.fail_phase(consumed, CompressedHeaderError::InvalidFormat(
-                                    CompressedFormatError::InvalidMetadata)),
-                            Err(crate::brotli_prefix::MetadataReadError::Workspace(error)) =>
-                                return self.fail_phase(consumed, CompressedHeaderError::Workspace(error)),
-                        };
-                        let mut queue = match load_b3b_queue(self.workspace, self.window_bytes) {
-                            Ok(value) => value,
-                            Err(error) => return self.fail_phase(consumed, error),
-                        };
-                        let mut prefix = match self.load_installed_prefix() {
-                            Ok(value) => value,
-                            Err(error) => return self.fail_phase(consumed, error),
-                        };
-                        let symbol_step = advance_installed_tree_symbol(
-                            self.workspace,
-                            self.window_bytes,
-                            crate::brotli_prefix::TreeRegion::BlockLength,
-                            kind as u16,
-                            meta,
-                            &mut queue,
-                            &mut prefix,
-                            &input[consumed..],
-                            end_of_input,
-                        );
-                        consumed = consumed + symbol_step.consumed;
-                        if let Err(error) = store_b3b_queue(
-                            self.workspace, self.window_bytes, &queue) {
-                            return self.fail_phase(consumed, error);
-                        }
-                        if let Err(error) = self.store_installed_prefix(prefix) {
-                            return self.fail_phase(consumed, error);
-                        }
-                        match symbol_step.status {
-                            InstalledSymbolStatus::NeedInput => return (consumed, Some(CompressedHeaderStatus::NeedInput)),
-                            InstalledSymbolStatus::Truncated =>
-                                return self.fail_phase(consumed, CompressedHeaderError::Truncated),
-                            InstalledSymbolStatus::InvalidPrefixCode => return self.fail_phase(
-                                consumed,
-                                CompressedHeaderError::InvalidFormat(
-                                    CompressedFormatError::InvalidPrefixCode),
-                            ),
-                            InstalledSymbolStatus::InternalState =>
-                                return self.fail_phase(consumed, CompressedHeaderError::InternalState),
-                            InstalledSymbolStatus::Symbol(symbol) => {
-                                if symbol >= 26 {
-                                    return self.fail_phase(consumed, CompressedHeaderError::InvalidFormat(
-                                        CompressedFormatError::InvalidBlockLength));
-                                }
-                                let width = crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS[
-                                    symbol as usize];
-                                if let Err(error) = put_state_byte(
-                                    self.workspace, self.window_bytes,
-                                    B3B_BLOCK_LENGTH_SYMBOL, symbol as u8) {
-                                    return self.fail_phase(consumed, error);
-                                }
-                                if let Err(error) = put_state_byte(
-                                    self.workspace, self.window_bytes,
-                                    B3B_BLOCK_LENGTH_SUFFIX_WIDTH, width) {
-                                    return self.fail_phase(consumed, error);
-                                }
-                                if let Err(error) = put_state_byte(
-                                    self.workspace, self.window_bytes,
-                                    B3B_BLOCK_LENGTH_PHASE, 1) {
-                                    return self.fail_phase(consumed, error);
-                                }
-                            }
-                        }
+                        return advance_initial_symbol_phase(self.workspace, self.window_bytes, input, end_of_input);
                     } else if subphase == 1 {
                         let width = match state_byte(
                             self.workspace, self.window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) {
@@ -20003,7 +21533,6 @@ pub(crate) enum BodySymbolStatus {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct BodySymbolStep {
     pub(crate) consumed: usize,
-    pub(crate) work: u64,
     pub(crate) status: BodySymbolStatus,
 }
 
@@ -21690,6 +23219,35 @@ fn plan_bit_read(
     PlannedBitRead { consumed, work, complete }
 }
 
+// Option A, explicitly selected on 2026-11-03: each nested parser start/reset
+// is a separate transition. These functions name the existing W1/E1 actions.
+fn serialized_tree_start_work() -> (r: u64)
+    ensures r == 76 + 1,
+{ 76 + 1 }
+
+fn serialized_map_start_work() -> (r: u64)
+    // Context-map reset plus its VAR_UINT8 reset.
+    ensures r == 14 + 1 + 1,
+{ 14 + 1 + 1 }
+
+fn installed_prefix_reset_work() -> (r: u64)
+    ensures r == 5 + 1,
+{ 5 + 1 }
+
+fn group_tree_start_work() -> (r: u64)
+    // B3a start; group tree index/phase writes; group transition.
+    ensures r == 77 + 2 + 1 + 1,
+{ serialized_tree_start_work() + 2 + 1 + 1 }
+
+fn tree_group_start_work() -> (r: u64)
+    // Four group-image writes, group reset, first-tree action, outer write/step.
+    ensures r == 4 + 1 + 81 + 1 + 1,
+{ 4 + 1 + group_tree_start_work() + 1 + 1 }
+
+fn ready_switch_start_work() -> (r: u64)
+    ensures r == 28 + 1,
+{ 28 + 1 }
+
 fn block_count_base_execution_work(read_work: u64) -> (r: u64)
     requires read_work <= 63,
     ensures r == read_work + 10 + 2 + 1,
@@ -21707,13 +23265,13 @@ fn block_count_truncated_execution_work(read_work: u64) -> (r: u64)
 fn block_count_value_execution_work(read_work: u64, raw: u16) -> (r: u64)
     requires read_work <= 63, raw <= 255,
     ensures r == read_work + 10 + 2 + 1
-        + if raw == 0 { 7 + 1 } else { 2 + 76 + 1 + 1 },
+        + if raw == 0 { 7 + 1 } else { 2 + 77 + 1 + 1 },
 {
     let base = block_count_base_execution_work(read_work);
     if raw == 0 {
         base + 7 + 1
     } else {
-        base + 2 + 76 + 1 + 1
+        base + 2 + 77 + 1 + 1
     }
 }
 
@@ -21865,9 +23423,9 @@ fn plan_distance_action(
 }
 
 fn context_mode_complete_execution_work() -> (r: u64)
-    ensures r == 14 + 1 + 2,
+    ensures r == 14 + 1 + 1 + 1 + 1,
 {
-    14 + 1 + 2
+    serialized_map_start_work() + 1 + 1
 }
 
 fn context_mode_base_execution_work(read_work: u64) -> (r: u64)
@@ -21980,9 +23538,9 @@ fn initial_suffix_truncated_execution_work(read_work: u64) -> (r: u64)
 
 fn initial_suffix_value_execution_work(read_work: u64) -> (r: u64)
     requires read_work <= 63,
-    ensures r == read_work + 1 + 10 + 1 + 4 + 1 + 1 + 1,
+    ensures r == read_work + 1 + 10 + 1 + 2 + 4 + 1 + 1 + 1,
 {
-    initial_suffix_base_execution_work(read_work) + 4 + 1 + 1 + 1
+    initial_suffix_base_execution_work(read_work) + 2 + 4 + 1 + 1 + 1
 }
 
 fn initial_suffix_planning_work(
@@ -22005,63 +23563,1734 @@ fn initial_suffix_planning_work(
     ))
 }
 
-fn plan_initial_suffix_action(
-    workspace: &[u8],
-    window_bytes: u32,
-    input: &[u8],
-    end_of_input: bool,
-) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+fn plan_initial_suffix_action(workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: Result<CompressedActionPlan, CoreFailure>)
+    requires old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        r.is_ok() ==> r.unwrap().consumed <= input.len(),
+        r.is_ok() ==> final(budget).work_remaining == old(budget).work_remaining - r.unwrap().planning_work,
 {
-    let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
-    let subphase = state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_PHASE)?;
-    let symbol = state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_SYMBOL)?;
-    let width = state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH)?;
-    if kind >= 3 || subphase != 1 || symbol >= 26 || width > 24 {
-        return Err(CompressedHeaderError::InternalState);
+    let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND).map_err(map_compressed_error)?;
+    let subphase = state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_PHASE).map_err(map_compressed_error)?;
+    let symbol = state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_SYMBOL).map_err(map_compressed_error)?;
+    let width = state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH).map_err(map_compressed_error)?;
+    if kind >= 3 || subphase != 1 || symbol >= 26 {
+        return Ok(CompressedActionPlan { planning_work: 0, execution_work: 4 + 1, consumed: 0,
+            status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) });
     }
+    if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
     let expected_width = crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS[symbol as usize];
     if width != expected_width {
-        return Err(CompressedHeaderError::InternalState);
+        return Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 4 + 1, consumed: 0,
+            status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) });
     }
-    let mut queue = load_b3b_queue(workspace, window_bytes)?;
+    if width > 24 { return Err(core_state_failure()); }
+    let mut queue = match load_b3b_queue(workspace, window_bytes) {
+        Ok(value) => value,
+        Err(error) => return Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 4 + 1, consumed: 0,
+            status: Some(CompressedHeaderStatus::Failed(error)) }),
+    };
     let read_plan = plan_bit_read(queue, width as usize, input.len());
+    if !budget.charge_work(read_plan.work) { return Err(CoreFailure::ResourceLimit); }
     let read = queue.read_bits(width as usize, input, end_of_input);
-    if read.consumed != read_plan.consumed {
-        return Err(CompressedHeaderError::InternalState);
-    }
-    let planning_work = initial_suffix_planning_total(read_plan.work);
+    if read.consumed != read_plan.consumed { return Err(core_state_failure()); }
+    let mut planning_work = initial_suffix_planning_total(read_plan.work);
     let (execution_work, status) = match read.status {
-        BitReadStatus::NeedInput => (
-            initial_suffix_base_execution_work(read_plan.work),
-            Some(CompressedHeaderStatus::NeedInput),
-        ),
-        BitReadStatus::Truncated => (
-            initial_suffix_truncated_execution_work(read_plan.work),
-            Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
-        ),
+        BitReadStatus::NeedInput => (initial_suffix_base_execution_work(read_plan.work),
+            Some(CompressedHeaderStatus::NeedInput)),
+        BitReadStatus::Truncated => (initial_suffix_truncated_execution_work(read_plan.work),
+            Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))),
         BitReadStatus::Value(suffix) => {
+            // decode_block_length reads the offset and extra-width table cells.
+            if !budget.charge_work(2) { return Err(CoreFailure::ResourceLimit); }
+            planning_work += 2;
             let status = match crate::brotli_prefix::decode_block_length(symbol, suffix as u32) {
                 Ok(_) => None,
-                Err(_) => Some(CompressedHeaderStatus::Failed(
-                    CompressedHeaderError::InvalidFormat(
-                        CompressedFormatError::InvalidBlockLength,
-                    ),
-                )),
+                Err(_) => Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InvalidFormat(
+                    CompressedFormatError::InvalidBlockLength))),
             };
-            let work = if status.is_none() {
-                initial_suffix_value_execution_work(read_plan.work)
-            } else {
-                initial_suffix_truncated_execution_work(read_plan.work)
-            };
+            let work = if status.is_none() { initial_suffix_value_execution_work(read_plan.work) }
+                else { initial_suffix_truncated_execution_work(read_plan.work) + 2 };
             (work, status)
-        }
+        },
     };
-    Ok(CompressedActionPlan {
-        planning_work,
-        execution_work,
-        consumed: read.consumed,
-        status,
+    Ok(CompressedActionPlan { planning_work, execution_work, consumed: read.consumed, status })
+}
+
+
+// Read-only local replay of E2's installed-tree action. No field survives the call.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct InstalledSymbolPlan {
+    consumed: usize,
+    planning_work: u64,
+    status: InstalledSymbolStatus,
+    end_queue: BitQueue,
+    end_prefix: InstalledPrefixState,
+}
+
+fn replay_installed_symbol_plan(
+    workspace: &[u8],
+    window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion,
+    tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata,
+    budget: &mut crate::brotli::RequestBudget,
+    queue: &mut BitQueue,
+    prefix: &mut InstalledPrefixState,
+    input: &[u8],
+    end_of_input: bool,
+) -> (r: Result<InstalledSymbolStep, CoreFailure>)
+    requires old(budget).valid(), old(queue).valid(), old(prefix).valid(), meta.valid_for(region),
+    ensures
+        final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        r.is_ok() ==> (final(queue).valid()),
+        r.is_ok() ==> (final(prefix).valid()),
+        r.is_ok() ==> (r.unwrap().consumed <= input.len()),
+
+        r.is_ok() ==> (r.unwrap().status == InstalledSymbolStatus::NeedInput ==> {
+            &&& !end_of_input
+            &&& r.unwrap().consumed == input.len()
+        }),
+        r.is_ok() ==> (match r.unwrap().status {
+            InstalledSymbolStatus::Symbol(symbol) => {
+                &&& symbol < meta.symbols
+                &&& *final(prefix) == InstalledPrefixState { width: 0, bits: 0, scan: 0 }
+            },
+            InstalledSymbolStatus::Truncated
+            | InstalledSymbolStatus::InvalidPrefixCode
+            | InstalledSymbolStatus::InternalState =>
+                *final(prefix) == InstalledPrefixState { width: 0, bits: 0, scan: 0 },
+            _ => true,
+        }),
+        r.is_ok() ==> (meta.storage == crate::brotli_prefix::TreeStorageState::Unused ==> {
+            &&& r.unwrap().consumed == 0
+
+            &&& r.unwrap().status == InstalledSymbolStatus::InternalState
+            &&& *final(queue) == *old(queue)
+        }),
+        r.is_ok() ==> (match meta.storage {
+            crate::brotli_prefix::TreeStorageState::Single { symbol } => {
+                &&& r.unwrap().consumed == 0
+
+                &&& *final(queue) == *old(queue)
+                &&& if old(prefix).width == 0
+                    && old(prefix).bits == 0
+                    && old(prefix).scan == 0
+                    && symbol < meta.symbols {
+                    r.unwrap().status == InstalledSymbolStatus::Symbol(symbol)
+                } else {
+                    r.unwrap().status == InstalledSymbolStatus::InternalState
+                }
+            },
+            _ => true,
+        }),
+        r.is_ok() ==> (match meta.storage {
+            crate::brotli_prefix::TreeStorageState::Canonical { initialized } => {
+                &&& (initialized != meta.symbols ==> {
+                    &&& r.unwrap().consumed == 0
+
+                    &&& r.unwrap().status == InstalledSymbolStatus::InternalState
+                    &&& *final(queue) == *old(queue)
+                })
+                &&& (initialized == meta.symbols ==> installed_canonical_step(
+                    workspace@,
+                    window_bytes,
+                    region,
+                    tree,
+                    meta,
+                    *old(queue),
+                    *old(prefix),
+                    input@,
+                    end_of_input,
+                    r.unwrap(),
+                    *final(queue),
+                    *final(prefix),
+                ))
+            },
+            _ => true,
+        }),
+        r.is_ok() ==> (installed_tree_step_refines(
+            workspace@,
+            window_bytes,
+            region,
+            tree,
+            meta,
+            *old(queue),
+            *old(prefix),
+            input@,
+            end_of_input,
+            r.unwrap(),
+            *final(queue),
+            *final(prefix),
+        )),
+
+        r.is_ok() ==> {
+            &&& installed_symbol_full_step(workspace@, window_bytes, region, tree, meta,
+                *old(queue), *old(prefix), input@, end_of_input, r.unwrap(), *final(queue), *final(prefix),
+                (old(budget).work_remaining - final(budget).work_remaining) as nat)
+            &&& old(budget).work_remaining - final(budget).work_remaining >= r.unwrap().consumed
+            &&& old(budget).work_remaining - final(budget).work_remaining <= 10_575 + r.unwrap().consumed as nat
+        },
+
+{
+    reveal(installed_symbol_full_step);
+    let ghost start_queue = *queue;
+    let ghost start_prefix = *prefix;
+    match meta.storage {
+        crate::brotli_prefix::TreeStorageState::Unused => {
+            *prefix = InstalledPrefixState::initial();
+            return Ok(InstalledSymbolStep { consumed: 0, status: InstalledSymbolStatus::InternalState });
+        }
+        crate::brotli_prefix::TreeStorageState::Single { symbol } => {
+            if prefix.width != 0 || prefix.bits != 0 || prefix.scan != 0
+                || symbol >= meta.symbols {
+                *prefix = InstalledPrefixState::initial();
+                return Ok(InstalledSymbolStep { consumed: 0, status: InstalledSymbolStatus::InternalState });
+            }
+            return Ok(InstalledSymbolStep { consumed: 0, status: InstalledSymbolStatus::Symbol(symbol) });
+        }
+        crate::brotli_prefix::TreeStorageState::Canonical { initialized } => {
+            if initialized != meta.symbols {
+                *prefix = InstalledPrefixState::initial();
+                return Ok(InstalledSymbolStep { consumed: 0, status: InstalledSymbolStatus::InternalState });
+            }
+        }
+    }
+
+    let mut consumed: usize = 0;
+    let mut iterations: u8 = 0;
+    let ghost mut exact_work: u64 = 0;
+    let ghost mut accepted = Seq::<u8>::empty();
+    proof {
+        reveal(installed_symbol_progress);
+        reveal(bit_queue_read_image);
+        reveal(installed_prefix_value);
+        reveal(installed_no_earlier_match);
+        reveal(installed_no_earlier_stop);
+        reveal(input_bytes_taken);
+        reveal(input_bytes_needed);
+        assert(input@.take(0) =~= Seq::<u8>::empty());
+        reveal_with_fuel(bytes_bits, 2);
+        reveal_with_fuel(bits_value, 2);
+        assert(bytes_bits(input@.take(0)) =~= Seq::<u8>::empty());
+        assert(start_queue.bits() + bytes_bits(input@.take(0))
+            =~= start_queue.bits());
+        assert((start_queue.bits() + bytes_bits(input@.take(0))).take(0)
+            =~= Seq::<u8>::empty());
+        assert(bits_value((start_queue.bits() + bytes_bits(input@.take(0))).take(0)) == 0);
+        assert(installed_prefix_value(
+            start_prefix,
+            (start_queue.bits() + bytes_bits(input@.take(0))).take(0),
+        ) == start_prefix.bits as nat);
+        assert(start_queue.bits().skip(0) == start_queue.bits());
+        assert(installed_no_earlier_match(
+            workspace@,
+            window_bytes,
+            region,
+            tree,
+            meta,
+            start_prefix,
+            start_queue.bits(),
+            1,
+        ));
+        assert(installed_symbol_progress(
+            workspace@,
+            window_bytes,
+            region,
+            tree,
+            meta,
+            start_queue,
+            start_prefix,
+            input@,
+            consumed,
+            accepted,
+            *queue,
+            *prefix,
+        ));
+    }
+    while iterations < 15
+        invariant budget.valid(), budget.limits == old(budget).limits,
+            budget.work_remaining <= old(budget).work_remaining,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            consumed <= input.len(), iterations <= 15,
+            budget.work_remaining as int == old(budget).work_remaining as int
+                - exact_work as int - consumed as int,
+            exact_work == iterations as u64 * (meta.symbols as u64 + 1),
+            exact_work <= 10_575,
+            meta.symbols <= 704,
+            queue.valid(), prefix.valid(), meta.valid_for(region),
+            meta.storage == (crate::brotli_prefix::TreeStorageState::Canonical {
+                initialized: meta.symbols,
+            }),
+            start_queue == *old(queue), start_prefix == *old(prefix),
+            start_queue.valid(), start_prefix.valid(),
+            start_prefix.width as nat + iterations as nat <= 15,
+            accepted.len() == iterations,
+            bit_queue_read_image(start_queue, input@, consumed, accepted.len(), *queue),
+            installed_no_earlier_stop(workspace@, window_bytes, region, tree, meta,
+                start_prefix, accepted, accepted.len() as int + 1),
+            forall|i: int| 0 <= i < accepted.len() ==> accepted[i] <= 1,
+            installed_symbol_progress(
+                workspace@,
+                window_bytes,
+                region,
+                tree,
+                meta,
+                start_queue,
+                start_prefix,
+                input@,
+                consumed,
+                accepted,
+                *queue,
+                *prefix,
+            ),
+        decreases 15 - iterations,
+    {
+        let ghost old_consumed = consumed;
+        let ghost before_queue = *queue;
+        let ghost before_accepted = accepted;
+        let ghost before_source = start_queue.bits()
+            + bytes_bits(input@.take(consumed as int));
+        let remaining_input = &input[consumed..];
+        assert(exact_work < 10_575) by (nonlinear_arith)
+            requires
+                exact_work == iterations as u64 * (meta.symbols as u64 + 1),
+                iterations < 15,
+                meta.symbols <= 704;
+        proof { exact_work = (exact_work + 1) as u64; }
+        let read_plan = plan_bit_read(*queue, 1, remaining_input.len());
+        if !budget.charge_work(read_plan.work) { return Err(CoreFailure::ResourceLimit); }
+        let read = queue.read_bits(1, remaining_input, end_of_input);
+        proof {
+            bit_queue_read_images_compose(start_queue, input@, old_consumed,
+                before_accepted.len(), before_queue, read.consumed,
+                if matches!(read.status, BitReadStatus::Value(_)) { 1nat } else { 0nat }, *queue);
+        }
+        proof {
+            assert(read.consumed == read_plan.consumed);
+            bytes_bits_len(remaining_input@.take(read.consumed as int));
+            match read.status {
+                BitReadStatus::Value(_) => { assert(read_plan.complete); },
+                _ => {
+                    bytes_bits_len(remaining_input@);
+                    assert(read.consumed == 0);
+                    assert(!read_plan.complete);
+                },
+            }
+        }
+        let bit = match read.status {
+            BitReadStatus::Value(value) => {
+                proof {
+                    lemma2_to64();
+                    assert(value < 2);
+                    installed_one_bit_fits(value);
+                }
+                value as u16
+            },
+            BitReadStatus::NeedInput => {
+                proof {
+                    reveal(installed_symbol_progress);
+                    reveal(installed_symbol_suspended);
+                    reveal(installed_symbol_exhausted);
+                    let remaining = input@.skip(old_consumed as int);
+                    assert(remaining_input@ =~= remaining);
+                    assert(read.consumed == remaining_input.len());
+                    assert(queue.bits()
+                        == before_queue.bits() + bytes_bits(remaining));
+                    assert(queue.bits().len() < 1);
+                    assert(queue.bits().len() == 0);
+                    assert(before_queue.bits() + bytes_bits(remaining)
+                        =~= Seq::<u8>::empty());
+                    bytes_bits_extend_take(
+                        input@,
+                        old_consumed as int,
+                        read.consumed as int,
+                    );
+                    assert(old_consumed + read.consumed == input.len());
+                    assert(input@.take(
+                        old_consumed as int + read.consumed as int,
+                    ) =~= input@);
+                    assert(bytes_bits(input@)
+                        == bytes_bits(input@.take(old_consumed as int))
+                            + bytes_bits(remaining));
+                    assert(before_source == before_accepted + before_queue.bits());
+                    assert(start_queue.bits() + bytes_bits(input@)
+                        =~= before_source + bytes_bits(remaining));
+                    assert(start_queue.bits() + bytes_bits(input@)
+                        =~= before_accepted);
+                    assert(installed_symbol_suspended(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        start_queue,
+                        start_prefix,
+                        input@,
+                        *queue,
+                        *prefix,
+                    ));
+                }
+                let result = InstalledSymbolStep {
+                    consumed: consumed + read.consumed,
+                    status: InstalledSymbolStatus::NeedInput,
+                };
+                proof {
+                    reveal(installed_canonical_step);
+                    assert(installed_canonical_step(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        start_queue,
+                        start_prefix,
+                        input@,
+                        end_of_input,
+                        result,
+                        *queue,
+                        *prefix,
+                    ));
+                }
+                proof {
+                    reveal(installed_scan_no_stop); reveal(installed_record_bad);
+                    reveal(installed_record_readable);
+                    if let InstalledSymbolStatus::Symbol(selected) = result.status {
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + selected as int + 2);
+                    }
+                    if result.status == InstalledSymbolStatus::InvalidPrefixCode {
+                        installed_full_scan_sum(iterations as nat, meta.symbols as nat, exact_work as nat);
+                        assert(exact_work as nat == accepted.len() * (meta.symbols as nat + 1));
+                    }
+                    establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+                }
+                return Ok(result);
+            },
+            BitReadStatus::Truncated => {
+                proof {
+                    reveal(installed_canonical_step);
+                    reveal(installed_symbol_progress);
+                    reveal(installed_symbol_exhausted);
+                    let remaining = input@.skip(old_consumed as int);
+                    assert(remaining_input@ =~= remaining);
+                    assert(read.consumed == remaining_input.len());
+                    assert(queue.bits()
+                        == before_queue.bits() + bytes_bits(remaining));
+                    assert(queue.bits().len() < 1);
+                    assert(queue.bits().len() == 0);
+                    assert(before_queue.bits() + bytes_bits(remaining)
+                        =~= Seq::<u8>::empty());
+                    bytes_bits_extend_take(
+                        input@,
+                        old_consumed as int,
+                        read.consumed as int,
+                    );
+                    assert(old_consumed + read.consumed == input.len());
+                    assert(input@.take(
+                        old_consumed as int + read.consumed as int,
+                    ) =~= input@);
+                    assert(bytes_bits(input@)
+                        == bytes_bits(input@.take(old_consumed as int))
+                            + bytes_bits(remaining));
+                    assert(before_source == before_accepted + before_queue.bits());
+                    assert(start_queue.bits() + bytes_bits(input@)
+                        =~= before_source + bytes_bits(remaining));
+                    assert(start_queue.bits() + bytes_bits(input@)
+                        =~= before_accepted);
+                    assert(installed_symbol_exhausted(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        start_queue,
+                        start_prefix,
+                        input@,
+                        *queue,
+                    ));
+                }
+                *prefix = InstalledPrefixState::initial();
+                let result = InstalledSymbolStep {
+                    consumed: consumed + read.consumed,
+                    status: InstalledSymbolStatus::Truncated,
+                };
+                proof {
+                    assert(installed_canonical_step(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        start_queue,
+                        start_prefix,
+                        input@,
+                        end_of_input,
+                        result,
+                        *queue,
+                        *prefix,
+                    ));
+                }
+                proof {
+                    reveal(installed_scan_no_stop); reveal(installed_record_bad);
+                    reveal(installed_record_readable);
+                    if let InstalledSymbolStatus::Symbol(selected) = result.status {
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + selected as int + 2);
+                    }
+                    if result.status == InstalledSymbolStatus::InvalidPrefixCode {
+                        installed_full_scan_sum(iterations as nat, meta.symbols as nat, exact_work as nat);
+                        assert(exact_work as nat == accepted.len() * (meta.symbols as nat + 1));
+                    }
+                    establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+                }
+                return Ok(result);
+            }
+        };
+        consumed = consumed + read.consumed;
+        let old_width = prefix.width;
+        let next_width = old_width + 1;
+        let next_bits = prefix.bits | (bit << old_width);
+        proof {
+            append_installed_bit_fits(prefix.bits, old_width, bit);
+            append_installed_bit_value(prefix.bits, old_width, bit);
+            pow2_matches_installed_shift(old_width);
+            reveal(installed_symbol_progress);
+            let remaining = input@.skip(old_consumed as int);
+            assert(remaining_input@ =~= remaining);
+            reveal(input_bytes_taken);
+            reveal(input_bytes_needed);
+            assert(read.consumed <= 1);
+            bytes_bits_extend_take(
+                input@,
+                old_consumed as int,
+                read.consumed as int,
+            );
+            assert(input@.subrange(
+                old_consumed as int,
+                old_consumed as int + read.consumed as int,
+            ) =~= remaining.take(read.consumed as int));
+            assert(bytes_bits(input@.take(consumed as int))
+                == bytes_bits(input@.take(old_consumed as int))
+                    + bytes_bits(remaining.take(read.consumed as int)));
+            let local_source = before_queue.bits()
+                + bytes_bits(remaining.take(read.consumed as int));
+            let after_source = start_queue.bits()
+                + bytes_bits(input@.take(consumed as int));
+            assert(before_source == before_accepted + before_queue.bits());
+            assert(after_source =~= before_accepted + local_source);
+            assert(local_source.len() >= 1);
+            assert(queue.bits() == local_source.skip(1));
+            assert(bit as nat == bits_value(local_source.take(1)));
+            assert(local_source.take(1) =~= seq![bit as u8]) by {
+                assert(local_source.take(1).len() == 1);
+                assert(local_source.take(1)[0] == bit as u8);
+            }
+            assert(local_source =~= local_source.take(1) + local_source.skip(1));
+            assert(after_source =~= (before_accepted + seq![bit as u8]) + queue.bits());
+            bytes_bits_len(input@.take(old_consumed as int));
+            bytes_bits_len(input@.take(consumed as int));
+            assert(before_source.len()
+                == start_queue.bits().len() + 8 * old_consumed as nat);
+            assert(before_source.len()
+                == before_accepted.len() + before_queue.bits().len());
+            assert(before_queue.bits().len()
+                == start_queue.bits().len() + 8 * old_consumed as nat
+                    - before_accepted.len());
+            assert(remaining.len() == input.len() - old_consumed);
+            input_bytes_taken_one_more(
+                start_queue.bits().len(),
+                before_accepted.len(),
+                input.len() as nat,
+                old_consumed as nat,
+                before_queue.bits().len(),
+                read.consumed as nat,
+            );
+            bits_value_push(before_accepted, bit as u8);
+            pow2_add(start_prefix.width as nat, before_accepted.len());
+            reveal(installed_prefix_value);
+            assert(prefix.bits as nat == installed_prefix_value(
+                start_prefix,
+                before_accepted,
+            ));
+            assert(prefix.width as nat
+                == start_prefix.width as nat + before_accepted.len());
+            assert(pow2(prefix.width as nat)
+                == pow2(start_prefix.width as nat) * pow2(before_accepted.len()));
+            assert(next_bits as nat == installed_prefix_value(
+                start_prefix,
+                before_accepted + seq![bit as u8],
+            )) by (nonlinear_arith)
+                requires
+                    next_bits as nat == prefix.bits as nat
+                        + bit as nat * pow2(prefix.width as nat),
+                    prefix.bits as nat == installed_prefix_value(
+                        start_prefix,
+                        before_accepted,
+                    ),
+                    bits_value(before_accepted + seq![bit as u8])
+                        == bits_value(before_accepted)
+                            + bit as nat * pow2(before_accepted.len()),
+                    pow2(prefix.width as nat)
+                        == pow2(start_prefix.width as nat)
+                            * pow2(before_accepted.len());
+            assert(next_bits as nat == installed_prefix_value(
+                start_prefix,
+                before_accepted + seq![bit as u8],
+            ));
+            accepted = before_accepted + seq![bit as u8];
+            assert(accepted.take(before_accepted.len() as int) =~= before_accepted);
+            installed_stop_prefix_extend(workspace@, window_bytes, region, tree, meta,
+                start_prefix, before_accepted, accepted, accepted.len() as int);
+            reveal(installed_no_earlier_match);
+            assert(installed_no_earlier_match(
+                workspace@,
+                window_bytes,
+                region,
+                tree,
+                meta,
+                start_prefix,
+                accepted,
+                accepted.len() as int,
+            )) by {
+                assert forall|used: int| 1 <= used < accepted.len() implies
+                    installed_no_match(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        (start_prefix.width as int + used) as u8,
+                        installed_prefix_value(start_prefix, accepted.take(used)),
+                    ) by {
+                    assert(used <= before_accepted.len());
+                    assert(accepted.take(used) =~= before_accepted.take(used));
+                }
+            }
+        }
+        let mut symbol: u16 = 0;
+        while symbol < meta.symbols
+            invariant budget.valid(), budget.limits == old(budget).limits,
+                budget.work_remaining <= old(budget).work_remaining,
+                budget.input_remaining == old(budget).input_remaining,
+                budget.output_remaining == old(budget).output_remaining,
+                budget.calls_remaining == old(budget).calls_remaining,
+                budget.initializations_remaining == old(budget).initializations_remaining,
+                symbol <= meta.symbols, meta.valid_for(region),
+                budget.work_remaining as int == old(budget).work_remaining as int
+                    - exact_work as int - consumed as int,
+                exact_work == iterations as u64 * (meta.symbols as u64 + 1)
+                    + 1 + symbol as u64,
+                exact_work <= 10_575,
+                meta.symbols <= 704,
+                meta.storage == (crate::brotli_prefix::TreeStorageState::Canonical {
+                    initialized: meta.symbols,
+                }),
+                start_queue == *old(queue), start_prefix == *old(prefix),
+                queue.valid(), prefix.valid(), consumed <= input.len(),
+                1 <= next_width <= 15,
+                next_bits < (1u16 << next_width),
+                accepted.len() == iterations as nat + 1,
+                bit_queue_read_image(start_queue, input@, consumed, accepted.len(), *queue),
+                installed_no_earlier_stop(workspace@, window_bytes, region, tree, meta,
+                    start_prefix, accepted, accepted.len() as int),
+                forall|earlier: int| 0 <= earlier < symbol ==> !#[trigger]
+                    installed_record_stops(workspace@, window_bytes, region, tree, meta,
+                        next_width, next_bits as nat, earlier),
+                forall|i: int| 0 <= i < accepted.len() ==> accepted[i] <= 1,
+                start_queue.bits() + bytes_bits(input@.take(consumed as int))
+                    == accepted + queue.bits(),
+                consumed as nat == input_bytes_taken(
+                    start_queue.bits().len(),
+                    accepted.len(),
+                    input.len() as nat,
+                ),
+                next_width as nat == start_prefix.width as nat + accepted.len(),
+                next_bits as nat == installed_prefix_value(start_prefix, accepted),
+                installed_no_earlier_match(
+                    workspace@,
+                    window_bytes,
+                    region,
+                    tree,
+                    meta,
+                    start_prefix,
+                    accepted,
+                    accepted.len() as int,
+                ),
+                forall|earlier: int| 0 <= earlier < symbol ==>
+                    #[trigger] installed_record_matches(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        next_width,
+                        next_bits as nat,
+                        earlier,
+                    ) == false,
+            decreases meta.symbols - symbol,
+        {
+            assert(exact_work < 10_575) by (nonlinear_arith)
+                requires
+                    exact_work == iterations as u64 * (meta.symbols as u64 + 1)
+                        + 1 + symbol as u64,
+                    iterations < 15,
+                    symbol < meta.symbols,
+                    meta.symbols <= 704;
+            proof { exact_work = (exact_work + 1) as u64; }
+            if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+            let record = match crate::brotli_prefix::read_tree_record(
+                workspace,
+                window_bytes,
+                region,
+                tree,
+                &meta,
+                symbol,
+            ) {
+                Ok(value) => value,
+                Err(_) => {
+                    *prefix = InstalledPrefixState::initial();
+                    let result = InstalledSymbolStep { consumed, status: InstalledSymbolStatus::InternalState };
+                    proof {
+                        reveal(installed_record_bad); reveal(installed_record_readable);
+                        reveal(installed_scan_no_stop);
+                        pow2_matches_installed_shift(next_width);
+                        assert(installed_record_bad(workspace@, window_bytes, region, tree, meta, next_width, symbol as int));
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + symbol as int + 2);
+                        establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                            start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                            accepted, symbol, installed_read_units(exact_work, consumed, result.status));
+                    }
+                    return Ok(result);
+                }
+            };
+            if record.length == next_width && record.length != 0 {
+                if record.code >= (1u16 << next_width) {
+                    *prefix = InstalledPrefixState::initial();
+                    let result = InstalledSymbolStep { consumed, status: InstalledSymbolStatus::InternalState };
+                    proof {
+                        reveal(installed_record_bad); reveal(installed_record_readable);
+                        reveal(installed_scan_no_stop);
+                        pow2_matches_installed_shift(next_width);
+                        assert(installed_record_bad(workspace@, window_bytes, region, tree, meta, next_width, symbol as int));
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + symbol as int + 2);
+                        establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                            start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                            accepted, symbol, installed_read_units(exact_work, consumed, result.status));
+                    }
+                    return Ok(result);
+                }
+                proof { pow2_matches_installed_shift(next_width); }
+                let reversed = reverse_installed_code(record.code, next_width);
+                if reversed == next_bits {
+                    proof {
+                        reveal(installed_record_matches);
+                        let at = crate::brotli_prefix::tree_record_at(
+                            window_bytes,
+                            region,
+                            tree,
+                            symbol,
+                        );
+                        assert(record.length == workspace@[at as int]);
+                        assert(record.code as nat
+                            == crate::brotli_prefix::little_u16_at(workspace@, at + 1));
+                        assert(installed_record_matches(
+                            workspace@,
+                            window_bytes,
+                            region,
+                            tree,
+                            meta,
+                            next_width,
+                            next_bits as nat,
+                            symbol as int,
+                        ));
+                        reveal(installed_symbol_success);
+                        assert(installed_symbol_success(
+                            workspace@,
+                            window_bytes,
+                            region,
+                            tree,
+                            meta,
+                            start_queue,
+                            start_prefix,
+                            input@,
+                            consumed,
+                            *queue,
+                            symbol,
+                        )) by {
+                            let used = accepted.len() as int;
+                            let source = start_queue.bits()
+                                + bytes_bits(input@.take(consumed as int));
+                            assert(1 <= used <= 15 - start_prefix.width);
+                            assert(used <= source.len());
+                            assert(source == accepted + queue.bits());
+                            assert(source.take(used) =~= accepted);
+                            assert(source.skip(used) =~= queue.bits());
+                            assert(installed_no_earlier_match(
+                                workspace@,
+                                window_bytes,
+                                region,
+                                tree,
+                                meta,
+                                start_prefix,
+                                source,
+                                used,
+                            )) by {
+                                reveal(installed_no_earlier_match);
+                                assert forall|prior: int| 1 <= prior < used implies
+                                    installed_no_match(
+                                        workspace@,
+                                        window_bytes,
+                                        region,
+                                        tree,
+                                        meta,
+                                        (start_prefix.width as int + prior) as u8,
+                                        installed_prefix_value(
+                                            start_prefix,
+                                            source.take(prior),
+                                        ),
+                                    ) by {
+                                    assert(source.take(prior) =~= accepted.take(prior));
+                                }
+                            }
+                            assert(installed_prefix_value(start_prefix, source.take(used))
+                                == next_bits as nat);
+                            assert(exists|candidate: int| #![trigger installed_prefix_value(
+                                start_prefix,
+                                (start_queue.bits()
+                                    + bytes_bits(input@.take(consumed as int))).take(candidate),
+                            )] candidate == used && {
+                                let candidate_source = start_queue.bits()
+                                    + bytes_bits(input@.take(consumed as int));
+                                &&& 1 <= candidate <= 15 - start_prefix.width
+                                &&& candidate <= candidate_source.len()
+                                &&& consumed as nat == input_bytes_taken(
+                                    start_queue.bits().len(),
+                                    candidate as nat,
+                                    input.len() as nat,
+                                )
+                                &&& queue.bits() == candidate_source.skip(candidate)
+                                &&& installed_no_earlier_match(
+                                    workspace@,
+                                    window_bytes,
+                                    region,
+                                    tree,
+                                    meta,
+                                    start_prefix,
+                                    candidate_source,
+                                    candidate,
+                                )
+                                &&& installed_record_matches(
+                                    workspace@,
+                                    window_bytes,
+                                    region,
+                                    tree,
+                                    meta,
+                                    (start_prefix.width as int + candidate) as u8,
+                                    installed_prefix_value(
+                                        start_prefix,
+                                        candidate_source.take(candidate),
+                                    ),
+                                    symbol as int,
+                                )
+                                &&& forall|earlier: int| 0 <= earlier < symbol ==>
+                                    #[trigger] installed_record_matches(
+                                        workspace@,
+                                        window_bytes,
+                                        region,
+                                        tree,
+                                        meta,
+                                        (start_prefix.width as int + candidate) as u8,
+                                        installed_prefix_value(
+                                            start_prefix,
+                                            candidate_source.take(candidate),
+                                        ),
+                                        earlier,
+                                    ) == false
+                            });
+                        }
+                    }
+                    *prefix = InstalledPrefixState::initial();
+                    proof {
+                        assert(meta.storage == (crate::brotli_prefix::TreeStorageState::Canonical {
+                            initialized: meta.symbols,
+                        }));
+                        assert(installed_symbol_success(
+                            workspace@,
+                            window_bytes,
+                            region,
+                            tree,
+                            meta,
+                            start_queue,
+                            start_prefix,
+                            input@,
+                            consumed,
+                            *queue,
+                            symbol,
+                        ));
+                        assert(*prefix == InstalledPrefixState {
+                            width: 0,
+                            bits: 0,
+                            scan: 0,
+                        });
+                    }
+                    let result = InstalledSymbolStep {
+                        consumed,
+                        status: InstalledSymbolStatus::Symbol(symbol),
+                    };
+                    proof {
+                        reveal(installed_canonical_step);
+                        assert(installed_tree_step_refines(
+                            workspace@,
+                            window_bytes,
+                            region,
+                            tree,
+                            meta,
+                            start_queue,
+                            start_prefix,
+                            input@,
+                            end_of_input,
+                            result,
+                            *queue,
+                            *prefix,
+                        ));
+                    }
+                    proof {
+                    reveal(installed_scan_no_stop); reveal(installed_record_bad);
+                    reveal(installed_record_readable);
+                    if let InstalledSymbolStatus::Symbol(selected) = result.status {
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + selected as int + 2);
+                    }
+                    if result.status == InstalledSymbolStatus::InvalidPrefixCode {
+                        installed_full_scan_sum(iterations as nat, meta.symbols as nat, exact_work as nat);
+                        assert(exact_work as nat == accepted.len() * (meta.symbols as nat + 1));
+                    }
+                    establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+                }
+                return Ok(result);
+                }
+                proof {
+                    reveal(installed_record_matches);
+                    let at = crate::brotli_prefix::tree_record_at(
+                        window_bytes,
+                        region,
+                        tree,
+                        symbol,
+                    );
+                    assert(record.code as nat
+                        == crate::brotli_prefix::little_u16_at(workspace@, at + 1));
+                    assert(installed_record_matches(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        next_width,
+                        next_bits as nat,
+                        symbol as int,
+                    ) == false);
+                }
+            } else {
+                proof {
+                    reveal(installed_record_matches);
+                    let at = crate::brotli_prefix::tree_record_at(
+                        window_bytes,
+                        region,
+                        tree,
+                        symbol,
+                    );
+                    assert(record.length == workspace@[at as int]);
+                    assert(installed_record_matches(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        next_width,
+                        next_bits as nat,
+                        symbol as int,
+                    ) == false);
+                }
+            }
+            proof {
+                reveal(installed_record_stops); reveal(installed_record_bad);
+                reveal(installed_record_readable);
+                assert(!installed_record_bad(workspace@, window_bytes, region, tree, meta, next_width, symbol as int));
+                assert(!installed_record_stops(workspace@, window_bytes, region, tree, meta, next_width, next_bits as nat, symbol as int));
+            }
+            symbol = symbol + 1;
+        }
+        proof {
+            reveal(installed_no_match);
+            assert(installed_no_match(
+                workspace@,
+                window_bytes,
+                region,
+                tree,
+                meta,
+                next_width,
+                next_bits as nat,
+            ));
+            reveal(installed_no_earlier_match);
+            assert(installed_no_earlier_match(
+                workspace@,
+                window_bytes,
+                region,
+                tree,
+                meta,
+                start_prefix,
+                accepted,
+                accepted.len() as int + 1,
+            )) by {
+                assert forall|used: int| 1 <= used < accepted.len() + 1 implies
+                    installed_no_match(
+                        workspace@,
+                        window_bytes,
+                        region,
+                        tree,
+                        meta,
+                        (start_prefix.width as int + used) as u8,
+                        installed_prefix_value(start_prefix, accepted.take(used)),
+                    ) by {
+                    if used < accepted.len() {
+                    } else {
+                        assert(used == accepted.len());
+                        assert(accepted.take(used) =~= accepted);
+                        assert((start_prefix.width as int + used) as u8 == next_width);
+                        assert(installed_prefix_value(start_prefix, accepted) == next_bits as nat);
+                    }
+                }
+            }
+        }
+        proof {
+            reveal(installed_scan_no_stop); reveal(installed_no_earlier_stop);
+            assert(installed_scan_no_stop(workspace@, window_bytes, region, tree, meta,
+                next_width, next_bits as nat, meta.symbols as int));
+            assert forall|used: int| 1 <= used < accepted.len() + 1 implies installed_scan_no_stop(
+                workspace@, window_bytes, region, tree, meta, (start_prefix.width as int + used) as u8,
+                installed_prefix_value(start_prefix, accepted.take(used)), meta.symbols as int) by {
+                if used == accepted.len() {
+                    assert(accepted.take(used) =~= accepted);
+                }
+            }
+        }
+        if next_width == 15 {
+            proof {
+                reveal(installed_symbol_invalid_prefix);
+                let used = 15 - start_prefix.width as int;
+                let source = start_queue.bits()
+                    + bytes_bits(input@.take(consumed as int));
+                assert(used == accepted.len());
+                assert(1 <= used <= 15);
+                assert(source == accepted + queue.bits());
+                assert(used <= source.len());
+                assert(source.take(used) =~= accepted);
+                assert(source.skip(used) =~= queue.bits());
+                assert(consumed as nat == input_bytes_taken(
+                    start_queue.bits().len(),
+                    used as nat,
+                    input.len() as nat,
+                ));
+                assert(installed_no_earlier_match(
+                    workspace@,
+                    window_bytes,
+                    region,
+                    tree,
+                    meta,
+                    start_prefix,
+                    source,
+                    used + 1,
+                )) by {
+                    reveal(installed_no_earlier_match);
+                    assert forall|prior: int| 1 <= prior < used + 1 implies
+                        installed_no_match(
+                            workspace@,
+                            window_bytes,
+                            region,
+                            tree,
+                            meta,
+                            (start_prefix.width as int + prior) as u8,
+                            installed_prefix_value(start_prefix, source.take(prior)),
+                        ) by {
+                        assert(prior <= used);
+                        assert(source.take(prior) =~= accepted.take(prior));
+                    }
+                }
+                assert(installed_symbol_invalid_prefix(
+                    workspace@,
+                    window_bytes,
+                    region,
+                    tree,
+                    meta,
+                    start_queue,
+                    start_prefix,
+                    input@,
+                    consumed,
+                    *queue,
+                ));
+            }
+            *prefix = InstalledPrefixState::initial();
+            let result = InstalledSymbolStep {
+                consumed,
+                status: InstalledSymbolStatus::InvalidPrefixCode,
+            };
+            proof {
+                reveal(installed_canonical_step);
+                assert(installed_canonical_step(
+                    workspace@,
+                    window_bytes,
+                    region,
+                    tree,
+                    meta,
+                    start_queue,
+                    start_prefix,
+                    input@,
+                    end_of_input,
+                    result,
+                    *queue,
+                    *prefix,
+                ));
+            }
+            proof {
+                    reveal(installed_scan_no_stop); reveal(installed_record_bad);
+                    reveal(installed_record_readable);
+                    if let InstalledSymbolStatus::Symbol(selected) = result.status {
+                        assert(exact_work as int == (accepted.len() as int - 1)
+                            * (meta.symbols as int + 1) + selected as int + 2);
+                    }
+                    if result.status == InstalledSymbolStatus::InvalidPrefixCode {
+                        installed_full_scan_sum(iterations as nat, meta.symbols as nat, exact_work as nat);
+                        assert(exact_work as nat == accepted.len() * (meta.symbols as nat + 1));
+                    }
+                    establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+                        start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+                        accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+                }
+                return Ok(result);
+        }
+        prefix.width = next_width;
+        prefix.bits = next_bits;
+        prefix.scan = 0;
+        proof {
+            assert(symbol == meta.symbols);
+            assert(exact_work
+                == (iterations as u64 + 1) * (meta.symbols as u64 + 1))
+                by (nonlinear_arith)
+                requires exact_work
+                    == iterations as u64 * (meta.symbols as u64 + 1)
+                        + 1 + meta.symbols as u64;
+        }
+        iterations = iterations + 1;
+    }
+    *prefix = InstalledPrefixState::initial();
+    proof { assert(false); }
+    Ok(InstalledSymbolStep {
+        consumed,
+        status: InstalledSymbolStatus::InternalState,
     })
+}
+
+fn plan_installed_symbol(
+    workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata,
+    mut queue: BitQueue, mut prefix: InstalledPrefixState,
+    input: &[u8], end_of_input: bool,
+) -> (r: Result<InstalledSymbolPlan, CoreFailure>)
+    requires old(budget).valid(), queue.valid(), prefix.valid(), meta.valid_for(region),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        r.is_ok() ==> {
+            &&& r.unwrap().consumed <= input.len()
+            &&& r.unwrap().end_queue.valid()
+            &&& r.unwrap().end_prefix.valid()
+            &&& r.unwrap().planning_work >= r.unwrap().consumed as nat
+            &&& installed_symbol_full_step(workspace@, window_bytes, region, tree, meta,
+                queue, prefix, input@, end_of_input,
+                InstalledSymbolStep { consumed: r.unwrap().consumed, status: r.unwrap().status },
+                r.unwrap().end_queue, r.unwrap().end_prefix, r.unwrap().planning_work as nat)
+            &&& installed_tree_step_refines(workspace@, window_bytes, region, tree, meta,
+                queue, prefix, input@, end_of_input,
+                InstalledSymbolStep { consumed: r.unwrap().consumed, status: r.unwrap().status },
+                r.unwrap().end_queue, r.unwrap().end_prefix)
+            &&& final(budget).work_remaining
+                == old(budget).work_remaining - r.unwrap().planning_work
+        },
+{
+    let before_work = budget.work_remaining;
+    let step = replay_installed_symbol_plan(workspace, window_bytes, region, tree, meta,
+        budget, &mut queue, &mut prefix, input, end_of_input)?;
+    Ok(InstalledSymbolPlan { consumed: step.consumed,
+        planning_work: before_work - budget.work_remaining,
+        status: step.status, end_queue: queue, end_prefix: prefix })
+}
+
+proof fn serialized_cursor_survives_terminal(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    queue: BitQueue, prefix: InstalledPrefixState)
+    requires serialized_b3b_queue(before, window_bytes, queue),
+        serialized_installed_prefix(before, window_bytes, prefix),
+        terminal_error_frame(before, after, window_bytes),
+    ensures serialized_b3b_queue(after, window_bytes, queue),
+        serialized_installed_prefix(after, window_bytes, prefix),
+{
+    reveal(terminal_error_frame); reveal(serialized_b3b_queue);
+    reveal(serialized_installed_prefix); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_u16_at);
+    b3b_scalar_layout_is_exact();
+    assert forall|i: int| 0 <= i < 10 implies #[trigger]
+        after[b3b_scalar_base(window_bytes) + i] == before[b3b_scalar_base(window_bytes) + i] by {}
+    assert forall|i: int| 0 <= i < queue.len implies #[trigger]
+        queue.pending@[i] == after[b3b_scalar_base(window_bytes) + i] by {}
+    assert forall|i: int| queue.len <= i < 8 implies #[trigger]
+        after[b3b_scalar_base(window_bytes) + i] == 0 by {
+            assert(before[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == 0);
+            assert(after[b3b_scalar_base(window_bytes) + i] == before[b3b_scalar_base(window_bytes) + i]);
+        }
+}
+
+fn fail_header_phase(workspace: &mut [u8], window_bytes: u32, consumed: usize,
+    error: CompressedHeaderError) -> (r: (usize, Option<CompressedHeaderStatus>))
+    requires b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+    ensures r == (consumed, Some(CompressedHeaderStatus::Failed(error))),
+        terminal_error_frame(old(workspace)@, final(workspace)@, window_bytes),
+        serialized_terminal_error(final(workspace)@, window_bytes, error),
+{
+    proof { reveal(terminal_error_frame); }
+    let stored = store_terminal_error(workspace, window_bytes, error);
+    (consumed, Some(CompressedHeaderStatus::Failed(error)))
+}
+
+fn advance_initial_symbol_phase(workspace: &mut [u8], window_bytes: u32,
+    input: &[u8], end_of_input: bool) -> (r: (usize, Option<CompressedHeaderStatus>))
+    requires b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 3,
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_BLOCK_LENGTH_PHASE) == 0,
+    ensures
+        initial_symbol_action_frame(old(workspace)@, final(workspace)@, window_bytes, r.1),
+        initial_symbol_action_refines(old(workspace)@, final(workspace)@, window_bytes,
+            input@, end_of_input, r.0, r.1),
+        r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+            ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
+        r.1 == Some(CompressedHeaderStatus::NeedInput) ==> !end_of_input && r.0 == input.len(),
+        match r.1 { Some(CompressedHeaderStatus::Failed(error)) =>
+            serialized_terminal_error(final(workspace)@, window_bytes, error), _ => true },
+ final(workspace)@.len() == old(workspace)@.len(), r.0 <= input.len(),
+{
+    let ghost original = workspace@;
+    proof { reveal(initial_symbol_action_frame); reveal(initial_symbol_write_at); }
+    proof { reveal(b3b_workspace_shape); assert(b3c_workspace_shape(workspace@.len() as nat, window_bytes)); }
+    proof { reveal(initial_symbol_action_refines); reveal(initial_symbol_early_error); }
+    let mut consumed = 0usize;
+    let kind = match state_byte(workspace, window_bytes, B3B_CURRENT_KIND) {
+        Ok(value) => value,
+        Err(error) => return fail_header_phase(workspace, window_bytes, consumed, error),
+    };
+    if kind >= 3 { return fail_header_phase(workspace, window_bytes, consumed, CompressedHeaderError::InternalState); }
+
+                        let meta = match crate::brotli_prefix::read_tree_metadata(
+                            workspace,
+                            window_bytes,
+                            crate::brotli_prefix::TreeRegion::BlockLength,
+                            3,
+                            kind as u16,
+                        ) {
+                            Ok(value) => value,
+                            Err(crate::brotli_prefix::MetadataReadError::InvalidEncoding) =>
+                                return fail_header_phase(workspace, window_bytes, consumed, CompressedHeaderError::InvalidFormat(
+                                    CompressedFormatError::InvalidMetadata)),
+                            Err(crate::brotli_prefix::MetadataReadError::Workspace(error)) =>
+                                return fail_header_phase(workspace, window_bytes, consumed, CompressedHeaderError::Workspace(error)),
+                        };
+                        let mut queue = match load_b3b_queue(workspace, window_bytes) {
+                            Ok(value) => value,
+                            Err(error) => return fail_header_phase(workspace, window_bytes, consumed, error),
+                        };
+                        let mut prefix = match load_installed_prefix_state(workspace, window_bytes) {
+                            Ok(value) => value,
+                            Err(error) => return fail_header_phase(workspace, window_bytes, consumed, error),
+                        };
+                        let ghost start_queue = queue;
+                        let ghost start_prefix = prefix;
+                        proof {
+                            assert(tree_metadata_value_matches(original, window_bytes,
+                                crate::brotli_prefix::TreeRegion::BlockLength, kind as u16, meta));
+                            tree_metadata_match_is_valid_encoding(original, window_bytes,
+                                crate::brotli_prefix::TreeRegion::BlockLength, kind as u16, meta);
+                            serialized_cursor_has_valid_encoding(original, window_bytes, queue, prefix);
+                            assert(initial_symbol_early_error(original, window_bytes).is_none());
+                        }
+                        let remaining = &input[consumed..];
+                        proof { assert(remaining@ == input@); assert(workspace@ == original); }
+                        let symbol_step = advance_installed_tree_symbol(
+                            workspace,
+                            window_bytes,
+                            crate::brotli_prefix::TreeRegion::BlockLength,
+                            kind as u16,
+                            meta,
+                            &mut queue,
+                            &mut prefix,
+                            remaining,
+                            end_of_input,
+                        );
+                        let ghost read_units = choose|cost: nat| {
+                            &&& #[trigger] installed_symbol_full_step(original, window_bytes,
+                                crate::brotli_prefix::TreeRegion::BlockLength, kind as u16, meta,
+                                start_queue, start_prefix, input@, end_of_input, symbol_step, queue, prefix, cost)
+                            &&& cost <= 10_575 + symbol_step.consumed as nat
+                        };
+                        consumed = consumed + symbol_step.consumed;
+                        if let Err(error) = store_b3b_queue(
+                            workspace, window_bytes, &queue) {
+                            return fail_header_phase(workspace, window_bytes, consumed, error);
+                        }
+                        let ghost after_queue_store = workspace@;
+                        if let Err(error) = store_installed_prefix_state(workspace, window_bytes, prefix) {
+                            return fail_header_phase(workspace, window_bytes, consumed, error);
+                        }
+                        proof {
+                            serialized_b3b_queue_from_frame(after_queue_store, workspace@, window_bytes, queue);
+                        }
+                        match symbol_step.status {
+                            InstalledSymbolStatus::NeedInput => {
+                                let result = (consumed, Some(CompressedHeaderStatus::NeedInput));
+                                proof {
+                                    reveal(initial_symbol_result);
+                                    establish_initial_symbol_action(original, workspace@, window_bytes, input@, end_of_input,
+                                        result.0, result.1, meta, start_queue, start_prefix, queue, prefix, symbol_step, read_units);
+                                }
+                                return result;
+                            },
+                            InstalledSymbolStatus::Truncated | InstalledSymbolStatus::InvalidPrefixCode
+                                | InstalledSymbolStatus::InternalState => {
+                                let error = match symbol_step.status {
+                                    InstalledSymbolStatus::Truncated => CompressedHeaderError::Truncated,
+                                    InstalledSymbolStatus::InvalidPrefixCode => CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode),
+                                    _ => CompressedHeaderError::InternalState,
+                                };
+                                let ghost before_error = workspace@;
+                                let result = fail_header_phase(workspace, window_bytes, consumed, error);
+                                proof {
+                                    serialized_cursor_survives_terminal(before_error, workspace@, window_bytes, queue, prefix);
+                                    reveal(initial_symbol_result);
+                                    establish_initial_symbol_action(original, workspace@, window_bytes, input@, end_of_input,
+                                        result.0, result.1, meta, start_queue, start_prefix, queue, prefix, symbol_step, read_units);
+                                }
+                                return result;
+                            },
+                            InstalledSymbolStatus::Symbol(symbol) => {
+                                if symbol >= 26 {
+                                    return fail_header_phase(workspace, window_bytes, consumed, CompressedHeaderError::InvalidFormat(
+                                        CompressedFormatError::InvalidBlockLength));
+                                }
+                                let ghost before_symbol_fields = workspace@;
+                                let width = crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS[
+                                    symbol as usize];
+                                if let Err(error) = put_state_byte(
+                                    workspace, window_bytes,
+                                    B3B_BLOCK_LENGTH_SYMBOL, symbol as u8) {
+                                    return fail_header_phase(workspace, window_bytes, consumed, error);
+                                }
+                                if let Err(error) = put_state_byte(
+                                    workspace, window_bytes,
+                                    B3B_BLOCK_LENGTH_SUFFIX_WIDTH, width) {
+                                    return fail_header_phase(workspace, window_bytes, consumed, error);
+                                }
+                                if let Err(error) = put_state_byte(
+                                    workspace, window_bytes,
+                                    B3B_BLOCK_LENGTH_PHASE, 1) {
+                                    return fail_header_phase(workspace, window_bytes, consumed, error);
+                                }
+                                proof {
+                                    serialized_b3b_queue_from_frame(before_symbol_fields, workspace@, window_bytes, queue);
+                                    serialized_installed_prefix_from_frame(before_symbol_fields, workspace@, window_bytes, prefix);
+                                    reveal(initial_symbol_result);
+                                    establish_initial_symbol_action(original, workspace@, window_bytes, input@, end_of_input,
+                                        consumed, None, meta, start_queue, start_prefix, queue, prefix, symbol_step, read_units);
+                                }
+                            }
+                        }
+
+    (consumed, None)
+}
+
+spec fn initial_symbol_write_at(window_bytes: u32, index: int,
+    status: Option<CompressedHeaderStatus>) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    ||| base <= index < base + 10
+    ||| index == base + B3B_INSTALLED_PREFIX_WIDTH as int
+    ||| base + B3B_INSTALLED_PREFIX_BITS as int <= index < base + B3B_INSTALLED_SCAN as int + 2
+    ||| (status.is_none() && base + B3B_BLOCK_LENGTH_PHASE as int <= index
+        < base + B3B_BLOCK_LENGTH_SUFFIX_WIDTH as int + 1)
+    ||| (matches!(status, Some(CompressedHeaderStatus::Failed(_))) && (
+        index == base + B3B_OUTER_PHASE as int
+        || index == base + B3B_TERMINAL_ERROR as int
+        || base + B3B_ERROR_DETAIL as int <= index < base + B3B_ERROR_DETAIL as int + 2))
+}
+
+spec fn initial_symbol_action_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    status: Option<CompressedHeaderStatus>) -> bool {
+    &&& before.len() == after.len()
+    &&& forall|i: int| 0 <= i < before.len() && !initial_symbol_write_at(window_bytes, i, status)
+        ==> #[trigger] after[i] == before[i]
+}
+
+spec fn initial_symbol_early_error(workspace: Seq<u8>, window_bytes: u32) -> Option<CompressedHeaderError> {
+    let kind = b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND);
+    if kind >= 3 { Some(CompressedHeaderError::InternalState) }
+    else if !tree_metadata_encoding_valid(workspace, window_bytes,
+        crate::brotli_prefix::TreeRegion::BlockLength, kind as u16) {
+        Some(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidMetadata))
+    } else if !b3b_queue_encoding_valid(workspace, window_bytes)
+        || !installed_prefix_encoding_valid(workspace, window_bytes) {
+        Some(CompressedHeaderError::InternalState)
+    } else { None }
+}
+
+spec fn initial_symbol_result(after: Seq<u8>, window_bytes: u32,
+    symbol_status: InstalledSymbolStatus, status: Option<CompressedHeaderStatus>) -> bool {
+    match symbol_status {
+        InstalledSymbolStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+        InstalledSymbolStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+        InstalledSymbolStatus::InvalidPrefixCode => status == Some(CompressedHeaderStatus::Failed(
+            CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode))),
+        InstalledSymbolStatus::InternalState => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)),
+        InstalledSymbolStatus::Symbol(symbol) => {
+            &&& symbol < 26
+            &&& status.is_none()
+            &&& b3b_scalar_byte_at(after, window_bytes, B3B_BLOCK_LENGTH_PHASE) == 1
+            &&& b3b_scalar_byte_at(after, window_bytes, B3B_BLOCK_LENGTH_SYMBOL) as nat == symbol
+            &&& b3b_scalar_byte_at(after, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH)
+                == crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS@[symbol as int]
+        },
+    }
+}
+
+spec fn initial_symbol_action_refines(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<CompressedHeaderStatus>) -> bool {
+    match initial_symbol_early_error(before, window_bytes) {
+        Some(error) => {
+            &&& used == 0
+            &&& status == Some(CompressedHeaderStatus::Failed(error))
+            &&& serialized_terminal_error(after, window_bytes, error)
+            &&& terminal_error_frame(before, after, window_bytes)
+        },
+        None => exists|meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue,
+            start_prefix: InstalledPrefixState, final_queue: BitQueue, final_prefix: InstalledPrefixState,
+            step: InstalledSymbolStep, read_units: nat| {
+            &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+                b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, meta)
+            &&& serialized_b3b_queue(before, window_bytes, start_queue)
+            &&& serialized_installed_prefix(before, window_bytes, start_prefix)
+            &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+                b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, meta,
+                start_queue, start_prefix, input, end, step, final_queue, final_prefix, read_units)
+            &&& serialized_b3b_queue(after, window_bytes, final_queue)
+            &&& serialized_installed_prefix(after, window_bytes, final_prefix)
+            &&& used == step.consumed
+            &&& initial_symbol_result(after, window_bytes, step.status, status)
+        },
+    }
+}
+
+proof fn tree_metadata_match_is_valid_encoding(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16, meta: crate::brotli_prefix::TreeMetadata)
+    requires tree_metadata_value_matches(workspace, window_bytes, region, tree, meta),
+    ensures tree_metadata_encoding_valid(workspace, window_bytes, region, tree),
+{
+    reveal(tree_metadata_value_matches); reveal(tree_metadata_encoding_valid);
+    match meta.storage {
+        crate::brotli_prefix::TreeStorageState::Unused => {},
+        crate::brotli_prefix::TreeStorageState::Single { .. } => {},
+        crate::brotli_prefix::TreeStorageState::Canonical { .. } => {},
+    }
+}
+
+proof fn serialized_cursor_has_valid_encoding(workspace: Seq<u8>, window_bytes: u32,
+    queue: BitQueue, prefix: InstalledPrefixState)
+    requires serialized_b3b_queue(workspace, window_bytes, queue),
+        serialized_installed_prefix(workspace, window_bytes, prefix),
+    ensures b3b_queue_encoding_valid(workspace, window_bytes),
+        installed_prefix_encoding_valid(workspace, window_bytes),
+{
+    reveal(serialized_b3b_queue); reveal(serialized_installed_prefix);
+    reveal(b3b_queue_encoding_valid); reveal(installed_prefix_encoding_valid);
+    b3b_scalar_layout_is_exact();
+    pow2_matches_installed_shift(prefix.width);
+    assert forall|i: int| queue.len <= i < 8 implies #[trigger]
+        workspace[b3b_scalar_base(window_bytes) + i] == 0 by {
+            assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == 0);
+        }
+}
+
+proof fn establish_initial_symbol_action(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<CompressedHeaderStatus>,
+    meta: crate::brotli_prefix::TreeMetadata, start_queue: BitQueue, start_prefix: InstalledPrefixState,
+    final_queue: BitQueue, final_prefix: InstalledPrefixState, step: InstalledSymbolStep, read_units: nat)
+    requires
+        initial_symbol_early_error(before, window_bytes).is_none(),
+        tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, meta),
+        serialized_b3b_queue(before, window_bytes, start_queue),
+        serialized_installed_prefix(before, window_bytes, start_prefix),
+        installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, meta,
+            start_queue, start_prefix, input, end, step, final_queue, final_prefix, read_units),
+        serialized_b3b_queue(after, window_bytes, final_queue),
+        serialized_installed_prefix(after, window_bytes, final_prefix),
+        used == step.consumed, initial_symbol_result(after, window_bytes, step.status, status),
+    ensures initial_symbol_action_refines(before, after, window_bytes, input, end, used, status),
+{
+    reveal(initial_symbol_action_refines);
+    assert(exists|m: crate::brotli_prefix::TreeMetadata, sq: BitQueue, sp: InstalledPrefixState,
+        eq: BitQueue, ep: InstalledPrefixState, ss: InstalledSymbolStep, units: nat| {
+        &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, m)
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& serialized_installed_prefix(before, window_bytes, sp)
+        &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, m,
+            sq, sp, input, end, ss, eq, ep, units)
+        &&& serialized_b3b_queue(after, window_bytes, eq)
+        &&& serialized_installed_prefix(after, window_bytes, ep)
+        &&& used == ss.consumed
+        &&& initial_symbol_result(after, window_bytes, ss.status, status)
+    });
+}
+
+proof fn serialized_parser_starts_agree(workspace: Seq<u8>, window_bytes: u32,
+    left_queue: BitQueue, right_queue: BitQueue,
+    left_prefix: InstalledPrefixState, right_prefix: InstalledPrefixState)
+    requires serialized_b3b_queue(workspace, window_bytes, left_queue),
+        serialized_b3b_queue(workspace, window_bytes, right_queue),
+        serialized_installed_prefix(workspace, window_bytes, left_prefix),
+        serialized_installed_prefix(workspace, window_bytes, right_prefix),
+    ensures left_queue.len == right_queue.len, left_queue.offset == right_queue.offset,
+        left_queue.pending@.take(left_queue.len as int) == right_queue.pending@.take(right_queue.len as int),
+        left_queue.bits() == right_queue.bits(), left_prefix == right_prefix,
+{
+    reveal(serialized_b3b_queue); reveal(serialized_installed_prefix);
+    serialized_bit_queues_agree(workspace, window_bytes, left_queue, right_queue);
+    assert(left_queue.pending@.take(left_queue.len as int) =~= right_queue.pending@.take(right_queue.len as int));
+}
+
+proof fn installed_canonical_trace_start_preserved(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, left_queue: BitQueue, right_queue: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    step: InstalledSymbolStep, final_queue: BitQueue, final_prefix: InstalledPrefixState, read_units: nat)
+    requires left_queue.valid(), right_queue.valid(), left_queue.len == right_queue.len,
+        left_queue.offset == right_queue.offset,
+        left_queue.bits() == right_queue.bits(),
+        left_queue.pending@.take(left_queue.len as int) == right_queue.pending@.take(right_queue.len as int),
+        installed_canonical_trace(workspace, window_bytes, region, tree, meta,
+            left_queue, start, input, end, step, final_queue, final_prefix, read_units),
+    ensures installed_canonical_trace(workspace, window_bytes, region, tree, meta,
+        right_queue, start, input, end, step, final_queue, final_prefix, read_units),
+{
+    reveal(installed_canonical_trace); reveal(installed_canonical_trace_case); reveal(bit_queue_read_image);
+    let used = choose|used: int| installed_canonical_trace_case(workspace, window_bytes, region, tree, meta,
+        left_queue, start, input, end, step, final_queue, final_prefix, read_units, used);
+    assert(installed_canonical_trace_case(workspace, window_bytes, region, tree, meta,
+        right_queue, start, input, end, step, final_queue, final_prefix, read_units, used));
+}
+
+proof fn installed_full_steps_agree(workspace: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    meta: crate::brotli_prefix::TreeMetadata, left_start: BitQueue, right_start: BitQueue,
+    start: InstalledPrefixState, input: Seq<u8>, end: bool,
+    left: InstalledSymbolStep, left_queue: BitQueue, left_prefix: InstalledPrefixState, left_work: nat,
+    right: InstalledSymbolStep, right_queue: BitQueue, right_prefix: InstalledPrefixState, right_work: nat)
+    requires left_start.valid(), right_start.valid(), left_start.len == right_start.len,
+        left_start.offset == right_start.offset, left_start.bits() == right_start.bits(),
+        left_start.pending@.take(left_start.len as int) == right_start.pending@.take(right_start.len as int),
+        installed_symbol_full_step(workspace, window_bytes, region, tree, meta,
+            left_start, start, input, end, left, left_queue, left_prefix, left_work),
+        installed_symbol_full_step(workspace, window_bytes, region, tree, meta,
+            right_start, start, input, end, right, right_queue, right_prefix, right_work),
+    ensures left.consumed == right.consumed, left.status == right.status,
+        left_queue.bits() == right_queue.bits(), left_prefix == right_prefix,
+        left_queue.len == right_queue.len, left_queue.offset == right_queue.offset,
+        left_queue.pending@.take(left_queue.len as int) == right_queue.pending@.take(right_queue.len as int),
+        left_work == right_work,
+{
+    reveal(installed_symbol_full_step);
+    if meta.storage == (crate::brotli_prefix::TreeStorageState::Canonical { initialized: meta.symbols }) {
+        installed_canonical_trace_start_preserved(workspace, window_bytes, region, tree, meta,
+            left_start, right_start, start, input, end, left, left_queue, left_prefix, left_work);
+        installed_canonical_traces_agree(workspace, window_bytes, region, tree, meta,
+            right_start, start, input, end, left, left_queue, left_prefix, left_work,
+            right, right_queue, right_prefix, right_work);
+        assert(left_queue.pending@.take(left_queue.len as int) =~= right_queue.pending@.take(right_queue.len as int));
+    } else {
+        reveal(installed_tree_step_refines);
+        match meta.storage {
+            crate::brotli_prefix::TreeStorageState::Unused => {},
+            crate::brotli_prefix::TreeStorageState::Single { .. } => {},
+            crate::brotli_prefix::TreeStorageState::Canonical { .. } => {},
+        }
+    }
+}
+
+spec fn initial_installed_status_to_header(status: InstalledSymbolStatus) -> Option<CompressedHeaderStatus> {
+    match status {
+        InstalledSymbolStatus::NeedInput => Some(CompressedHeaderStatus::NeedInput),
+        InstalledSymbolStatus::Symbol(_) => None,
+        InstalledSymbolStatus::Truncated => Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+        InstalledSymbolStatus::InvalidPrefixCode => Some(CompressedHeaderStatus::Failed(
+            CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode))),
+        InstalledSymbolStatus::InternalState => Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)),
+    }
+}
+
+spec fn initial_symbol_work_spec(planning_work: nat, status: InstalledSymbolStatus) -> nat {
+    planning_work + 10 + 5 + 1 + match status {
+        InstalledSymbolStatus::Symbol(_) => 1nat + 3 + 1,
+        InstalledSymbolStatus::NeedInput => 0nat,
+        _ => 4nat + 1,
+    }
+}
+
+spec fn initial_symbol_plan_valid(workspace: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: CompressedActionPlan) -> bool {
+    let kind = b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND);
+    match initial_symbol_early_error(workspace, window_bytes) {
+        Some(error) => {
+            &&& plan.consumed == 0
+            &&& plan.status == Some(CompressedHeaderStatus::Failed(error))
+            &&& plan.planning_work == if kind >= 3 { 0u64 } else { 1u64 }
+            &&& plan.execution_work == if kind >= 3 { 5u64 } else { 6u64 }
+        },
+        None => exists|meta: crate::brotli_prefix::TreeMetadata, sq: BitQueue, sp: InstalledPrefixState,
+            eq: BitQueue, ep: InstalledPrefixState, step: InstalledSymbolStep, read_units: nat| {
+            &&& tree_metadata_value_matches(workspace, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+                kind as u16, meta)
+            &&& serialized_b3b_queue(workspace, window_bytes, sq)
+            &&& serialized_installed_prefix(workspace, window_bytes, sp)
+            &&& #[trigger] installed_symbol_full_step(workspace, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+                kind as u16, meta, sq, sp, input, end, step, eq, ep, read_units)
+            &&& plan.planning_work as nat == 1 + read_units
+            &&& plan.execution_work as nat == initial_symbol_work_spec(plan.planning_work as nat, step.status)
+            &&& plan.consumed == step.consumed
+            &&& plan.status == initial_installed_status_to_header(step.status)
+        },
+    }
+}
+
+proof fn establish_initial_symbol_plan(workspace: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: CompressedActionPlan,
+    meta: crate::brotli_prefix::TreeMetadata, sq: BitQueue, sp: InstalledPrefixState,
+    symbol: InstalledSymbolPlan)
+    requires initial_symbol_early_error(workspace, window_bytes).is_none(),
+        tree_metadata_value_matches(workspace, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND) as u16, meta),
+        serialized_b3b_queue(workspace, window_bytes, sq), serialized_installed_prefix(workspace, window_bytes, sp),
+        installed_symbol_full_step(workspace, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND) as u16, meta, sq, sp, input, end,
+            InstalledSymbolStep { consumed: symbol.consumed, status: symbol.status },
+            symbol.end_queue, symbol.end_prefix, symbol.planning_work as nat),
+        plan.planning_work as nat == 1 + symbol.planning_work as nat,
+        plan.execution_work as nat == initial_symbol_work_spec(plan.planning_work as nat, symbol.status),
+        plan.consumed == symbol.consumed, plan.status == initial_installed_status_to_header(symbol.status),
+    ensures initial_symbol_plan_valid(workspace, window_bytes, input, end, plan),
+{
+    reveal(initial_symbol_plan_valid);
+    let step = InstalledSymbolStep { consumed: symbol.consumed, status: symbol.status };
+    assert(exists|m: crate::brotli_prefix::TreeMetadata, a: BitQueue, b: InstalledPrefixState,
+        c: BitQueue, d: InstalledPrefixState, ss: InstalledSymbolStep, work: nat| {
+        &&& tree_metadata_value_matches(workspace, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND) as u16, m)
+        &&& serialized_b3b_queue(workspace, window_bytes, a)
+        &&& serialized_installed_prefix(workspace, window_bytes, b)
+        &&& #[trigger] installed_symbol_full_step(workspace, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND) as u16, m, a, b, input, end, ss, c, d, work)
+        &&& plan.planning_work as nat == 1 + work
+        &&& plan.execution_work as nat == initial_symbol_work_spec(plan.planning_work as nat, ss.status)
+        &&& plan.consumed == ss.consumed
+        &&& plan.status == initial_installed_status_to_header(ss.status)
+    });
+}
+
+proof fn initial_symbol_plan_matches_action(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: CompressedActionPlan,
+    used: usize, status: Option<CompressedHeaderStatus>)
+    requires initial_symbol_plan_valid(before, window_bytes, input, end, plan),
+        initial_symbol_action_refines(before, after, window_bytes, input, end, used, status),
+    ensures used == plan.consumed, status == plan.status,
+{
+    reveal(initial_symbol_plan_valid); reveal(initial_symbol_action_refines);
+    if initial_symbol_early_error(before, window_bytes).is_some() {
+    } else {
+        let (pm, pq, pp, peq, pep, ps, pw) = choose|m: crate::brotli_prefix::TreeMetadata,
+            q: BitQueue, p: InstalledPrefixState, eq: BitQueue, ep: InstalledPrefixState,
+            ss: InstalledSymbolStep, work: nat| {
+            &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+                b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, m)
+            &&& serialized_b3b_queue(before, window_bytes, q)
+            &&& serialized_installed_prefix(before, window_bytes, p)
+            &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+                b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, m,
+                q, p, input, end, ss, eq, ep, work)
+            &&& plan.planning_work as nat == 1 + work
+            &&& plan.execution_work as nat == initial_symbol_work_spec(plan.planning_work as nat, ss.status)
+            &&& plan.consumed == ss.consumed
+            &&& plan.status == initial_installed_status_to_header(ss.status)
+        };
+        let (am, aq, ap, aeq, aep, astep, aw) = choose|m: crate::brotli_prefix::TreeMetadata,
+            q: BitQueue, p: InstalledPrefixState, eq: BitQueue, ep: InstalledPrefixState,
+            ss: InstalledSymbolStep, work: nat| {
+            &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+                b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, m)
+            &&& serialized_b3b_queue(before, window_bytes, q)
+            &&& serialized_installed_prefix(before, window_bytes, p)
+            &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+                b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, m,
+                q, p, input, end, ss, eq, ep, work)
+            &&& serialized_b3b_queue(after, window_bytes, eq)
+            &&& serialized_installed_prefix(after, window_bytes, ep)
+            &&& used == ss.consumed
+            &&& initial_symbol_result(after, window_bytes, ss.status, status)
+        };
+        reveal(tree_metadata_value_matches);
+        tree_metadata_values_agree(crate::brotli_prefix::TreeRegion::BlockLength, pm, am);
+        serialized_parser_starts_agree(before, window_bytes, pq, aq, pp, ap);
+        installed_full_steps_agree(before, window_bytes, crate::brotli_prefix::TreeRegion::BlockLength,
+            b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as u16, pm,
+            pq, aq, pp, input, end, ps, peq, pep, pw, astep, aeq, aep, aw);
+        reveal(initial_symbol_result); reveal(initial_installed_status_to_header);
+        match astep.status {
+            InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated
+            | InstalledSymbolStatus::InternalState | InstalledSymbolStatus::InvalidPrefixCode => {},
+            InstalledSymbolStatus::Symbol(_) => {},
+        }
+    }
 }
 
 fn initial_symbol_execution_work(
@@ -22104,7 +25333,16 @@ fn plan_initial_symbol_action(
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
         final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        r.is_ok() ==> r.unwrap().consumed <= input.len(),
+        r.is_ok() ==> final(budget).work_remaining == old(budget).work_remaining - r.unwrap().planning_work,
+        b3b_scalar_byte_at(workspace@, window_bytes, B3B_BLOCK_LENGTH_PHASE) == 0 && r.is_ok()
+            ==> initial_symbol_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap()),
 {
+    reveal(initial_symbol_plan_valid); reveal(initial_symbol_early_error);
     let kind = match state_byte(workspace, window_bytes, B3B_CURRENT_KIND) {
         Ok(value) => value,
         Err(_) => return Err(core_state_failure()),
@@ -22113,9 +25351,11 @@ fn plan_initial_symbol_action(
         Ok(value) => value,
         Err(_) => return Err(core_state_failure()),
     };
-    if kind >= 3 || subphase != 0 {
-        return Err(core_state_failure());
+    if kind >= 3 {
+        return Ok(CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+            consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) });
     }
+    if subphase != 0 { return Err(core_state_failure()); }
     if !budget.charge_work(1) {
         return Err(CoreFailure::ResourceLimit);
     }
@@ -22128,154 +25368,39 @@ fn plan_initial_symbol_action(
         kind as u16,
     ) {
         Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
+        Err(error) => {
+            let error = match error {
+                crate::brotli_prefix::MetadataReadError::InvalidEncoding =>
+                    CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidMetadata),
+                crate::brotli_prefix::MetadataReadError::Workspace(error) => CompressedHeaderError::Workspace(error),
+            };
+            return Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 4 + 1,
+                consumed: 0, status: Some(CompressedHeaderStatus::Failed(error)) });
+        },
     };
-    if meta.symbols != 26 {
-        return Err(core_state_failure());
-    }
-    proof {
-        assert(meta.valid_for(crate::brotli_prefix::TreeRegion::BlockLength));
-    }
     let mut queue = match load_b3b_queue(workspace, window_bytes) {
         Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
+        Err(error) => return Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 4 + 1,
+            consumed: 0, status: Some(CompressedHeaderStatus::Failed(error)) }),
     };
     let mut prefix = match load_installed_prefix_state(workspace, window_bytes) {
         Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
+        Err(error) => return Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 4 + 1,
+            consumed: 0, status: Some(CompressedHeaderStatus::Failed(error)) }),
     };
-    let mut consumed = 0usize;
-    let status = match meta.storage {
-        crate::brotli_prefix::TreeStorageState::Unused => {
-            InstalledSymbolStatus::InternalState
-        }
-        crate::brotli_prefix::TreeStorageState::Single { symbol } => {
-            if prefix.width != 0 || prefix.bits != 0 || prefix.scan != 0
-                || symbol >= meta.symbols
-            {
-                InstalledSymbolStatus::InternalState
-            } else {
-                InstalledSymbolStatus::Symbol(symbol)
-            }
-        }
-        crate::brotli_prefix::TreeStorageState::Canonical { initialized } => {
-            if initialized != meta.symbols {
-                InstalledSymbolStatus::InternalState
-            } else {
-                let mut iterations = 0u8;
-                let mut final_status = InstalledSymbolStatus::InternalState;
-                while iterations < 15
-                    invariant
-                        consumed <= input.len(),
-                        iterations <= 15,
-                        queue.valid(),
-                        prefix.valid(),
-                        meta.valid_for(crate::brotli_prefix::TreeRegion::BlockLength),
-                        meta.symbols == 26,
-                        budget.valid(),
-                        budget.limits == old(budget).limits,
-                        budget.work_remaining <= old(budget).work_remaining,
-                    decreases 15 - iterations,
-                {
-                    let read_plan = plan_bit_read(queue, 1, input.len() - consumed);
-                    if !budget.charge_work(read_plan.work) {
-                        return Err(CoreFailure::ResourceLimit);
-                    }
-                    planning_work = checked_planned_work_add(
-                        planning_work,
-                        read_plan.work,
-                    )?;
-                    let read = queue.read_bits(1, &input[consumed..], end_of_input);
-                    if read.consumed != read_plan.consumed {
-                        return Err(core_state_failure());
-                    }
-                    consumed += read.consumed;
-                    let bit = match read.status {
-                        BitReadStatus::NeedInput => {
-                            final_status = InstalledSymbolStatus::NeedInput;
-                            break;
-                        }
-                        BitReadStatus::Truncated => {
-                            final_status = InstalledSymbolStatus::Truncated;
-                            break;
-                        }
-                        BitReadStatus::Value(value) => {
-                            proof {
-                                lemma2_to64();
-                                assert(pow2(1) == 2);
-                                assert(value < 2);
-                                bounded_u64_fits_u16(value);
-                            }
-                            value as u16
-                        }
-                    };
-                    let old_width = prefix.width;
-                    let next_width = old_width + 1;
-                    let next_bits = prefix.bits | (bit << old_width);
-                    proof {
-                        append_installed_bit_fits(prefix.bits, old_width, bit);
-                        append_installed_bit_value(prefix.bits, old_width, bit);
-                    }
-                    let mut symbol = 0u16;
-                    let mut matched = false;
-                    while symbol < meta.symbols
-                        invariant
-                            symbol <= meta.symbols,
-                            meta.symbols == 26,
-                            meta.valid_for(crate::brotli_prefix::TreeRegion::BlockLength),
-                            next_width <= 15,
-                            budget.valid(),
-                            budget.limits == old(budget).limits,
-                            budget.work_remaining <= old(budget).work_remaining,
-                        decreases meta.symbols - symbol,
-                    {
-                        if !budget.charge_work(1) {
-                            return Err(CoreFailure::ResourceLimit);
-                        }
-                        planning_work = checked_planned_work_add(planning_work, 1)?;
-                        let record = match crate::brotli_prefix::read_tree_record(
-                            workspace,
-                            window_bytes,
-                            crate::brotli_prefix::TreeRegion::BlockLength,
-                            kind as u16,
-                            &meta,
-                            symbol,
-                        ) {
-                            Ok(value) => value,
-                            Err(_) => return Err(core_state_failure()),
-                        };
-                        if record.length == next_width && record.length != 0 {
-                            if record.code >= (1u16 << next_width) {
-                                final_status = InstalledSymbolStatus::InternalState;
-                                matched = true;
-                                break;
-                            }
-                            proof { pow2_matches_installed_shift(next_width); }
-                            let reversed = reverse_installed_code(record.code, next_width);
-                            if reversed == next_bits {
-                                final_status = InstalledSymbolStatus::Symbol(symbol);
-                                matched = true;
-                                break;
-                            }
-                        }
-                        symbol += 1;
-                    }
-                    if matched {
-                        break;
-                    }
-                    if next_width == 15 {
-                        final_status = InstalledSymbolStatus::InvalidPrefixCode;
-                        break;
-                    }
-                    prefix.width = next_width;
-                    prefix.bits = next_bits;
-                    prefix.scan = 0;
-                    iterations += 1;
-                }
-                final_status
-            }
-        }
-    };
+    proof {
+        assert(tree_metadata_value_matches(workspace@, window_bytes,
+            crate::brotli_prefix::TreeRegion::BlockLength, kind as u16, meta));
+        tree_metadata_match_is_valid_encoding(workspace@, window_bytes,
+            crate::brotli_prefix::TreeRegion::BlockLength, kind as u16, meta);
+        serialized_cursor_has_valid_encoding(workspace@, window_bytes, queue, prefix);
+    }
+    let symbol = plan_installed_symbol(workspace, window_bytes, budget,
+        crate::brotli_prefix::TreeRegion::BlockLength, kind as u16, meta, queue, prefix,
+        input, end_of_input)?;
+    planning_work = checked_planned_work_add(planning_work, symbol.planning_work)?;
+    let consumed = symbol.consumed;
+    let status = symbol.status;
     let execution_work = initial_symbol_execution_work(planning_work, status)?;
     let mapped = match status {
         InstalledSymbolStatus::NeedInput => Some(CompressedHeaderStatus::NeedInput),
@@ -22290,12 +25415,68 @@ fn plan_initial_symbol_action(
             CompressedHeaderError::InternalState,
         )),
     };
-    Ok(CompressedActionPlan {
-        planning_work,
-        execution_work,
-        consumed,
-        status: mapped,
-    })
+    let result = CompressedActionPlan { planning_work, execution_work, consumed, status: mapped };
+    proof {
+        establish_initial_symbol_plan(workspace@, window_bytes, input@, end_of_input,
+            result, meta, queue, prefix, symbol);
+    }
+    Ok(result)
+}
+
+fn execute_planned_initial_symbol(workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end: bool,
+    input_was_limited: bool, plan: CompressedActionPlan,
+) -> (r: Result<usize, CompressedStep>)
+    requires old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 3,
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_BLOCK_LENGTH_PHASE) == 0,
+        initial_symbol_plan_valid(old(workspace)@, window_bytes, input@, end, plan),
+        plan.consumed <= input.len(), plan.consumed as u64 <= old(budget).input_remaining,
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(workspace)@.len() == old(workspace)@.len(),
+        old(budget).work_remaining < plan.execution_work ==> {
+            &&& final(workspace)@ == old(workspace)@
+            &&& *final(budget) == *old(budget)
+            &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+        },
+        old(budget).work_remaining >= plan.execution_work ==> {
+            &&& final(budget).work_remaining == old(budget).work_remaining - plan.execution_work
+            &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+            &&& initial_symbol_action_refines(old(workspace)@, final(workspace)@, window_bytes,
+                input@, end, plan.consumed, plan.status)
+            &&& initial_symbol_action_frame(old(workspace)@, final(workspace)@, window_bytes, plan.status)
+        },
+        match r {
+            Ok(used) => used == plan.consumed && used <= input.len()
+                && compressed_decoder_state_ok(final(workspace)@, window_bytes),
+            Err(step) => step.consumed <= input.len() && (!matches!(step.status, CompressedStatus::Failed(_)) ==>
+                compressed_decoder_state_ok(final(workspace)@, window_bytes)),
+        },
+{
+    if !budget.charge_work(plan.execution_work) {
+        return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    let ghost before = workspace@;
+    let (used, status) = advance_initial_symbol_phase(workspace, window_bytes, input, end);
+    proof { initial_symbol_plan_matches_action(before, workspace@, window_bytes, input@, end, plan, used, status); }
+    if !budget.charge_input(used as u64) {
+        return Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    match status {
+        None => Ok(used),
+        Some(CompressedHeaderStatus::NeedInput) => Err(CompressedStep { consumed: used,
+            status: if input_was_limited { CompressedStatus::Failed(CoreFailure::ResourceLimit) }
+                else { CompressedStatus::NeedInput } }),
+        Some(CompressedHeaderStatus::Failed(error)) => Err(CompressedStep { consumed: used,
+            status: CompressedStatus::Failed(map_compressed_error(error)) }),
+        _ => Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) }),
+    }
 }
 
 fn advance_planned_initial_symbol(
@@ -22349,68 +25530,8 @@ fn advance_planned_initial_symbol(
             });
         }
     };
-    if !budget.charge_work(plan.execution_work) {
-        return Err(CompressedStep {
-            consumed: 0,
-            status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
-        });
-    }
-    let ghost before_planned_action = workspace@;
-    let (used, planned_status) = {
-        let mut decoder = CompressedMetaBlockDecoder {
-            workspace: &mut workspace[..],
-            window_bytes,
-        };
-        proof {
-            assert(decoder.workspace@ == before_planned_action);
-            assert(after_borrow(workspace)@ == final(decoder.workspace)@);
-            assert(compressed_decoder_state_ok(decoder.workspace@, window_bytes));
-        }
-        let result = decoder.advance_outer_phase_once(
-            CompressedOuterPhase::InitialBlockLength,
-            &input[..allowed],
-            end_of_input && allowed == input.len(),
-        );
-        proof {
-            assert(has_resolved(decoder));
-            assert(has_resolved(decoder.workspace));
-            assert(decoder.workspace@ == final(decoder.workspace)@);
-            assert(after_borrow(workspace)@ == final(decoder.workspace)@);
-            if result.1.is_none()
-                || result.1 == Some(CompressedHeaderStatus::NeedInput)
-            {
-                assert(compressed_decoder_state_ok(decoder.workspace@, window_bytes));
-                assert(compressed_decoder_state_ok(after_borrow(workspace)@, window_bytes));
-            }
-        }
-        result
-    };
-    if used != plan.consumed || planned_status != plan.status {
-        return Err(CompressedStep {
-            consumed: used,
-            status: CompressedStatus::Failed(core_state_failure()),
-        });
-    }
-    if used > 0 && !budget.charge_input(used as u64) {
-        return Err(CompressedStep {
-            consumed: 0,
-            status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
-        });
-    }
-    if let Some(status) = planned_status {
-        let status = match status {
-            CompressedHeaderStatus::NeedInput if allowed < input.len() => {
-                CompressedStatus::Failed(CoreFailure::ResourceLimit)
-            }
-            CompressedHeaderStatus::NeedInput => CompressedStatus::NeedInput,
-            CompressedHeaderStatus::Complete(_) => CompressedStatus::Complete,
-            CompressedHeaderStatus::Failed(error) => {
-                CompressedStatus::Failed(map_compressed_error(error))
-            }
-        };
-        return Err(CompressedStep { consumed: used, status });
-    }
-    Ok(used)
+    execute_planned_initial_symbol(workspace, window_bytes, budget, &input[..allowed],
+        end_of_input && allowed == input.len(), allowed < input.len(), plan)
 }
 
 fn code_description_phase_width_exec(
@@ -22621,13 +25742,38 @@ fn plan_serialized_tree(
         final(budget).limits == old(budget).limits,
         final(budget).work_remaining <= old(budget).work_remaining,
 {
+    let region_tag = match state_byte(workspace, window_bytes, B3B_ACTIVE_REGION) {
+        Ok(value) => value,
+        Err(error) => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
+            status: SerializedTreeStatus::Failed(error) }),
+    };
+    let region = match decode_tree_region(region_tag) {
+        Some(value) => value,
+        None => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
+            status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) }),
+    };
+    let tree = match state_u16(workspace, window_bytes, B3B_ACTIVE_TREE) {
+        Ok(value) => value,
+        Err(error) => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
+            status: SerializedTreeStatus::Failed(error) }),
+    };
+    let (tree_count, capacity) = match region {
+        crate::brotli_prefix::TreeRegion::Literal => (256u16, crate::brotli_prefix::LITERAL_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::Command => (256u16, crate::brotli_prefix::COMMAND_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::Distance => (256u16, crate::brotli_prefix::DISTANCE_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::BlockType => (3u16, crate::brotli_prefix::BLOCK_TYPE_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::BlockLength => (3u16, crate::brotli_prefix::BLOCK_LENGTH_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::TemporaryContext => (1u16, crate::brotli_prefix::TEMP_CONTEXT_SYMBOLS),
+    };
     let queue = match load_b3b_queue(workspace, window_bytes) {
         Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
+        Err(error) => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
+            status: SerializedTreeStatus::Failed(error) }),
     };
     let mut decoder = match load_code_description_decoder(workspace, window_bytes, queue) {
         Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
+        Err(error) => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
+            status: SerializedTreeStatus::Failed(error) }),
     };
     let mut builder_initialized = match state_u16(
         workspace,
@@ -22635,22 +25781,21 @@ fn plan_serialized_tree(
         B3B_BUILDER_INITIALIZED,
     ) {
         Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
+        Err(error) => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
+            status: SerializedTreeStatus::Failed(error) }),
     };
-    if builder_initialized > decoder.alphabet_limit {
-        return Err(core_state_failure());
-    }
     // Replay spans into a local image. Reading the original builder at install
     // time would omit the spans produced by this very plan.
     let mut lengths = [0u8; 704];
+    let copy_len = if builder_initialized <= decoder.alphabet_limit { builder_initialized } else { 0u16 };
     let mut copied = 0u16;
-    while copied < builder_initialized
+    while copied < copy_len
         invariant
-            copied <= builder_initialized <= decoder.alphabet_limit <= 704,
+            copied <= copy_len <= decoder.alphabet_limit <= 704,
             budget.valid(),
             budget.limits == old(budget).limits,
             budget.work_remaining <= old(budget).work_remaining,
-        decreases builder_initialized - copied,
+        decreases copy_len - copied,
     {
         if !budget.charge_work(1) {
             return Err(CoreFailure::ResourceLimit);
@@ -22664,7 +25809,7 @@ fn plan_serialized_tree(
         copied += 1;
     }
     let mut consumed = 0usize;
-    let mut planning_work = builder_initialized as u64;
+    let mut planning_work = copy_len as u64;
     let mut execution_work = 0u64;
     let mut iterations = 0u16;
     while iterations < 2_000
@@ -22672,7 +25817,7 @@ fn plan_serialized_tree(
             consumed <= input.len(),
             iterations <= 2_000,
             decoder.valid(),
-            builder_initialized <= decoder.alphabet_limit <= 704,
+            decoder.alphabet_limit <= 704,
             budget.valid(),
             budget.limits == old(budget).limits,
             budget.work_remaining <= old(budget).work_remaining,
@@ -22708,7 +25853,8 @@ fn plan_serialized_tree(
                 if builder_initialized != start
                     || start as u32 + span_count as u32 > decoder.alphabet_limit as u32
                 {
-                    return Err(core_state_failure());
+                    return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
+                        status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) });
                 }
                 let mut at = start;
                 while at < start + span_count
@@ -22731,6 +25877,13 @@ fn plan_serialized_tree(
                 )?;
             }
             CodeDescriptionPhase::CompleteSimple(code) => {
+                // W1 validates the install destination only after parsing the
+                // description and storing its queue, including on bad state.
+                if decoder.alphabet_limit > capacity || tree >= tree_count {
+                    return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
+                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
+                            crate::brotli_prefix::WorkspaceError::InvalidSymbol)) });
+                }
                 execution_work = checked_planned_work_add(
                     execution_work,
                     simple_tree_install_work(decoder.alphabet_limit, code.selector),
@@ -22746,7 +25899,15 @@ fn plan_serialized_tree(
                 if builder_initialized != decoded_symbols
                     || decoded_symbols != decoder.alphabet_limit
                 {
-                    return Err(core_state_failure());
+                    return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
+                        status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) });
+                }
+                if decoder.alphabet_limit > capacity || tree >= tree_count {
+                    let error = if decoder.alphabet_limit > capacity {
+                        crate::brotli_prefix::WorkspaceError::InvalidSymbol
+                    } else { crate::brotli_prefix::WorkspaceError::InvalidTree };
+                    return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
+                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(error)) });
                 }
                 let (install_planning, install_execution) = plan_canonical_tree_install(
                     &lengths,
@@ -22831,9 +25992,9 @@ fn plan_block_tree_action(
             execution_work = checked_planned_work_add(
                 execution_work,
                 if phase == CompressedOuterPhase::BlockTypeTree {
-                    76 + 1 + 1
+                    serialized_tree_start_work() + 1 + 1
                 } else {
-                    5 + 1 + 1 + 1
+                    installed_prefix_reset_work() + 1 + 1 + 1
                 },
             )?;
             None
@@ -23012,11 +26173,11 @@ fn plan_tree_group_action(
             execution_work = checked_planned_work_add(
                 execution_work,
                 if next < count {
-                    76 + 2 + 1 + 1
+                    group_tree_start_work()
                 } else if group < 2 {
-                    1 + 1 + 2 + 76 + 2 + 1 + 1 + 1
+                    tree_group_start_work()
                 } else {
-                    2 + 6 + 28 + 1 + 1 + 1
+                    2 + 6 + ready_switch_start_work() + 1 + 1 + 1
                 },
             )?;
             None
@@ -23241,108 +26402,72 @@ fn execute_fixed_compressed_plan(
     Ok(used)
 }
 
-fn advance_conservative_compressed_header(
-    workspace: &mut [u8],
-    window_bytes: u32,
-    budget: &mut crate::brotli::RequestBudget,
-    input: &[u8],
-    end_of_input: bool,
+fn plan_terminal_header_work(workspace: &[u8], window_bytes: u32,
+    outer: u8) -> (r: Result<u64, CoreFailure>)
+{
+    if outer == 12 {
+        return Ok(if load_terminal_error(workspace, window_bytes).is_ok() { 0 } else { 4 + 1 });
+    }
+    if outer != 11 { return Ok(4 + 1); }
+    let mut i = 0u16;
+    let mut failed = false;
+    while i < 3
+        invariant i <= 3,
+        decreases 3 - i,
+    {
+        let count = state_u16(workspace, window_bytes, B3B_BLOCK_COUNTS + 2 * i)
+            .map_err(map_compressed_error)?;
+        let length = state_u32(workspace, window_bytes, B3B_INITIAL_LENGTHS + 4 * i)
+            .map_err(map_compressed_error)?;
+        if count == 0 || count > 256 || length == 0 { failed = true; }
+        i += 1;
+    }
+    Ok(if failed { 4 + 1 } else { 0 })
+}
+
+fn advance_planned_terminal_header(
+    workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, outer: u8,
 ) -> (r: CompressedStep)
-    requires
-        old(budget).valid(),
+    requires old(budget).valid(),
         b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
         compressed_decoder_state_ok(old(workspace)@, window_bytes),
-    ensures
-        final(budget).valid(),
-        final(budget).limits == old(budget).limits,
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == outer,
+        outer >= 11,
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
         final(budget).work_remaining <= old(budget).work_remaining,
+        final(workspace)@.len() == old(workspace)@.len(), r.consumed == 0,
         !matches!(r.status, CompressedStatus::Failed(_)) ==>
             compressed_decoder_state_ok(final(workspace)@, window_bytes),
-        final(workspace)@.len() == old(workspace)@.len(),
-        r.consumed <= input.len(),
 {
-    let allowed = if budget.input_remaining > usize::MAX as u64 {
-        input.len()
-    } else {
-        input.len().min(budget.input_remaining as usize)
+    let work = match plan_terminal_header_work(workspace, window_bytes, outer) {
+        Ok(value) => value,
+        Err(error) => return CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) },
     };
-    const FIXED_WORK: u64 = 17_728_416;
-    const INPUT_BYTE_WORK: u64 = 5_640;
-    let input_work = match (allowed as u64).checked_mul(INPUT_BYTE_WORK) {
-        Some(value) => value,
-        None => {
-            return CompressedStep {
-                consumed: 0,
-                status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
-            };
-        }
-    };
-    let reservation = match FIXED_WORK.checked_add(input_work) {
-        Some(value) => value,
-        None => {
-            return CompressedStep {
-                consumed: 0,
-                status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
-            };
-        }
-    };
-    if !budget.charge_work(reservation) {
-        return CompressedStep {
-            consumed: 0,
-            status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
-        };
+    if !budget.charge_work(work) {
+        return CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) };
     }
-    let ghost before_decoder_workspace = workspace@;
+    let ghost before_action = workspace@;
     let step = {
-        let mut decoder = CompressedMetaBlockDecoder {
-            workspace: &mut workspace[..],
-            window_bytes,
-        };
+        let mut decoder = CompressedMetaBlockDecoder { workspace: &mut workspace[..], window_bytes };
         proof {
-            assert(decoder.workspace@ == before_decoder_workspace);
+            assert(decoder.workspace@ == before_action);
             assert(after_borrow(workspace)@ == final(decoder.workspace)@);
             assert(compressed_decoder_state_ok(decoder.workspace@, window_bytes));
         }
-        let result = decoder.step(
-            &input[..allowed],
-            end_of_input && allowed == input.len(),
-        );
+        let result = decoder.step(&[], false);
         proof {
-            assert(has_resolved(decoder));
-            assert(has_resolved(decoder.workspace));
+            assert(has_resolved(decoder)); assert(has_resolved(decoder.workspace));
             assert(decoder.workspace@ == final(decoder.workspace)@);
             assert(after_borrow(workspace)@ == final(decoder.workspace)@);
-            assert(after_borrow(workspace)@.len() == old(workspace)@.len());
-            if !matches!(result.status, CompressedHeaderStatus::Failed(_)) {
-                assert(compressed_decoder_state_ok(decoder.workspace@, window_bytes));
-                assert(compressed_decoder_state_ok(after_borrow(workspace)@, window_bytes));
-            }
         }
         result
     };
-    proof {
-        assert(workspace@.len() == old(workspace)@.len());
-        if !matches!(step.status, CompressedHeaderStatus::Failed(_)) {
-            assert(compressed_decoder_state_ok(workspace@, window_bytes));
-        }
-    }
-    if step.consumed > 0 && !budget.charge_input(step.consumed as u64) {
-        return CompressedStep {
-            consumed: 0,
-            status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
-        };
-    }
-    let status = match step.status {
-        CompressedHeaderStatus::NeedInput if allowed < input.len() => {
-            CompressedStatus::Failed(CoreFailure::ResourceLimit)
-        }
-        CompressedHeaderStatus::NeedInput => CompressedStatus::NeedInput,
+    CompressedStep { consumed: step.consumed, status: match step.status {
         CompressedHeaderStatus::Complete(_) => CompressedStatus::Complete,
-        CompressedHeaderStatus::Failed(error) => {
-            CompressedStatus::Failed(map_compressed_error(error))
-        }
-    };
-    CompressedStep { consumed: step.consumed, status }
+        CompressedHeaderStatus::Failed(error) => CompressedStatus::Failed(map_compressed_error(error)),
+        CompressedHeaderStatus::NeedInput => CompressedStatus::Failed(core_state_failure()),
+    } }
 }
 
 spec fn context_tree_count_work_spec(
@@ -23523,6 +26648,17 @@ proof fn serialized_var_uint8_starts_agree(
         assert(left.pending@[at] == right.pending@[at]);
     }
     assert(left.bits() =~= right.bits());
+}
+
+proof fn serialized_var_uint8_has_valid_encoding(workspace: Seq<u8>, window_bytes: u32,
+    phase: VarUint8Phase)
+    requires serialized_var_uint8_phase(workspace, window_bytes, phase),
+    ensures var_uint8_encoding_valid(workspace, window_bytes),
+{
+    reveal(serialized_var_uint8_phase); reveal(var_uint8_encoding_valid);
+    reveal(var_uint8_phase_tag); reveal(var_uint8_phase_width);
+    match phase { VarUint8Phase::First | VarUint8Phase::Short => {},
+        VarUint8Phase::Long { .. } => {} }
 }
 
 proof fn var_uint8_steps_agree(
@@ -23709,6 +26845,10 @@ fn execute_planned_context_tree_count(
         final(budget).initializations_remaining == old(budget).initializations_remaining,
         old(budget).work_remaining >= plan.execution_work ==>
             final(budget).work_remaining == old(budget).work_remaining - plan.execution_work,
+        old(budget).work_remaining >= plan.execution_work ==> {
+            &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+            &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
+        },
         final(workspace)@.len() == old(workspace)@.len(),
         old(budget).work_remaining < plan.execution_work ==> {
             &&& final(workspace)@ == old(workspace)@
@@ -23775,6 +26915,11 @@ fn execute_planned_context_tree_count(
         reveal(serialized_context_map_prefix_ok);
     }
     let ghost before_action = workspace@;
+    proof {
+        reveal(context_tree_count_plan_valid);
+        serialized_queue_has_valid_encoding(workspace@, window_bytes, plan.start_queue);
+        serialized_var_uint8_has_valid_encoding(workspace@, window_bytes, plan.start_phase);
+    }
     let (used, status) = advance_context_tree_count_phase(
         workspace, window_bytes, kind_tag, kind, active_len, input, end_of_input,
     );
@@ -23785,7 +26930,20 @@ fn execute_planned_context_tree_count(
         )),
         _ => None,
     };
-    if used != plan.consumed || status != expected {
+    proof {
+        context_tree_count_plan_matches_action(before_action, workspace@, window_bytes,
+            input@, end_of_input, plan, used, status);
+        assert(status == expected);
+        assert(used == plan.consumed);
+    }
+    let status_matches = match (status, expected) {
+        (None, None)
+        | (Some(ContextAdvanceStatus::NeedInput), Some(ContextAdvanceStatus::NeedInput))
+        | (Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+            Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated))) => true,
+        _ => false,
+    };
+    if used != plan.consumed || !status_matches {
         return Err(CompressedStep { consumed: used,
             status: CompressedStatus::Failed(core_state_failure()) });
     }
@@ -24056,6 +27214,19 @@ proof fn serialized_bit_queues_agree(workspace: Seq<u8>, window_bytes: u32,
     assert(left.bits() =~= right.bits());
 }
 
+proof fn serialized_queue_has_valid_encoding(workspace: Seq<u8>, window_bytes: u32,
+    queue: BitQueue)
+    requires serialized_b3b_queue(workspace, window_bytes, queue),
+    ensures b3b_queue_encoding_valid(workspace, window_bytes),
+{
+    reveal(serialized_b3b_queue); reveal(b3b_queue_encoding_valid);
+    b3b_scalar_layout_is_exact();
+    assert forall|i: int| queue.len <= i < 8 implies #[trigger]
+        workspace[b3b_scalar_base(window_bytes) + i] == 0 by {
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == 0);
+    }
+}
+
 proof fn bit_read_steps_agree(left: BitQueue, right: BitQueue,
     input: Seq<u8>, end: bool, width: nat,
     left_used: usize, right_used: usize, left_end: BitQueue, right_end: BitQueue,
@@ -24116,8 +27287,14 @@ proof fn context_bits_plan_matches_action(before: Seq<u8>, after: Seq<u8>, windo
     status: Option<ContextAdvanceStatus>)
     requires context_bits_plan_valid(before, window_bytes, input, end, plan),
         context_bits_phase_refines(before, after, window_bytes, plan.phase, input, end, used, status),
-        status == context_bits_expected_status(before, window_bytes, plan),
+        match status {
+            Some(ContextAdvanceStatus::Failed(error)) => error == CompressedHeaderError::Truncated
+                || error == CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat),
+            Some(ContextAdvanceStatus::Complete { .. }) => false,
+            _ => true,
+        },
     ensures used == plan.consumed, context_bits_effect_matches(before, after, window_bytes, plan),
+        status == context_bits_expected_status(before, window_bytes, plan),
 {
     reveal(context_bits_phase_refines);
     let (sq, eq, rs) = choose|sq: BitQueue, eq: BitQueue, rs: BitReadStatus| {
@@ -24135,6 +27312,8 @@ proof fn context_bits_plan_matches_action(before: Seq<u8>, after: Seq<u8>, windo
     bit_read_steps_agree(sq, plan.start_queue, input, end,
         context_bits_width(before, window_bytes, plan.phase), used, plan.consumed,
         eq, plan.end_queue, rs, plan.status);
+    reveal(context_bits_plan_valid); reveal(context_bits_value_result);
+    reveal(context_bits_expected_status); reveal(context_bits_width);
     assert(exists|queue: BitQueue| serialized_b3b_queue(after, window_bytes, queue)
         && queue.bits() == plan.end_queue.bits());
 }
@@ -24157,6 +27336,10 @@ fn execute_planned_context_bits(workspace: &mut [u8], window_bytes: u32,
         final(budget).initializations_remaining == old(budget).initializations_remaining,
         old(budget).work_remaining >= plan.execution_work ==>
             final(budget).work_remaining == old(budget).work_remaining - plan.execution_work,
+        old(budget).work_remaining >= plan.execution_work ==> {
+            &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+            &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
+        },
         final(workspace)@.len() == old(workspace)@.len(),
         old(budget).work_remaining < plan.execution_work ==> {
             &&& final(workspace)@ == old(workspace)@
@@ -24216,8 +27399,18 @@ fn execute_planned_context_bits(workspace: &mut [u8], window_bytes: u32,
         reveal(serialized_context_data_ok); reveal(serialized_context_map_prefix_ok);
     }
     let ghost before_action = workspace@;
+    proof {
+        reveal(context_bits_plan_valid);
+        serialized_queue_has_valid_encoding(workspace@, window_bytes, plan.start_queue);
+    }
     let (used, status) = advance_context_bits_phase(workspace, window_bytes, plan.phase,
         kind_tag, kind, active_len, input, end_of_input);
+    proof {
+        context_bits_plan_matches_action(before_action, workspace@, window_bytes,
+            input@, end_of_input, plan, used, status);
+        assert(status == expected);
+        assert(used == plan.consumed);
+    }
     let status_matches = match (status, expected) {
         (None, None) => true,
         (Some(ContextAdvanceStatus::NeedInput), Some(ContextAdvanceStatus::NeedInput)) => true,
@@ -24289,249 +27482,546 @@ fn advance_planned_context_bits(workspace: &mut [u8], window_bytes: u32,
         end_of_input && allowed == input.len(), allowed < input.len(), plan)
 }
 
-fn plan_context_map_tail(
-    workspace: &[u8],
-    window_bytes: u32,
-    budget: &mut crate::brotli::RequestBudget,
-    outer_phase: CompressedOuterPhase,
-) -> (r: Result<CompressedActionPlan, CoreFailure>)
-    requires old(budget).valid(),
+fn context_tree_action_work(tree_work: u64, status: SerializedTreeStatus)
+    -> (r: Result<u64, CoreFailure>)
     ensures
-        final(budget).valid(),
-        final(budget).limits == old(budget).limits,
-        final(budget).work_remaining <= old(budget).work_remaining,
-{
-    let context_phase = match state_byte(workspace, window_bytes, B3B_CONTEXT_PHASE) {
-        Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
-    };
-    if context_phase < 7 || context_phase > 9 {
-        return Err(core_state_failure());
-    }
-    let kind_tag = match state_byte(workspace, window_bytes, B3B_CONTEXT_KIND) {
-        Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
-    };
-    if kind_tag > 1 {
-        return Err(core_state_failure());
-    }
-    let kind = if kind_tag == 0 {
-        crate::brotli_prefix::ContextMapKind::Literal
-    } else {
-        crate::brotli_prefix::ContextMapKind::Distance
-    };
-    let active_len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
-        Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
-    };
-    let num_trees = match state_u16(workspace, window_bytes, B3B_MAP_TREES) {
-        Ok(value) => value,
-        Err(_) => return Err(core_state_failure()),
-    };
-    if active_len == 0 || num_trees == 0 || num_trees > 256 {
-        return Err(core_state_failure());
-    }
-    let context_capacity = match kind {
-        crate::brotli_prefix::ContextMapKind::Literal => 16_384u16,
-        crate::brotli_prefix::ContextMapKind::Distance => 1_024u16,
-    };
-    if active_len > context_capacity {
-        return Err(core_state_failure());
-    }
-    let mut planning_work = 0u64;
-    let mut execution_work = 0u64;
-    let mut covered = true;
-    let context_base = match kind {
-        crate::brotli_prefix::ContextMapKind::Literal => {
-            crate::brotli_prefix::LITERAL_CONTEXT_MAP_OFFSET
-        }
-        crate::brotli_prefix::ContextMapKind::Distance => {
-            crate::brotli_prefix::DISTANCE_CONTEXT_MAP_OFFSET
-        }
-    };
-    let context_address = match (window_bytes as usize).checked_add(context_base as usize) {
-        Some(value) => value,
-        None => return Err(core_state_failure()),
-    };
-
-    if context_phase == 7 {
-        let upper = match state_byte(workspace, window_bytes, B3B_MTF_UPPER_BOUND) {
-            Ok(value) => value,
-            Err(_) => return Err(core_state_failure()),
+        ({ let extra: nat = match status {
+            SerializedTreeStatus::Complete => 2nat,
+            SerializedTreeStatus::Failed(_) => 5nat,
+            SerializedTreeStatus::NeedInput => 0nat,
         };
-        if upper > 63 {
-            return Err(core_state_failure());
-        }
-        if !budget.charge_work(active_len as u64) {
-            return Err(CoreFailure::ResourceLimit);
-        }
-        planning_work = active_len as u64;
-        let mut list = [0u8; 256];
-        let mut i = 0usize;
-        while i < 256
-            invariant i <= 256,
-            decreases 256 - i,
-        {
-            list[i] = i as u8;
-            i += 1;
-        }
-        let mut index = 0u16;
-        let mut mtf_work = 4u64 * (upper as u64 + 1);
-        while index < active_len
-            invariant
-                index <= active_len,
-                budget.valid(),
-                budget.limits == old(budget).limits,
-                budget.work_remaining <= old(budget).work_remaining,
-                mtf_work <= 256 + 516 * index as u64,
-            decreases active_len - index,
-        {
-            let at = match context_address.checked_add(index as usize) {
-                Some(value) => value,
-                None => return Err(core_state_failure()),
-            };
-            if at >= workspace.len() {
-                return Err(core_state_failure());
-            }
-            let rank = workspace[at];
-            if rank as u16 >= num_trees {
-                return Err(core_state_failure());
-            }
-            assert(2 * rank as u64 + 6 <= 516);
-            mtf_work = checked_planned_work_add(mtf_work, 2 * rank as u64 + 6)?;
-            let value = list[rank as usize];
-            let mut move_at = rank as usize;
-            while move_at > 0
-                invariant move_at <= rank as usize,
-                decreases move_at,
-            {
-                list[move_at] = list[move_at - 1];
-                move_at -= 1;
-            }
-            list[0] = value;
-            index += 1;
-        }
-        let mtf_action_work = checked_planned_work_add(mtf_work, 2 + 1)?;
-        execution_work = checked_planned_work_add(execution_work, mtf_action_work)?;
-    }
-
-    if context_phase <= 8 {
-        if !budget.charge_work(active_len as u64) {
-            return Err(CoreFailure::ResourceLimit);
-        }
-        planning_work = checked_planned_work_add(planning_work, active_len as u64)?;
-        let mut seen = [false; 256];
-        if context_phase == 8 {
-            let mut index = 0u16;
-            while index < active_len
-                invariant
-                    index <= active_len,
-                    budget.valid(),
-                    budget.limits == old(budget).limits,
-                    budget.work_remaining <= old(budget).work_remaining,
-                decreases active_len - index,
-            {
-                let at = match context_address.checked_add(index as usize) {
-                    Some(value) => value,
-                    None => return Err(core_state_failure()),
-                };
-                if at >= workspace.len() {
-                    return Err(core_state_failure());
-                }
-                let value = workspace[at];
-                if value as u16 >= num_trees {
-                    return Err(core_state_failure());
-                }
-                seen[value as usize] = true;
-                index += 1;
-            }
-        } else {
-            let mut list = [0u8; 256];
-            let mut i = 0usize;
-            while i < 256
-                invariant i <= 256,
-                decreases 256 - i,
-            {
-                list[i] = i as u8;
-                i += 1;
-            }
-            let mut index = 0u16;
-            while index < active_len
-                invariant
-                    index <= active_len,
-                    budget.valid(),
-                    budget.limits == old(budget).limits,
-                    budget.work_remaining <= old(budget).work_remaining,
-                decreases active_len - index,
-            {
-                let at = match context_address.checked_add(index as usize) {
-                    Some(value) => value,
-                    None => return Err(core_state_failure()),
-                };
-                if at >= workspace.len() {
-                    return Err(core_state_failure());
-                }
-                let rank = workspace[at];
-                if rank as u16 >= num_trees {
-                    return Err(core_state_failure());
-                }
-                let value = list[rank as usize];
-                seen[value as usize] = true;
-                let mut move_at = rank as usize;
-                while move_at > 0
-                    invariant move_at <= rank as usize,
-                    decreases move_at,
-                {
-                    list[move_at] = list[move_at - 1];
-                    move_at -= 1;
-                }
-                list[0] = value;
-                index += 1;
-            }
-        }
-        let mut tree = 0u16;
-        while tree < num_trees
-            invariant tree <= num_trees <= 256,
-            decreases num_trees - tree,
-        {
-            if !seen[tree as usize] {
-                covered = false;
-            }
-            tree += 1;
-        }
-        let coverage_work = 32u64 + 3 * active_len as u64 + num_trees as u64;
-        execution_work = checked_planned_work_add(execution_work, coverage_work)?;
-        if !covered {
-            execution_work = checked_planned_work_add(execution_work, 4 + 1)?;
-            return Ok(CompressedActionPlan {
-                planning_work,
-                execution_work,
-                consumed: 0,
-                status: Some(CompressedHeaderStatus::Failed(
-                    CompressedHeaderError::InvalidFormat(
-                        CompressedFormatError::ContextMapCoverage,
-                    ),
-                )),
-            });
-        }
-        execution_work = checked_planned_work_add(execution_work, 1 + 1)?;
-    }
-
-    execution_work = checked_planned_work_add(
-        execution_work,
-        if outer_phase == CompressedOuterPhase::LiteralContextMap {
-            2 + 14 + 1 + 2
-        } else {
-            2 + 1 + 1 + 2 + 76 + 2 + 1 + 1 + 1
-        },
-    )?;
-    Ok(CompressedActionPlan {
-        planning_work,
-        execution_work,
-        consumed: 0,
-        status: None,
+        &&& r.is_ok() == (tree_work as nat + extra <= u64::MAX as nat)
+        &&& r.is_ok() ==> r.unwrap() as nat == tree_work as nat + extra }),
+{
+    checked_planned_work_add(tree_work, match status {
+        SerializedTreeStatus::Complete => 1 + 1,
+        SerializedTreeStatus::Failed(_) => 4 + 1,
+        SerializedTreeStatus::NeedInput => 0,
     })
 }
+
+fn advance_planned_context_tree(
+    workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: Result<usize, CompressedStep>)
+    requires old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE) == 3,
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(workspace)@.len() == old(workspace)@.len(),
+        match r {
+            Ok(used) => used <= input.len() && compressed_decoder_state_ok(final(workspace)@, window_bytes),
+            Err(step) => step.consumed <= input.len() && (!matches!(step.status, CompressedStatus::Failed(_)) ==>
+                compressed_decoder_state_ok(final(workspace)@, window_bytes)),
+        },
+{
+    let allowed = if budget.input_remaining > usize::MAX as u64 { input.len() }
+        else { input.len().min(budget.input_remaining as usize) };
+    let plan = match plan_serialized_tree(workspace, window_bytes, budget,
+        &input[..allowed], end_of_input && allowed == input.len()) {
+        Ok(value) => value,
+        Err(error) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+    };
+    let work = match context_tree_action_work(plan.execution_work, plan.status) {
+        Ok(value) => value,
+        Err(error) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+    };
+    if !budget.charge_work(work) {
+        return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    proof { reveal(compressed_decoder_state_ok); }
+    let step = advance_serialized_tree(workspace, window_bytes,
+        &input[..allowed], end_of_input && allowed == input.len());
+    if step.consumed != plan.consumed || step.status != plan.status {
+        return Err(CompressedStep { consumed: step.consumed, status: CompressedStatus::Failed(core_state_failure()) });
+    }
+    if !budget.charge_input(step.consumed as u64) {
+        return Err(CompressedStep { consumed: step.consumed, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    match step.status {
+        SerializedTreeStatus::NeedInput => {
+            proof { reveal(compressed_decoder_state_ok); }
+            Err(CompressedStep { consumed: step.consumed, status: if allowed < input.len() {
+                CompressedStatus::Failed(CoreFailure::ResourceLimit)
+            } else { CompressedStatus::NeedInput } })
+        },
+        SerializedTreeStatus::Failed(error) => {
+            if store_terminal_error(workspace, window_bytes, error).is_err() {
+                return Err(CompressedStep { consumed: step.consumed, status: CompressedStatus::Failed(core_state_failure()) });
+            }
+            Err(CompressedStep { consumed: step.consumed, status: CompressedStatus::Failed(map_compressed_error(error)) })
+        },
+        SerializedTreeStatus::Complete => {
+            if store_context_phase(workspace, window_bytes, 4).is_err() {
+                return Err(CompressedStep { consumed: step.consumed, status: CompressedStatus::Failed(core_state_failure()) });
+            }
+            proof { reveal(compressed_decoder_state_ok); }
+            Ok(step.consumed)
+        },
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct ContextSymbolPlan {
+    consumed: usize,
+    execution_work: u64,
+    status: Option<ContextAdvanceStatus>,
+}
+
+spec fn context_installed_status_to_header(before: Seq<u8>, window_bytes: u32,
+    status: InstalledSymbolStatus) -> Option<ContextAdvanceStatus> {
+    match status {
+        InstalledSymbolStatus::NeedInput => Some(ContextAdvanceStatus::NeedInput),
+        InstalledSymbolStatus::Truncated => Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+        InstalledSymbolStatus::InternalState => Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InternalState)),
+        InstalledSymbolStatus::InvalidPrefixCode => Some(ContextAdvanceStatus::Failed(
+            CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode))),
+        InstalledSymbolStatus::Symbol(symbol) => {
+            let max_run = b3b_scalar_byte_at(before, window_bytes, B3B_MAX_RUN_PREFIX);
+            if symbol > max_run && (symbol as nat - max_run as nat) >= b3b_scalar_u16_at(before, window_bytes, B3B_MAP_TREES) {
+                Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapValue)))
+            } else { None }
+        },
+    }
+}
+
+spec fn context_symbol_work_spec(reads: nat, status: InstalledSymbolStatus, max_run: u8) -> nat {
+    reads + 1 + 10 + 5 + 1 + match status {
+        InstalledSymbolStatus::NeedInput => 0nat,
+        InstalledSymbolStatus::Symbol(symbol) => if 1 <= symbol <= max_run { 3nat } else { 5nat },
+        _ => 5nat,
+    }
+}
+
+spec fn context_symbol_plan_valid(before: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: ContextSymbolPlan, planning_work: nat) -> bool {
+    if b3b_scalar_u16_at(before, window_bytes, B3B_MAP_INITIALIZED)
+        == b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE) {
+        &&& plan.consumed == 0 && plan.status.is_none()
+        &&& planning_work == 0 && plan.execution_work == 2
+    } else {
+        match context_symbol_early_error(before, window_bytes) {
+            Some(error) => plan.consumed == 0 && plan.status == Some(ContextAdvanceStatus::Failed(error))
+                && planning_work == 1 && plan.execution_work == 6,
+            None => exists|meta: crate::brotli_prefix::TreeMetadata, sq: BitQueue, sp: InstalledPrefixState,
+                eq: BitQueue, ep: InstalledPrefixState, step: InstalledSymbolStep, reads: nat| {
+                &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta)
+                &&& serialized_b3b_queue(before, window_bytes, sq)
+                &&& serialized_installed_prefix(before, window_bytes, sp)
+                &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+                    0, meta, sq, sp, input, end, step, eq, ep, reads)
+                &&& planning_work == 1 + reads
+                &&& plan.execution_work as nat == context_symbol_work_spec(reads, step.status,
+                    b3b_scalar_byte_at(before, window_bytes, B3B_MAX_RUN_PREFIX))
+                &&& plan.consumed == step.consumed
+                &&& plan.status == context_installed_status_to_header(before, window_bytes, step.status)
+            },
+        }
+    }
+}
+
+proof fn context_symbol_plan_matches_action(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: ContextSymbolPlan, planning_work: nat,
+    used: usize, status: Option<ContextAdvanceStatus>)
+    requires context_symbol_plan_valid(before, window_bytes, input, end, plan, planning_work),
+        context_symbol_full_refines(before, after, window_bytes, input, end, used, status),
+    ensures used == plan.consumed, status == plan.status,
+{
+    reveal(context_symbol_plan_valid); reveal(context_symbol_full_refines);
+    if b3b_scalar_u16_at(before, window_bytes, B3B_MAP_INITIALIZED)
+        == b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE) {
+    } else if context_symbol_early_error(before, window_bytes).is_some() {
+    } else {
+        let (pm, pq, pp, peq, pep, ps, pw) = choose|m: crate::brotli_prefix::TreeMetadata,
+            q: BitQueue, p: InstalledPrefixState, eq: BitQueue, ep: InstalledPrefixState,
+            ss: InstalledSymbolStep, work: nat| {
+            &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+                0, m)
+            &&& serialized_b3b_queue(before, window_bytes, q)
+            &&& serialized_installed_prefix(before, window_bytes, p)
+            &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+                0, m,
+                q, p, input, end, ss, eq, ep, work)
+            &&& planning_work == 1 + work
+            &&& plan.execution_work as nat == context_symbol_work_spec(work, ss.status, b3b_scalar_byte_at(before, window_bytes, B3B_MAX_RUN_PREFIX))
+            &&& plan.consumed == ss.consumed
+            &&& plan.status == context_installed_status_to_header(before, window_bytes, ss.status)
+        };
+        let (am, aq, ap, aeq, aep, astep, aw) = choose|m: crate::brotli_prefix::TreeMetadata,
+            q: BitQueue, p: InstalledPrefixState, eq: BitQueue, ep: InstalledPrefixState,
+            ss: InstalledSymbolStep, work: nat| {
+            &&& tree_metadata_value_matches(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+                0, m)
+            &&& serialized_b3b_queue(before, window_bytes, q)
+            &&& serialized_installed_prefix(before, window_bytes, p)
+            &&& #[trigger] installed_symbol_full_step(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+                0, m,
+                q, p, input, end, ss, eq, ep, work)
+            &&& serialized_b3b_queue(after, window_bytes, eq)
+            &&& serialized_installed_prefix(after, window_bytes, ep)
+            &&& used == ss.consumed
+            &&& context_symbol_result_total(before, after, window_bytes, ss.status, status)
+        };
+        reveal(tree_metadata_value_matches);
+        tree_metadata_values_agree(crate::brotli_prefix::TreeRegion::TemporaryContext, pm, am);
+        serialized_parser_starts_agree(before, window_bytes, pq, aq, pp, ap);
+        installed_full_steps_agree(before, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext,
+            0, pm,
+            pq, aq, pp, input, end, ps, peq, pep, pw, astep, aeq, aep, aw);
+        reveal(context_symbol_result_total); reveal(context_symbol_value_total);
+        reveal(context_symbol_value_result); reveal(context_installed_status_to_header);
+        match astep.status {
+            InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated
+            | InstalledSymbolStatus::InternalState | InstalledSymbolStatus::InvalidPrefixCode => {},
+            InstalledSymbolStatus::Symbol(_) => {},
+        }
+    }
+}
+
+fn context_symbol_execution_work(read_work: u64, status: InstalledSymbolStatus,
+    max_run: u8, num_trees: u16) -> (r: Result<u64, CoreFailure>)
+    ensures ({
+        let extra: nat = match status {
+            InstalledSymbolStatus::NeedInput => 0nat,
+            InstalledSymbolStatus::Symbol(symbol) => {
+                if symbol == 0 { 5nat }
+                else if symbol <= max_run { 3nat }
+                else if (symbol as nat - max_run as nat) < num_trees { 5nat }
+                else { 5nat }
+            },
+            _ => 5nat,
+        };
+        &&& r.is_ok() == (read_work as nat + 1 + 10 + 5 + 1 + extra <= u64::MAX as nat)
+        &&& r.is_ok() ==> r.unwrap() as nat == read_work as nat + 1 + 10 + 5 + 1 + extra
+    }),
+{
+    let base = checked_planned_work_add(read_work, 1 + 10 + 5 + 1)?;
+    checked_planned_work_add(base, match status {
+        InstalledSymbolStatus::NeedInput => 0,
+        InstalledSymbolStatus::Symbol(symbol) => {
+            if symbol == 0 { 1 + 4 }
+            else if symbol <= max_run as u16 { 1 + 1 + 1 }
+            else if (symbol - max_run as u16) < num_trees { 1 + 4 }
+            else { 4 + 1 }
+        },
+        _ => 4 + 1,
+    })
+}
+
+fn plan_context_symbol_action(workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: Result<ContextSymbolPlan, CoreFailure>)
+    requires old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() ==> r.unwrap().consumed <= input.len(),
+        r.is_ok() ==> context_symbol_plan_valid(workspace@, window_bytes, input@, end_of_input,
+            r.unwrap(), (old(budget).work_remaining - final(budget).work_remaining) as nat),
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+{
+    reveal(context_symbol_plan_valid); reveal(context_symbol_early_error);
+    let initialized = match state_u16(workspace, window_bytes, B3B_MAP_INITIALIZED) {
+        Ok(value) => value, _ => return Err(core_state_failure()),
+    };
+    let active_len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
+        Ok(value) => value, _ => return Err(core_state_failure()),
+    };
+    if initialized > active_len { return Err(core_state_failure()); }
+    if initialized == active_len {
+        return Ok(ContextSymbolPlan { consumed: 0, execution_work: 1 + 1, status: None });
+    }
+    let num_trees = match state_u16(workspace, window_bytes, B3B_MAP_TREES) {
+        Ok(value) if 1 <= value && value <= 256 => value,
+        _ => return Err(core_state_failure()),
+    };
+    let max_run = match state_byte(workspace, window_bytes, B3B_MAX_RUN_PREFIX) {
+        Ok(value) => value, _ => return Err(core_state_failure()),
+    };
+    if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+    let meta = match crate::brotli_prefix::read_tree_metadata(workspace, window_bytes,
+        crate::brotli_prefix::TreeRegion::TemporaryContext, 1, 0) {
+        Ok(value) => value,
+        Err(error) => {
+            let error = match error {
+                crate::brotli_prefix::MetadataReadError::InvalidEncoding =>
+                    CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidMetadata),
+                crate::brotli_prefix::MetadataReadError::Workspace(error) =>
+                    CompressedHeaderError::Workspace(error),
+            };
+            return Ok(ContextSymbolPlan { consumed: 0, execution_work: 1 + 4 + 1,
+                status: Some(ContextAdvanceStatus::Failed(error)) });
+        },
+    };
+    let queue = match load_b3b_queue(workspace, window_bytes) {
+        Ok(value) => value,
+        Err(error) => return Ok(ContextSymbolPlan { consumed: 0, execution_work: 1 + 4 + 1,
+            status: Some(ContextAdvanceStatus::Failed(error)) }),
+    };
+    let prefix = match load_installed_prefix_state(workspace, window_bytes) {
+        Ok(value) => value,
+        Err(error) => return Ok(ContextSymbolPlan { consumed: 0, execution_work: 1 + 4 + 1,
+            status: Some(ContextAdvanceStatus::Failed(error)) }),
+    };
+    proof {
+        assert(tree_metadata_value_matches(workspace@, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta));
+        tree_metadata_match_is_valid_encoding(workspace@, window_bytes, crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta);
+        serialized_cursor_has_valid_encoding(workspace@, window_bytes, queue, prefix);
+    }
+    let symbol = plan_installed_symbol(workspace, window_bytes, budget,
+        crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta, queue, prefix, input, end_of_input)?;
+    let status = match symbol.status {
+        InstalledSymbolStatus::NeedInput => Some(ContextAdvanceStatus::NeedInput),
+        InstalledSymbolStatus::Truncated => Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)),
+        InstalledSymbolStatus::InternalState => Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InternalState)),
+        InstalledSymbolStatus::InvalidPrefixCode => Some(ContextAdvanceStatus::Failed(
+            CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode))),
+        InstalledSymbolStatus::Symbol(value) => {
+            if value > max_run as u16 && value - max_run as u16 >= num_trees {
+                Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapValue)))
+            } else { None }
+        },
+    };
+    let execution_work = context_symbol_execution_work(symbol.planning_work, symbol.status, max_run, num_trees)?;
+    Ok(ContextSymbolPlan { consumed: symbol.consumed, execution_work, status })
+}
+
+spec fn context_symbol_execution_effect(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: ContextSymbolPlan) -> bool {
+    exists|during: Seq<u8>| {
+        &&& context_symbol_full_refines(before, during, window_bytes, input, end, plan.consumed, plan.status)
+        &&& context_symbol_action_frame(before, during, window_bytes, plan.status)
+        &&& match plan.status {
+            Some(ContextAdvanceStatus::Failed(error)) => {
+                &&& serialized_terminal_error(after, window_bytes, error)
+                &&& terminal_error_frame(during, after, window_bytes)
+            },
+            _ => after == during,
+        }
+    }
+}
+
+fn execute_planned_context_symbol(workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end: bool,
+    input_was_limited: bool, plan: ContextSymbolPlan, planning_work: u64,
+) -> (r: Result<usize, CompressedStep>)
+    requires old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE) == 4,
+        context_symbol_plan_valid(old(workspace)@, window_bytes, input@, end, plan, planning_work as nat),
+        plan.consumed <= input.len(), plan.consumed as u64 <= old(budget).input_remaining,
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(workspace)@.len() == old(workspace)@.len(),
+        old(budget).work_remaining < plan.execution_work ==> {
+            &&& final(workspace)@ == old(workspace)@
+            &&& *final(budget) == *old(budget)
+            &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+        },
+        old(budget).work_remaining >= plan.execution_work ==> {
+            &&& final(budget).work_remaining == old(budget).work_remaining - plan.execution_work
+            &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+            &&& context_symbol_execution_effect(old(workspace)@, final(workspace)@, window_bytes, input@, end, plan)
+        },
+        match r {
+            Ok(used) => used == plan.consumed && used <= input.len()
+                && compressed_decoder_state_ok(final(workspace)@, window_bytes),
+            Err(step) => step.consumed <= input.len() && (!matches!(step.status, CompressedStatus::Failed(_)) ==>
+                compressed_decoder_state_ok(final(workspace)@, window_bytes)),
+        },
+{
+    proof { reveal(context_symbol_execution_effect); }
+    if !budget.charge_work(plan.execution_work) {
+        return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    let kind_tag = match state_byte(workspace, window_bytes, B3B_CONTEXT_KIND) {
+        Ok(value) => value, _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    let kind = if kind_tag == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+        else { crate::brotli_prefix::ContextMapKind::Distance };
+    let len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
+        Ok(value) => value, _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    proof {
+        reveal(compressed_decoder_state_ok); reveal(serialized_context_state_ok);
+        reveal(serialized_context_data_ok); reveal(serialized_context_map_prefix_ok);
+    }
+    let ghost before = workspace@;
+    let (used, status) = advance_context_symbol_phase(workspace, window_bytes, kind_tag, kind, len, input, end);
+    proof { context_symbol_plan_matches_action(before, workspace@, window_bytes, input@, end,
+        plan, planning_work as nat, used, status); }
+    let ghost during = workspace@;
+    if !budget.charge_input(used as u64) {
+        return Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    match status {
+        Some(ContextAdvanceStatus::Failed(error)) => {
+            let stored = store_terminal_error(workspace, window_bytes, error);
+            proof {
+                assert(exists|mid: Seq<u8>| mid == during && {
+                    &&& context_symbol_full_refines(before, mid, window_bytes, input@, end, plan.consumed, plan.status)
+                    &&& context_symbol_action_frame(before, mid, window_bytes, plan.status)
+                    &&& serialized_terminal_error(workspace@, window_bytes, error)
+                    &&& terminal_error_frame(mid, workspace@, window_bytes)
+                });
+            }
+            Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(map_compressed_error(error)) })
+        },
+        Some(ContextAdvanceStatus::NeedInput) => Err(CompressedStep { consumed: used,
+            status: if input_was_limited { CompressedStatus::Failed(CoreFailure::ResourceLimit) }
+                else { CompressedStatus::NeedInput } }),
+        None => Ok(used),
+        _ => Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) }),
+    }
+}
+
+fn advance_planned_context_symbol(workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: Result<usize, CompressedStep>)
+    requires old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        compressed_decoder_state_ok(old(workspace)@, window_bytes),
+        6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE) == 4,
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(workspace)@.len() == old(workspace)@.len(),
+        match r {
+            Ok(used) => used <= input.len() && compressed_decoder_state_ok(final(workspace)@, window_bytes),
+            Err(step) => step.consumed <= input.len() && (!matches!(step.status, CompressedStatus::Failed(_)) ==>
+                compressed_decoder_state_ok(final(workspace)@, window_bytes)),
+        },
+{
+    let allowed = if budget.input_remaining > usize::MAX as u64 { input.len() }
+        else { input.len().min(budget.input_remaining as usize) };
+    let before_work = budget.work_remaining;
+    let plan = match plan_context_symbol_action(workspace, window_bytes, budget,
+        &input[..allowed], end_of_input && allowed == input.len()) {
+        Ok(value) => value,
+        Err(error) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+    };
+    execute_planned_context_symbol(workspace, window_bytes, budget, &input[..allowed],
+        end_of_input && allowed == input.len(), allowed < input.len(), plan,
+        before_work - budget.work_remaining)
+}
+
+fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, outer_phase: CompressedOuterPhase,
+) -> (r: Result<CompressedActionPlan, CoreFailure>)
+    requires old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+{
+    let phase = state_byte(workspace, window_bytes, B3B_CONTEXT_PHASE).map_err(map_compressed_error)?;
+    let kind = state_byte(workspace, window_bytes, B3B_CONTEXT_KIND).map_err(map_compressed_error)?;
+    let len = state_u16(workspace, window_bytes, B3B_MAP_SIZE).map_err(map_compressed_error)?;
+    let trees = state_u16(workspace, window_bytes, B3B_MAP_TREES).map_err(map_compressed_error)?;
+    if phase < 7 || phase > 9 || kind > 1 || len == 0 || trees == 0 || trees > 256 {
+        return Err(core_state_failure());
+    }
+    let capacity = if kind == 0 { 16_384u16 } else { 1_024u16 };
+    if len > capacity { return Err(core_state_failure()); }
+    let context_base = if kind == 0 { crate::brotli_prefix::LITERAL_CONTEXT_MAP_OFFSET }
+        else { crate::brotli_prefix::DISTANCE_CONTEXT_MAP_OFFSET };
+    let base = match (window_bytes as usize).checked_add(context_base as usize) {
+        Some(value) => value, None => return Err(core_state_failure()),
+    };
+    let mut planning_work = 0u64;
+    let mut execution_work = 0u64;
+    let mut status = None;
+    if phase == 7 {
+        let upper = state_byte(workspace, window_bytes, B3B_MTF_UPPER_BOUND).map_err(map_compressed_error)?;
+        if upper > 63 { return Err(core_state_failure()); }
+        execution_work = 4u64 * (upper as u64 + 1);
+        let mut index = 0u16;
+        while index < len
+            invariant index <= len <= 16_384,
+                execution_work <= 256 + 516 * index as u64,
+                planning_work == index as u64,
+                budget.valid(), budget.limits == old(budget).limits,
+                budget.work_remaining <= old(budget).work_remaining,
+            decreases len - index,
+        {
+            if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+            let at = match base.checked_add(index as usize) {
+                Some(value) => value, None => return Err(core_state_failure()),
+            };
+            if at >= workspace.len() { return Err(core_state_failure()); }
+            let rank = workspace[at];
+            if rank as u16 >= trees { return Err(core_state_failure()); }
+            planning_work += 1;
+            execution_work += 2 * rank as u64 + 6;
+            index += 1;
+        }
+        execution_work += 1 + 1 + 1;
+    } else if phase == 8 {
+        let mut seen = [false; 256];
+        let mut index = 0u16;
+        while index < len
+            invariant index <= len <= 16_384, planning_work == index as u64,
+                budget.valid(), budget.limits == old(budget).limits,
+                budget.work_remaining <= old(budget).work_remaining,
+            decreases len - index,
+        {
+            if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+            let at = match base.checked_add(index as usize) {
+                Some(value) => value, None => return Err(core_state_failure()),
+            };
+            if at >= workspace.len() { return Err(core_state_failure()); }
+            let value = workspace[at];
+            if value as u16 >= trees { return Err(core_state_failure()); }
+            seen[value as usize] = true;
+            planning_work += 1;
+            index += 1;
+        }
+        let mut covered = true;
+        let mut tree = 0u16;
+        while tree < trees
+            invariant tree <= trees <= 256, planning_work == len as u64 + tree as u64,
+                budget.valid(), budget.limits == old(budget).limits,
+                budget.work_remaining <= old(budget).work_remaining,
+            decreases trees - tree,
+        {
+            if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+            if !seen[tree as usize] { covered = false; }
+            planning_work += 1;
+            tree += 1;
+        }
+        execution_work = 32 + 3 * len as u64 + trees as u64
+            + if covered { 1 + 1 } else { 4 + 1 };
+        if !covered { status = Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InvalidFormat(
+            CompressedFormatError::ContextMapCoverage))); }
+    } else {
+        let expected = if outer_phase == CompressedOuterPhase::LiteralContextMap { 0u8 } else { 1u8 };
+        if kind != expected {
+            execution_work = 4 + 1;
+            status = Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState));
+        } else {
+            let next_count = state_u16(workspace, window_bytes, if kind == 0 {
+                B3B_BLOCK_COUNTS + 4
+            } else { B3B_LITERAL_TREES }).map_err(map_compressed_error)?;
+            if next_count == 0 || next_count > 256 {
+                execution_work = 2 + 4 + 1;
+                status = Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState));
+            } else {
+                execution_work = if kind == 0 { 2 + serialized_map_start_work() + 1 + 1 }
+                    else { 2 + tree_group_start_work() };
+            }
+        }
+    }
+    Ok(CompressedActionPlan { planning_work, execution_work, consumed: 0, status })
+}
+
 
 fn advance_planned_context_map_tail(
     workspace: &mut [u8],
@@ -24585,7 +28075,12 @@ fn advance_planned_context_map_tail(
             });
         }
     };
-    execute_fixed_compressed_plan(
+    let subphase = match state_byte(workspace, window_bytes, B3B_CONTEXT_PHASE) {
+        Ok(value) => value,
+        Err(_) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    if subphase == 9 {
+        return execute_fixed_compressed_plan(
         workspace,
         window_bytes,
         budget,
@@ -24594,7 +28089,35 @@ fn advance_planned_context_map_tail(
         end_of_input,
         false,
         plan,
-    )
+    );
+    }
+
+    if !budget.charge_work(plan.execution_work) {
+        return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+    }
+    let kind_tag = match state_byte(workspace, window_bytes, B3B_CONTEXT_KIND) {
+        Ok(value) => value, _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    let kind = if kind_tag == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+        else { crate::brotli_prefix::ContextMapKind::Distance };
+    let len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
+        Ok(value) => value, _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
+    };
+    proof {
+        reveal(compressed_decoder_state_ok); reveal(serialized_context_state_ok);
+        reveal(serialized_context_data_ok); reveal(serialized_context_map_prefix_ok);
+    }
+    let result = if subphase == 7 {
+        advance_context_mtf_phase(workspace, window_bytes, kind, len)
+    } else { advance_context_coverage_phase(workspace, window_bytes, kind, len) };
+    if let Err(error) = result {
+        if store_terminal_error(workspace, window_bytes, error).is_err() {
+            return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) });
+        }
+        return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(map_compressed_error(error)) });
+    }
+    proof { reveal(compressed_decoder_state_ok); }
+    Ok(0)
 }
 
 #[verifier::rlimit(1000)]
@@ -24784,38 +28307,10 @@ fn advance_planned_compressed_action(
                 CompressedOuterPhase::InitialBlockLength,
             ));
         }
-        let planning_work = match initial_suffix_planning_work(
-            workspace,
-            window_bytes,
-            initial_allowed,
-        ) {
+        let plan = match plan_initial_suffix_action(workspace, window_bytes, budget,
+            &input[..initial_allowed], end_of_input && initial_allowed == input.len()) {
             Ok(value) => value,
-            Err(_) => {
-                return Err(CompressedStep {
-                    consumed: 0,
-                    status: CompressedStatus::Failed(core_state_failure()),
-                });
-            }
-        };
-        if !budget.charge_work(planning_work) {
-            return Err(CompressedStep {
-                consumed: 0,
-                status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
-            });
-        }
-        let plan = match plan_initial_suffix_action(
-            workspace,
-            window_bytes,
-            &input[..initial_allowed],
-            end_of_input && initial_allowed == input.len(),
-        ) {
-            Ok(value) if value.planning_work == planning_work => value,
-            _ => {
-                return Err(CompressedStep {
-                    consumed: 0,
-                    status: CompressedStatus::Failed(core_state_failure()),
-                });
-            }
+            Err(error) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
         };
         match execute_fixed_compressed_plan(
             workspace,
@@ -24962,6 +28457,16 @@ fn advance_planned_compressed_action(
             Ok(used) => already_consumed = used,
             Err(step) => return Err(step),
         }
+    } else if (initial_outer == 6 || initial_outer == 7) && initial_context_phase == 3 {
+        match advance_planned_context_tree(workspace, window_bytes, budget, input, end_of_input) {
+            Ok(used) => already_consumed = used,
+            Err(step) => return Err(step),
+        }
+    } else if (initial_outer == 6 || initial_outer == 7) && initial_context_phase == 4 {
+        match advance_planned_context_symbol(workspace, window_bytes, budget, input, end_of_input) {
+            Ok(used) => already_consumed = used,
+            Err(step) => return Err(step),
+        }
     } else if (initial_outer == 6 || initial_outer == 7)
         && 7 <= initial_context_phase && initial_context_phase <= 9
     {
@@ -25021,10 +28526,22 @@ fn advance_planned_compressed_action(
             Ok(used) => already_consumed = used,
             Err(step) => return Err(step),
         }
+    } else if initial_outer < 11 {
+        // W1 rejects unknown initial-length/context subphases without reading
+        // input. Preserve that terminal action and prepay its four writes.
+        if !budget.charge_work(4 + 1) {
+            return Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+        }
+        if store_terminal_error(workspace, window_bytes, CompressedHeaderError::InternalState).is_err() {
+            return Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()) });
+        }
+        return Err(CompressedStep { consumed: 0,
+            status: CompressedStatus::Failed(core_state_failure()) });
     } else {
-        return Err(advance_conservative_compressed_header(
-            workspace, window_bytes, budget, input, end_of_input,
-        ));
+        proof { assert(initial_outer >= 11); }
+        return Err(advance_planned_terminal_header(workspace, window_bytes, budget, initial_outer));
     }
     Ok(already_consumed)
 }
@@ -25664,7 +29181,26 @@ fn completed_body_symbol_work(
     scanned_and_read_work.checked_add(SERIALIZED_WRITE_WORK + TRANSITION_WORK)
 }
 
-pub(crate) fn advance_serialized_body_symbol(
+spec fn body_symbol_success_refines(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16, alphabet_limit: u16,
+    input: Seq<u8>, end: bool, consumed: usize, value: u16,
+    work_spent: nat) -> bool {
+    exists|meta: crate::brotli_prefix::TreeMetadata, sq: BitQueue, sp: InstalledPrefixState,
+        eq: BitQueue, ep: InstalledPrefixState, reads: nat| {
+        &&& meta.symbols == alphabet_limit
+        &&& tree_metadata_value_matches(before, window_bytes, region, tree, meta)
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& serialized_installed_prefix(before, window_bytes, sp)
+        &&& #[trigger] installed_symbol_full_step(before, window_bytes, region, tree, meta,
+            sq, sp, input, end,
+            InstalledSymbolStep { consumed, status: InstalledSymbolStatus::Symbol(value) }, eq, ep, reads)
+        &&& serialized_b3b_queue(after, window_bytes, eq)
+        &&& serialized_installed_prefix(after, window_bytes, ep)
+        &&& work_spent == 2 * reads + 17
+    }
+}
+
+fn advance_planned_body_symbol(
     workspace: &mut [u8],
     window_bytes: u32,
     budget: &mut crate::brotli::RequestBudget,
@@ -25680,10 +29216,22 @@ pub(crate) fn advance_serialized_body_symbol(
     ensures
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
-        final(budget).work_remaining == old(budget).work_remaining - r.work,
-        r.work <= old(budget).work_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).input_remaining == old(budget).input_remaining - r.consumed as u64,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
         final(workspace)@.len() == old(workspace)@.len(),
         r.consumed <= input.len(),
+        match r.status {
+            BodySymbolStatus::Symbol(value) => body_symbol_success_refines(
+                old(workspace)@, final(workspace)@, window_bytes, region, tree, alphabet_limit,
+                input@.take(if input@.len() < old(budget).input_remaining {
+                    input@.len() as int } else { old(budget).input_remaining as int }),
+                end_of_input && input@.len() <= old(budget).input_remaining, r.consumed, value,
+                (old(budget).work_remaining - final(budget).work_remaining) as nat),
+            _ => true,
+        },
         match r.status {
             BodySymbolStatus::Symbol(value) => value < alphabet_limit,
             _ => true,
@@ -25698,12 +29246,14 @@ pub(crate) fn advance_serialized_body_symbol(
             B3C_STREAM_PHASE as int,
         ),
 {
+    let ghost original = workspace@;
     // C1 charges one prefix-metadata record visit before it can inspect the
     // selected tree. The scan reports its exact bit-attempt/tree-record work.
     // A completed adapter action then charges each accepted input-byte read,
     // ten serialized queue writes, five serialized prefix writes, and one
     // logical state transition before either serialized store occurs.
     const TREE_METADATA_WORK: u64 = 1;
+    let work_before = budget.work_remaining;
     let mut exact_work: u64 = 0;
     let initialized = match region {
         crate::brotli_prefix::TreeRegion::Literal => {
@@ -25712,7 +29262,6 @@ pub(crate) fn advance_serialized_body_symbol(
                 Err(error) => {
                     return BodySymbolStep {
                         consumed: 0,
-                        work: exact_work,
                         status: BodySymbolStatus::Failed(map_compressed_error(error)),
                     };
                 }
@@ -25724,7 +29273,6 @@ pub(crate) fn advance_serialized_body_symbol(
                 Err(error) => {
                     return BodySymbolStep {
                         consumed: 0,
-                        work: exact_work,
                         status: BodySymbolStatus::Failed(map_compressed_error(error)),
                     };
                 }
@@ -25736,7 +29284,6 @@ pub(crate) fn advance_serialized_body_symbol(
                 Err(error) => {
                     return BodySymbolStep {
                         consumed: 0,
-                        work: exact_work,
                         status: BodySymbolStatus::Failed(map_compressed_error(error)),
                     };
                 }
@@ -25747,7 +29294,6 @@ pub(crate) fn advance_serialized_body_symbol(
         _ => {
             return BodySymbolStep {
                 consumed: 0,
-                work: exact_work,
                 status: BodySymbolStatus::Failed(core_state_failure()),
             };
         }
@@ -25755,7 +29301,6 @@ pub(crate) fn advance_serialized_body_symbol(
     if !budget.charge_work(TREE_METADATA_WORK) {
         return BodySymbolStep {
             consumed: 0,
-            work: exact_work,
             status: BodySymbolStatus::Failed(CoreFailure::ResourceLimit),
         };
     }
@@ -25771,7 +29316,6 @@ pub(crate) fn advance_serialized_body_symbol(
         Err(_) => {
             return BodySymbolStep {
                 consumed: 0,
-                work: exact_work,
                 status: BodySymbolStatus::Failed(core_state_failure()),
             };
         }
@@ -25779,7 +29323,6 @@ pub(crate) fn advance_serialized_body_symbol(
     if meta.symbols != alphabet_limit {
         return BodySymbolStep {
             consumed: 0,
-            work: exact_work,
             status: BodySymbolStatus::Failed(core_state_failure()),
         };
     }
@@ -25788,7 +29331,6 @@ pub(crate) fn advance_serialized_body_symbol(
         Err(error) => {
             return BodySymbolStep {
                 consumed: 0,
-                work: exact_work,
                 status: BodySymbolStatus::Failed(map_compressed_error(error)),
             };
         }
@@ -25798,7 +29340,6 @@ pub(crate) fn advance_serialized_body_symbol(
         Err(error) => {
             return BodySymbolStep {
                 consumed: 0,
-                work: exact_work,
                 status: BodySymbolStatus::Failed(map_compressed_error(error)),
             };
         }
@@ -25808,52 +29349,86 @@ pub(crate) fn advance_serialized_body_symbol(
     } else {
         input.len().min(budget.input_remaining as usize)
     };
-    let step = advance_installed_tree_symbol(
-        workspace,
-        window_bytes,
-        region,
-        tree,
-        meta,
-        &mut queue,
-        &mut prefix,
-        &input[..allowed],
-        end_of_input && allowed == input.len(),
-    );
+    let ghost start_queue = queue;
+    let ghost start_prefix = prefix;
+    let plan = match plan_installed_symbol(workspace, window_bytes, budget, region, tree, meta,
+        queue, prefix, &input[..allowed], end_of_input && allowed == input.len()) {
+        Ok(value) => value,
+        Err(error) => return BodySymbolStep { consumed: 0, status: BodySymbolStatus::Failed(error) },
+    };
+    exact_work = work_before - budget.work_remaining;
     let completed_action_work = match completed_body_symbol_work(
-        step.work,
-        step.consumed,
-    ) {
+        plan.planning_work - plan.consumed as u64, plan.consumed) {
         Some(value) => value,
-        None => {
-            return BodySymbolStep {
-                consumed: 0,
-                work: exact_work,
-                status: BodySymbolStatus::Failed(CoreFailure::ResourceLimit),
-            };
-        }
+        None => return BodySymbolStep { consumed: 0,
+            status: BodySymbolStatus::Failed(CoreFailure::ResourceLimit) },
     };
     if !budget.charge_work(completed_action_work) {
-        return BodySymbolStep {
-            consumed: 0,
-            work: exact_work,
-            status: BodySymbolStatus::Failed(CoreFailure::ResourceLimit),
-        };
+        return BodySymbolStep { consumed: 0,
+            status: BodySymbolStatus::Failed(CoreFailure::ResourceLimit) };
     }
-    exact_work = exact_work + completed_action_work;
+    exact_work = work_before - budget.work_remaining;
+    let step = advance_installed_tree_symbol(workspace, window_bytes, region, tree, meta,
+        &mut queue, &mut prefix, &input[..allowed], end_of_input && allowed == input.len());
+    let ghost replay_input = input@.take(allowed as int);
+    let ghost replay_end = end_of_input && allowed == input.len();
+    let ghost read_units = choose|cost: nat| {
+        &&& #[trigger] installed_symbol_full_step(original, window_bytes, region, tree, meta,
+            start_queue, start_prefix, replay_input, replay_end,
+            step, queue, prefix, cost)
+        &&& cost <= 10_575 + step.consumed as nat
+    };
+    proof {
+        installed_full_steps_agree(original, window_bytes, region, tree, meta,
+            start_queue, start_queue, start_prefix, input@.take(allowed as int),
+            end_of_input && allowed == input.len(),
+            InstalledSymbolStep { consumed: plan.consumed, status: plan.status },
+            plan.end_queue, plan.end_prefix, plan.planning_work as nat,
+            step, queue, prefix, read_units);
+        assert(step.consumed == plan.consumed);
+        assert(read_units == plan.planning_work);
+    }
     if step.consumed > 0 && !budget.charge_input(step.consumed as u64) {
         return BodySymbolStep {
             consumed: 0,
-            work: exact_work,
             status: BodySymbolStatus::Failed(CoreFailure::ResourceLimit),
         };
     }
-    if store_b3b_queue(workspace, window_bytes, &queue).is_err()
-        || store_installed_prefix_state(workspace, window_bytes, prefix).is_err() {
+    if store_b3b_queue(workspace, window_bytes, &queue).is_err() {
         return BodySymbolStep {
             consumed: step.consumed,
-            work: exact_work,
             status: BodySymbolStatus::Failed(core_state_failure()),
         };
+    }
+    let ghost after_queue_store = workspace@;
+    if store_installed_prefix_state(workspace, window_bytes, prefix).is_err() {
+        return BodySymbolStep {
+            consumed: step.consumed,
+            status: BodySymbolStatus::Failed(core_state_failure()),
+        };
+    }
+    proof {
+        serialized_b3b_queue_from_frame(after_queue_store, workspace@, window_bytes, queue);
+        if let InstalledSymbolStatus::Symbol(value) = step.status {
+            reveal(body_symbol_success_refines);
+            assert(tree_metadata_value_matches(original, window_bytes, region, tree, meta));
+            assert((work_before - budget.work_remaining) as nat == 2 * read_units + 17);
+            assert(exists|m: crate::brotli_prefix::TreeMetadata, sq: BitQueue, sp: InstalledPrefixState,
+                eq: BitQueue, ep: InstalledPrefixState, reads: nat| {
+                &&& m == meta && sq == start_queue && sp == start_prefix
+                    && eq == queue && ep == prefix && reads == read_units
+                &&& m.symbols == alphabet_limit
+                &&& tree_metadata_value_matches(original, window_bytes, region, tree, m)
+                &&& serialized_b3b_queue(original, window_bytes, sq)
+                &&& serialized_installed_prefix(original, window_bytes, sp)
+                &&& #[trigger] installed_symbol_full_step(original, window_bytes, region, tree, m,
+                    sq, sp, replay_input, replay_end,
+                    InstalledSymbolStep { consumed: step.consumed, status: InstalledSymbolStatus::Symbol(value) }, eq, ep, reads)
+                &&& serialized_b3b_queue(workspace@, window_bytes, eq)
+                &&& serialized_installed_prefix(workspace@, window_bytes, ep)
+                &&& (work_before - budget.work_remaining) as nat == 2 * reads + 17
+            });
+        }
     }
     let status = match step.status {
         InstalledSymbolStatus::NeedInput if allowed < input.len() => {
@@ -25871,9 +29446,31 @@ pub(crate) fn advance_serialized_body_symbol(
     };
     BodySymbolStep {
         consumed: step.consumed,
-        work: exact_work,
         status,
     }
+}
+
+pub(crate) fn advance_serialized_body_symbol(
+    workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    alphabet_limit: u16, input: &[u8], end_of_input: bool,
+) -> (r: BodySymbolStep)
+    requires old(budget).valid(),
+        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).input_remaining == old(budget).input_remaining - r.consumed as u64,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(workspace)@.len() == old(workspace)@.len(), r.consumed <= input.len(),
+        match r.status { BodySymbolStatus::Symbol(value) => value < alphabet_limit, _ => true },
+        b3c_scalar_byte_at(final(workspace)@, window_bytes, B3C_STREAM_PHASE as int)
+            == b3c_scalar_byte_at(old(workspace)@, window_bytes, B3C_STREAM_PHASE as int),
+{
+    advance_planned_body_symbol(workspace, window_bytes, budget, region, tree,
+        alphabet_limit, input, end_of_input)
 }
 
 pub(crate) fn advance_serialized_body_bits(
@@ -27666,7 +31263,6 @@ mod tests {
             ),
             InstalledSymbolStep {
                 consumed: 0,
-                work: 0,
                 status: InstalledSymbolStatus::Symbol(19)
             }
         );
@@ -27716,7 +31312,6 @@ mod tests {
             ),
             InstalledSymbolStep {
                 consumed: 0,
-                work: 1,
                 status: InstalledSymbolStatus::NeedInput
             }
         );
@@ -27735,7 +31330,6 @@ mod tests {
             ),
             InstalledSymbolStep {
                 consumed: 0,
-                work: 1,
                 status: InstalledSymbolStatus::Truncated
             }
         );
@@ -28855,6 +32449,372 @@ mod tests {
     }
 
     #[test]
+    fn m1_context_symbols_match_w1_and_keep_unpaid_workspace_unchanged() {
+        use crate::brotli_prefix::{ContextMapKind, TreeMetadata, TreeRegion};
+        let budget = |input, work| {
+            crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: input,
+                max_output: 0,
+                max_work: work,
+                max_calls: 0,
+                max_initializations: 0,
+                max_window_bits: 16,
+            })
+            .unwrap()
+        };
+        for kind in [ContextMapKind::Literal, ContextMapKind::Distance] {
+            let tag = if kind == ContextMapKind::Literal {
+                0
+            } else {
+                1
+            };
+            for case in 0..8 {
+                let (mut original, window) = setup_binary_context_map(kind, 4);
+                put_state_byte(&mut original, window, B3B_OUTER_PHASE, 6 + tag).unwrap();
+                match case {
+                    1 | 2 | 3 | 4 => {
+                        let symbol = match case {
+                            1 => 0,
+                            2 => 1,
+                            3 => 2,
+                            _ => 3,
+                        };
+                        let meta =
+                            TreeMetadata::single(TreeRegion::TemporaryContext, 4, symbol).unwrap();
+                        crate::brotli_prefix::write_tree_metadata(
+                            &mut original,
+                            window,
+                            TreeRegion::TemporaryContext,
+                            0,
+                            meta,
+                        )
+                        .unwrap();
+                        if case == 3 {
+                            put_state_byte(&mut original, window, B3B_MAX_RUN_PREFIX, 2).unwrap();
+                        }
+                    }
+                    5 => {
+                        let at = window as usize
+                            + crate::brotli_prefix::TEMP_CONTEXT_TREE_OFFSET as usize;
+                        original[at + 1] = 2;
+                    }
+                    6 => crate::brotli_prefix::write_tree_metadata(
+                        &mut original,
+                        window,
+                        TreeRegion::TemporaryContext,
+                        0,
+                        TreeMetadata::unused(),
+                    )
+                    .unwrap(),
+                    7 => {
+                        for i in 0..4 {
+                            crate::brotli_prefix::write_next_context_entry(
+                                &mut original,
+                                window,
+                                kind,
+                                4,
+                                i,
+                                0,
+                                2,
+                            )
+                            .unwrap();
+                        }
+                        store_context_map_progress(&mut original, window, 4).unwrap();
+                    }
+                    _ => {}
+                }
+                for input in [&[][..], &[0u8][..], &[1u8][..]] {
+                    for end in [false, true] {
+                        let mut reference = original.clone();
+                        let (used, status) = advance_context_symbol_phase(
+                            &mut reference,
+                            window,
+                            tag,
+                            kind,
+                            4,
+                            input,
+                            end,
+                        );
+                        if let Some(ContextAdvanceStatus::Failed(error)) = status {
+                            store_terminal_error(&mut reference, window, error).unwrap();
+                        }
+                        let mut planning = budget(input.len() as u64, u64::MAX);
+                        let plan = plan_context_symbol_action(
+                            &original,
+                            window,
+                            &mut planning,
+                            input,
+                            end,
+                        )
+                        .unwrap();
+                        let read_work = u64::MAX - planning.work_remaining;
+                        for short in [true, false] {
+                            let mut actual = original.clone();
+                            let mut request = budget(
+                                input.len() as u64,
+                                read_work + plan.execution_work - u64::from(short),
+                            );
+                            let result = advance_planned_context_symbol(
+                                &mut actual,
+                                window,
+                                &mut request,
+                                input,
+                                end,
+                            );
+                            if short {
+                                assert_eq!(
+                                    result,
+                                    Err(CompressedStep {
+                                        consumed: 0,
+                                        status: CompressedStatus::Failed(
+                                            CoreFailure::ResourceLimit
+                                        )
+                                    })
+                                );
+                                assert_eq!(actual, original);
+                                assert_eq!(request.work_remaining, plan.execution_work - 1);
+                                assert_eq!(request.input_remaining, input.len() as u64);
+                            } else {
+                                let expected = match status {
+                                    None => Ok(used),
+                                    Some(ContextAdvanceStatus::NeedInput) => Err(CompressedStep {
+                                        consumed: used,
+                                        status: CompressedStatus::NeedInput,
+                                    }),
+                                    Some(ContextAdvanceStatus::Failed(error)) => {
+                                        Err(CompressedStep {
+                                            consumed: used,
+                                            status: CompressedStatus::Failed(map_compressed_error(
+                                                error,
+                                            )),
+                                        })
+                                    }
+                                    _ => unreachable!(),
+                                };
+                                assert_eq!(
+                                    result, expected,
+                                    "case={case} input={input:?} end={end}"
+                                );
+                                assert_eq!(
+                                    actual, reference,
+                                    "case={case} input={input:?} end={end}"
+                                );
+                                assert_eq!(request.work_remaining, 0);
+                                assert_eq!(
+                                    request.input_remaining,
+                                    input.len() as u64 - used as u64
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_invalid_initial_subphase_prepays_w1_terminal_image() {
+        let (mut original, window) = fresh_b3b_workspace();
+        put_state_byte(&mut original, window, B3B_OUTER_PHASE, 3).unwrap();
+        put_state_byte(&mut original, window, B3B_BLOCK_LENGTH_PHASE, 255).unwrap();
+        let mut reference = original.clone();
+        let step = CompressedMetaBlockDecoder {
+            workspace: &mut reference,
+            window_bytes: window,
+        }
+        .step(&[0], false);
+        let error = match step.status {
+            CompressedHeaderStatus::Failed(error) => error,
+            _ => panic!("W1 must reject the unknown subphase"),
+        };
+        assert_eq!(step.consumed, 0);
+        for work in [4, 5] {
+            let mut actual = original.clone();
+            let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: 1,
+                max_output: 0,
+                max_work: work,
+                max_calls: 0,
+                max_initializations: 0,
+                max_window_bits: 16,
+            })
+            .unwrap();
+            let result =
+                advance_serialized_compressed_header(&mut actual, window, &mut budget, &[0], false);
+            assert_eq!(result.consumed, 0);
+            assert_eq!(budget.input_remaining, 1);
+            if work == 4 {
+                assert_eq!(
+                    result.status,
+                    CompressedStatus::Failed(CoreFailure::ResourceLimit)
+                );
+                assert_eq!(actual, original);
+                assert_eq!(budget.work_remaining, 4);
+            } else {
+                assert_eq!(
+                    result.status,
+                    CompressedStatus::Failed(map_compressed_error(error))
+                );
+                assert_eq!(actual, reference);
+                assert_eq!(budget.work_remaining, 0);
+            }
+        }
+    }
+
+    #[test]
+    fn m1_tree_planning_preserves_w1_malformed_state_outcomes() {
+        use crate::brotli_prefix::{ContextMapKind, TreeRegion};
+        let cases = [
+            (B3B_ACTIVE_TREE, 1u16, true),
+            (B3B_BUILDER_INITIALIZED, 3, true),
+            (B3B_QUEUE_LEN, 9, false),
+            (B3B_QUEUE_OFFSET_BYTE, 8, false),
+            (B3B_ACTIVE_REGION, 255, false),
+            (B3B_CODE_PHASE, 255, false),
+            (B3B_ALPHABET_LIMIT, 0, true),
+            (B3B_ALPHABET_MAX, 1, true),
+        ];
+        let bytes = pack_lsb_bits(&[1, 0, 0, 0, 0]);
+        for (relative, value, wide) in cases {
+            let (mut original, window) = fresh_b3b_workspace();
+            put_state_byte(&mut original, window, B3B_OUTER_PHASE, 6).unwrap();
+            start_context_map(&mut original, window, ContextMapKind::Literal, 4).unwrap();
+            put_state_u16(&mut original, window, B3B_MAP_TREES, 2).unwrap();
+            start_serialized_tree(&mut original, window, TreeRegion::TemporaryContext, 0, 2, 2)
+                .unwrap();
+            store_context_phase(&mut original, window, 3).unwrap();
+            if wide {
+                put_state_u16(&mut original, window, relative, value).unwrap();
+            } else {
+                put_state_byte(&mut original, window, relative, value as u8).unwrap();
+            }
+            for split in 0..=bytes.len() {
+                for end in [false, true] {
+                    let input = &bytes[..split];
+                    let mut reference = original.clone();
+                    let step = advance_serialized_tree(&mut reference, window, input, end);
+                    let mut budget =
+                        crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                            max_input: input.len() as u64,
+                            max_output: 0,
+                            max_work: u64::MAX,
+                            max_calls: 0,
+                            max_initializations: 0,
+                            max_window_bits: 16,
+                        })
+                        .unwrap();
+                    let plan =
+                        plan_serialized_tree(&original, window, &mut budget, input, end).unwrap();
+                    assert_eq!(
+                        (plan.consumed, plan.status),
+                        (step.consumed, step.status),
+                        "relative={relative} value={value} split={split} end={end}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_context_tree_actions_match_w1_at_every_split_and_quota_boundary() {
+        use crate::brotli_prefix::{ContextMapKind, TreeRegion};
+        let budget = |input, work| {
+            crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: input,
+                max_output: 0,
+                max_work: work,
+                max_calls: 0,
+                max_initializations: 0,
+                max_window_bits: 16,
+            })
+            .unwrap()
+        };
+        for kind in [ContextMapKind::Literal, ContextMapKind::Distance] {
+            let tag = if kind == ContextMapKind::Literal {
+                0
+            } else {
+                1
+            };
+            for bits in [
+                vec![1, 0, 0, 0, 0],
+                vec![1, 0, 0, 0, 1],
+                vec![1, 0, 1, 0, 0, 1],
+                vec![1, 0, 1, 0, 0, 0],
+            ] {
+                let bytes = pack_lsb_bits(&bits);
+                let (mut original, window) = fresh_b3b_workspace();
+                put_state_byte(&mut original, window, B3B_OUTER_PHASE, 6 + tag).unwrap();
+                start_context_map(&mut original, window, kind, 4).unwrap();
+                put_state_u16(&mut original, window, B3B_MAP_TREES, 2).unwrap();
+                start_serialized_tree(&mut original, window, TreeRegion::TemporaryContext, 0, 2, 2)
+                    .unwrap();
+                store_context_phase(&mut original, window, 3).unwrap();
+                for end_at in 0..=bytes.len() {
+                    for end in [false, true] {
+                        let input = &bytes[..end_at];
+                        let mut reference = original.clone();
+                        let step = advance_serialized_tree(&mut reference, window, input, end);
+                        let expected = match step.status {
+                            SerializedTreeStatus::NeedInput => Err(CompressedStep {
+                                consumed: step.consumed,
+                                status: CompressedStatus::NeedInput,
+                            }),
+                            SerializedTreeStatus::Complete => {
+                                store_context_phase(&mut reference, window, 4).unwrap();
+                                Ok(step.consumed)
+                            }
+                            SerializedTreeStatus::Failed(error) => {
+                                store_terminal_error(&mut reference, window, error).unwrap();
+                                Err(CompressedStep {
+                                    consumed: step.consumed,
+                                    status: CompressedStatus::Failed(map_compressed_error(error)),
+                                })
+                            }
+                        };
+                        let mut planning = budget(input.len() as u64, u64::MAX);
+                        let plan =
+                            plan_serialized_tree(&original, window, &mut planning, input, end)
+                                .unwrap();
+                        let execution =
+                            context_tree_action_work(plan.execution_work, plan.status).unwrap();
+                        let reads = u64::MAX - planning.work_remaining;
+                        for short in [true, false] {
+                            let mut actual = original.clone();
+                            let mut request =
+                                budget(input.len() as u64, reads + execution - u64::from(short));
+                            let result = advance_planned_context_tree(
+                                &mut actual,
+                                window,
+                                &mut request,
+                                input,
+                                end,
+                            );
+                            if short {
+                                assert_eq!(
+                                    result,
+                                    Err(CompressedStep {
+                                        consumed: 0,
+                                        status: CompressedStatus::Failed(
+                                            CoreFailure::ResourceLimit
+                                        )
+                                    })
+                                );
+                                assert_eq!(actual, original);
+                                assert_eq!(request.work_remaining, execution - 1);
+                                assert_eq!(request.input_remaining, input.len() as u64);
+                            } else {
+                                assert_eq!(result, expected);
+                                assert_eq!(actual, reference);
+                                assert_eq!(request.work_remaining, 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn b3c_tree_plan_uses_replayed_lengths_across_every_input_split() {
         let mut dense = vec![0, 0];
         push_auxiliary_code_lengths(&mut dense, &[(8, 1), (16, 1)]);
@@ -29218,7 +33178,7 @@ mod tests {
         )
         .unwrap();
         let mut complete_short = complete_initial.clone();
-        let mut complete_short_budget = crate::brotli::RequestBudget::new(limits(0, 16)).unwrap();
+        let mut complete_short_budget = crate::brotli::RequestBudget::new(limits(0, 17)).unwrap();
         let short = advance_serialized_compressed_header(
             &mut complete_short,
             window_bytes,
@@ -29233,7 +33193,7 @@ mod tests {
         assert_eq!(complete_short, complete_initial);
 
         let mut complete_exact = complete_initial.clone();
-        let mut complete_exact_budget = crate::brotli::RequestBudget::new(limits(0, 17)).unwrap();
+        let mut complete_exact_budget = crate::brotli::RequestBudget::new(limits(0, 18)).unwrap();
         let exact = advance_serialized_compressed_header(
             &mut complete_exact,
             window_bytes,
@@ -29284,8 +33244,10 @@ mod tests {
         put_state_byte(&mut initial, window_bytes, B3B_BLOCK_LENGTH_SYMBOL, 0).unwrap();
         put_state_byte(&mut initial, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH, 2).unwrap();
 
+        // The range decoder reads two additional immutable cells in both planning
+        // and replay: four units beyond width validation, input and serialization.
         let mut short_workspace = initial.clone();
-        let mut short_budget = crate::brotli::RequestBudget::new(limits(1, 25)).unwrap();
+        let mut short_budget = crate::brotli::RequestBudget::new(limits(1, 29)).unwrap();
         let short = advance_serialized_compressed_header(
             &mut short_workspace,
             window_bytes,
@@ -29299,11 +33261,11 @@ mod tests {
             CompressedStatus::Failed(CoreFailure::ResourceLimit)
         );
         assert_eq!(short_budget.input_remaining, 1);
-        assert_eq!(short_budget.work_remaining, 21);
+        assert_eq!(short_budget.work_remaining, 23);
         assert_eq!(short_workspace, initial);
 
         let mut exact_workspace = initial.clone();
-        let mut exact_budget = crate::brotli::RequestBudget::new(limits(1, 26)).unwrap();
+        let mut exact_budget = crate::brotli::RequestBudget::new(limits(1, 30)).unwrap();
         let exact = advance_serialized_compressed_header(
             &mut exact_workspace,
             window_bytes,

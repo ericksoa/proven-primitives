@@ -1,0 +1,49 @@
+{
+  "generated_utc": "2026-11-03T23:09:28.323186+00:00",
+  "scope": "Private serialized command-tree description, not a complete Brotli stream",
+  "test": "m1_maximum_alphabet_accepts_valid_long_direct_zero_descriptions",
+  "auxiliary_code_lengths": {
+    "0": 5,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5
+  },
+  "final_alphabet_symbols": 704,
+  "final_lengths_description": "Length one at indices0and703; zero at indices1through702",
+  "input_bytes": 442,
+  "whole_call": {
+    "status": "Failed(InternalState)",
+    "consumed": 251,
+    "code_phase": 5,
+    "final_symbol": 398,
+    "builder_initialized": 398,
+    "prefix_width": 0
+  },
+  "one_byte_chunks": {
+    "status": "Complete"
+  },
+  "current_tree_action_cap": 2000,
+  "proposed_cap": 5696,
+  "approval_status": "pending",
+  "source_snapshot": "Separate local M1 ledger working copy",
+  "source_sha256": {
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "c7911f5c4a8c039f5595bc8e89534ab7768e0624419444620e0e8e30ab0fa4cc",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/brotli_data.rs": "188030151158d62799924dfb7b78879462e6f8410e1391fa773b02c63bbed54b",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "866af4c50814a05a0d9ce3fa1f789ccd6d448f2f0b5e1b6fdb9d32b2fab4f899",
+    "src/brotli_prefix.rs": "34cd01e68c586a7dec1bf8c4ef8daee1ea9d4c4dab5fe4e307c4e6e084451708",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+  },
+  "log": {
+    "path": "evidence/m1-long-tree-chunking-diagnostic.log",
+    "sha256": "87b55406ea4557b78af0d8c156c7b55d659559818d52bd62e5b3d6e13d0fd52d"
+  },
+  "claim": "A finite regression demonstrates chunk-dependent outcomes. No universal format or new bound proof is claimed."
+}

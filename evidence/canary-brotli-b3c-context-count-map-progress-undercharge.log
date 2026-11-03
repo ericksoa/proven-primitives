@@ -1,0 +1,35 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-55073/src/brotli_input.rs:26489:1
+      |
+26489 | / fn context_tree_count_execution_work(
+26490 | |     read_work: u64,
+26491 | |     active_len: u16,
+26492 | |     status: VarUint8Status,
+26493 | | ) -> (r: u64)
+      | |____________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-55073/src/brotli_input.rs:26496:9
+      |
+26496 | /         r as nat == context_tree_count_work_spec(
+26497 | |             read_work as nat, active_len as nat, status,
+26498 | |         ),
+      | |_________^ failed this postcondition
+...
+26502 | /     match status {
+26503 | |         VarUint8Status::Value(raw) => base + 2 + if raw == 0 {
+26504 | |             active_len as u64 + 3 + 1 + 1
+26505 | |         } else {
+...     |
+26509 | |         _ => base,
+26510 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

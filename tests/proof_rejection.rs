@@ -2626,8 +2626,8 @@ fn the_prover_rejects_b3c_exact_symbol_work_undercharge() {
 
     let path = temporary.join("src/brotli_input.rs");
     let original = fs::read_to_string(&path).unwrap();
-    let old = "        exact_work = exact_work + 1;\n        let read = queue.read_bits";
-    let new = "        exact_work = exact_work;\n        let read = queue.read_bits";
+    let old = "        proof { exact_work = (exact_work + 1) as u64; }\n        let read = queue.read_bits";
+    let new = "        proof { exact_work = exact_work; }\n        let read = queue.read_bits";
     assert_eq!(original.matches(old).count(), 1, "unique mutation anchor");
     fs::write(&path, original.replacen(old, new, 1)).unwrap();
     let result = check_brotli_input_function(&verus, &temporary, function);
@@ -2644,6 +2644,7 @@ fn the_prover_rejects_b3c_exact_symbol_work_undercharge() {
     );
     assert!(
         log.contains("invariant not satisfied")
+            || log.contains("precondition not satisfied")
             || log.contains("postcondition not satisfied")
             || log.contains("assertion failed"),
         "expected a proof rejection, not a tooling error: {log}",
@@ -2777,7 +2778,7 @@ fn the_prover_rejects_five_b3c_block_count_metering_undercharges() {
         (
             "brotli-b3c-block-count-tree-start-undercharge",
             "block_count_value_execution_work",
-            "        base + 2 + 76 + 1 + 1",
+            "        base + 2 + 77 + 1 + 1",
             "        base + 2 + 75 + 1 + 1",
         ),
     ] {
@@ -2936,7 +2937,7 @@ fn the_prover_rejects_four_b3c_context_mode_metering_undercharges() {
         (
             "brotli-b3c-context-mode-complete-undercharge",
             "context_mode_complete_execution_work",
-            "{\n    14 + 1 + 2\n}",
+            "{\n    serialized_map_start_work() + 1 + 1\n}",
             "{\n    13 + 1 + 2\n}",
         ),
         (
@@ -3038,7 +3039,7 @@ fn the_prover_rejects_four_b3c_initial_suffix_metering_undercharges() {
         (
             "brotli-b3c-initial-suffix-value-undercharge",
             "initial_suffix_value_execution_work",
-            "{\n    initial_suffix_base_execution_work(read_work) + 4 + 1 + 1 + 1\n}",
+            "{\n    initial_suffix_base_execution_work(read_work) + 2 + 4 + 1 + 1 + 1\n}",
             "{\n    initial_suffix_base_execution_work(read_work) + 4 + 1 + 1\n}",
         ),
     ] {
@@ -3257,6 +3258,34 @@ fn the_prover_rejects_seventeen_b3c_context_bits_defects() {
             assert_eq!(changed.matches(call).count(), 1, "unique execution site");
             changed = changed.replacen(call, &format!("{call}\n{old}"), 1);
         }
+        if name == "brotli-b3c-context-bits-skips-overshoot-check" {
+            // Restate the existing post-guard loop/write bound explicitly.
+            // Check the hint with the original guard first; neither run changes
+            // the function's admitted inputs or requires/ensures contracts.
+            let add_bound = |source: &str, guard: &str| {
+                let at = source.find(guard).expect("unique repeat guard");
+                let begin = at + source[at..].find('{').unwrap();
+                let mut depth = 0usize;
+                let mut finish = None;
+                for (offset, byte) in source.as_bytes()[begin..].iter().enumerate() {
+                    if *byte == b'{' { depth += 1; }
+                    else if *byte == b'}' {
+                        depth -= 1;
+                        if depth == 0 { finish = Some(begin + offset + 1); break; }
+                    }
+                }
+                let finish = finish.expect("balanced repeat guard");
+                let bound = "\n                            proof {\n                                assert(index as u32 + repeat <= active_len as u32) by (nonlinear_arith)\n                                    requires index as u32 + repeat <= active_len as u32;\n                            }\n";
+                format!("{}{}{}", &source[..finish], bound, &source[finish..])
+            };
+            let positive = add_bound(selected, old);
+            fs::write(&path, format!("{}{}{}", &original[..start], positive, &original[end..])).unwrap();
+            let positive = check_brotli_input_function(&verus, &temporary, function);
+            let positive_log = transcript(&positive);
+            fs::write(project.join("evidence/positive-brotli-b3c-repeat-bound-obligation.log"), &positive_log).unwrap();
+            assert!(positive.status.success(), "original guard with explicit existing bound failed: {positive_log}");
+            changed = add_bound(&changed, new);
+        }
         let mutated = format!("{}{}{}", &original[..start], changed, &original[end..]);
         fs::write(&path, mutated).unwrap();
         let result = check_brotli_input_function(&verus, &temporary, function);
@@ -3265,9 +3294,231 @@ fn the_prover_rejects_seventeen_b3c_context_bits_defects() {
         assert!(!result.status.success(), "prover accepted {name}");
         assert!(log.contains("postcondition not satisfied")
             || log.contains("precondition not satisfied")
+            || log.contains("requires not satisfied")
             || log.contains("invariant not satisfied")
             || log.contains("assertion failed"),
             "expected a proof rejection, not a tooling error: {log}");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_m1_nested_reset_transition_undercharges() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-nested-reset-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-m1-tree-reset-transition-undercharge",
+            "serialized_tree_start_work",
+            "{ 76 + 1 }",
+            "{ 76 }",
+        ),
+        (
+            "brotli-m1-var-reset-transition-undercharge",
+            "serialized_map_start_work",
+            "{ 14 + 1 + 1 }",
+            "{ 14 + 1 }",
+        ),
+        (
+            "brotli-m1-prefix-reset-transition-undercharge",
+            "installed_prefix_reset_work",
+            "{ 5 + 1 }",
+            "{ 5 }",
+        ),
+        (
+            "brotli-m1-group-tree-transition-undercharge",
+            "group_tree_start_work",
+            "{ serialized_tree_start_work() + 2 + 1 + 1 }",
+            "{ serialized_tree_start_work() + 2 + 1 }",
+        ),
+        (
+            "brotli-m1-group-reset-transition-undercharge",
+            "tree_group_start_work",
+            "{ 4 + 1 + group_tree_start_work() + 1 + 1 }",
+            "{ 4 + group_tree_start_work() + 1 + 1 }",
+        ),
+        (
+            "brotli-m1-ready-reset-transition-undercharge",
+            "ready_switch_start_work",
+            "{ 28 + 1 }",
+            "{ 28 }",
+        ),
+    ] {
+        let start = original
+            .find(&format!("fn {function}("))
+            .expect("selected function exists");
+        let end = start
+            + original[start..]
+                .find("\n\n")
+                .expect("selected function ends");
+        let selected = &original[start..end];
+        assert_eq!(
+            selected.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        let mutated = format!(
+            "{}{}{}",
+            &original[..start],
+            selected.replacen(old, new, 1),
+            &original[end..]
+        );
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied") || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}"
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_nine_m1_source_refinement_and_debit_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-source-refinement-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-m1-code-field-wrong-width",
+            "CodeDescriptionDecoder::advance_field",
+            "self.queue.read_bits(width, input, end_of_input)",
+            "self.queue.read_bits(width / 2, input, end_of_input)",
+        ),
+        (
+            "brotli-m1-auxiliary-wrong-symbol",
+            "decode_auxiliary_symbol",
+            "return Some(i as u8);",
+            "return Some(i as u8 + 1);",
+        ),
+        (
+            "brotli-m1-complex-start-wrong-previous-length",
+            "start_complex_symbol_progress",
+            "prev_code_len: 8,",
+            "prev_code_len: 7,",
+        ),
+        (
+            "brotli-m1-var-integer-wrong-value",
+            "advance_var_uint8",
+            "let value = (1u16 << width) + field as u16;",
+            "let value = (1u16 << width) + field as u16 + 1;",
+        ),
+        (
+            "brotli-m1-body-metadata-read-not-charged",
+            "advance_planned_body_symbol",
+            "budget.charge_work(TREE_METADATA_WORK)",
+            "budget.charge_work(0)",
+        ),
+        (
+            "brotli-m1-body-execution-undercharge",
+            "advance_planned_body_symbol",
+            "budget.charge_work(completed_action_work)",
+            "budget.charge_work(completed_action_work - 1)",
+        ),
+        (
+            "brotli-m1-context-direct-wrong-value",
+            "store_context_direct_symbol",
+            "let value = symbol - max_run as u16;",
+            "let value = symbol - max_run as u16 + 1;",
+        ),
+        (
+            "brotli-m1-initial-symbol-execution-undercharge",
+            "execute_planned_initial_symbol",
+            "budget.charge_work(plan.execution_work)",
+            "budget.charge_work(plan.execution_work - 1)",
+        ),
+        (
+            "brotli-m1-context-symbol-execution-undercharge",
+            "execute_planned_context_symbol",
+            "budget.charge_work(plan.execution_work)",
+            "budget.charge_work(plan.execution_work - 1)",
+        ),
+    ] {
+        let scope = if function.starts_with("CodeDescriptionDecoder::") {
+            original
+                .find("impl CodeDescriptionDecoder {")
+                .expect("decoder implementation exists")
+        } else {
+            0
+        };
+        let function_name = function.rsplit("::").next().unwrap();
+        let start = scope
+            + original[scope..]
+                .find(&format!("fn {function_name}("))
+                .expect("selected function exists");
+        let end = start
+            + original[start..]
+                .find("\n}\n")
+                .expect("selected function ends")
+            + 3;
+        let selected = &original[start..end];
+        assert_eq!(
+            selected.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        let mutated = format!(
+            "{}{}{}",
+            &original[..start],
+            selected.replacen(old, new, 1),
+            &original[end..]
+        );
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied")
+                || log.contains("precondition not satisfied")
+                || log.contains("invariant not satisfied")
+                || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}"
+        );
         fs::write(&path, &original).unwrap();
     }
     fs::remove_dir_all(temporary).unwrap();

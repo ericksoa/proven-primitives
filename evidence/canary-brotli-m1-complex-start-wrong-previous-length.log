@@ -1,0 +1,32 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-53825/src/brotli_input.rs:2052:9
+     |
+2052 |         assert(0u8 < (1u8 << 0)) by (bit_vector);
+     |         ^^^^^^
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-53825/src/brotli_input.rs:2009:1
+     |
+2009 | / fn start_complex_symbol_progress(
+2010 | |     code: ComplexCodeLengthAlphabet,
+2011 | |     _alphabet_limit: u16,
+2012 | | ) -> (r: ComplexSymbolProgress)
+     | |______________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-53825/src/brotli_input.rs:2018:9
+     |
+2018 |         r.prev_code_len == 8,
+     |         ^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+2055 |     progress
+     |     -------- at the end of the function body
+
+error: aborting due to 1 previous error
+

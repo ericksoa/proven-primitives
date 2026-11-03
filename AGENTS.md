@@ -93,6 +93,16 @@ reserve each exact mutation formula before execution; and add exact plan/action
 refinement plus unchanged-specification undercharge controls. Candidate M2
 remains unselected.
 
+The human selected Option A in `BROTLI_M1_TRANSITION_RULE_DECISION.md` on
+2026-11-03: charge nested parser resets/starts separately from enclosing B3b
+transitions. This applies to M1 compressed-header parsing; preserve C1's exact
+425-unit construction/reset charge.
+
+The human explicitly approved charging the 18 saved auxiliary code-length loads
+as table reads on 2026-11-03, beyond later indexed lookups. Apply this to both
+planning and replay; partial loads charge only the cells actually read. This
+does not change ordinary scalar fields or the 425-unit construction/reset cost.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

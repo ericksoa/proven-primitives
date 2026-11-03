@@ -1,0 +1,134 @@
+{
+  "component": "Brotli B3c M1",
+  "generated_utc": "2026-11-03T21:56:07.824583+00:00",
+  "release_gate": "incomplete",
+  "obligations": [
+    {
+      "id": "nested-transition-policy",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "Separate explicit nested resets and starts during M1 compressed-header parsing. Construction/reset remains 425.",
+      "roots": [
+        "serialized_tree_start_work",
+        "serialized_map_start_work",
+        "installed_prefix_reset_work",
+        "group_tree_start_work",
+        "tree_group_start_work",
+        "ready_switch_start_work"
+      ],
+      "remaining": "Complete binding to source-operation events, beyond arithmetic formula equality."
+    },
+    {
+      "id": "installed-symbol-refinement",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "First-stop record, actual symbol, malformed record outcomes, physical active queue, prefix, input/bit/record reads; initial/context symbol executors.",
+      "roots": [
+        "installed_symbol_full_step",
+        "installed_full_steps_agree",
+        "advance_installed_tree_symbol",
+        "replay_installed_symbol_plan",
+        "execute_planned_initial_symbol",
+        "execute_planned_context_symbol"
+      ],
+      "remaining": "This does not establish every body adapter failure path or complete header/body refinement."
+    },
+    {
+      "id": "code-field-refinement",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "Terminal, zero-input, partial input, EOF and complete field outcomes, physical active queue, deterministic phases and symbols.",
+      "roots": [
+        "code_field_step_refines",
+        "code_field_steps_agree",
+        "code_transition_deterministic",
+        "CodeDescriptionDecoder::advance_field"
+      ],
+      "remaining": "Lift through complete serialized-tree replay, builder state and installs; meter internal table/cell reads.",
+      "concrete_ledger_gaps": [
+        {
+          "operation": "process_complex_code_length -> CODE_LENGTH_ORDER[index]",
+          "cell_reads": 1,
+          "status": "not yet fully prepaid by serialized-tree planner"
+        },
+        {
+          "operation": "start_complex_symbol_progress -> auxiliary_singleton",
+          "cell_reads": 18,
+          "status": "including the zero-input auxiliary completion transition"
+        },
+        {
+          "operation": "auxiliary_canonical_code_exec(lengths, symbol)",
+          "cell_reads_formula": "1 + 18 * (length - 1) + symbol",
+          "status": "plus the outer auxiliary candidate-length reads; complete charging remains open"
+        }
+      ]
+    },
+    {
+      "id": "context-count-and-bit-agreement",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "Unconditional status and consumption agreement for valid planned actions; exact prepaid input/work debit and failed-reservation atomicity.",
+      "roots": [
+        "advance_context_tree_count_phase",
+        "context_tree_count_plan_matches_action",
+        "execute_planned_context_tree_count",
+        "advance_context_bits_phase",
+        "context_bits_plan_matches_action",
+        "execute_planned_context_bits"
+      ],
+      "remaining": "Outcome-specific minimal byte frames and complete operation ledger."
+    },
+    {
+      "id": "body-symbol-success-accounting",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "Successful symbol identity, exact retained cursor and 2 * read_units + 17 work in input-private helper; approved adapter/result unchanged.",
+      "roots": [
+        "body_symbol_success_refines",
+        "advance_planned_body_symbol",
+        "advance_serialized_body_symbol"
+      ],
+      "remaining": "Total failure-path refinement and accounting."
+    },
+    {
+      "id": "serialized-tree-whole-action",
+      "state": "open",
+      "roots": [
+        "plan_serialized_tree",
+        "advance_serialized_tree",
+        "advance_planned_context_tree"
+      ],
+      "remaining": "Complete state, frame, all malformed builder/install outcomes and source operation ledger. Finite regressions are not this proof."
+    },
+    {
+      "id": "remaining-header-actions",
+      "state": "open",
+      "roots": [
+        "plan_block_count_action",
+        "plan_initial_suffix_action",
+        "plan_distance_action",
+        "plan_context_mode_action",
+        "plan_block_tree_action",
+        "plan_tree_group_action",
+        "plan_context_map_tail",
+        "plan_terminal_header_work"
+      ],
+      "remaining": "Complete plan/action functional, frame and exact-source-ledger proofs and their controls."
+    }
+  ],
+  "later_required_phases": [
+    "Remaining B3c resource/public refinement/confidentiality/control gates",
+    "B3d arbitrary permitted call-sequence and source-observation induction",
+    "B4 quarantining caller and profile closure",
+    "Named independent human specification review and fail-closed release evidence"
+  ],
+  "positive_control": {
+    "path": "evidence/brotli-b3c-m1-option-a-verification.json",
+    "sha256": "d7cc6ed2b1db63f5e05e5d1f9732637f8697f6ba9ae7776b36c574a4806f2fbc"
+  },
+  "negative_controls": {
+    "path": "evidence/brotli-b3c-m1-option-a-controls.json",
+    "sha256": "f007250c187ce810d360cc6bb9680a2d2b0e86850f25b4204f141d2cab4f4841"
+  },
+  "saved_auxiliary_load_policy": {
+    "human_approval": "Charge the 18 loads as table reads",
+    "scope": "Planning and replay; partial loads charge the cells inspected; 425 construction/reset unchanged",
+    "implementation_in_this_checkpoint": false,
+    "status": "In progress in separate local working copy"
+  }
+}

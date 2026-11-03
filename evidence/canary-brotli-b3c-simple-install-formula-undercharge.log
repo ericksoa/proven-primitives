@@ -1,0 +1,23 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-55004/src/brotli_input.rs:25620:1
+      |
+25620 | fn simple_tree_install_work(alphabet: u16, selector: u8) -> (r: u64)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-55004/src/brotli_input.rs:25622:13
+      |
+25622 |     ensures r as nat == if selector == 0 { 5nat } else { 3 * alphabet as nat + 5 },
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+25623 | {
+25624 |     if selector == 0 { 4 } else { 3 * alphabet as u64 + 5 }
+      |     ------------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

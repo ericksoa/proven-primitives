@@ -1,0 +1,116 @@
+note: preparing crate for verification
+
+note: verifying root module
+
+note: verifying module base64
+
+note: verifying module brotli
+
+note: verifying module brotli_block
+
+note: done with root module
+
+note: verifying module brotli_data
+
+note: done with module brotli_block
+
+note: verifying module brotli_dictionary
+
+note: done with module brotli_dictionary
+
+note: verifying module brotli_input
+
+WARNING: (52555,13): 'if' cannot be used in patterns.
+WARNING: (57926,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: done with module base64
+
+note: verifying module brotli_prefix
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: done with module brotli_prefix
+
+note: verifying module composition_demo
+
+note: done with module composition_demo
+
+note: verifying module lz4
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: done with module lz4
+
+note: verifying module percent
+
+note: done with module percent
+
+note: verifying module brotli_input, function lib::brotli_input::body_decrement_block_remaining
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::body_decrement_block_remaining
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12866:1
+      |
+12866 | / fn install_completed_simple_tree(
+12867 | |     workspace: &mut [u8],
+12868 | |     window_bytes: u32,
+12869 | |     region: crate::brotli_prefix::TreeRegion,
+...     |
+12872 | |     code: SimpleCodeDescription,
+12873 | | ) -> (r: Result<crate::brotli_prefix::TreeMetadata, CompressedHeaderError>)
+      | |__________________________________________________________________________^
+
+error: assertion failed
+     --> src/brotli_input.rs:13038:24
+      |
+13038 |                   assert(record_end <= window_bytes as nat
+      |  ________________________^
+13039 | |                     + crate::brotli_prefix::BLOCK_LENGTH_TREES_OFFSET as nat);
+      | |____________________________________________________________________________^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:13052:24
+      |
+13052 |                   assert(record_end <= window_bytes as nat
+      |  ________________________^
+13053 | |                     + crate::brotli_prefix::MTF_OFFSET as nat);
+      | |_____________________________________________________________^ assertion failed
+
+note: done with module brotli
+

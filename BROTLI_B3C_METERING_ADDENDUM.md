@@ -61,6 +61,13 @@ driver.
 The human approved **Candidate M1 exactly as written** on 2026-10-29.
 Candidate M2 remains unselected.
 
+## Nested transition rule
+
+On 2026-11-03 the human explicitly selected **charge nested resets/starts
+separately**. The scope and examples are recorded in
+`BROTLI_M1_TRANSITION_RULE_DECISION.md`. C1's 425-unit construction/reset charge
+remains fixed.
+
 ## Implementation checkpoint
 
 M1 remains **incomplete**. The current implementation is a reviewable B3c
@@ -226,7 +233,7 @@ minimal per-status write footprints and a complete ledger remain open.
 Executor correspondence is conditioned on its explicit predicted-status check;
 a universal no-mismatch theorem remains open.
 
-Remaining M1 obligations:
+At that checkpoint, the remaining M1 obligations were:
 
 - Context phases 3 and 4 still enter the conservative driver: temporary-tree
   construction and installed-tree context symbols/direct values/run setup.
@@ -246,3 +253,113 @@ Whole-crate verification checks the contracts actually written in the source.
 It does not close these explicitly missing contracts or substitute for the
 remaining B3c refinement, confidentiality, resource, control-mapping and release
 gates. B3d and B4 remain separate.
+
+### Option A and installed-symbol continuation
+
+The human selected separate nested reset/start transitions on 2026-11-03.
+The named input-private initialization formulas now apply that rule to tree,
+context-map/VAR_UINT8, installed-prefix, tree-group and B2 Ready starts. The
+425-unit construction/reset charge is unchanged. The complete policy and
+formula table are in `BROTLI_M1_TRANSITION_RULE_DECISION.md`.
+
+Context phase 3 now plans the existing serialized temporary-tree action, and
+phase 4 plans installed-tree symbols and their zero/direct/repeat setup
+effects. MTF, coverage and handoff are separate existing W1 actions; their
+planning no longer performs an uncharged local MTF transform. Complete, failed
+and invalid subphase observations have prepaid terminal paths. Both previous
+conservative reservation constants and the conservative driver are removed.
+This removes a known coverage gap; it does not establish every replacement
+formula or refinement obligation.
+
+The installed-symbol model binds the first stopping record, malformed-record
+failure, successful symbol identity, consumption, active physical queue bytes,
+prefix state and actual bit/record/input read count. Both W1 execution and B3c
+read-only replay refine that model, and a checked determinism lemma equates
+their results and read counts. Initial block-length and context-symbol
+executors use this relation before their result checks. Their prepaid
+execution contracts retain exact debits and unchanged workspace on failed
+reservation. The public/private result representations remain the approved
+two fields; no runtime work-result field is added.
+
+The code-description field contract now covers every terminal, zero-input,
+partial-input, EOF and successful field action, including active physical queue
+bytes. Determinism is checked through simple descriptions, auxiliary symbols,
+repeats and pending spans. This is a field-action theorem; it does not yet
+prove the complete serialized-tree planner.
+
+Context-bit and context-tree-count execution now prove their predicted status
+and consumption without assuming the status match. Valid serialized cursors
+exclude the formerly unconstrained internal-error alternative. With execution
+credit available, both executors prove exact input and work debits. The
+input-private body-symbol helper also connects successful results to the same
+installed-tree model and proves work of `2 * read_units + 17`: planning and
+replay reads, one metadata visit, 15 serialized byte writes and one transition.
+Its approved crate-private adapter signature and result remain unchanged.
+
+Two source-derived defects were corrected. Initial block-length suffix
+decoding reads two immutable range-table cells in planning and again in replay;
+those four units are now charged. A malformed temporary-tree destination was
+previously predicted as success. The planner now preserves W1's workspace
+error, consumption and validation timing. Tests also cover malformed queue,
+region, alphabet and code-description state, and exact/one-short terminal
+reservation for an unknown initial block-length subphase.
+
+Current remaining M1 obligations:
+
+- Complete serialized-tree, block-count/suffix, distance/context-mode,
+  tree-group, tail and terminal plan/action state and byte-frame refinement.
+- Complete source-operation ledger binding, including internal B3a
+  table/cell reads and malformed canonical-builder/install paths. Formula
+  equality alone is insufficient.
+- Complete outcome-specific frames and failure-path accounting, then bind
+  every outstanding relation to unchanged-specification defect controls.
+
+In particular, `process_complex_code_length` reads `CODE_LENGTH_ORDER`;
+`auxiliary_singleton` reads all 18 auxiliary lengths; and auxiliary canonical
+lookup performs further length-table scans. `plan_serialized_tree` currently
+prepays its bit read before calling the field decoder, without a complete
+separate precharge for those nested table reads. The zero-input transition
+after a completed auxiliary alphabet also invokes the 18-cell singleton scan.
+These source paths are concrete outstanding metering work, even when all
+currently written contracts verify. The complete-ledger claim remains denied.
+
+The human explicitly selected **charge the 18 loads as table reads** on
+2026-11-03. `read_aux_lengths`
+loads the 18 auxiliary lengths from serialized parser state before later
+indexed lookups. Counting those loads adds 18 table-read units for each full
+load in planning or replay, beyond later indexed lookups. A rejected partial
+load charges its actual inspected prefix. Treating the copy as state-loading
+bookkeeping is unselected. This approval does not change ordinary scalar
+fields, interfaces, storage or the 425-unit construction/reset charge. The
+implementation of this additional approved charge remains in progress.
+
+M1, B3c and the supported-decoder release gate remain incomplete. B3d's
+call-sequence and source-observation theorems, B4's quarantining caller and
+profile, and the named independent human specification review remain separate
+requirements. The whole-crate checker proves the written contracts; it cannot
+close contracts that have not yet been written.
+
+### Validation of the nested-transition/symbol checkpoint
+
+The frozen production source passed the entire pinned `--no-cheating` check:
+**1,138 verified, 0 errors**. All **87 release tests** passed: 76 library tests,
+nine primitive tests, the source trust-bypass scan and the upstream comparison.
+After that unchanged whole-crate positive, all **68 deliberate defects** across
+11 metering/refinement suites were semantically rejected. Exact source,
+validation, tool, artifact and log identities are recorded in
+`evidence/brotli-b3c-m1-option-a.json`.
+
+The negative-test classifier now also recognizes the checker's precondition
+and nested-proof-requirement failure labels. For the repeat-guard-removal
+control, an explicit existing loop/write bound is checked with the original
+guard before checking the same obligation with the guard removed. Function
+contracts and admitted inputs are unchanged. Earlier checker resource failures
+are retained and are not counted as successful defect rejections.
+
+The separately developed table-ledger continuation and its saved auxiliary
+load charges are outside this checkpoint's frozen source. A regression there
+also demonstrates a valid private 704-symbol tree completing in byte chunks
+but failing in one slice at the existing 2,000-action cap. The proposed change
+to that cap is pending human selection in
+`BROTLI_M1_TREE_ACTION_BOUND_DECISION.md`. M1 and all later release gates remain
+incomplete.

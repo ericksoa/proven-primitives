@@ -1,0 +1,89 @@
+verification results:: 7 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:5958:9
+     |
+5958 |         assert(exact_work == iterations as u64 * (meta.symbols as u64 + 1)) by (nonlinear_arith)
+     |         ^^^^^^
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:6000:9
+     |
+6000 |         assert(exact_work < 10_575) by (nonlinear_arith)
+     |         ^^^^^^
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:6265:13
+     |
+6265 |             assert(next_bits as nat == installed_prefix_value(
+     |             ^^^^^^
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:6370:13
+     |
+6370 |             assert(exact_work < 10_575) by (nonlinear_arith)
+     |             ^^^^^^
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:6317:9
+     |
+6317 |         while symbol < meta.symbols
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:6837:13
+     |
+6837 |             assert(exact_work
+     |             ^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:5961:5
+     |
+5961 |     while iterations < 15
+     |     ^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:5773:1
+     |
+5773 | / fn advance_installed_tree_symbol(
+5774 | |     workspace: &[u8],
+5775 | |     window_bytes: u32,
+5776 | |     region: crate::brotli_prefix::TreeRegion,
+...    |
+5782 | |     end_of_input: bool,
+5783 | | ) -> (r: InstalledSymbolStep)
+     | |____________________________^
+
+error: precondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-57311/src/brotli_input.rs:6097:21
+     |
+5241 | /         match step.status {
+5242 | |             InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated => {
+5243 | |                 &&& accepted.len() < 15 - start.width
+5244 | |                 &&& step.consumed == input.len()
+...    |
+5291 | |             },
+5292 | |         },
+     | |_________- failed precondition
+...
+6097 | /                     establish_installed_canonical_trace(workspace@, window_bytes, region, tree, meta,
+6098 | |                         start_queue, start_prefix, input@, end_of_input, result, *queue, *prefix,
+6099 | |                         accepted, 0, installed_read_units(exact_work, result.consumed, result.status));
+     | |______________________________________________________________________________________________________^
+
+error: aborting due to 1 previous error
+

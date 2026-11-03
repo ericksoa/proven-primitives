@@ -1,0 +1,56 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:16160:33
+      |
+16160 | ...                   assert(index as u32 + repeat <= active_len as u32) by (nonlinear_arith)
+      |                       ^^^^^^
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:16247:29
+      |
+16247 | ...                   while initialized < target
+      |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:15865:1
+      |
+15865 | / fn advance_context_bits_phase(
+15866 | |     workspace: &mut [u8],
+15867 | |     window_bytes: u32,
+15868 | |     phase: u8,
+...     |
+15873 | |     end_of_input: bool,
+15874 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+      | |______________________________________________^
+
+note: function body check finished in 4 seconds
+     --> src/brotli_input.rs:15865:1
+      |
+15865 | / fn advance_context_bits_phase(
+15866 | |     workspace: &mut [u8],
+15867 | |     window_bytes: u32,
+15868 | |     phase: u8,
+...     |
+15873 | |     end_of_input: bool,
+15874 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+      | |______________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:15865:1
+      |
+15865 | / fn advance_context_bits_phase(
+15866 | |     workspace: &mut [u8],
+15867 | |     window_bytes: u32,
+15868 | |     phase: u8,
+...     |
+15873 | |     end_of_input: bool,
+15874 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+      | |______________________________________________^
+
+verification results:: 3 verified, 0 errors (partial verification with `--verify-*`)

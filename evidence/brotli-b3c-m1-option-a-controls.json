@@ -1,0 +1,685 @@
+{
+  "generated_utc": "2026-11-03T23:03:33.977923+00:00",
+  "positive_control": {
+    "path": "evidence/brotli-b3c-m1-option-a-verification.json",
+    "sha256": "d7cc6ed2b1db63f5e05e5d1f9732637f8697f6ba9ae7776b36c574a4806f2fbc",
+    "verified": 1138,
+    "errors": 0,
+    "entire_crate": true
+  },
+  "source_unchanged": true,
+  "suites": [
+    {
+      "suite": "the_prover_rejects_six_m1_nested_reset_transition_undercharges",
+      "expected_mutations": 6,
+      "exit_code": 0,
+      "elapsed_seconds": 79.53846429096302,
+      "log": "evidence/m1-option-a-control-six_m1_nested_reset_transition_undercharges.log",
+      "log_sha256": "c9f76179fc44a69612f04755554a1dc781fbdf293fb2fa4f0b1eb339f544ca54",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_six_m1_nested_reset_transition_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_nine_m1_source_refinement_and_debit_defects",
+      "expected_mutations": 9,
+      "exit_code": 0,
+      "elapsed_seconds": 125.63059883296955,
+      "log": "evidence/m1-option-a-control-nine_m1_source_refinement_and_debit_defects.log",
+      "log_sha256": "740b150a0d0d392d3344799577f0c16b345f02f0596cfb2149ed55985ec67ea4",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_nine_m1_source_refinement_and_debit_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_five_b3c_block_count_metering_undercharges",
+      "expected_mutations": 5,
+      "exit_code": 0,
+      "elapsed_seconds": 66.4145089579979,
+      "log": "evidence/m1-option-a-control-five_b3c_block_count_metering_undercharges.log",
+      "log_sha256": "bebf1ec7f82f1841b89a8080943e55387fd6e0a5b892a3d0323fbb5263720e06",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_five_b3c_block_count_metering_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_three_b3c_distance_metering_undercharges",
+      "expected_mutations": 3,
+      "exit_code": 0,
+      "elapsed_seconds": 39.55022795801051,
+      "log": "evidence/m1-option-a-control-three_b3c_distance_metering_undercharges.log",
+      "log_sha256": "d07376dea9707b959d414dcade6733ad01dc1f7d6ce7e275edded05e829e8ad4",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_three_b3c_distance_metering_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+      "expected_mutations": 4,
+      "exit_code": 0,
+      "elapsed_seconds": 52.005950874998234,
+      "log": "evidence/m1-option-a-control-four_b3c_context_mode_metering_undercharges.log",
+      "log_sha256": "a56f7a155ffa78e9061adcbfd6c11a00b4fb49de31d927cabdbf2bbc7122cb24",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+      "expected_mutations": 4,
+      "exit_code": 0,
+      "elapsed_seconds": 52.1348950000247,
+      "log": "evidence/m1-option-a-control-four_b3c_initial_suffix_metering_undercharges.log",
+      "log_sha256": "0278fc5b4f8291e22ecc1ff7c93a7a31dd31ba132d6e65a100088e75cc11261e",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_five_b3c_tree_formula_undercharges",
+      "expected_mutations": 5,
+      "exit_code": 0,
+      "elapsed_seconds": 65.45918258297024,
+      "log": "evidence/m1-option-a-control-five_b3c_tree_formula_undercharges.log",
+      "log_sha256": "d4b327b0c8bb83ff617afffbf35bf1376e0ff505d811ce51fd96ff3a694b00ca",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_five_b3c_tree_formula_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+      "expected_mutations": 13,
+      "exit_code": 0,
+      "elapsed_seconds": 173.8709583330201,
+      "log": "evidence/m1-option-a-control-thirteen_b3c_context_tree_count_defects.log",
+      "log_sha256": "a44c5b79c2b2631dfad316e7fd4a2d9d935fb6c938536a05f3f97470ff3fc4ca",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_seventeen_b3c_context_bits_defects",
+      "expected_mutations": 17,
+      "exit_code": 0,
+      "elapsed_seconds": 282.97,
+      "log": "evidence/m1-option-a-control-seventeen_b3c_context_bits_defects.log",
+      "log_sha256": "31929c23c92cc5ffe15b6e0bc3c735077dc84858332297a56ce68a8a61e5cf02",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_seventeen_b3c_context_bits_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "earlier_attempt": {
+        "exit_code": 101,
+        "log": "evidence/m1-option-a-control-seventeen_b3c_context_bits_defects-attempt1.log",
+        "reason": "The unaugmented skipped-guard mutant exceeded the checker resource limit; not counted as rejection."
+      }
+    },
+    {
+      "suite": "the_prover_rejects_b3c_exact_symbol_work_undercharge",
+      "expected_mutations": 1,
+      "exit_code": 0,
+      "elapsed_seconds": 36.93,
+      "log": "evidence/m1-option-a-control-b3c_exact_symbol_work_undercharge.log",
+      "log_sha256": "ea6a3d5b73bfd6cc8fd17c45a052481895c4fdeb46c84a50ba1c62c92d980f05",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_b3c_exact_symbol_work_undercharge",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "earlier_attempt": {
+        "exit_code": 101,
+        "log": "evidence/m1-option-a-control-b3c_exact_symbol_work_undercharge-attempt1.log",
+        "reason": "The intended mutant was semantically rejected; the test classifier did not yet recognize precondition failures."
+      }
+    },
+    {
+      "suite": "the_prover_rejects_b3c_serialized_symbol_write_undercharge",
+      "expected_mutations": 1,
+      "exit_code": 0,
+      "elapsed_seconds": 29.568685042031575,
+      "log": "evidence/m1-option-a-control-b3c_serialized_symbol_write_undercharge.log",
+      "log_sha256": "5956124b5d6abbac0129687d0a3ff5503ead0f5bdb8fe3b692c8c4724b7924b2",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_b3c_serialized_symbol_write_undercharge",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    }
+  ],
+  "suites_passed": 11,
+  "suites_failed": 0,
+  "rejected_mutations": 68,
+  "validation_harness_sha256": "6dbee33f4b712efe15ad4ad6ad9c6100c8961f86c00c09d3a8837c3f2ee06f4d",
+  "guard_control_method": {
+    "note": "The existing loop/write bounds obligation is restated in a proof block. The original guard with this obligation passes before guard removal is checked. No function requires/ensures or admitted inputs change. Earlier timeout/checker failure attempts do not count as rejections.",
+    "positive_log": "evidence/positive-brotli-b3c-repeat-bound-obligation.log",
+    "positive_log_sha256": "5af0f91e85934840299ee7e10d55b3e0157599e21413cfe45867e6480c40052e",
+    "earlier_checker_failure_log": "evidence/m1-overshoot-control-checker-failure.log"
+  },
+  "mutations": [
+    {
+      "name": "brotli-b3c-block-count-base-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-base-write-undercharge.log",
+      "sha256": "4fa91fd16b2e81e3d8c29bb38b8508f9a0fead1980c73eacb1289a658adf90ba",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-block-count-planning-bit-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-planning-bit-undercharge.log",
+      "sha256": "31d51d9e4b2303d024aba80eb3322c5508b184eb1b7e5af6a9582210f14edfdf",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-block-count-single-value-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-single-value-undercharge.log",
+      "sha256": "fb166702e0f0e1334c6f6aa26f9656cf1d098f2412916125f4474de933af6807",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-block-count-terminal-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-terminal-write-undercharge.log",
+      "sha256": "faabba5276e0e28bd4dbb1aad473aaba6eb5567f3e42c659eb5a66615c86aabb",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-block-count-tree-start-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-tree-start-undercharge.log",
+      "sha256": "d8f1bc7359a21d2151d4a5d9cb9b510e03ae7f86117fc191dcbb4415f8b6b959",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-canonical-install-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-canonical-install-formula-undercharge.log",
+      "sha256": "734b8a7016cb0d5522fd1f5b7fea2c7aa10d914d50d98d053690595a24891fd6",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-execution-debit-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-execution-debit-undercharge.log",
+      "sha256": "14ab454becc925c165a9e8d02220efd085bea3c7d112619d4fb3b9d3b6e4e727",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-execution-reserved-after-writes",
+      "path": "evidence/canary-brotli-b3c-context-bits-execution-reserved-after-writes.log",
+      "sha256": "978f3bafbf0db25526f739e27cc95d3565a866f919f8c956931cff82e1cb4267",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-map-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-map-undercharge.log",
+      "sha256": "f708d547037c55c64b23153a2e7d87aa017d339a0559ed738f3865e772abf331",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-overshoot-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-overshoot-terminal-undercharge.log",
+      "sha256": "f708d547037c55c64b23153a2e7d87aa017d339a0559ed738f3865e772abf331",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-phase-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-phase-undercharge.log",
+      "sha256": "f708d547037c55c64b23153a2e7d87aa017d339a0559ed738f3865e772abf331",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-planning-debit-omitted",
+      "path": "evidence/canary-brotli-b3c-context-bits-planning-debit-omitted.log",
+      "sha256": "932948744cb0cf4012a6ddeced21ac76390320768e1098b9549cac5ebc271a6d",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-prefix-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-prefix-undercharge.log",
+      "sha256": "f708d547037c55c64b23153a2e7d87aa017d339a0559ed738f3865e772abf331",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-progress-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-progress-undercharge.log",
+      "sha256": "f708d547037c55c64b23153a2e7d87aa017d339a0559ed738f3865e772abf331",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-queue-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-queue-undercharge.log",
+      "sha256": "f708d547037c55c64b23153a2e7d87aa017d339a0559ed738f3865e772abf331",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-reads-wrong-width",
+      "path": "evidence/canary-brotli-b3c-context-bits-reads-wrong-width.log",
+      "sha256": "7feb3c55527a3f23bb5aac2ccd831ebb0f5fa834036f89aa0435bfc3776f2456",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-reset-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-reset-undercharge.log",
+      "sha256": "f708d547037c55c64b23153a2e7d87aa017d339a0559ed738f3865e772abf331",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-skips-overshoot-check",
+      "path": "evidence/canary-brotli-b3c-context-bits-skips-overshoot-check.log",
+      "sha256": "4876896f1e0fb2a4571da44c96e95ef298715023864305f36bdf25aa126d2af2",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-start-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-start-undercharge.log",
+      "sha256": "f708d547037c55c64b23153a2e7d87aa017d339a0559ed738f3865e772abf331",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-start-writes-unrelated-byte",
+      "path": "evidence/canary-brotli-b3c-context-bits-start-writes-unrelated-byte.log",
+      "sha256": "d310f994e146c3dc2e141553500d2305df015aa81ba1c4dca73cfed76ff9b4bf",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-terminal-undercharge.log",
+      "sha256": "acaae907af16cd19f4d1096f3f6ecb062f23c70f15e9f8b1add8fb8504bd3f3a",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-wrong-prefix",
+      "path": "evidence/canary-brotli-b3c-context-bits-wrong-prefix.log",
+      "sha256": "c39b65f60e7105ea04a1384fda320669749c66a3d9ad912b603e99f27578086e",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-bits-wrong-zero",
+      "path": "evidence/canary-brotli-b3c-context-bits-wrong-zero.log",
+      "sha256": "4ea98b8f9f738c381cc9cdf32c61793a3e4443122ee341def43a5fba1efceb9f",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-execution-debit-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-execution-debit-undercharge.log",
+      "sha256": "c081b4e0168c6001889d55f9766f69636df94ccb6168b63fc220066cb877927f",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-execution-reserved-after-writes",
+      "path": "evidence/canary-brotli-b3c-context-count-execution-reserved-after-writes.log",
+      "sha256": "f1ef146fa02f9db7d3dc8c1180b09c95742fb171d0db3717ad93becba60a3b10",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-map-cell-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-map-cell-undercharge.log",
+      "sha256": "adb07a7a20f51506055527ddb923f9706316d1cf9ed36ddc5590d5ba26f3eb08",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-map-progress-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-map-progress-undercharge.log",
+      "sha256": "8113468c0ac98751efc026d87b4c449b40da184d6fa47beff9b28d3f582d24b7",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-phase-transition-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-phase-transition-undercharge.log",
+      "sha256": "eddb2f0daef29e9b666714f5ecdeca5c91a250818a5745e37fcea588bd8b6e4c",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-planning-debit-omitted",
+      "path": "evidence/canary-brotli-b3c-context-count-planning-debit-omitted.log",
+      "sha256": "f4053d2cd6f39009d2bf81ba6ec320057d014062a3117e31a3378c0cbfb37ca7",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-progress-writes-map-size",
+      "path": "evidence/canary-brotli-b3c-context-count-progress-writes-map-size.log",
+      "sha256": "306ee578dd229c67d5675b85f4829900fd05ce49693ea389ec375ad3d836ecff",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-queue-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-queue-write-undercharge.log",
+      "sha256": "eddb2f0daef29e9b666714f5ecdeca5c91a250818a5745e37fcea588bd8b6e4c",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-terminal-undercharge.log",
+      "sha256": "eddb2f0daef29e9b666714f5ecdeca5c91a250818a5745e37fcea588bd8b6e4c",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-tree-count-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-tree-count-undercharge.log",
+      "sha256": "46aafbcee79a100431a0d680c21a0b2ad9cbdfd385539ec173c5d24665e60389",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-var-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-var-write-undercharge.log",
+      "sha256": "eddb2f0daef29e9b666714f5ecdeca5c91a250818a5745e37fcea588bd8b6e4c",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-wrong-decoded-count",
+      "path": "evidence/canary-brotli-b3c-context-count-wrong-decoded-count.log",
+      "sha256": "a7ef0a60a73d20fab30017e6108b36c6a8f696bbeab467ad9c66ef4e1f647426",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-count-wrong-zero-map-value",
+      "path": "evidence/canary-brotli-b3c-context-count-wrong-zero-map-value.log",
+      "sha256": "16aeb31ecdf3d6a805dcf759e372f5f52979fbdce0d218e2754e0f0d1a620d11",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-mode-complete-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-mode-complete-undercharge.log",
+      "sha256": "c181b3bf69c46dc952caed580786a24a5a9bf08eac9890e6da60f0b426afd742",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-mode-queue-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-mode-queue-undercharge.log",
+      "sha256": "5c8210cd937db1f6f4b6aa80cefea81e123f23d627057c3e1ce325268304c58b",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-mode-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-mode-terminal-undercharge.log",
+      "sha256": "ef501d82f77df3eb8bfcfbd724b32e0ace6a1ec9ed058ca34006404ffdfd6ac2",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-context-mode-value-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-mode-value-undercharge.log",
+      "sha256": "5b07390dc1cd0c8c4b16cae7f3787482a8786b236bde5150a9f4ebbfcd54d244",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-distance-queue-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-distance-queue-write-undercharge.log",
+      "sha256": "2be678a039f692e95de29deea66915986124a72d933519d156af2ff942b0b24b",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-distance-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-distance-terminal-undercharge.log",
+      "sha256": "c12ed3bdd1120be649da0da5bae922155079c681d335e5409cd27e1bc42c1522",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-distance-value-undercharge",
+      "path": "evidence/canary-brotli-b3c-distance-value-undercharge.log",
+      "sha256": "c34899c8da56dd3ecaec8d69b5e6d436774b1c5d97fb8008d3f0f16dfd193915",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-planning-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-suffix-planning-undercharge.log",
+      "sha256": "78f4cadfca73101938e6049e0acc744f1c1bcce2e918a7fce02aca411827364e",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-queue-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-suffix-queue-undercharge.log",
+      "sha256": "3e304f3ccf43736ac7811867073dcebd28fbffc105e4df00a8351e7c716a12d7",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-suffix-terminal-undercharge.log",
+      "sha256": "bab15078b2d4bf19b08bc9cfe7e7c20e2905cc67cebfd25757c15053dd6d8c63",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-value-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-suffix-value-undercharge.log",
+      "sha256": "1608e29ece2361c3ad53fc2fec291d96a839df0cfa19e76f6ca0f21e04d30e11",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-initial-symbol-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-symbol-formula-undercharge.log",
+      "sha256": "a119b0e5329c8adeefa27da3093f39ff22266f9abfc18ab76df345f1f5aea083",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-repeat-serialization-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-repeat-serialization-formula-undercharge.log",
+      "sha256": "67120ada63cb3d16087e1226fac2c62f8b1a5883f92ef949f3005c23ceee3c3e",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-serialization-base-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-serialization-base-formula-undercharge.log",
+      "sha256": "4a83a17daa354770d6d08817d68cbd5989f819d4b3ef0936c2d484eae4ce418c",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-simple-install-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-simple-install-formula-undercharge.log",
+      "sha256": "a512ee49f5c635ca0cb261228a46316a877379ee5f11e65f76596d3fe18abdf2",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-symbol-work-undercharge",
+      "path": "evidence/canary-brotli-b3c-symbol-work-undercharge.log",
+      "sha256": "c7ca95abebf3ed9c522a3db2cb18c7371cb516f437d0b54fe2e297a3fb7119c0",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-b3c-symbol-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-symbol-write-undercharge.log",
+      "sha256": "a88326810fcf8c368e657f8f62009252d95d0c238dedc983a8af188a1f0922df",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-auxiliary-wrong-symbol",
+      "path": "evidence/canary-brotli-m1-auxiliary-wrong-symbol.log",
+      "sha256": "93a7bac7ab869bf8efd0c1cc8e3ffb20b106cf578ff1c31eab3147ae8ebb1b87",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-body-execution-undercharge",
+      "path": "evidence/canary-brotli-m1-body-execution-undercharge.log",
+      "sha256": "635ca3a9ddf42abe8011fcb23c1582dde835e1bc874b93a87cb316bb729d9241",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-body-metadata-read-not-charged",
+      "path": "evidence/canary-brotli-m1-body-metadata-read-not-charged.log",
+      "sha256": "635ca3a9ddf42abe8011fcb23c1582dde835e1bc874b93a87cb316bb729d9241",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-code-field-wrong-width",
+      "path": "evidence/canary-brotli-m1-code-field-wrong-width.log",
+      "sha256": "d028dc69dbed8238e7fc82b1c1629ec78e4453d4a71ac0d6f6282c216e77af9f",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-complex-start-wrong-previous-length",
+      "path": "evidence/canary-brotli-m1-complex-start-wrong-previous-length.log",
+      "sha256": "b3ebd8349a3706890ddcb3e8a15f0b61a6b6ca41afacbbfb63b5796a204c2428",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-context-direct-wrong-value",
+      "path": "evidence/canary-brotli-m1-context-direct-wrong-value.log",
+      "sha256": "787ac61fdf295b6a9f6a16f87cf35b9f9af08fdb832b7058003c8e1ea3cf9920",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-context-symbol-execution-undercharge",
+      "path": "evidence/canary-brotli-m1-context-symbol-execution-undercharge.log",
+      "sha256": "f65d8cdc63a8f182c4e20dec34bedd8d523ec0dd285425054136463255b955ab",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-group-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-group-reset-transition-undercharge.log",
+      "sha256": "f8395b74b2290d170f14ab0e40970e9cd17b56245e79d40dcf9a88f94105bff6",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-group-tree-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-group-tree-transition-undercharge.log",
+      "sha256": "b77dba975a0ad8bbed95af70f68470f75fe12012b0cb40f48521d9717c88af75",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-initial-symbol-execution-undercharge",
+      "path": "evidence/canary-brotli-m1-initial-symbol-execution-undercharge.log",
+      "sha256": "d8613f0a1c2eca3467c570118f8f08b4da2247d2d303030816218633ee304eb0",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-prefix-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-prefix-reset-transition-undercharge.log",
+      "sha256": "ee1daf5664004b73ec4376ee1a3e20513562e3da72965cd50e3f8fe363e13844",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-ready-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-ready-reset-transition-undercharge.log",
+      "sha256": "65e09bbb75e936e33abe698181042ca9ea9e472eb0a5035f8b80bbb081b37f8f",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-tree-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-tree-reset-transition-undercharge.log",
+      "sha256": "1aab62580707c079ab7ea8207077994adb667731ad831612c55144b46f1f55e9",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-var-integer-wrong-value",
+      "path": "evidence/canary-brotli-m1-var-integer-wrong-value.log",
+      "sha256": "e9d3b737816374266963b1c8de01540a6bf80e622139d9d70bea7f8ae12f6969",
+      "result": "semantic proof rejection under unchanged source contracts"
+    },
+    {
+      "name": "brotli-m1-var-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-var-reset-transition-undercharge.log",
+      "sha256": "055f23a5c4f14b32a9fd6b086a9ff32a714caecf179bfd746b73035c6213c3b1",
+      "result": "semantic proof rejection under unchanged source contracts"
+    }
+  ]
+}

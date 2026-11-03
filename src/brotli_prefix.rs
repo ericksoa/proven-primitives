@@ -2602,6 +2602,9 @@ pub(crate) fn write_next_context_entry(
         1 <= num_htrees <= 256,
         (value as int) < num_htrees,
     ensures
+        window_bytes <= 16_777_216
+            && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+            && initialized < active_len ==> r.is_ok(),
         final(workspace)@.len() == old(workspace)@.len(),
         r.is_ok() ==> {
             let at = context_entry_at(window_bytes, kind, initialized);
@@ -4571,6 +4574,16 @@ pub(crate) fn read_tree_record(
 ) -> (r: Result<TreeRecord, WorkspaceError>)
     requires meta.valid_for(region),
     ensures
+    match meta.storage {
+        TreeStorageState::Canonical { initialized } => r.is_ok() == (
+            window_bytes <= 16_777_216
+            && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+            && tree < tree_region_count(region)
+            && symbol < meta.symbols
+            && symbol < initialized
+        ),
+        _ => true,
+    },
     window_bytes <= 16_777_216
         && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
         && tree < tree_region_count(region)

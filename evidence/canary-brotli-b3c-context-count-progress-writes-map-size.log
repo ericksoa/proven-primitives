@@ -1,0 +1,28 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50108,13): 'if' cannot be used in patterns.
+WARNING: (54257,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-55073/src/brotli_input.rs:13638:1
+      |
+13638 | / fn store_context_map_progress(
+13639 | |     workspace: &mut [u8],
+13640 | |     window_bytes: u32,
+13641 | |     progress: u16,
+13642 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-55073/src/brotli_input.rs:13688:9
+      |
+13688 | /         b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_MAP_SIZE)
+13689 | |             == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE),
+      | |_____________________________________________________________________________^ failed this postcondition
+...
+13722 |       put_state_u16(workspace, window_bytes, B3B_MAP_INITIALIZED, progress)
+      |       --------------------------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+
