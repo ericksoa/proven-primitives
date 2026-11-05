@@ -1,0 +1,29 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-61246/src/brotli_input.rs:11894:5
+      |
+11894 |     while i < 18
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-61246/src/brotli_input.rs:11874:1
+      |
+11874 | / fn read_aux_lengths(
+11875 | |     workspace: &[u8],
+11876 | |     window_bytes: u32,
+11877 | | ) -> (r: Result<[u8; 18], CompressedHeaderError>)
+      | |________________________________________________^
+
+error: invariant not satisfied at end of loop body
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-61246/src/brotli_input.rs:11898:13
+      |
+11898 |             forall|j: int| 0 <= j < i ==> lengths@[j] <= 5,
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

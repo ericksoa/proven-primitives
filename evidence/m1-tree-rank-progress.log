@@ -1,0 +1,45 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50943,13): 'if' cannot be used in patterns.
+WARNING: (55659,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3470:7
+     |
+3470 |   proof fn direct_symbol_rank_decreases(old: ComplexSymbolProgress, length: u8,
+     |  _______^
+3471 | |     after: CodeDescriptionDecoder, status: CodeDescriptionStatus)
+     | |_________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3489:7
+     |
+3489 |   proof fn repeated_symbol_rank_decreases(old: ComplexSymbolProgress, length: u8,
+     |  _______^
+3490 | |     extra: u8, suffix: u8, after: CodeDescriptionDecoder, status: CodeDescriptionStatus)
+     | |________________________________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3511:7
+     |
+3511 |   proof fn complex_symbol_rank_decreases(old: ComplexSymbolProgress, field: nat,
+     |  _______^
+3512 | |     after: CodeDescriptionDecoder, status: CodeDescriptionStatus)
+     | |_________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3545:7
+     |
+3545 |   proof fn code_transition_rank_decreases(before: CodeDescriptionDecoder, field: nat,
+     |  _______^
+3546 | |     after: CodeDescriptionDecoder, status: CodeDescriptionStatus)
+     | |_________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3572:7
+     |
+3572 |   proof fn code_field_rank_decreases(before: CodeDescriptionDecoder, input: Seq<u8>, end: bool,
+     |  _______^
+3573 | |     after: CodeDescriptionDecoder, step: CodeDescriptionStep)
+     | |_____________________________________________________________^
+
+verification results:: 5 verified, 0 errors (partial verification with `--verify-*`)

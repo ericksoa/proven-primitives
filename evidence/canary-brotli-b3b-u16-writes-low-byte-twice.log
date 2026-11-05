@@ -1,0 +1,33 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-6861/src/brotli_input.rs:10173:1
+      |
+10173 | / fn write_b3b_state_u16(
+10174 | |     workspace: &mut [u8],
+10175 | |     window_bytes: u32,
+10176 | |     relative: u16,
+10177 | |     value: u16,
+10178 | | ) -> (r: Result<(), crate::brotli_prefix::WorkspaceError>)
+      | |_________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-6861/src/brotli_input.rs:10259:17
+      |
+10259 | /                 #[trigger] workspace@[i] == before
+10260 | |                     .update(spec_at, (value % 256) as u8)
+10261 | |                     .update(spec_at + 1, (value / 256) as u8)[i] by {
+      | |________________________________________________________________^ assertion failed
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-6861/src/brotli_input.rs:10249:21
+      |
+10249 |     workspace[at] = value as u8;
+      |                     ^^^^^
+
+error: aborting due to 1 previous error
+

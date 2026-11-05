@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,hashlib,datetime,re
+root=Path.cwd()
+def digest(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+freeze=json.loads(Path('evidence/m1-f2-source-freeze.json').read_text())
+assert freeze['exit_code']==0 and freeze['source_unchanged'] and all(digest(n)==h for n,h in freeze['source_sha256'].items())
+rows=json.loads(Path('evidence/m1-f2-retained-control-runs.json').read_text())['suites']
+for name,count in [('b3a_auxiliary_code_without_bit_reversal',1),('four_m1_tree_action_bound_and_drain_defects',4)]:
+ p=Path('evidence')/('m1-f2-control-'+name+'.log');s=p.read_text()
+ assert 'test result: ok. 1 passed; 0 failed;' in s and 'test result: FAILED' not in s,p
+ seconds=float(re.search(r'finished in ([\d.]+)s',s[s.index('test result: ok.'):]).group(1))
+ rows.append({'suite':'the_prover_rejects_'+name,'expected_mutations':count,'exit_code':0,'test_elapsed_seconds':seconds,'log':str(p),'log_sha256':digest(p),'command':['cargo','test','--locked','--release','--test','proof_rejection','the_prover_rejects_'+name,'--','--ignored','--exact','--nocapture'],'env':{'DEVELOPER_DIR':'/Library/Developer/CommandLineTools','RUSTUP_TOOLCHAIN':'1.99.1','VERUS_ROOT':'/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos'}})
+assert len(rows)==19 and sum(x['expected_mutations'] for x in rows)==118
+for row in rows:assert row['exit_code']==0 and digest(row['log'])==row['log_sha256']
+positive=Path('evidence/brotli-b3c-m1-f2-verification.json');results=json.loads(positive.read_text())['verification-results']
+harness=Path('tests/proof_rejection.rs').read_text();body_hashes={}
+for row in rows:
+ a=harness.index('fn '+row['suite']+'(');b=harness.find('\n#[test]',a)
+ body_hashes[row['suite']]=hashlib.sha256(harness[a:b if b!=-1 else len(harness)].encode()).hexdigest()
+record={'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'positive_control':{'path':str(positive),'sha256':digest(positive),'verified':results['verified'],'errors':results['errors'],'entire_crate':results['is-verifying-entire-crate']},'source_unchanged':True,'suites':rows,'suites_passed':19,'suites_failed':0,'rejected_mutations':118,'harness_sha256':digest('tests/proof_rejection.rs'),'suite_definition_sha256':body_hashes,'continuation':'Retained 17 complete successful runs with unchanged mutation definitions; reran the two incomplete/failed suites after scoped-anchor and checked rank-adequacy repairs. Library source and original function specifications unchanged.','planner_cap_positive':'evidence/positive-brotli-m1-planner-cap-rank.log'}
+Path('evidence/brotli-b3c-m1-f2-controls.json').write_text(json.dumps(record,indent=2)+'\n')
+Path('evidence/m1-f2-control-runs.json').write_text(json.dumps(rows,indent=2)+'\n')
+Path('evidence/m1-f2-validation-continuation.json').write_text(json.dumps({'status':'controls_passed','updated_utc':record['generated_utc'],'exit_code':0,'resumed_suites':2,'retained_suites':17},indent=2)+'\n')
+print('All 19 suites / 118 defects complete on unchanged verified library source.')

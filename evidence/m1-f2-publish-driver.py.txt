@@ -1,0 +1,75 @@
+from pathlib import Path
+import datetime,hashlib,json,os,subprocess,time,shutil
+root=Path('/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next');os.chdir(root)
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools')
+status=Path('/tmp/m1-f2-publication-status.json')
+expected=json.loads(Path('evidence/m1-f2-source-start.json').read_text())
+def state(value,**kw):
+ status.write_text(json.dumps(dict(status=value,updated_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),**kw),indent=2)+'\n')
+ print(value,flush=True)
+def run(args): return subprocess.check_output(args,env=env,text=True).strip()
+try:
+ state('waiting_for_current_source_verification_and_controls')
+ while True:
+  p=Path('evidence/m1-f2-source-freeze.json')
+  if p.exists():
+   frozen=json.loads(p.read_text())
+   if frozen['started_utc']==expected['started_utc']:
+    assert frozen['exit_code']==0 and frozen['source_unchanged'],'Whole-crate check did not succeed unchanged'
+    break
+  time.sleep(1)
+ while True:
+  p=Path('evidence/brotli-b3c-m1-f2-controls.json')
+  if p.exists():
+   control=json.loads(p.read_text())
+   proof_path=Path(control['positive_control']['path'])
+   if control['positive_control']['sha256']==hashlib.sha256(proof_path.read_bytes()).hexdigest():
+    assert control['source_unchanged'] and control['suites_failed']==0,'Defect controls did not pass'
+    break
+  p=Path('evidence/m1-f2-validation-continuation.json')
+  if p.exists():
+   assert json.loads(p.read_text())['status'] not in ['controls_failed','stopped_without_positive'],'Validation continuation stopped'
+  time.sleep(1)
+ assert all(hashlib.sha256(Path(n).read_bytes()).hexdigest()==h for n,h in expected['source_sha256'].items()),'Source changed'
+ assert run(['git','rev-parse','HEAD'])=='c3e6355a994addbe82c3f3ddec1b801bdf0b1fd7','Branch head changed outside this checkpoint'
+ assert run(['git','branch','--show-current'])=='codex/m1-saved-table-ledger','Unexpected branch'
+ verdict=json.loads(Path('evidence/brotli-b3c-m1-f2-verification.json').read_text())['verification-results']
+ state('finalizing_evidence',verified=verdict['verified'],defects=control['rejected_mutations'])
+ report=Path('BROTLI_B3C_METERING_ADDENDUM.md')
+ note=('\n### Final F2-source validation\n\nThe unchanged final source passed the entire pinned `--no-cheating` check: '
+       +str(verdict['verified'])+' verified, zero errors. All 95 release tests passed, and all 118 deliberate defects across 19 suites were rejected after that positive. '
+       'Exact source, harness, tool, compiled-artifact, approval and transcript identities are bound in `evidence/brotli-b3c-m1-f2.json`. '
+       'The earlier resource-limited check is retained and is not counted as a semantic rejection. M1 and all later release gates remain incomplete.\n')
+ if '### Final F2-source validation' not in report.read_text():
+  report.write_text(report.read_text()+note)
+ else:
+  assert note in report.read_text(),'Existing final validation note differs'
+ shutil.copyfile('/tmp/m1_f2_publish_when_validated.py','evidence/m1-f2-publish-driver.py.txt')
+ subprocess.run(['python3','/tmp/m1_f2_finalize.py'],env=env,check=True)
+ manifest=json.loads(Path('evidence/brotli-b3c-m1-f2.json').read_text())
+ paths=set(manifest['artifact_sha256'])|set(manifest['approval_and_document_sha256'])|set(manifest['source_sha256'])|set(manifest['validation_source_sha256'])|{'evidence/brotli-b3c-m1-f2.json'}
+ # All other tracked changes from this task are regenerated proof-control logs.
+ dirty=run(['git','diff','--name-only']).splitlines()
+ for p in dirty:
+  assert p in paths or p.startswith('evidence/canary-') or p.startswith('evidence/positive-'),('Unexpected tracked change',p)
+  paths.add(p)
+ subprocess.run(['git','add','-f','--',*sorted(paths)],env=env,check=True)
+ subprocess.run(['git','diff','--cached','--check','--','.',':(exclude)evidence'],env=env,check=True)
+ state('committing_validated_checkpoint')
+ subprocess.run(['git','commit','-m','Refine Brotli M1 tree metering and apply approved F2 fixtures'],env=env,check=True)
+ commit=run(['git','rev-parse','HEAD'])
+ state('pushing_validated_checkpoint',commit=commit)
+ subprocess.run(['git','push','--set-upstream','origin','codex/m1-saved-table-ledger'],env=env,check=True)
+ remote=run(['git','ls-remote','--heads','origin','codex/m1-saved-table-ledger']).split()[0]
+ assert remote==commit,('Remote head mismatch',remote,commit)
+ for _ in range(5):
+  response=json.loads(run(['gh','api','repos/ericksoa/proven-primitives/commits/'+commit]))
+  verification=response['commit']['verification']
+  if response['sha']==commit and verification['verified']:break
+  time.sleep(2)
+ assert verification['verified'] and verification['reason']=='valid',verification
+ assert not run(['git','status','--porcelain']), 'Worktree is not clean after publication'
+ state('pushed_signature_verified',commit=commit,remote_sha=remote,branch='codex/m1-saved-table-ledger',verified=verdict['verified'],errors=verdict['errors'],tests=95,defects=118,signature=verification['reason'],manifest_sha256=hashlib.sha256(Path('evidence/brotli-b3c-m1-f2.json').read_bytes()).hexdigest())
+except BaseException as e:
+ state('stopped_without_success',reason=str(e),error_type=type(e).__name__)
+ raise

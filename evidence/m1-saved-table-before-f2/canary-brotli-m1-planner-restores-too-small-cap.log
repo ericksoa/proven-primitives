@@ -1,0 +1,44 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-61216/src/brotli_input.rs:27011:5
+      |
+27011 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-61216/src/brotli_input.rs:27099:17
+      |
+27099 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-61216/src/brotli_input.rs:27038:5
+      |
+27038 |     while iterations < 2_000
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-61216/src/brotli_input.rs:26939:1
+      |
+26939 | / fn plan_serialized_tree(
+26940 | |     workspace: &[u8],
+26941 | |     window_bytes: u32,
+26942 | |     budget: &mut crate::brotli::RequestBudget,
+26943 | |     input: &[u8],
+26944 | |     end_of_input: bool,
+26945 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-61216/src/brotli_input.rs:27208:20
+      |
+27208 |     proof { assert(false); }
+      |                    ^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-61992/src/brotli_input.rs:16099:1
+      |
+16099 | / fn store_context_direct_symbol(
+16100 | |     workspace: &mut [u8],
+16101 | |     window_bytes: u32,
+16102 | |     kind: crate::brotli_prefix::ContextMapKind,
+...     |
+16107 | |     symbol: u16,
+16108 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+error: precondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-61992/src/brotli_input.rs:16144:13
+      |
+ 4968 |     requires value < 256,
+      |              ----------- failed precondition
+...
+16144 |     proof { bounded_u16_fits_u8(value); }
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

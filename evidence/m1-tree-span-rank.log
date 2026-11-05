@@ -1,0 +1,13 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50943,13): 'if' cannot be used in patterns.
+WARNING: (55659,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3457:7
+     |
+3457 |   proof fn after_span_matches_end(old: ComplexSymbolProgress, end: u16, space: u32,
+     |  _______^
+3458 | |     prev: u8, repeat: u32, repeat_length: u8, limit: u16, after: ComplexAfterSpan)
+     | |__________________________________________________________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

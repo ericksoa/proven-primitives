@@ -1,0 +1,58 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:11658:5
+      |
+11658 |     while relative < B3B_BLOCK_LENGTH_PHASE
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:11580:1
+      |
+11580 | / fn initialize_code_description_state(
+11581 | |     workspace: &mut [u8],
+11582 | |     window_bytes: u32,
+11583 | |     region: crate::brotli_prefix::TreeRegion,
+...     |
+11586 | |     alphabet_limit: u16,
+11587 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:11734:20
+      |
+11734 |               assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_GROUP_KIND)
+      |  ____________________^
+11735 | |                 == b3b_scalar_byte_at(original, window_bytes, B3B_GROUP_KIND));
+      | |_____________________________________________________________________________^ assertion failed
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:11691:56
+      |
+11691 |               forall|i: int| 0 <= i < B3B_GROUP_KIND ==> #[trigger]
+      |  ________________________________________________________^
+11692 | |                 workspace@[b3b_scalar_base(window_bytes) + i]
+      | |_____________________________________________________________^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:11644:52
+      |
+11644 |           forall|i: int| 0 <= i < B3B_GROUP_KIND ==> #[trigger]
+      |  ____________________________________________________^
+11645 | |             final(workspace)@[b3b_scalar_base(window_bytes) + i]
+      | |________________________________________________________________^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+error: aborting due to 1 previous error
+

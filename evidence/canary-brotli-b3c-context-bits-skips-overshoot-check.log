@@ -2,63 +2,63 @@ verification results:: 2 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (50108,13): 'if' cannot be used in patterns.
-WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-61598/src/brotli_input.rs:16160:33
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:17208:33
       |
-16160 | ...                   assert(index as u32 + repeat <= active_len as u32) by (nonlinear_arith)
+17208 | ...                   assert(index as u32 + repeat <= active_len as u32) by (nonlinear_arith)
       |                       ^^^^^^
 
-WARNING: (50108,13): 'if' cannot be used in patterns.
-WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-61598/src/brotli_input.rs:16247:29
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:17295:29
       |
-16247 | ...                   while initialized < target
+17295 | ...                   while initialized < target
       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check has been running for 2 seconds
       reporting errors as they are discovered (they may not be in source order)
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-61598/src/brotli_input.rs:15865:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:16913:1
       |
-15865 | / fn advance_context_bits_phase(
-15866 | |     workspace: &mut [u8],
-15867 | |     window_bytes: u32,
-15868 | |     phase: u8,
+16913 | / fn advance_context_bits_phase(
+16914 | |     workspace: &mut [u8],
+16915 | |     window_bytes: u32,
+16916 | |     phase: u8,
 ...     |
-15873 | |     end_of_input: bool,
-15874 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+16921 | |     end_of_input: bool,
+16922 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
       | |______________________________________________^
 
-note: function body check finished in 22 seconds
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-61598/src/brotli_input.rs:15865:1
+note: function body check finished in 17 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:16913:1
       |
-15865 | / fn advance_context_bits_phase(
-15866 | |     workspace: &mut [u8],
-15867 | |     window_bytes: u32,
-15868 | |     phase: u8,
+16913 | / fn advance_context_bits_phase(
+16914 | |     workspace: &mut [u8],
+16915 | |     window_bytes: u32,
+16916 | |     phase: u8,
 ...     |
-15873 | |     end_of_input: bool,
-15874 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+16921 | |     end_of_input: bool,
+16922 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
       | |______________________________________________^
 
 error: requires not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-61598/src/brotli_input.rs:16161:46
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:17209:46
       |
-16161 | ...                   requires index as u32 + repeat <= active_len as u32;
+17209 | ...                   requires index as u32 + repeat <= active_len as u32;
       |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-61598/src/brotli_input.rs:15865:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:16913:1
       |
-15865 | / fn advance_context_bits_phase(
-15866 | |     workspace: &mut [u8],
-15867 | |     window_bytes: u32,
-15868 | |     phase: u8,
+16913 | / fn advance_context_bits_phase(
+16914 | |     workspace: &mut [u8],
+16915 | |     window_bytes: u32,
+16916 | |     phase: u8,
 ...     |
-15873 | |     end_of_input: bool,
-15874 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+16921 | |     end_of_input: bool,
+16922 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
       | |______________________________________________^
 
 error: aborting due to 1 previous error

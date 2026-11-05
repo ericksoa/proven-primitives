@@ -82,9 +82,12 @@ and body-state helpers are part of the B3c implementation boundary. Candidate
 A2 remains unselected.
 
 The human approved Candidate F1 in `BROTLI_B3C_FIXTURE_ADDENDUM.md` exactly as
-written on 2026-10-27. Classify `quickfox_repeated` and `monkey` as intentional
-strict tree-coverage rejections and use the approved fixed `compression`
-dictionary-transform stream for successful B3c dictionary coverage.
+written on 2026-10-27, then explicitly approved its Candidate F2 correction in
+`BROTLI_B3C_FIXTURE_F2_DECISION.md` on 2026-11-04. Expect `quickfox_repeated`
+to decode to its pinned bytes. Retain `monkey`'s zero-output sticky rejection
+for this checkpoint, recording the observed `ContextMapRepeat` reason and the
+unresolved native disagreement. Preserve strict tree coverage, its synthetic
+rejections, and the fixed `compression` dictionary-transform stream.
 
 The human approved Candidate M1 in `BROTLI_B3C_METERING_ADDENDUM.md` exactly as
 written on 2026-10-29. Keep W1's exact private `step` interface unchanged;
@@ -102,6 +105,18 @@ The human explicitly approved charging the 18 saved auxiliary code-length loads
 as table reads on 2026-11-03, beyond later indexed lookups. Apply this to both
 planning and replay; partial loads charge only the cells actually read. This
 does not change ordinary scalar fields or the 425-unit construction/reset cost.
+
+The human explicitly approved raising both private tree-action caps from 2,000
+to 5,696 actions (`8 * 704 + 64`) on 2026-11-04, then proving the bound and
+rerunning verification. This covers only `advance_serialized_tree` and
+`plan_serialized_tree`; preserve the interfaces, RequestBudget policy,
+workspace, parser representations and 425-unit construction/reset charge.
+
+The human explicitly held Candidate K1 in
+`BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md` for review on 2026-11-04.
+K1 remains unapproved: do not expose its named prefix-code mathematical
+definitions or constant, or implement its proposed installer-contract change.
+This hold does not pause the approved F2 validation and publication.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,

@@ -1,0 +1,56 @@
+    #[test]
+    fn f1_actual_header_coverage_diagnostic() {
+        for (name, input) in [
+            ("monkey", include_bytes!("../tests/fixtures/brotli/corpus/monkey.compressed").as_slice()),
+            ("quickfox_repeated", include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated.compressed").as_slice()),
+        ] {
+            for chunk in [1usize, 7, input.len()] {
+                let mut header = HeaderDecoder::new();
+                let h = header.advance_header(input, false);
+                assert!(matches!(h.status, HeaderStatus::Complete { .. }));
+                let mut at = h.consumed;
+                let mut meta = MetaBlockDecoder::from_header(header).unwrap();
+                for _ in 0..64 {
+                    let end = (at + chunk).min(input.len());
+                    let m = meta.advance_field(&input[at..end], end == input.len());
+                    at += m.consumed;
+                    if matches!(m.status, MetaBlockStatus::Complete(_)) { break; }
+                    assert!(matches!(m.status, MetaBlockStatus::Progress | MetaBlockStatus::NeedInput));
+                }
+                assert!(matches!(meta.phase, MetaBlockPhase::Complete(_)));
+                let window = 1u32 << 16;
+                let mut workspace = vec![0xa5; crate::brotli_prefix::required_workspace_bytes(16).unwrap() as usize];
+                let mut decoder = CompressedMetaBlockDecoder::from_meta(&mut workspace, window, meta).unwrap();
+                let terminal = loop {
+                    let end = (at + chunk).min(input.len());
+                    let step = decoder.step(&input[at..end], end == input.len());
+                    at += step.consumed;
+                    if !matches!(step.status, CompressedHeaderStatus::NeedInput) { break step.status; }
+                    assert!(at < input.len());
+                };
+                println!("F1_HEADER name={name} chunk={chunk} at={at} terminal={terminal:?}");
+                let w = decoder.workspace;
+                for (tag, kind, multiplier, trees_offset) in [
+                    (0u16, crate::brotli_prefix::ContextMapKind::Literal, 64u16, B3B_LITERAL_TREES),
+                    (2u16, crate::brotli_prefix::ContextMapKind::Distance, 4u16, B3B_DISTANCE_TREES),
+                ] {
+                    let blocks = state_u16(w, window, B3B_BLOCK_COUNTS + tag * 2).unwrap();
+                    let trees = state_u16(w, window, trees_offset).unwrap();
+                    let len = blocks * multiplier;
+                    let map = context_map_bytes(w, window, kind, len);
+                    let values: std::collections::BTreeSet<u8> = map.iter().copied().collect();
+                    let missing: Vec<u16> = (0..trees).filter(|i| !map.contains(&(*i as u8))).collect();
+                    println!("F1_COVERAGE name={name} chunk={chunk} kind={kind:?} blocks={blocks} trees={trees} len={len} values={values:?} missing={missing:?}");
+                }
+                let kind_tag = state_byte(w, window, B3B_CONTEXT_KIND).unwrap();
+                let kind = if kind_tag == 0 { crate::brotli_prefix::ContextMapKind::Literal } else { crate::brotli_prefix::ContextMapKind::Distance };
+                let trees = state_u16(w, window, B3B_MAP_TREES).unwrap();
+                let len = state_u16(w, window, B3B_MAP_SIZE).unwrap();
+                let initialized = state_u16(w, window, B3B_MAP_INITIALIZED).unwrap();
+                let map = context_map_bytes(w, window, kind, initialized);
+                let missing: Vec<u16> = (0..trees).filter(|i| !map.contains(&(*i as u8))).collect();
+                println!("F1_CURRENT name={name} chunk={chunk} kind={kind:?} trees={trees} len={len} initialized={initialized} missing={missing:?}");
+            }
+        }
+    }
+

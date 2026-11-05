@@ -1259,12 +1259,30 @@ fn the_prover_rejects_b3a_auxiliary_code_without_bit_reversal() {
     let new = "let reversed = reverse_auxiliary_code(candidate, width);\n                if candidate == bits as u32 {";
     let path = temporary.join("src/brotli_input.rs");
     let original = fs::read_to_string(project.join("src/brotli_input.rs")).unwrap();
+    let start = original
+        .find(&format!("fn {function}("))
+        .expect("selected function exists");
+    let end = start
+        + original[start..]
+            .find("\n}\n")
+            .expect("selected function ends")
+        + 3;
+    let selected = &original[start..end];
     assert_eq!(
-        original.matches(old).count(),
+        selected.matches(old).count(),
         1,
         "unique mutation anchor for {name}"
     );
-    fs::write(&path, original.replacen(old, new, 1)).unwrap();
+    fs::write(
+        &path,
+        format!(
+            "{}{}{}",
+            &original[..start],
+            selected.replacen(old, new, 1),
+            &original[end..]
+        ),
+    )
+    .unwrap();
     let result = check_brotli_input_function(&verus, &temporary, function);
     let log = transcript(&result);
     fs::write(
@@ -3588,5 +3606,254 @@ fn the_prover_rejects_b3c_wrong_dictionary_source() {
             || log.contains("assertion failed"),
         "expected a proof rejection, not a tooling error: {log}",
     );
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-saved-table-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-m1-aux-count-read-not-charged", "auxiliary_count_metered",
+            "budget.charge_work(1)", "budget.charge_work(0)"),
+        ("brotli-m1-aux-first-code-skips-last-length", "auxiliary_first_code_metered",
+            "auxiliary_count_metered(lengths, width, 18, budget)",
+            "auxiliary_count_metered(lengths, width, 17, budget)"),
+        ("brotli-m1-aux-canonical-length-read-not-charged", "auxiliary_canonical_code_metered",
+            "budget.charge_work(1)", "budget.charge_work(0)"),
+        ("brotli-m1-aux-candidate-read-not-charged", "decode_auxiliary_symbol_metered",
+            "budget.charge_work(1)", "budget.charge_work(0)"),
+        ("brotli-m1-aux-singleton-skips-last-length", "auxiliary_singleton_metered",
+            "while i < 18", "while i < 17"),
+        ("brotli-m1-simple-pair-second-read-not-charged", "simple_symbol_pair_metered",
+            "let a = symbols[left];\n    if !budget.charge_work(1)",
+            "let a = symbols[left];\n    if !budget.charge_work(0)"),
+        ("brotli-m1-simple-validation-skips-last-pair", "simple_distinct_validation_metered",
+            "        let equal = simple_symbol_pair_metered(symbols, 2, 3, budget)?;\n        assert(!equal);",
+            ""),
+        ("brotli-m1-field-planning-replay-not-charged", "plan_code_description_field",
+            "budget.charge_work(replay_work)", "budget.charge_work(0)"),
+        ("brotli-m1-saved-aux-load-not-charged", "plan_saved_aux_load",
+            "budget.charge_work(1)", "budget.charge_work(0)"),
+        ("brotli-m1-saved-aux-wrong-partial-count", "plan_saved_aux_load",
+            "return Ok(i as u64 + 1);", "return Ok(18);"),
+        ("brotli-m1-saved-aux-skips-last-copy", "read_aux_lengths",
+            "while i < 18", "while i < 17"),
+        ("brotli-m1-saved-aux-accepts-invalid-length", "read_aux_lengths",
+            "if value > 5 {", "if false {"),
+        ("brotli-m1-canonical-validation-read-not-charged", "plan_canonical_tree_install",
+            "budget.charge_work(1)", "budget.charge_work(0)"),
+        ("brotli-m1-canonical-accepts-invalid-length", "plan_canonical_tree_install",
+            "if length > 15 {\n            return Ok((planning_work, planning_work, false));",
+            "if length > 15 {\n            return Ok((planning_work, planning_work, true));"),
+        ("brotli-m1-canonical-accepts-incomplete-space", "plan_canonical_tree_install",
+            "if nonzero < 2 || space != 0 {", "if nonzero < 2 {"),
+    ] {
+        let start = original.find(&format!("fn {function}(")).expect("selected function exists");
+        let end = start + original[start..].find("\n}\n").expect("selected function ends") + 3;
+        let selected = &original[start..end];
+        assert_eq!(selected.matches(old).count(), 1, "unique mutation anchor for {name}");
+        let mutated = format!("{}{}{}", &original[..start], selected.replacen(old, new, 1), &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_four_m1_tree_action_bound_and_drain_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-tree-bound-canary-{}",
+        std::process::id()
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-m1-parser-restores-too-small-cap",
+            "advance_serialized_tree",
+            "while work < 5_696",
+            "while work < 2_000",
+        ),
+        (
+            "brotli-m1-planner-restores-too-small-cap",
+            "plan_serialized_tree",
+            "while iterations < 5_696",
+            "while iterations < 2_000",
+        ),
+        (
+            "brotli-m1-parser-skips-pending-span-drain",
+            "advance_serialized_tree",
+            "if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {",
+            "if false {",
+        ),
+        (
+            "brotli-m1-planner-skips-pending-span-drain",
+            "plan_serialized_tree",
+            "if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {",
+            "if false {",
+        ),
+    ] {
+        let start = original.find(&format!("fn {function}(")).unwrap();
+        let end = start + original[start..].find("\n}\n").unwrap() + 3;
+        let mut selected = original[start..end].to_string();
+        let (old, new) = if name == "brotli-m1-planner-restores-too-small-cap" {
+            // Check the existing rank's adequacy for the executable cap before
+            // mutation. This derived assertion is valid on the unmodified
+            // function; it avoids an expensive fallthrough counterexample.
+            let receipt = "    let action_cap: u16 = 5_696;\n    proof { assert(initial_rank < action_cap as nat); }\n    while iterations < action_cap";
+            assert_eq!(selected.matches("    while iterations < 5_696").count(), 1);
+            selected = selected.replacen("    while iterations < 5_696", receipt, 1);
+            fs::write(
+                &path,
+                format!("{}{}{}", &original[..start], selected, &original[end..]),
+            )
+            .unwrap();
+            let positive = check_brotli_input_function(&verus, &temporary, function);
+            fs::write(
+                project.join("evidence/positive-brotli-m1-planner-cap-rank.log"),
+                transcript(&positive),
+            )
+            .unwrap();
+            assert!(
+                positive.status.success(),
+                "unmodified cap/rank obligation failed: {}",
+                transcript(&positive)
+            );
+            (
+                "let action_cap: u16 = 5_696;",
+                "let action_cap: u16 = 2_000;",
+            )
+        } else {
+            (old, new)
+        };
+        assert_eq!(
+            selected.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        fs::write(
+            &path,
+            format!(
+                "{}{}{}",
+                &original[..start],
+                selected.replacen(old, new, 1),
+                &original[end..]
+            ),
+        )
+        .unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied")
+                || log.contains("precondition not satisfied")
+                || log.contains("requires not satisfied")
+                || log.contains("assertion failed")
+                || log.contains("invariant not satisfied"),
+            "expected semantic proof rejection: {log}"
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-tree-refinement-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-m1-tree-plan-omits-saved-load-planning", "plan_serialized_tree",
+            "let mut planning_work = initial_planning_work + copy_len as u64;",
+            "let mut planning_work = copy_len as u64;"),
+        ("brotli-m1-block-tree-plan-omits-planning-debit", "plan_block_tree_action",
+            "planning_work: tree.planning_work,", "planning_work: 0,"),
+        ("brotli-m1-group-tree-plan-omits-planning-debit", "plan_tree_group_action",
+            "planning_work: tree.planning_work,", "planning_work: 0,"),
+        ("brotli-m1-pending-span-writes-wrong-length", "drain_serialized_pending_span",
+            "next_initialized,\n            length,\n        )",
+            "next_initialized,\n            0,\n        )"),
+        ("brotli-m1-descriptor-store-writes-unrelated-byte", "store_code_description_decoder",
+            "B3B_PENDING_SPAN_LENGTH, 0)", "B3B_PENDING_SPAN_LENGTH + 1, 0)"),
+        ("brotli-m1-inconsistent-span-mutates-decoder", "drain_serialized_pending_span",
+            "return Err(CompressedHeaderError::InternalState);\n    }\n    let mut written",
+            "decoder.phase = CodeDescriptionPhase::Failed(CodeDescriptionError::InvalidAlphabet);\n        return Err(CompressedHeaderError::InternalState);\n    }\n    let mut written"),
+    ] {
+        let start = original.find(&format!("fn {function}(")).expect("selected function exists");
+        let end = start + original[start..].find("\n}\n").expect("selected function ends") + 3;
+        let selected = &original[start..end];
+        assert_eq!(selected.matches(old).count(), 1, "unique mutation anchor for {name}");
+        let mutated = format!("{}{}{}", &original[..start], selected.replacen(old, new, 1), &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("requires not satisfied")
+            || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}");
+        fs::write(&path, &original).unwrap();
+    }
     fs::remove_dir_all(temporary).unwrap();
 }

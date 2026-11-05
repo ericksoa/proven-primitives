@@ -1,0 +1,37 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:28583:1
+      |
+28583 | / fn execute_planned_context_bits(workspace: &mut [u8], window_bytes: u32,
+28584 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+28585 | |     input_was_limited: bool, plan: ContextBitsPlan,
+28586 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:28606:9
+      |
+28606 | /         old(budget).work_remaining < plan.execution_work ==> {
+28607 | |             &&& final(workspace)@ == old(workspace)@
+28608 | |             &&& *final(budget) == *old(budget)
+28609 | |             &&& r == Err(CompressedStep { consumed: 0,
+28610 | |                 status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+28611 | |         },
+      | |_________^ failed this postcondition
+...
+28697 | /     match status {
+28698 | |         Some(ContextAdvanceStatus::Failed(error)) => {
+28699 | |             if store_terminal_error(workspace, window_bytes, error).is_err() {
+28700 | |                 return Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) });
+...     |
+28714 | |         _ => Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) }),
+28715 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

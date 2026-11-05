@@ -1,0 +1,31 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-write-canary-64442/src/brotli_input.rs:30615:1
+      |
+30615 | / fn completed_body_symbol_work(
+30616 | |     scan_work: u64,
+30617 | |     consumed: usize,
+30618 | | ) -> (r: Option<u64>)
+      | |____________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-write-canary-64442/src/brotli_input.rs:30619:13
+      |
+30619 |       ensures match r {
+      |  _____________^
+30620 | |         Some(value) => value as nat
+30621 | |             == scan_work as nat + consumed as nat + 15 + 1,
+30622 | |         None => scan_work as nat + consumed as nat + 15 + 1 > u64::MAX as nat,
+30623 | |     },
+      | |_____^ failed this postcondition
+...
+30631 |       scanned_and_read_work.checked_add(SERIALIZED_WRITE_WORK + TRANSITION_WORK)
+      |       -------------------------------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

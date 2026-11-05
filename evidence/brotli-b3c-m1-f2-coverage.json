@@ -1,0 +1,204 @@
+{
+  "component": "Brotli B3c M1 saved-table/action-bound/F2 continuation",
+  "generated_utc": "2026-11-05T21:30:33.422965+00:00",
+  "release_gate": "incomplete",
+  "obligations": [
+    {
+      "id": "nested-transition-policy",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "Separate explicit nested resets and starts during M1 compressed-header parsing. Construction/reset remains 425.",
+      "roots": [
+        "serialized_tree_start_work",
+        "serialized_map_start_work",
+        "installed_prefix_reset_work",
+        "group_tree_start_work",
+        "tree_group_start_work",
+        "ready_switch_start_work"
+      ],
+      "remaining": "Complete binding to source-operation events, beyond arithmetic formula equality."
+    },
+    {
+      "id": "installed-symbol-refinement",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "First-stop record, actual symbol, malformed record outcomes, physical active queue, prefix, input/bit/record reads; initial/context symbol executors.",
+      "roots": [
+        "installed_symbol_full_step",
+        "installed_full_steps_agree",
+        "advance_installed_tree_symbol",
+        "replay_installed_symbol_plan",
+        "execute_planned_initial_symbol",
+        "execute_planned_context_symbol"
+      ],
+      "remaining": "This does not establish every body adapter failure path or complete header/body refinement."
+    },
+    {
+      "id": "code-field-refinement",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "Terminal, zero-input, partial input, EOF and complete field outcomes, physical active queue, deterministic phases and symbols.",
+      "roots": [
+        "code_field_step_refines",
+        "code_field_steps_agree",
+        "code_transition_deterministic",
+        "CodeDescriptionDecoder::advance_field"
+      ],
+      "remaining": "Lift exact field results and read costs through complete serialized-tree replay, builder validation/install state, all outcomes and byte frames.",
+      "concrete_ledger_gaps": [
+        {
+          "operation": "process_complex_code_length -> CODE_LENGTH_ORDER[index]",
+          "cell_reads": 1,
+          "status": "Individual planning precharge and replay read-cost model implemented; full serialized-tree source-operation ledger remains open"
+        },
+        {
+          "operation": "start_complex_symbol_progress -> auxiliary_singleton",
+          "cell_reads": 18,
+          "status": "Individual planning precharge and replay read-cost model implemented; full serialized-tree source-operation ledger remains open"
+        },
+        {
+          "operation": "auxiliary_canonical_code_exec(lengths, symbol)",
+          "cell_reads_formula": "1 + 18 * (length - 1) + symbol",
+          "status": "Individual planning precharge and replay read-cost model implemented; full serialized-tree source-operation ledger remains open"
+        }
+      ]
+    },
+    {
+      "id": "context-count-and-bit-agreement",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "Unconditional status and consumption agreement for valid planned actions; exact prepaid input/work debit and failed-reservation atomicity.",
+      "roots": [
+        "advance_context_tree_count_phase",
+        "context_tree_count_plan_matches_action",
+        "execute_planned_context_tree_count",
+        "advance_context_bits_phase",
+        "context_bits_plan_matches_action",
+        "execute_planned_context_bits"
+      ],
+      "remaining": "Outcome-specific minimal byte frames and complete operation ledger."
+    },
+    {
+      "id": "body-symbol-success-accounting",
+      "state": "checked_named_contracts_with_remaining_obligations",
+      "scope": "Successful symbol identity, exact retained cursor and 2 * read_units + 17 work in input-private helper; approved adapter/result unchanged.",
+      "roots": [
+        "body_symbol_success_refines",
+        "advance_planned_body_symbol",
+        "advance_serialized_body_symbol"
+      ],
+      "remaining": "Total failure-path refinement and accounting."
+    },
+    {
+      "id": "serialized-tree-whole-action",
+      "state": "open",
+      "roots": [
+        "plan_serialized_tree",
+        "advance_serialized_tree",
+        "advance_planned_context_tree",
+        "code_phase_rank",
+        "code_phase_rank_is_bounded",
+        "drain_serialized_pending_span",
+        "drain_and_store_serialized_pending_span",
+        "code_descriptor_store_frame"
+      ],
+      "remaining": "Complete state, frame, all malformed builder/install outcomes and source operation ledger. Finite regressions are not this proof.",
+      "scope": "Checked local action-rank, pending-span effects/frames, descriptor frame, successful planning debit/consumption and bounded estimates; complete plan/action equality remains open"
+    },
+    {
+      "id": "remaining-header-actions",
+      "state": "open",
+      "roots": [
+        "plan_block_count_action",
+        "plan_initial_suffix_action",
+        "plan_distance_action",
+        "plan_context_mode_action",
+        "plan_block_tree_action",
+        "plan_tree_group_action",
+        "plan_context_map_tail",
+        "plan_terminal_header_work"
+      ],
+      "remaining": "Complete plan/action functional, frame and exact-source-ledger proofs and their controls."
+    }
+  ],
+  "later_required_phases": [
+    "Remaining B3c resource/public refinement/confidentiality/control gates",
+    "B3d arbitrary permitted call-sequence and source-observation induction",
+    "B4 quarantining caller and profile closure",
+    "Named independent human specification review and fail-closed release evidence"
+  ],
+  "saved_auxiliary_load_policy": {
+    "human_approval": "Charge the 18 loads as table reads",
+    "scope": "Planning and replay; partial loads charge the cells inspected; 425 construction/reset unchanged",
+    "implementation_in_this_checkpoint": true,
+    "status": "Individual precharge, exact inspected prefix and per-reload execution estimate implemented; complete operation ledger remains open"
+  },
+  "validation_state": "unchanged_whole_crate_positive_and_named_defect_controls_passed_full_M1_open",
+  "prior_positive_control": {
+    "path": "evidence/brotli-b3c-m1-saved-table-verification.json",
+    "sha256": "6b74b4b44c80e7bd64e5eb427f4a503726d40b2636f990e6ceb39a5eea8d9c88",
+    "verified": 1174,
+    "errors": 0,
+    "same_as_final_f2_source": false,
+    "source_patch": {
+      "path": "evidence/m1-saved-table-before-f2-source.patch.txt",
+      "sha256": "31ce94f12a3aa5a3ffc7111f0bf9fbcd81313c12b5117ca73140f06e3cda709b",
+      "base_commit": "c3e6355a994addbe82c3f3ddec1b801bdf0b1fd7"
+    }
+  },
+  "prior_negative_controls": {
+    "path": "evidence/brotli-b3c-m1-saved-table-controls.json",
+    "sha256": "b3f0bdddf504803ad71844e3c81843f4efb1baa5c20dc5dd8cf7a5baa65cb14d",
+    "rejected": 87,
+    "same_as_final_f2_source": false
+  },
+  "runtime_validation": {
+    "path": "evidence/m1-f2-release-tests.log",
+    "sha256": "be109d91b1c7b4df1a0cf0af2d75b02639193fa316b3fd9469b66a6d6f57e463",
+    "passed": 95,
+    "failed": 0,
+    "library": 84,
+    "primitives": 9,
+    "trust_scan": 1,
+    "upstream_comparison": 1
+  },
+  "f2_approval": {
+    "date": "2026-11-04",
+    "answer": "Approve F2 as written",
+    "decision": "BROTLI_B3C_FIXTURE_F2_DECISION.md",
+    "strict_coverage_unchanged": true,
+    "quickfox_repeated": "Success with pinned expected bytes; all 57 input splits and 12 chunk combinations with output suffix guards",
+    "monkey": "Zero-output sticky InvalidFormat; observed ContextMapRepeat, native disagreement unresolved"
+  },
+  "k1_decision": {
+    "path": "BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md",
+    "status": "held_for_human_review_not_approved_not_implemented",
+    "human_answer": "Hold this proof-boundary change for review"
+  },
+  "earlier_failed_checks": [
+    {
+      "source_start": "evidence/m1-f2-attempt1-source-start.json",
+      "source_freeze": "evidence/m1-f2-attempt1-source-freeze.json",
+      "log": "evidence/m1-f2-attempt1-whole-crate.log",
+      "outcome": "Resource limit in advance_serialized_tree loop; stopped after that failure; no positive or semantic negative verdict",
+      "source_unchanged": true
+    },
+    {
+      "log": "evidence/m1-f2-control-b3a_auxiliary_code_without_bit_reversal-attempt1.log",
+      "outcome": "Test harness found two global mutation anchors; no mutation or semantic rejection from that attempt. Fixed by scoping to the existing intended decoder function."
+    },
+    {
+      "log": "evidence/m1-f2-control-four_m1_tree_action_bound_and_drain_defects-attempt1.log",
+      "outcome": "Suite did not finish; no suite success counted. Rerun with unchanged mutation definitions and verified source."
+    },
+    {
+      "log": "evidence/m1-f2-control-four_m1_tree_action_bound_and_drain_defects-attempt2.log",
+      "outcome": "Stopped the long original planner-cap solver query without claiming a verdict. Its replacement first checks the existing initial-rank adequacy against an equivalent guard binding on the unmodified function, then changes the guard cap; original function contracts remain unchanged."
+    }
+  ],
+  "proof_refactoring": "Pending-span frame assertions retain the same definitions in private named predicates. Both span roots and the consuming tree root pass the selected checker at rlimit300; final whole-crate proof still required.",
+  "positive_control": {
+    "path": "evidence/brotli-b3c-m1-f2-verification.json",
+    "sha256": "a0ef1c51a4c286170214454fda997b6565c9f4b0095764eaaeb4e4c73473c560"
+  },
+  "negative_controls": {
+    "path": "evidence/brotli-b3c-m1-f2-controls.json",
+    "sha256": "8cd26361c64cf966525191b0dcd7728b251c4374e821ff99f8f5d708eb848ee6"
+  }
+}

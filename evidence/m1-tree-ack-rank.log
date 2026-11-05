@@ -1,0 +1,13 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50943,13): 'if' cannot be used in patterns.
+WARNING: (55659,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13113:1
+      |
+13113 | / fn acknowledge_serialized_pending_span(
+13114 | |     decoder: &mut CodeDescriptionDecoder,
+13115 | | ) -> (r: CodeDescriptionStep)
+      | |____________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

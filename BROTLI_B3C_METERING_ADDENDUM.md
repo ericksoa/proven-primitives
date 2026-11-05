@@ -314,14 +314,14 @@ Current remaining M1 obligations:
 - Complete outcome-specific frames and failure-path accounting, then bind
   every outstanding relation to unchanged-specification defect controls.
 
-In particular, `process_complex_code_length` reads `CODE_LENGTH_ORDER`;
+At that checkpoint, `process_complex_code_length` read `CODE_LENGTH_ORDER`;
 `auxiliary_singleton` reads all 18 auxiliary lengths; and auxiliary canonical
-lookup performs further length-table scans. `plan_serialized_tree` currently
-prepays its bit read before calling the field decoder, without a complete
+lookup performed further length-table scans. `plan_serialized_tree` then
+prepaid its bit read before calling the field decoder, without a complete
 separate precharge for those nested table reads. The zero-input transition
 after a completed auxiliary alphabet also invokes the 18-cell singleton scan.
-These source paths are concrete outstanding metering work, even when all
-currently written contracts verify. The complete-ledger claim remains denied.
+The continuation below addresses these individual reads. The complete-ledger
+claim remains denied.
 
 The human explicitly selected **charge the 18 loads as table reads** on
 2026-11-03. `read_aux_lengths`
@@ -331,7 +331,7 @@ load in planning or replay, beyond later indexed lookups. A rejected partial
 load charges its actual inspected prefix. Treating the copy as state-loading
 bookkeeping is unselected. This approval does not change ordinary scalar
 fields, interfaces, storage or the 425-unit construction/reset charge. The
-implementation of this additional approved charge remains in progress.
+implementation is included in the saved-table continuation below.
 
 M1, B3c and the supported-decoder release gate remain incomplete. B3d's
 call-sequence and source-observation theorems, B4's quarantining caller and
@@ -357,9 +357,60 @@ contracts and admitted inputs are unchanged. Earlier checker resource failures
 are retained and are not counted as successful defect rejections.
 
 The separately developed table-ledger continuation and its saved auxiliary
-load charges are outside this checkpoint's frozen source. A regression there
-also demonstrates a valid private 704-symbol tree completing in byte chunks
-but failing in one slice at the existing 2,000-action cap. The proposed change
-to that cap is pending human selection in
-`BROTLI_M1_TREE_ACTION_BOUND_DECISION.md`. M1 and all later release gates remain
-incomplete.
+load charges were outside that checkpoint's frozen source. A regression there
+demonstrated a valid private 704-symbol tree completing in byte chunks but
+failing in one slice at the previous 2,000-action cap. The human explicitly
+approved the 5,696-action correction on 2026-11-04 in
+`BROTLI_M1_TREE_ACTION_BOUND_DECISION.md`.
+
+### Saved tables, tree actions and approved F2 correction
+
+The continuation prepays each auxiliary-table candidate/count/canonical cell
+read, the singleton scan, simple-symbol comparisons and the `CODE_LENGTH_ORDER`
+lookup. The field planner reserves its local replay's bit and table reads
+before invoking the unchanged W1 field action. The initial saved-length load
+charges both its pre-scan and local replay; rejected loads charge only the
+inspected prefix. Each subsequent W1 descriptor reload contributes its 18
+saved-length reads to the planned execution work. The zero-input auxiliary
+completion has its own lookup and transition charges.
+
+Canonical validation plans now retain the exact first failing length/space
+prefix, or the full invalid/valid classification. Malformed builder plans
+retain W1's error and consumed prefix. A successful tree plan proves its
+reported planning work equals the actual planning debit and its consumption
+stays within the supplied input. Block-tree and tree-group planners propagate
+those properties and preserve the other budget counters. Loose mathematical
+bounds on computed work totals do not change RequestBudget policy.
+
+Both tree loops use the approved 5,696-action cap and prove their cap
+fallthrough unreachable using a rank bounded by `8 * alphabet_limit + 63`.
+They drain an already-pending span before advancing. Drainage proves the exact
+builder cells written, preservation outside the span and initialized counter,
+and unchanged workspace/decoder on inconsistent-position failure. Descriptor
+stores preserve bytes outside their designated scalar fields; the drained
+lengths survive serialization. These are named local relations, not a complete
+serialized-tree plan/action theorem.
+
+The pending-span correction exposed the false F1 classification of
+`quickfox_repeated`. Candidate F2 was explicitly approved on 2026-11-04:
+that fixture must decode to its pinned 176,128 bytes; `monkey` retains its
+zero-output sticky rejection for this checkpoint, with the observed
+`ContextMapRepeat` reason and native disagreement recorded as unresolved.
+Strict advertised-tree coverage and the fixed `compression` fixture remain.
+
+The pre-F2 frozen source passed **1,174 whole-crate checks, zero errors**, then
+all **87 deliberate defects** across 13 suites were rejected. The final F2
+source and additional debit/frame contracts require their own unchanged
+whole-crate positive and defect controls. The final source passes **95 release
+tests**: 84 library, nine primitive, one trust scan and one upstream comparison.
+The fixture checks include all 57 input splits of `quickfox_repeated` and
+one-byte, 31-byte, exact and excess output buffers across whole, one-byte and
+seven-byte input chunks, with untouched output suffixes.
+
+Complete serialized-tree state/outcome agreement, the full operation ledger,
+remaining header/body failure relations, B3d, B4 and independent human review
+remain open. M1 and the supported-decoder release gate remain incomplete.
+
+### Final F2-source validation
+
+The unchanged final source passed the entire pinned `--no-cheating` check: 1174 verified, zero errors. All 95 release tests passed, and all 118 deliberate defects across 19 suites were rejected after that positive. Exact source, harness, tool, compiled-artifact, approval and transcript identities are bound in `evidence/brotli-b3c-m1-f2.json`. The earlier resource-limited check is retained and is not counted as a semantic rejection. M1 and all later release gates remain incomplete.

@@ -3323,7 +3323,10 @@ pub(crate) fn check_context_tree_coverage(
                 context_entry_at(window_bytes, kind, i as u16) as int
             ]
                 < num_htrees,
-    ensures r.is_ok() ==> {
+    ensures
+        1_024 <= window_bytes <= 16_777_216
+            && (window_bytes & ((window_bytes - 1) as u32)) == 0 ==> r.is_ok(),
+        r.is_ok() ==> {
         let values = context_map_values(old(workspace)@, window_bytes, kind, active_len);
         &&& r.unwrap().0 == context_tree_coverage(values, num_htrees)
         &&& r.unwrap().1 == 32u64 + 3u64 * active_len as u64 + num_htrees as u64
@@ -4134,6 +4137,8 @@ pub(crate) fn inverse_mtf_context_map(
         mtf_upper_bound == 63
             || mtf_reusable(mtf_list_values(old(workspace)@, window_bytes), mtf_upper_bound),
     ensures
+        1_024 <= window_bytes <= 16_777_216
+            && (window_bytes & ((window_bytes - 1) as u32)) == 0 ==> r.is_ok(),
         r.is_ok() ==> {
             let ranks = context_map_values(old(workspace)@, window_bytes, kind, active_len);
             let next_bound = mtf_rank_or(ranks) >> 2;

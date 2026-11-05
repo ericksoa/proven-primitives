@@ -1,0 +1,82 @@
+from pathlib import Path
+import datetime,hashlib,json,os,re,shutil,subprocess
+root=Path.cwd()
+def digest(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p): return {'path':str(p),'sha256':digest(p)}
+def read(p): return json.loads(Path(p).read_text())
+freeze=read('evidence/m1-f2-source-freeze.json')
+positive=read('evidence/brotli-b3c-m1-f2-verification.json')
+verdict=positive['verification-results']
+assert freeze['exit_code']==0 and freeze['source_unchanged']
+assert verdict['success'] and verdict['is-verifying-entire-crate'] and verdict['errors']==0 and not verdict['encountered-error']
+assert all(digest(p)==h for p,h in freeze['source_sha256'].items()), 'Source changed after positive'
+controls=read('evidence/brotli-b3c-m1-f2-controls.json')
+assert controls['source_unchanged'] and controls['suites_passed']==19 and controls['suites_failed']==0 and controls['rejected_mutations']==118
+assert controls['positive_control']['sha256']==digest('evidence/brotli-b3c-m1-f2-verification.json')
+for suite in controls['suites']:assert suite['exit_code']==0 and digest(suite['log'])==suite['log_sha256']
+start=datetime.datetime.fromisoformat(freeze['started_utc']).timestamp()
+canaries=sorted(p for p in Path('evidence').glob('canary-brotli-*.log') if p.stat().st_mtime>=start)
+assert len(canaries)==118,(len(canaries),'final-source canaries')
+for p in canaries:
+ text=p.read_text()
+ assert any(s in text for s in ['postcondition not satisfied','precondition not satisfied','requires not satisfied','invariant not satisfied','assertion failed']),p
+ assert not re.search(r'Resource limit .*exceeded|internal compiler error|thread .*panicked|timed out|error\[E\d+\]',text),p
+runtime=Path('evidence/m1-f2-release-tests.log').read_text()
+assert 'FAILED' not in runtime and 'test result: FAILED' not in runtime
+passed=[int(n) for n in re.findall(r'test result: ok\. (\d+) passed;',runtime)]
+assert passed==[84,9,1,1,0],passed
+assert Path('evidence/m1-f2-format-check.log').read_text()==''
+subprocess.run(['git','diff','--check','--','.',':(exclude)evidence'],env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools'),check=True)
+for name,p in [('verification','/tmp/m1_f2_verify.py'),('controls','/tmp/m1_f2_controls.py'),('wait','/tmp/m1_f2_wait_positive_controls.py'),('finalize','/tmp/m1_f2_finalize.py'),('resume-controls','/tmp/m1_f2_resume_controls_record.py')]:
+ shutil.copyfile(p,Path('evidence')/('m1-f2-'+name+'-driver.py.txt'))
+coverage=read('evidence/brotli-b3c-m1-f2-coverage.json')
+coverage['generated_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+coverage['validation_state']='unchanged_whole_crate_positive_and_named_defect_controls_passed_full_M1_open'
+coverage['positive_control']=ref('evidence/brotli-b3c-m1-f2-verification.json')
+coverage['negative_controls']=ref('evidence/brotli-b3c-m1-f2-controls.json')
+coverage['runtime_validation']['sha256']=digest('evidence/m1-f2-release-tests.log')
+Path('evidence/brotli-b3c-m1-f2-coverage.json').write_text(json.dumps(coverage,indent=2)+'\n')
+prior=read('evidence/brotli-b3c-m1-option-a.json')
+old_start=datetime.datetime.fromisoformat(read('evidence/m1-saved-table-source-start.json')['started_utc']).timestamp()
+old_canaries=sorted(p for p in Path('evidence/m1-saved-table-before-f2').glob('canary-*.log') if p.stat().st_mtime>=old_start)
+assert len(old_canaries)==87,('retained pre-F2 canaries',len(old_canaries))
+artifact_paths=set(canaries+old_canaries)
+artifact_paths.add(Path('evidence/positive-brotli-m1-planner-cap-rank.log'))
+for pattern in ['m1-f2-*.log','m1-f2-*.json','m1-f2-*.txt','m1-f1-*.log','m1-f1-*.txt','m1-saved-table-*.log','m1-saved-table-*.json','m1-saved-table-*.txt','brotli-b3c-m1-saved-table-*.json','brotli-m1-f1-classification-diagnostic.json','brotli-m1-tree-action-bound-diagnostic.json','m1-tree-*.log','m1-bound-*.log','m1-trailing-zero-*.log']:
+ artifact_paths.update(Path('evidence').glob(pattern))
+artifact_paths.update(Path('evidence')/name for name in ['brotli-b3c-m1-f2-verification.json','brotli-b3c-m1-f2-controls.json','brotli-b3c-m1-f2-coverage.json'])
+documents=['AGENTS.md','BROTLI_B3C_PROPOSAL.md','BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md','BROTLI_B3C_FIXTURE_ADDENDUM.md','BROTLI_B3C_FIXTURE_F2_DECISION.md','BROTLI_B3C_METERING_ADDENDUM.md','BROTLI_M1_TRANSITION_RULE_DECISION.md','BROTLI_M1_TREE_ACTION_BOUND_DECISION.md','BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md']
+validation_files=sorted(Path(p) for p in subprocess.check_output(['git','ls-files','-z','tests'],env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools'),text=True).split('\0') if p)
+record={
+ 'component':'Brotli B3c M1 saved-table/action-bound/F2 checkpoint',
+ 'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+ 'base_commit':'c3e6355a994addbe82c3f3ddec1b801bdf0b1fd7',
+ 'claim':'The pinned whole-crate verifier checked the written contracts on unchanged final source. Individual table precharges, local tree ranks, span effects and frames, exact successful planning debits and F2 comparisons are validated. Complete serialized-tree plan/action refinement and the source-operation ledger remain open.',
+ 'source_sha256':freeze['source_sha256'],
+ 'validation_source_sha256':{str(p):digest(p) for p in validation_files},
+ 'approval_and_document_sha256':{p:digest(p) for p in documents},
+ 'verifier':prior['verifier'],'verifier_binary':prior['verifier_binary'],
+ 'verification_options':freeze['command'][2:],
+ 'verification_elapsed_seconds':freeze['elapsed_seconds'],
+ 'verification_results':verdict,
+ 'verification_evidence':ref('evidence/brotli-b3c-m1-f2-verification.json'),
+ 'verification_log':ref('evidence/m1-f2-whole-crate.log'),
+ 'source_freeze':ref('evidence/m1-f2-source-freeze.json'),
+ 'negative_controls':{'evidence':ref('evidence/brotli-b3c-m1-f2-controls.json'),'suites_passed':19,'rejected_mutations':118,'order':'All deliberate mutations started after the unchanged entire-crate positive completed. All 118 raw checker logs contain semantic proof failures without resource or compiler failures.'},
+ 'runtime_tests':{'evidence':ref('evidence/m1-f2-release-tests.log'),'passed':95,'library':84,'primitives':9,'trust_scan':1,'upstream_comparison':1},
+ 'compiled_artifact':ref('target/release/libproven_primitives.rlib'),
+ 'format_check':ref('evidence/m1-f2-format-check.log'),
+ 'diff_check':{'command':['git','diff','--cached','--check','--','.',':(exclude)evidence'],'scope':'Library source, tests and documents. Raw evidence transcripts and patches retain exact checker output bytes and are validated by hashes.'},
+ 'coverage':ref('evidence/brotli-b3c-m1-f2-coverage.json'),
+ 'artifact_sha256':{str(p):digest(p) for p in sorted(artifact_paths)},
+ 'prior_saved_table_positive':{'verification':ref('evidence/brotli-b3c-m1-saved-table-verification.json'),'source_patch':ref('evidence/m1-saved-table-before-f2-source.patch.txt'),'controls':ref('evidence/brotli-b3c-m1-saved-table-controls.json'),'retained_canaries':87,'same_as_final_source':False},
+ 'release_gate':'incomplete',
+ 'not_established':coverage['later_required_phases']+['Complete serialized-tree state/outcome/byte-frame and exact source-operation ledger','All remaining header/body outcome and failure-path relations','monkey format equivalence with the pinned native reference'],
+ 'trusted_components':prior['trusted_components'],
+ 'execution_environment':prior['execution_environment'],
+ 'approvals':{'saved_auxiliary_loads':'Charge the 18 loads as table reads','tree_cap':'Approve 5,696 actions','fixture_correction':'Approve F2 as written','k1':'Human held the proof-boundary change for review on 2026-11-04; unapproved and not implemented'},
+ 'earlier_failed_checks':coverage['earlier_failed_checks'],
+}
+assert digest(record['verifier_binary']['path'])==record['verifier_binary']['sha256']
+Path('evidence/brotli-b3c-m1-f2.json').write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps({'verified':verdict['verified'],'errors':verdict['errors'],'tests':95,'rejected_mutations':118,'manifest':'evidence/brotli-b3c-m1-f2.json','release_gate':'incomplete'}))

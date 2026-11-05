@@ -1,0 +1,21 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:11966:5
+      |
+11966 |     while i < 18
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:11932:1
+      |
+11932 | / fn write_aux_lengths(
+11933 | |     workspace: &mut [u8],
+11934 | |     window_bytes: u32,
+11935 | |     lengths: [u8; 18],
+11936 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)

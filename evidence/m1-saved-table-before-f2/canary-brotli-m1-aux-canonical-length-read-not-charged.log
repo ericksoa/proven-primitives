@@ -1,0 +1,36 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-61246/src/brotli_input.rs:1994:1
+     |
+1994 | / fn auxiliary_canonical_code_metered(lengths: &[u8; 18], symbol: usize,
+1995 | |     budget: &mut crate::brotli::RequestBudget,
+1996 | | ) -> (r: Result<(u32, u64), CoreFailure>)
+     | |________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-61246/src/brotli_input.rs:2006:9
+     |
+2006 | /         r.is_ok() ==> {
+2007 | |             &&& r.unwrap().0 as nat == auxiliary_canonical_code(lengths@, symbol as int)
+2008 | |             &&& r.unwrap().0 <= 1134
+2009 | |             &&& r.unwrap().1 == 1 + 18 * (lengths@[symbol as int] as u64 - 1) + symbol as u64
+2010 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
+2011 | |         },
+     | |_________^ failed this postcondition
+...
+2014 | / {
+2015 | |     if !budget.charge_work(0) { return Err(CoreFailure::ResourceLimit); }
+2016 | |     let length = lengths[symbol];
+2017 | |     let (first, first_reads) = auxiliary_first_code_metered(lengths, length, budget)?;
+2018 | |     let (rank, rank_reads) = auxiliary_count_metered(lengths, length, symbol, budget)?;
+2019 | |     Ok((first + rank, 1 + first_reads + rank_reads))
+2020 | | }
+     | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

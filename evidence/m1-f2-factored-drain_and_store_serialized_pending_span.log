@@ -1,0 +1,15 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13546:1
+      |
+13546 | / fn drain_and_store_serialized_pending_span(
+13547 | |     workspace: &mut [u8],
+13548 | |     window_bytes: u32,
+13549 | |     decoder: &mut CodeDescriptionDecoder,
+13550 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

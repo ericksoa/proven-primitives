@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:3213:1
+     |
+3213 | / fn process_complex_code_length(
+3214 | |     progress: ComplexProgress,
+3215 | |     value: u8,
+3216 | | ) -> (r: CodeDescriptionPhase)
+     | |_____________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:3225:9
+     |
+3225 | /         complex_process_holds(
+3226 | |             progress,
+3227 | |             value,
+3228 | |             r,
+...    |
+3234 | |             },
+3235 | |         ),
+     | |_________^ failed this postcondition
+...
+3244 |               return CodeDescriptionPhase::Failed(CodeDescriptionError::InvalidAlphabet);
+     |               -------------------------------------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

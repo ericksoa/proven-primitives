@@ -1,6 +1,14 @@
 # Brotli B3c C1 comparison-fixture addendum
 
 Status: **Candidate F1 approved exactly as written by the human on 2026-10-27.**
+Its two fixture classifications and their stated reason were corrected by
+**Candidate F2, explicitly approved on 2026-11-04**, in
+`BROTLI_B3C_FIXTURE_F2_DECISION.md`. The discovery text below is historical and
+contains the false claim that both maps omit an advertised tree. Current
+evidence shows successful `quickfox_repeated` decoding with full coverage;
+`monkey` rejects a context-map repeat before coverage is reached, with the
+native disagreement unresolved. The fixed `compression` stream remains.
+
 This addendum changes only the approved C1 comparison matrix. It does not
 change the decoder API, serialized state, algorithms, dependencies, tools,
 resource policy, or proof trust boundary.

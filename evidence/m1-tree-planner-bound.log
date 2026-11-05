@@ -1,0 +1,35 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50943,13): 'if' cannot be used in patterns.
+WARNING: (55659,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26888:5
+      |
+26888 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26973:17
+      |
+26973 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26915:5
+      |
+26915 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26816:1
+      |
+26816 | / fn plan_serialized_tree(
+26817 | |     workspace: &[u8],
+26818 | |     window_bytes: u32,
+26819 | |     budget: &mut crate::brotli::RequestBudget,
+26820 | |     input: &[u8],
+26821 | |     end_of_input: bool,
+26822 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+verification results:: 4 verified, 0 errors (partial verification with `--verify-*`)

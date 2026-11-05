@@ -1,0 +1,15 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50943,13): 'if' cannot be used in patterns.
+WARNING: (55659,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12521:1
+      |
+12521 | / fn load_code_description_decoder(
+12522 | |     workspace: &[u8],
+12523 | |     window_bytes: u32,
+12524 | |     queue: BitQueue,
+12525 | | ) -> (r: Result<CodeDescriptionDecoder, CompressedHeaderError>)
+      | |______________________________________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

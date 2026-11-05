@@ -1,0 +1,302 @@
+{
+  "generated_utc": "2026-11-04T19:10:37.445925+00:00",
+  "positive_control": {
+    "path": "evidence/brotli-b3c-m1-saved-table-verification.json",
+    "sha256": "6b74b4b44c80e7bd64e5eb427f4a503726d40b2636f990e6ceb39a5eea8d9c88",
+    "verified": 1174,
+    "errors": 0,
+    "entire_crate": true
+  },
+  "source_unchanged": true,
+  "suites": [
+    {
+      "suite": "the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects",
+      "expected_mutations": 15,
+      "exit_code": 0,
+      "elapsed_seconds": 219.73652041697642,
+      "log": "evidence/m1-saved-table-control-fifteen_m1_saved_table_and_lookup_defects.log",
+      "log_sha256": "48c9b40010698fed7659c8d3eb0d3cd6360c4b55a5faf83118d277205bd441d3",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+      "expected_mutations": 4,
+      "exit_code": 0,
+      "elapsed_seconds": 169.992452333041,
+      "log": "evidence/m1-saved-table-control-four_m1_tree_action_bound_and_drain_defects.log",
+      "log_sha256": "7f5076160baa5dfa5fbec761ed74eadb575c8aff4243966a4c5b9f3503a0dc8c",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_six_m1_nested_reset_transition_undercharges",
+      "expected_mutations": 6,
+      "exit_code": 0,
+      "elapsed_seconds": 89.47401583299506,
+      "log": "evidence/m1-saved-table-control-six_m1_nested_reset_transition_undercharges.log",
+      "log_sha256": "513a3f5a0357f10aded505624452a1b2534563d59fa9b27652706f27d201f956",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_six_m1_nested_reset_transition_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_nine_m1_source_refinement_and_debit_defects",
+      "expected_mutations": 9,
+      "exit_code": 0,
+      "elapsed_seconds": 130.37623616599012,
+      "log": "evidence/m1-saved-table-control-nine_m1_source_refinement_and_debit_defects.log",
+      "log_sha256": "178ba8af8d23b327054b012ce8a2907c18dac743d7253e8af6876a5ca00841f2",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_nine_m1_source_refinement_and_debit_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_five_b3c_block_count_metering_undercharges",
+      "expected_mutations": 5,
+      "exit_code": 0,
+      "elapsed_seconds": 68.0807726670173,
+      "log": "evidence/m1-saved-table-control-five_b3c_block_count_metering_undercharges.log",
+      "log_sha256": "72f2438a79b1c9d854b194302afd7797ddcb44f1d4c56a62f3f0d57234f77773",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_five_b3c_block_count_metering_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_three_b3c_distance_metering_undercharges",
+      "expected_mutations": 3,
+      "exit_code": 0,
+      "elapsed_seconds": 41.41152320901165,
+      "log": "evidence/m1-saved-table-control-three_b3c_distance_metering_undercharges.log",
+      "log_sha256": "a4de6cf78e073e7cb600cd922f67d538efc4a9b9eee15411e1622d710720ff2e",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_three_b3c_distance_metering_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+      "expected_mutations": 4,
+      "exit_code": 0,
+      "elapsed_seconds": 54.8050137499813,
+      "log": "evidence/m1-saved-table-control-four_b3c_context_mode_metering_undercharges.log",
+      "log_sha256": "b4f528c1b41eab320b0ab6c48e252be3188ab98601a46a9ac2f72111a838248a",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+      "expected_mutations": 4,
+      "exit_code": 0,
+      "elapsed_seconds": 55.66264333296567,
+      "log": "evidence/m1-saved-table-control-four_b3c_initial_suffix_metering_undercharges.log",
+      "log_sha256": "5e2d6b52a9b04cd6d069814a1fab8ca9b99b7a2ba5fe5a302c2866f03a382bc9",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_five_b3c_tree_formula_undercharges",
+      "expected_mutations": 5,
+      "exit_code": 0,
+      "elapsed_seconds": 69.86958983400837,
+      "log": "evidence/m1-saved-table-control-five_b3c_tree_formula_undercharges.log",
+      "log_sha256": "8e2d33bd52be9ab41acb0cbeefa4ec7b9052e0e1f56a8fdf2478d5978dbc0a9a",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_five_b3c_tree_formula_undercharges",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+      "expected_mutations": 13,
+      "exit_code": 0,
+      "elapsed_seconds": 186.20042925002053,
+      "log": "evidence/m1-saved-table-control-thirteen_b3c_context_tree_count_defects.log",
+      "log_sha256": "46c80393aab54aa07cae0663724780125cc9c71026d45ea19c3c5dba64730b50",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_seventeen_b3c_context_bits_defects",
+      "expected_mutations": 17,
+      "exit_code": 0,
+      "elapsed_seconds": 317.6260825409554,
+      "log": "evidence/m1-saved-table-control-seventeen_b3c_context_bits_defects.log",
+      "log_sha256": "60628100a5d93bbf77f9fe51a6b6cf55d3df64d92e36960644d8351ca71afa40",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_seventeen_b3c_context_bits_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_b3c_exact_symbol_work_undercharge",
+      "expected_mutations": 1,
+      "exit_code": 0,
+      "elapsed_seconds": 42.377055959019344,
+      "log": "evidence/m1-saved-table-control-b3c_exact_symbol_work_undercharge.log",
+      "log_sha256": "acb3aa28bef0215da09bc1a6c8e01929797770abba3fb03899ec0ac4c657c415",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_b3c_exact_symbol_work_undercharge",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_b3c_serialized_symbol_write_undercharge",
+      "expected_mutations": 1,
+      "exit_code": 0,
+      "elapsed_seconds": 31.304716667043976,
+      "log": "evidence/m1-saved-table-control-b3c_serialized_symbol_write_undercharge.log",
+      "log_sha256": "9c9cc5f9b82439240e648796f0c5ded07da5ba85578aee79adb413db3f54e8b2",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_b3c_serialized_symbol_write_undercharge",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ]
+    }
+  ],
+  "suites_passed": 13,
+  "suites_failed": 0,
+  "rejected_mutations": 87
+}

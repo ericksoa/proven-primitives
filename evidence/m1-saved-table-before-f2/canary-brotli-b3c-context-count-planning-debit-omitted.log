@@ -1,0 +1,38 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-63428/src/brotli_input.rs:27816:1
+      |
+27816 | / fn plan_context_tree_count_action(
+27817 | |     workspace: &[u8],
+27818 | |     window_bytes: u32,
+27819 | |     budget: &mut crate::brotli::RequestBudget,
+27820 | |     input: &[u8],
+27821 | |     end_of_input: bool,
+27822 | | ) -> (r: Result<ContextTreeCountPlan, CoreFailure>)
+      | |__________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-63428/src/brotli_input.rs:27832:9
+      |
+27832 | /         r.is_ok() ==> {
+27833 | |             &&& context_tree_count_plan_valid(
+27834 | |                 workspace@, window_bytes, input@, end_of_input, r.unwrap(),
+...     |
+27837 | |                 == old(budget).work_remaining - r.unwrap().read_work
+27838 | |         },
+      | |_________^ failed this postcondition
+...
+27876 | /     Ok(ContextTreeCountPlan {
+27877 | |         start_queue, start_phase, end_queue: queue, end_phase: phase,
+27878 | |         status: step.status, consumed: step.consumed,
+27879 | |         read_work: read.work, execution_work,
+27880 | |     })
+      | |______- at the end of the function body
+
+error: aborting due to 1 previous error
+

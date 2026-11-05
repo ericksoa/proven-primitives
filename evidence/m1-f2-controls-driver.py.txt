@@ -1,0 +1,48 @@
+from pathlib import Path
+import json,hashlib,os,subprocess,time,datetime,concurrent.futures
+root=Path.cwd()
+freeze=json.loads((root/'evidence/m1-f2-source-freeze.json').read_text())
+verification_path=root/'evidence/brotli-b3c-m1-f2-verification.json'
+verification=json.loads(verification_path.read_text())
+result=verification['verification-results']
+assert freeze['exit_code']==0 and freeze['source_unchanged'], 'No unchanged whole-crate positive'
+assert result['is-verifying-entire-crate'] and not result['encountered-error'] and result['errors']==0, result
+assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in freeze['source_sha256'].items()), 'Source changed after positive'
+suites=[
+ ('the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects',6),
+ ('the_prover_rejects_six_b3a_code_description_defects',6),
+ ('the_prover_rejects_b3a_auxiliary_code_without_bit_reversal',1),
+ ('the_prover_rejects_six_b3a_repeat_stream_defects',6),
+ ('the_prover_rejects_six_b3b_serialization_and_error_defects',6),
+ ('the_prover_rejects_six_b3b_cross_call_state_defects',6),
+ ('the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects',15),
+ ('the_prover_rejects_four_m1_tree_action_bound_and_drain_defects',4),
+ ('the_prover_rejects_six_m1_nested_reset_transition_undercharges',6),
+ ('the_prover_rejects_nine_m1_source_refinement_and_debit_defects',9),
+ ('the_prover_rejects_five_b3c_block_count_metering_undercharges',5),
+ ('the_prover_rejects_three_b3c_distance_metering_undercharges',3),
+ ('the_prover_rejects_four_b3c_context_mode_metering_undercharges',4),
+ ('the_prover_rejects_four_b3c_initial_suffix_metering_undercharges',4),
+ ('the_prover_rejects_five_b3c_tree_formula_undercharges',5),
+ ('the_prover_rejects_thirteen_b3c_context_tree_count_defects',13),
+ ('the_prover_rejects_seventeen_b3c_context_bits_defects',17),
+ ('the_prover_rejects_b3c_exact_symbol_work_undercharge',1),
+ ('the_prover_rejects_b3c_serialized_symbol_write_undercharge',1),
+]
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1',VERUS_ROOT='/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+def run(item):
+ name,count=item; started=time.monotonic(); log=root/'evidence'/('m1-f2-control-'+name.removeprefix('the_prover_rejects_')+'.log')
+ command=['cargo','+1.99.1','test','--locked','--release','--test','proof_rejection',name,'--','--ignored','--exact','--nocapture']
+ with log.open('w') as output: completed=subprocess.run(command,env=env,stdout=output,stderr=subprocess.STDOUT)
+ row={'suite':name,'expected_mutations':count,'exit_code':completed.returncode,'elapsed_seconds':time.monotonic()-started,'log':str(log.relative_to(root)),'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest(),'command':command}
+ print(json.dumps(row),flush=True)
+ return row
+rows=[]
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+ for row in pool.map(run,suites):
+  rows.append(row)
+  (root/'evidence/m1-f2-control-runs.json').write_text(json.dumps(rows,indent=2)+'\n')
+unchanged=all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in freeze['source_sha256'].items())
+record={'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'positive_control':{'path':str(verification_path.relative_to(root)),'sha256':hashlib.sha256(verification_path.read_bytes()).hexdigest(),'verified':result['verified'],'errors':result['errors'],'entire_crate':result['is-verifying-entire-crate']},'source_unchanged':unchanged,'suites':rows,'suites_passed':sum(x['exit_code']==0 for x in rows),'suites_failed':sum(x['exit_code']!=0 for x in rows),'rejected_mutations':sum(x['expected_mutations'] for x in rows if x['exit_code']==0)}
+(root/'evidence/brotli-b3c-m1-f2-controls.json').write_text(json.dumps(record,indent=2)+'\n')
+assert unchanged and record['suites_failed']==0, record

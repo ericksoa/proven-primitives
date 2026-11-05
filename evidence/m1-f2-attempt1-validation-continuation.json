@@ -1,0 +1,7 @@
+{
+  "status": "stopped_after_resource_limit_no_mutations_started",
+  "updated_utc": "2026-11-04T22:43:17.639322+00:00",
+  "controls_script": "/tmp/m1_f2_controls.py",
+  "failure_log": "evidence/m1-f2-attempt1-whole-crate.log",
+  "proof_status": "resource_limit_not_a_semantic_rejection_or_successful_positive"
+}

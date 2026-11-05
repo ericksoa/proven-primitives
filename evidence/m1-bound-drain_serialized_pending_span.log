@@ -1,0 +1,21 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13350:5
+      |
+13350 |     while written < span_count
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13256:1
+      |
+13256 | / fn drain_serialized_pending_span(
+13257 | |     workspace: &mut [u8],
+13258 | |     window_bytes: u32,
+13259 | |     decoder: &mut CodeDescriptionDecoder,
+13260 | | ) -> (r: Result<CodeDescriptionStep, CompressedHeaderError>)
+      | |___________________________________________________________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)

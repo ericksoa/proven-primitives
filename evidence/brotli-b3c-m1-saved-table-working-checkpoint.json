@@ -1,0 +1,64 @@
+{
+  "generated_utc": "2026-11-04T00:01:57.006646+00:00",
+  "base_commit": "c3e6355a994addbe82c3f3ddec1b801bdf0b1fd7",
+  "branch": "codex/m1-saved-table-ledger",
+  "source_sha256": {
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "c7911f5c4a8c039f5595bc8e89534ab7768e0624419444620e0e8e30ab0fa4cc",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/brotli_data.rs": "188030151158d62799924dfb7b78879462e6f8410e1391fa773b02c63bbed54b",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "9b922f1d6b996603eb29343c68fc5f3d0e68101e584d40df7572f2fee270ccfc",
+    "src/brotli_prefix.rs": "51aef479d715d4836ffce0a84ed73ea7f52aee827d182848ff96a7edb1a112c8",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+  },
+  "module_checks": {
+    "input": {
+      "path": "evidence/m1-next-input-verification.json",
+      "sha256": "55b30f3f386eae8c471252846a8cad605474ea6566254798475ff3473b3c11ea",
+      "results": {
+        "encountered-error": false,
+        "encountered-vir-error": false,
+        "verified": 720,
+        "errors": 0,
+        "is-verifying-entire-crate": false
+      }
+    },
+    "prefix": {
+      "path": "evidence/m1-next-prefix-verification.json",
+      "sha256": "e3c6a3892b516260a18e5f4d4f56d372461fb934276e6143f44b3dec127fdb80",
+      "results": {
+        "encountered-error": false,
+        "encountered-vir-error": false,
+        "verified": 217,
+        "errors": 0,
+        "is-verifying-entire-crate": false
+      }
+    }
+  },
+  "whole_crate_verified": false,
+  "release_gate": "incomplete",
+  "pending_human_decision": {
+    "document": "BROTLI_M1_TREE_ACTION_BOUND_DECISION.md",
+    "current_cap": 2000,
+    "proposed_cap": 5696,
+    "approval_status": "pending",
+    "changed": false
+  },
+  "remaining": [
+    "Private maximum-alphabet tree regression must be resolved under explicit human-selected bound",
+    "Complete remaining M1 serialized-tree/header/action frame and source ledger refinements",
+    "Fresh unchanged entire-crate verification before all new deliberate-defect controls",
+    "B3c completion, B3d, B4 and named independent human specification review"
+  ],
+  "library_tests": {
+    "passed": 81,
+    "failed": 1,
+    "log": "evidence/m1-next-library-tests.log",
+    "log_sha256": "4509c298b84fb7c7203032bab88710ca3e6aaf36b2eda21e0cc9319f8576d21e",
+    "known_failure": "m1_maximum_alphabet_accepts_valid_long_direct_zero_descriptions"
+  }
+}

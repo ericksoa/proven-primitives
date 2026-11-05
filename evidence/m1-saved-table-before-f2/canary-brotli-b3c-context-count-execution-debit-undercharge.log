@@ -1,0 +1,41 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-63428/src/brotli_input.rs:28082:1
+      |
+28082 | / fn execute_planned_context_tree_count(
+28083 | |     workspace: &mut [u8],
+28084 | |     window_bytes: u32,
+28085 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+28089 | |     plan: ContextTreeCountPlan,
+28090 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-63428/src/brotli_input.rs:28115:9
+      |
+28115 | /         old(budget).work_remaining < plan.execution_work ==> {
+28116 | |             &&& final(workspace)@ == old(workspace)@
+28117 | |             &&& *final(budget) == *old(budget)
+28118 | |             &&& r == Err(CompressedStep {
+...     |
+28121 | |             })
+28122 | |         },
+      | |_________^ failed this postcondition
+...
+28226 | /     match status {
+28227 | |         Some(ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated)) => {
+28228 | |             proof {
+28229 | |                 assert(plan.status == VarUint8Status::Truncated);
+...     |
+28261 | |             status: CompressedStatus::Failed(core_state_failure()) }),
+28262 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

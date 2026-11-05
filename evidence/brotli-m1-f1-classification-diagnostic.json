@@ -1,0 +1,90 @@
+{
+  "status": "diagnostic_only_not_a_proof",
+  "source_start": "evidence/m1-saved-table-source-start.json",
+  "source_start_sha256": "68f1de6ad768de4a5749eb06029d5ec4a667a774a1bd29ddb04eb65508060bb5",
+  "diagnostic_copy": "/tmp/m1-f1-diagnostic",
+  "production_source_modified": false,
+  "quickfox_repeated": {
+    "input_chunks": [
+      1,
+      7,
+      58
+    ],
+    "output_chunks": [
+      1,
+      31,
+      176128
+    ],
+    "combinations": 9,
+    "status": "Finished",
+    "output_length": 176128,
+    "all_outputs_equal_pinned_expected": true,
+    "header_consumed_bytes": 45,
+    "literal_map": {
+      "length": 64,
+      "advertised_trees": 5,
+      "observed_values": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "missing_trees": []
+    },
+    "distance_map": {
+      "length": 4,
+      "advertised_trees": 1,
+      "observed_values": [
+        0
+      ],
+      "missing_trees": []
+    }
+  },
+  "monkey": {
+    "input_chunks": [
+      1,
+      7,
+      425
+    ],
+    "output_chunks": [
+      1,
+      31,
+      843
+    ],
+    "combinations": 9,
+    "status": "Failed(InvalidFormat)",
+    "produced": 0,
+    "private_header_status": "Failed(InvalidFormat(ContextMapRepeat))",
+    "header_consumed_bytes": 11,
+    "current_map_initialized": 60,
+    "current_map_length": 64,
+    "coverage_reached": false
+  },
+  "logs": {
+    "evidence/m1-f1-output-diagnostic.log": "499f817fab5872a2fef474398a416c83e6f8d6bc309479d7a13d8008c60da769",
+    "evidence/m1-f1-header-diagnostic.log": "ba2cfc23a4166c5c2ef85ba73b39cc6f32e55e84a26792797d439bc14fedd33d"
+  },
+  "fixtures": {
+    "tests/fixtures/brotli/corpus/monkey": {
+      "bytes": 843,
+      "sha256": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99"
+    },
+    "tests/fixtures/brotli/corpus/monkey.compressed": {
+      "bytes": 425,
+      "sha256": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9"
+    },
+    "tests/fixtures/brotli/corpus/quickfox_repeated": {
+      "bytes": 176128,
+      "sha256": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82"
+    },
+    "tests/fixtures/brotli/corpus/quickfox_repeated.compressed": {
+      "bytes": 58,
+      "sha256": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a"
+    }
+  },
+  "diagnostic_sources": {
+    "evidence/m1-f1-diagnostic-brotli.rs.txt": "91df0cc22b46546400d79b2ff4295b669df2abd2a367d4bcca1e871cc50e09fd",
+    "evidence/m1-f1-diagnostic-brotli_input.rs.txt": "12dea200348b562442ac47d8b8733831b66eaac661dd60cf02d773cbd796fe27"
+  }
+}

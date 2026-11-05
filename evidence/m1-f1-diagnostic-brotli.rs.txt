@@ -1,0 +1,16 @@
+    #[test]
+    fn f1_corrected_parser_native_output_diagnostic() {
+        for (name, compressed, expected) in [
+            ("monkey", include_bytes!("../tests/fixtures/brotli/corpus/monkey.compressed").as_slice(), include_bytes!("../tests/fixtures/brotli/corpus/monkey").as_slice()),
+            ("quickfox_repeated", include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated.compressed").as_slice(), include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated").as_slice()),
+        ] {
+            for input_chunk in [1usize, 7, compressed.len()] {
+                for output_chunk in [1usize, 31, expected.len()] {
+                    let (status, output) = decode_fixture(compressed, input_chunk, output_chunk);
+                    println!("F1_DIAGNOSTIC name={name} input_chunk={input_chunk} output_chunk={output_chunk} status={status:?} produced={} expected={} byte_equal={}", output.len(), expected.len(), output == expected);
+
+                }
+            }
+        }
+    }
+

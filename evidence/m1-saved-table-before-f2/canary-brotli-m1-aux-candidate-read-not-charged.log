@@ -1,0 +1,36 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-61246/src/brotli_input.rs:2113:5
+     |
+2113 |     while i < 18
+     |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-61246/src/brotli_input.rs:2081:1
+     |
+2081 | / fn decode_auxiliary_symbol_metered(code: &ComplexCodeLengthAlphabet, bits: u8, width: u8,
+2082 | |     budget: &mut crate::brotli::RequestBudget,
+2083 | | ) -> (r: Result<(Option<u8>, u64), CoreFailure>)
+     | |_______________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-61246/src/brotli_input.rs:2093:9
+     |
+2093 | /         r.is_ok() ==> {
+2094 | |             &&& r.unwrap().1 <= 1638
+2095 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
+2096 | |             &&& match r.unwrap().0 {
+...    |
+2109 | |         },
+     | |_________^ failed this postcondition
+...
+2140 |                       return Ok((Some(i as u8), before_work - budget.work_remaining));
+     |                       --------------------------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

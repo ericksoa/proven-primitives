@@ -1,0 +1,25 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-7203/src/brotli_input.rs:14827:1
+      |
+14827 | / fn advance_context_mtf_phase(
+14828 | |     workspace: &mut [u8],
+14829 | |     window_bytes: u32,
+14830 | |     kind: crate::brotli_prefix::ContextMapKind,
+14831 | |     active_len: u16,
+14832 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-7203/src/brotli_input.rs:14968:17
+      |
+14968 |                 #[trigger] after_upper[i] == transformed.update(upper_at, next_upper)[i] by {
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

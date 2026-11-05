@@ -1,0 +1,49 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-repeat-canaries-6224/src/brotli_input.rs:3772:9
+     |
+3772 |         assert((1u8 << 2) == 4) by (bit_vector);
+     |         ^^^^^^
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-repeat-canaries-6224/src/brotli_input.rs:3776:9
+     |
+3776 |         assert((1u8 << 3) == 8) by (bit_vector);
+     |         ^^^^^^
+
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-repeat-canaries-6224/src/brotli_input.rs:3820:9
+     |
+3820 |         assert((weight as nat) * (delta as nat)
+     |         ^^^^^^
+
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-repeat-canaries-6224/src/brotli_input.rs:3733:1
+     |
+3733 | / fn process_repeated_symbol_length(
+3734 | |     progress: ComplexSymbolProgress,
+3735 | |     length: u8,
+3736 | |     extra_bits: u8,
+3737 | |     suffix: u8,
+3738 | |     alphabet_limit: u16,
+3739 | | ) -> (r: CodeDescriptionPhase)
+     | |_____________________________^
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-repeat-canaries-6224/src/brotli_input.rs:3767:12
+     |
+3767 |       assert(old_repeat as nat == if progress.repeat_code_len == length {
+     |  ____________^
+3768 | |         progress.repeat as nat
+3769 | |     } else { 0nat });
+     | |___________________^ assertion failed
+
+error: aborting due to 1 previous error
+

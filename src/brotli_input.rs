@@ -1679,6 +1679,57 @@ spec fn code_phase_terminal(phase: CodeDescriptionPhase) -> bool {
     }
 }
 
+// Remaining field actions. Eight units per final symbol cover a five-bit
+// auxiliary prefix, repeat suffix, and pending-span acknowledgements. The
+// additional 64 cover selection and the eighteen auxiliary lengths.
+spec fn code_phase_rank(phase: CodeDescriptionPhase, limit: u16) -> nat {
+    match phase {
+        CodeDescriptionPhase::Selector => 8 * limit as nat + 63,
+        CodeDescriptionPhase::SimpleSize => 7,
+        CodeDescriptionPhase::SimpleSymbols { count, index, .. } => (count as int - index as int + 2) as nat,
+        CodeDescriptionPhase::SimpleShape { .. } => 1,
+        CodeDescriptionPhase::ComplexPrefix2(p) => (8 * limit as int + 7 + 3 * (18 - p.index as int)) as nat,
+        CodeDescriptionPhase::ComplexPrefix3(p) => (8 * limit as int + 6 + 3 * (18 - p.index as int)) as nat,
+        CodeDescriptionPhase::ComplexPrefix4(p) => (8 * limit as int + 5 + 3 * (18 - p.index as int)) as nat,
+        CodeDescriptionPhase::CompleteComplexAlphabet(_) => 8 * limit as nat + 7,
+        CodeDescriptionPhase::ComplexSymbol(p) => (8 * (limit as int - p.symbol as int) + 6 - p.prefix_width as int) as nat,
+        CodeDescriptionPhase::ComplexRepeat { progress, .. } => (8 * (limit as int - progress.symbol as int) + 1) as nat,
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, .. } =>
+            (8 * (limit as int - start as int - span_count as int) + 8) as nat,
+        _ => 0,
+    }
+}
+
+// This is a theorem premise for the existing pending-span representation,
+// not a restriction on any executable function's admitted inputs.
+spec fn code_rank_aligned(phase: CodeDescriptionPhase) -> bool {
+    match phase {
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, after, .. } => match after {
+            ComplexAfterSpan::Symbol(p) => p.symbol as int == start as int + span_count as int,
+            ComplexAfterSpan::TrailingZeros { start: end, .. } => end as int == start as int + span_count as int,
+            ComplexAfterSpan::Complete { symbols, .. } => symbols as int == start as int + span_count as int,
+        },
+        _ => true,
+    }
+}
+
+proof fn code_phase_rank_is_bounded(decoder: CodeDescriptionDecoder)
+    requires decoder.valid(),
+    ensures code_phase_rank(decoder.phase, decoder.alphabet_limit) <= 8 * decoder.alphabet_limit as nat + 63,
+        code_phase_rank(decoder.phase, decoder.alphabet_limit) <= 5_695,
+        !code_phase_terminal(decoder.phase) ==> code_phase_rank(decoder.phase, decoder.alphabet_limit) > 0,
+{
+    reveal(code_phase_rank); reveal(code_phase_terminal); reveal(CodeDescriptionDecoder::valid);
+    match decoder.phase {
+        CodeDescriptionPhase::ComplexPrefix2(p) | CodeDescriptionPhase::ComplexPrefix3(p)
+            | CodeDescriptionPhase::ComplexPrefix4(p) => { reveal(ComplexProgress::valid); },
+        CodeDescriptionPhase::ComplexSymbol(p) | CodeDescriptionPhase::ComplexRepeat { progress: p, .. } => {
+            reveal(ComplexSymbolProgress::valid);
+        },
+        _ => {},
+    }
+}
+
 spec fn simple_prefix_contains(symbols: Seq<u16>, count: nat, symbol: u16) -> bool {
     exists|i: int| 0 <= i < count && symbols[i] == symbol
 }
@@ -1849,6 +1900,125 @@ fn auxiliary_count_exec(
     count
 }
 
+// B3c read-only planning helpers. Each indexed table read is prepaid before
+// execution; the independent W1 parser and its interfaces remain unchanged.
+fn auxiliary_count_metered(lengths: &[u8; 18], length: u8, limit: usize,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<(u32, u64), CoreFailure>)
+    requires limit <= 18, old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() == (old(budget).work_remaining >= limit as u64),
+        r.is_ok() ==> {
+            &&& r.unwrap().0 <= limit
+            &&& r.unwrap().0 as nat == auxiliary_count_prefix(lengths@, length, limit as nat)
+            &&& r.unwrap().1 == limit as u64
+            &&& final(budget).work_remaining == old(budget).work_remaining - limit as u64
+        },
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+{
+    let mut i = 0usize;
+    let mut count = 0u32;
+    while i < limit
+        invariant i <= limit <= 18, count <= i,
+            count as nat == auxiliary_count_prefix(lengths@, length, i as nat),
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            i as u64 <= old(budget).work_remaining,
+            budget.work_remaining == old(budget).work_remaining - i as u64,
+        decreases limit - i,
+    {
+        if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+        reveal(auxiliary_count_prefix);
+        if lengths[i] == length { count += 1; }
+        i += 1;
+    }
+    Ok((count, limit as u64))
+}
+
+fn auxiliary_first_code_metered(lengths: &[u8; 18], length: u8,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<(u32, u64), CoreFailure>)
+    requires 1 <= length <= 5, old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() == (old(budget).work_remaining >= 18 * (length as u64 - 1)),
+        r.is_ok() ==> {
+            &&& r.unwrap().0 as nat == auxiliary_first_code(lengths@, length as nat)
+            &&& r.unwrap().0 <= 1116
+            &&& r.unwrap().1 == 18 * (length as u64 - 1)
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
+        },
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+{
+    let mut width = 1u8;
+    let mut code = 0u32;
+    while width < length
+        invariant 1 <= width <= length <= 5,
+            code as nat == auxiliary_first_code(lengths@, width as nat),
+            (width == 1 ==> code == 0), (width == 2 ==> code <= 36),
+            (width == 3 ==> code <= 108), (width == 4 ==> code <= 252),
+            (width == 5 ==> code <= 540),
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            18 * (width as u64 - 1) <= old(budget).work_remaining,
+            budget.work_remaining == old(budget).work_remaining - 18 * (width as u64 - 1),
+        decreases length - width,
+    {
+        let (count, _) = auxiliary_count_metered(lengths, width, 18, budget)?;
+        assert(code + count <= 558);
+        assert((code + count) * 2 <= 1116);
+        code = (code + count) * 2;
+        reveal(auxiliary_first_code);
+        width += 1;
+    }
+    Ok((code, 18 * (length as u64 - 1)))
+}
+
+fn auxiliary_canonical_code_metered(lengths: &[u8; 18], symbol: usize,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<(u32, u64), CoreFailure>)
+    requires symbol < 18, 1 <= lengths@[symbol as int] <= 5, old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() == (old(budget).work_remaining >= 1
+            + 18 * (lengths@[symbol as int] as u64 - 1) + symbol as u64),
+        r.is_ok() ==> {
+            &&& r.unwrap().0 as nat == auxiliary_canonical_code(lengths@, symbol as int)
+            &&& r.unwrap().0 <= 1134
+            &&& r.unwrap().1 == 1 + 18 * (lengths@[symbol as int] as u64 - 1) + symbol as u64
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
+        },
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+{
+    if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+    let length = lengths[symbol];
+    let (first, first_reads) = auxiliary_first_code_metered(lengths, length, budget)?;
+    let (rank, rank_reads) = auxiliary_count_metered(lengths, length, symbol, budget)?;
+    Ok((first + rank, 1 + first_reads + rank_reads))
+}
+
 fn auxiliary_first_code_exec(lengths: &[u8; 18], length: u8) -> (r: u32)
     requires 1 <= length <= 5,
     ensures r as nat == auxiliary_first_code(lengths@, length as nat), r <= 1116,
@@ -1886,6 +2056,96 @@ fn auxiliary_canonical_code_exec(
     let first = auxiliary_first_code_exec(lengths, length);
     let rank = auxiliary_count_exec(lengths, length, symbol);
     first + rank
+}
+
+spec fn auxiliary_scan_read_units(lengths: Seq<u8>, width: u8, limit: nat) -> nat
+    decreases limit,
+{
+    if limit == 0 { 0 } else {
+        auxiliary_scan_read_units(lengths, width, (limit - 1) as nat) + 1
+            + if lengths[limit as int - 1] == width {
+                1 + 18 * ((width as nat - 1) as nat) + (limit - 1) as nat
+            } else { 0nat }
+    }
+}
+
+proof fn auxiliary_scan_read_units_bound(lengths: Seq<u8>, width: u8, limit: nat)
+    requires lengths.len() == 18, 1 <= width <= 5, limit <= 18,
+    ensures auxiliary_scan_read_units(lengths, width, limit) <= 91 * limit,
+    decreases limit,
+{
+    reveal(auxiliary_scan_read_units);
+    if limit > 0 { auxiliary_scan_read_units_bound(lengths, width, (limit - 1) as nat); }
+}
+
+fn decode_auxiliary_symbol_metered(code: &ComplexCodeLengthAlphabet, bits: u8, width: u8,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<(Option<u8>, u64), CoreFailure>)
+    requires code.valid(), 1 <= width <= 5, bits < (1u8 << width), old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        r.is_ok() ==> {
+            &&& r.unwrap().1 <= 1638
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
+            &&& match r.unwrap().0 {
+                Some(symbol) => {
+                    &&& symbol < 18
+                    &&& auxiliary_symbol_match(*code, bits, width, symbol)
+                    &&& forall|earlier: u8| earlier < symbol ==>
+                        !auxiliary_symbol_match(*code, bits, width, earlier)
+                    &&& r.unwrap().1 as nat == auxiliary_scan_read_units(code.lengths@, width, symbol as nat + 1)
+                },
+                None => {
+                    &&& forall|symbol: u8| !auxiliary_symbol_match(*code, bits, width, symbol)
+                    &&& r.unwrap().1 as nat == auxiliary_scan_read_units(code.lengths@, width, 18)
+                },
+            }
+        },
+{
+    let before_work = budget.work_remaining;
+    let mut i = 0usize;
+    while i < 18
+        invariant i <= 18, code.valid(), 1 <= width <= 5, bits < (1u8 << width),
+            forall|symbol: u8| symbol < i ==> !auxiliary_symbol_match(*code, bits, width, symbol),
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            before_work == old(budget).work_remaining,
+            budget.work_remaining <= before_work,
+            (before_work - budget.work_remaining) as nat
+                == auxiliary_scan_read_units(code.lengths@, width, i as nat),
+        decreases 18 - i,
+    {
+        if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+        let length = code.lengths[i];
+        if length == width {
+            proof { code.length_bound(i as int); }
+            let (candidate, _) = auxiliary_canonical_code_metered(&code.lengths, i, budget)?;
+            proof { pow2_matches_auxiliary_shift(width); }
+            if candidate < (1u32 << width) {
+                let reversed = reverse_auxiliary_code(candidate, width);
+                if reversed == bits {
+                    proof {
+                        reveal(auxiliary_scan_read_units);
+                        auxiliary_scan_read_units_bound(code.lengths@, width, i as nat + 1);
+                    }
+                    return Ok((Some(i as u8), before_work - budget.work_remaining));
+                }
+            }
+        }
+        proof { reveal(auxiliary_scan_read_units); }
+        i += 1;
+    }
+    proof { auxiliary_scan_read_units_bound(code.lengths@, width, 18); }
+    Ok((None, before_work - budget.work_remaining))
 }
 
 fn decode_auxiliary_symbol(
@@ -1946,6 +2206,83 @@ proof fn auxiliary_unique_nonzero_agrees(code: ComplexCodeLengthAlphabet, left: 
     ensures left == right,
 {
     if left != right { assert(code.lengths@[left as int] == 0); }
+}
+
+fn auxiliary_singleton_metered(code: &ComplexCodeLengthAlphabet,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<(u8, u64), CoreFailure>)
+    requires code.valid(), old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() == (old(budget).work_remaining >= 18),
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        r.is_ok() ==> {
+            &&& r.unwrap().0 <= 18
+            &&& r.unwrap().0 == auxiliary_singleton_value(*code)
+            &&& r.unwrap().1 == 18
+            &&& final(budget).work_remaining == old(budget).work_remaining - 18
+        },
+{
+    let mut found = 18u8;
+    let mut multiple = false;
+    let mut i = 0usize;
+    while i < 18
+        invariant i <= 18, found <= 18,
+            found == 18 ==> forall|j: int| 0 <= j < i ==> code.lengths@[j] == 0,
+            multiple ==> exists|a: int, b: int| 0 <= a < b < i
+                && code.lengths@[a] != 0 && code.lengths@[b] != 0,
+            found < 18 ==> {
+                &&& code.lengths@[found as int] != 0 && found < i
+                &&& forall|j: int| 0 <= j < found ==> code.lengths@[j] == 0
+            },
+            !multiple ==> forall|j: int| 0 <= j < i && code.lengths@[j] != 0 ==> found == j,
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            i as u64 <= old(budget).work_remaining,
+            budget.work_remaining == old(budget).work_remaining - i as u64,
+        decreases 18 - i,
+    {
+        if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+        if code.lengths[i] != 0 {
+            if found == 18 { found = i as u8; }
+            else {
+                proof { assert(exists|a: int, b: int| a == found && b == i
+                    && 0 <= a < b < i + 1 && code.lengths@[a] != 0 && code.lengths@[b] != 0); }
+                multiple = true;
+            }
+        }
+        i += 1;
+    }
+    let value = if found < 18 && !multiple { found } else { 18u8 };
+    proof {
+        reveal(auxiliary_singleton_value); reveal(auxiliary_unique_nonzero);
+        if value < 18 {
+            assert(auxiliary_unique_nonzero(*code, value));
+            let expected = choose|symbol: u8| auxiliary_unique_nonzero(*code, symbol);
+            auxiliary_unique_nonzero_agrees(*code, value, expected);
+        } else {
+            assert forall|symbol: u8| !auxiliary_unique_nonzero(*code, symbol) by {
+                if auxiliary_unique_nonzero(*code, symbol) {
+                    if found == 18 { assert(code.lengths@[symbol as int] == 0); }
+                    else {
+                        let (a, b) = choose|a: int, b: int| 0 <= a < b < 18
+                            && code.lengths@[a] != 0 && code.lengths@[b] != 0;
+                        if symbol as int != a { assert(code.lengths@[a] == 0); }
+                        else { assert(code.lengths@[b] == 0); }
+                    }
+                }
+            }
+        }
+    }
+    Ok((value, 18))
 }
 
 fn auxiliary_singleton(code: &ComplexCodeLengthAlphabet) -> (r: Option<u8>)
@@ -3117,6 +3454,140 @@ proof fn complex_symbol_deterministic(old: ComplexSymbolProgress, field: nat, li
     }
 }
 
+proof fn after_span_matches_end(old: ComplexSymbolProgress, end: u16, space: u32,
+    prev: u8, repeat: u32, repeat_length: u8, limit: u16, after: ComplexAfterSpan)
+    requires end <= limit,
+        complex_after_span_holds(old, end, space, prev, repeat, repeat_length, limit, after),
+    ensures match after {
+        ComplexAfterSpan::Symbol(p) => p.symbol == end,
+        ComplexAfterSpan::TrailingZeros { start, .. } => start == end,
+        ComplexAfterSpan::Complete { symbols, .. } => symbols == end,
+    },
+{
+    reveal(complex_after_span_holds);
+}
+
+proof fn direct_symbol_rank_decreases(old: ComplexSymbolProgress, length: u8,
+    after: CodeDescriptionDecoder, status: CodeDescriptionStatus)
+    requires old.valid(after.alphabet_limit), after.valid(),
+        direct_symbol_transition_holds(old, length, after.alphabet_limit, after.phase, status),
+    ensures code_rank_aligned(after.phase),
+        code_phase_rank(after.phase, after.alphabet_limit)
+            < code_phase_rank(CodeDescriptionPhase::ComplexSymbol(old), after.alphabet_limit),
+{
+    reveal(direct_symbol_transition_holds); reveal(code_rank_aligned); reveal(code_phase_rank);
+    reveal(CodeDescriptionDecoder::valid); reveal(ComplexSymbolProgress::valid);
+    if let CodeDescriptionPhase::ComplexPendingSpan { start, span_count, after: tail, .. } = after.phase {
+        let amount = symbol_code_length_weight(length);
+        after_span_matches_end(old, (old.symbol as nat + 1) as u16,
+            (old.space as nat - amount) as u32,
+            if length == 0 { old.prev_code_len } else { length }, 0, old.repeat_code_len,
+            after.alphabet_limit, tail);
+    }
+}
+
+proof fn repeated_symbol_rank_decreases(old: ComplexSymbolProgress, length: u8,
+    extra: u8, suffix: u8, after: CodeDescriptionDecoder, status: CodeDescriptionStatus)
+    requires old.valid(after.alphabet_limit), after.valid(),
+        repeated_symbol_transition_holds(old, length, extra, suffix, after.alphabet_limit, after.phase, status),
+    ensures code_rank_aligned(after.phase),
+        code_phase_rank(after.phase, after.alphabet_limit)
+            < code_phase_rank(CodeDescriptionPhase::ComplexRepeat { progress: old, length, extra_bits: extra }, after.alphabet_limit),
+{
+    reveal(repeated_symbol_transition_holds); reveal(code_rank_aligned); reveal(code_phase_rank);
+    reveal(CodeDescriptionDecoder::valid); reveal(ComplexSymbolProgress::valid);
+    if let CodeDescriptionPhase::ComplexPendingSpan { start, span_count, after: tail, .. } = after.phase {
+        let reset: nat = if old.repeat_code_len == length { old.repeat as nat } else { 0nat };
+        let base: nat = if reset > 0 { (reset - 2) as nat * if extra == 2 { 4nat } else { 8nat } } else { 0nat };
+        let next_repeat = base + suffix as nat + 3;
+        let delta = (next_repeat - reset) as nat;
+        let amount = delta * symbol_code_length_weight(length);
+        after_span_matches_end(old, (old.symbol as nat + delta) as u16,
+            (old.space as nat - amount) as u32, old.prev_code_len, next_repeat as u32,
+            length, after.alphabet_limit, tail);
+    }
+}
+
+proof fn complex_symbol_rank_decreases(old: ComplexSymbolProgress, field: nat,
+    after: CodeDescriptionDecoder, status: CodeDescriptionStatus)
+    requires old.valid(after.alphabet_limit), after.valid(),
+        complex_symbol_transition_holds(old, field, after.alphabet_limit, after.phase, status),
+    ensures code_rank_aligned(after.phase),
+        code_phase_rank(after.phase, after.alphabet_limit)
+            < code_phase_rank(CodeDescriptionPhase::ComplexSymbol(old), after.alphabet_limit),
+{
+    reveal(complex_symbol_transition_holds); reveal(code_phase_rank); reveal(code_rank_aligned);
+    reveal(ComplexSymbolProgress::valid); reveal(CodeDescriptionDecoder::valid);
+    if old.singleton < 18 {
+        if old.singleton < 16 { direct_symbol_rank_decreases(old, old.singleton, after, status); }
+    } else {
+        let bits = old.prefix_bits | ((field as u8) << old.prefix_width);
+        let width = (old.prefix_width + 1) as u8;
+        if exists|symbol: u8| auxiliary_symbol_match(old.code, bits, width, symbol) {
+            let symbol = choose|symbol: u8| {
+                &&& auxiliary_symbol_match(old.code, bits, width, symbol)
+                &&& forall|earlier: u8| earlier < symbol ==> !auxiliary_symbol_match(old.code, bits, width, earlier)
+                &&& if symbol < 16 {
+                    direct_symbol_transition_holds(old, symbol, after.alphabet_limit, after.phase, status)
+                } else {
+                    after.phase == CodeDescriptionPhase::ComplexRepeat {
+                        progress: ComplexSymbolProgress { prefix_width: 0, prefix_bits: 0, ..old },
+                        length: if symbol == 16 { old.prev_code_len } else { 0 },
+                        extra_bits: if symbol == 16 { 2 } else { 3 },
+                    } && status == CodeDescriptionStatus::Progress
+                }
+            };
+            if symbol < 16 { direct_symbol_rank_decreases(old, symbol, after, status); }
+        }
+    }
+}
+
+proof fn code_transition_rank_decreases(before: CodeDescriptionDecoder, field: nat,
+    after: CodeDescriptionDecoder, status: CodeDescriptionStatus)
+    requires before.valid(), after.valid(), code_rank_aligned(before.phase),
+        before.alphabet_max == after.alphabet_max, before.alphabet_limit == after.alphabet_limit,
+        !code_phase_terminal(before.phase),
+        code_transition_holds(before.phase, field, before.alphabet_max, before.alphabet_limit, after.phase, status),
+    ensures code_rank_aligned(after.phase),
+        code_phase_rank(after.phase, after.alphabet_limit) < code_phase_rank(before.phase, before.alphabet_limit),
+{
+    reveal(code_transition_holds); reveal(code_phase_rank); reveal(code_rank_aligned);
+    reveal(CodeDescriptionDecoder::valid);
+    match before.phase {
+        CodeDescriptionPhase::ComplexPrefix2(p) | CodeDescriptionPhase::ComplexPrefix3(p)
+            | CodeDescriptionPhase::ComplexPrefix4(p) => {
+            reveal(complex_process_holds); reveal(ComplexProgress::valid);
+        },
+        CodeDescriptionPhase::ComplexSymbol(p) => complex_symbol_rank_decreases(p, field, after, status),
+        CodeDescriptionPhase::ComplexRepeat { progress, length, extra_bits } =>
+            repeated_symbol_rank_decreases(progress, length, extra_bits, field as u8, after, status),
+        CodeDescriptionPhase::ComplexPendingSpan { .. } => {
+            reveal(pending_span_transition_holds); reveal(ComplexAfterSpan::valid);
+            reveal(ComplexSymbolProgress::valid);
+        },
+        _ => {},
+    }
+}
+
+proof fn code_field_rank_decreases(before: CodeDescriptionDecoder, input: Seq<u8>, end: bool,
+    after: CodeDescriptionDecoder, step: CodeDescriptionStep)
+    requires before.valid(), after.valid(), code_rank_aligned(before.phase),
+        !code_phase_terminal(before.phase), step.status != CodeDescriptionStatus::NeedInput,
+        code_field_step_refines(before, input, end, after, step),
+    ensures code_rank_aligned(after.phase),
+        code_phase_rank(after.phase, after.alphabet_limit) < code_phase_rank(before.phase, before.alphabet_limit),
+{
+    reveal(code_field_step_refines);
+    let width = code_phase_width(before.phase, before.alphabet_max);
+    let source = before.queue.bits() + bytes_bits(input.take(step.consumed as int));
+    if source.len() >= width {
+        code_transition_rank_decreases(before, bits_value(source.take(width as int)), after, step.status);
+    } else {
+        code_phase_rank_is_bounded(before);
+        reveal(code_phase_rank); reveal(code_rank_aligned);
+    }
+}
+
 proof fn code_transition_deterministic(old: CodeDescriptionPhase, field: nat, maximum: u16, limit: u16,
     left: CodeDescriptionPhase, ls: CodeDescriptionStatus, right: CodeDescriptionPhase, rs: CodeDescriptionStatus)
     requires code_transition_holds(old, field, maximum, limit, left, ls),
@@ -3444,6 +3915,263 @@ spec fn code_field_step_refines(before: CodeDescriptionDecoder, input: Seq<u8>,
     }
 }
 
+fn simple_symbol_pair_metered(symbols: &[u16; 4], left: usize, right: usize,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<bool, CoreFailure>)
+    requires left < 4, right < 4, old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() == (old(budget).work_remaining >= 2),
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        r.is_ok() ==> {
+            &&& r.unwrap() == (symbols@[left as int] == symbols@[right as int])
+            &&& final(budget).work_remaining == old(budget).work_remaining - 2
+        },
+{
+    if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+    let a = symbols[left];
+    if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+    let b = symbols[right];
+    Ok(a == b)
+}
+
+fn simple_distinct_validation_metered(symbols: &[u16; 4], count: u8,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<u64, CoreFailure>)
+    requires 1 <= count <= 4, active_symbols_distinct(symbols@, count as nat), old(budget).valid(),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        r.is_ok() == (old(budget).work_remaining >= count as u64 * (count as u64 - 1)),
+        r.is_ok() ==> {
+            &&& r.unwrap() == count as u64 * (count as u64 - 1)
+            &&& r.unwrap() <= 12
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap()
+        },
+{
+    let work = match count { 1 => 0u64, 2 => 2u64, 3 => 6u64, _ => 12u64 };
+    proof {
+        match count {
+            1 => { assert(work == 0); }, 2 => { assert(work == 2); },
+            3 => { assert(work == 6); }, 4 => { assert(work == 12); },
+            _ => { assert(false); },
+        }
+        assert(count >= 2 ==> work >= 2);
+        assert(count >= 3 ==> work >= 6);
+        assert(work == count as u64 * (count as u64 - 1)) by (nonlinear_arith)
+            requires (count == 1 && work == 0) || (count == 2 && work == 2)
+                || (count == 3 && work == 6) || (count == 4 && work == 12);
+    }
+    if count >= 2 {
+        let equal = simple_symbol_pair_metered(symbols, 0, 1, budget)?;
+        assert(!equal);
+    }
+    if count >= 3 {
+        let equal = simple_symbol_pair_metered(symbols, 0, 2, budget)?;
+        assert(!equal);
+        let equal = simple_symbol_pair_metered(symbols, 1, 2, budget)?;
+        assert(!equal);
+    }
+    if count == 4 {
+        let equal = simple_symbol_pair_metered(symbols, 0, 3, budget)?;
+        assert(!equal);
+        let equal = simple_symbol_pair_metered(symbols, 1, 3, budget)?;
+        assert(!equal);
+        let equal = simple_symbol_pair_metered(symbols, 2, 3, budget)?;
+        assert(!equal);
+    }
+    match count { 1 => {}, 2 => {}, 3 => {}, 4 => {}, _ => { proof { assert(false); } } }
+    Ok(work)
+}
+
+spec fn auxiliary_scan_stop(code: ComplexCodeLengthAlphabet, bits: u8, width: u8) -> nat {
+    if exists|symbol: u8| auxiliary_symbol_match(code, bits, width, symbol)
+        && (forall|earlier: u8| earlier < symbol ==> !auxiliary_symbol_match(code, bits, width, earlier)) {
+        let symbol = choose|symbol: u8| auxiliary_symbol_match(code, bits, width, symbol)
+            && (forall|earlier: u8| earlier < symbol ==> !auxiliary_symbol_match(code, bits, width, earlier));
+        symbol as nat + 1
+    } else { 18 }
+}
+
+proof fn auxiliary_selected_scan_stop(code: ComplexCodeLengthAlphabet, bits: u8, width: u8,
+    selected: Option<u8>)
+    requires match selected {
+        Some(symbol) => auxiliary_symbol_match(code, bits, width, symbol)
+            && (forall|earlier: u8| earlier < symbol ==> !auxiliary_symbol_match(code, bits, width, earlier)),
+        None => forall|symbol: u8| !auxiliary_symbol_match(code, bits, width, symbol),
+    },
+    ensures auxiliary_scan_stop(code, bits, width) == match selected {
+        Some(symbol) => symbol as nat + 1, None => 18nat,
+    },
+{
+    reveal(auxiliary_scan_stop);
+    if let Some(symbol) = selected {
+        let expected = choose|symbol: u8| auxiliary_symbol_match(code, bits, width, symbol)
+            && (forall|earlier: u8| earlier < symbol ==> !auxiliary_symbol_match(code, bits, width, earlier));
+        auxiliary_first_matches_agree(code, bits, width, symbol, expected);
+    }
+}
+
+spec fn complex_field_table_read_units(before: CodeDescriptionDecoder, field: u64) -> nat {
+    match before.phase {
+        CodeDescriptionPhase::ComplexPrefix2(_) => if field <= 2 { 1nat } else { 0nat },
+        CodeDescriptionPhase::ComplexPrefix3(_) => if field == 0 { 1nat } else { 0nat },
+        CodeDescriptionPhase::ComplexPrefix4(_) => 1,
+        CodeDescriptionPhase::CompleteComplexAlphabet(_) => 18,
+        CodeDescriptionPhase::ComplexSymbol(progress) => if progress.singleton < 18 { 0nat } else {
+            let bits = progress.prefix_bits | ((field as u8) << progress.prefix_width);
+            let width = (progress.prefix_width + 1) as u8;
+            auxiliary_scan_read_units(progress.code.lengths@, width,
+                auxiliary_scan_stop(progress.code, bits, width))
+        },
+        _ => 0,
+    }
+}
+
+fn plan_complex_field_table_reads(before: &CodeDescriptionDecoder, field: u64,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<u64, CoreFailure>)
+    requires before.valid(), old(budget).valid(),
+        !matches!(before.phase, CodeDescriptionPhase::SimpleSymbols { .. }),
+        (field as nat) < pow2(code_phase_width(before.phase, before.alphabet_max)),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        r.is_ok() ==> {
+            &&& r.unwrap() <= 1638
+            &&& r.unwrap() as nat == complex_field_table_read_units(*before, field)
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap()
+        },
+{
+    reveal(complex_field_table_read_units);
+    let need_order = match before.phase {
+        CodeDescriptionPhase::ComplexPrefix2(_) => field <= 2,
+        CodeDescriptionPhase::ComplexPrefix3(_) => field == 0,
+        CodeDescriptionPhase::ComplexPrefix4(_) => true,
+        _ => false,
+    };
+    if need_order {
+        let index = match before.phase {
+            CodeDescriptionPhase::ComplexPrefix2(p) | CodeDescriptionPhase::ComplexPrefix3(p)
+                | CodeDescriptionPhase::ComplexPrefix4(p) => p.index,
+            _ => { proof { assert(false); } 0u8 },
+        };
+        if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+        let _slot = CODE_LENGTH_ORDER[index as usize];
+        return Ok(1);
+    }
+    match before.phase {
+        CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+            let (_, reads) = auxiliary_singleton_metered(&code, budget)?;
+            Ok(reads)
+        },
+        CodeDescriptionPhase::ComplexSymbol(progress) if progress.singleton >= 18 => {
+            proof {
+                lemma2_to64(); assert(field < 2); bounded_u64_fits_u8(field);
+                append_auxiliary_bit_bound(progress.prefix_bits, progress.prefix_width, field as u8);
+            }
+            let bits = progress.prefix_bits | ((field as u8) << progress.prefix_width);
+            let width = progress.prefix_width + 1;
+            let (selected, reads) = decode_auxiliary_symbol_metered(&progress.code, bits, width, budget)?;
+            proof { auxiliary_selected_scan_stop(progress.code, bits, width, selected); }
+            Ok(reads)
+        },
+        _ => Ok(0),
+    }
+}
+
+spec fn simple_field_table_read_units(before: CodeDescriptionDecoder, field: u64) -> nat {
+    match before.phase {
+        CodeDescriptionPhase::SimpleSymbols { count, index, symbols, .. } => {
+            if field >= before.alphabet_limit { 0nat } else {
+                index as nat + if !simple_prefix_contains(symbols@, index as nat, field as u16)
+                    && index as nat + 1 >= count {
+                    count as nat * ((count as nat - 1) as nat)
+                } else { 0nat }
+            }
+        },
+        _ => 0,
+    }
+}
+
+fn plan_simple_field_table_reads(before: &CodeDescriptionDecoder, field: u64,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<u64, CoreFailure>)
+    requires before.valid(), old(budget).valid(),
+        matches!(before.phase, CodeDescriptionPhase::SimpleSymbols { .. }),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        r.is_ok() ==> {
+            &&& r.unwrap() <= 15
+            &&& r.unwrap() as nat == simple_field_table_read_units(*before, field)
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap()
+        },
+{
+    reveal(simple_field_table_read_units);
+    if field >= before.alphabet_limit as u64 { return Ok(0); }
+    let (count, index, mut symbols) = match before.phase {
+        CodeDescriptionPhase::SimpleSymbols { count, index, symbols, .. } => (count, index, symbols),
+        _ => { proof { assert(false); } return Err(core_state_failure()); },
+    };
+    let symbol = field as u16;
+    let mut duplicate = false;
+    let mut i = 0usize;
+    while i < index as usize
+        invariant i <= index < count <= 4,
+            active_symbols_distinct(symbols@, index as nat),
+            !duplicate ==> forall|j: int| 0 <= j < i ==> symbols@[j] != symbol,
+            duplicate ==> exists|j: int| 0 <= j < i && symbols@[j] == symbol,
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            i as u64 <= old(budget).work_remaining,
+            budget.work_remaining == old(budget).work_remaining - i as u64,
+        decreases index as usize - i,
+    {
+        if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+        if symbols[i] == symbol { duplicate = true; }
+        i += 1;
+    }
+    proof { assert(duplicate == simple_prefix_contains(symbols@, index as nat, symbol)); }
+    let mut extra = 0u64;
+    if !duplicate && index + 1 >= count {
+        symbols[index as usize] = symbol;
+        proof {
+            assert(active_symbols_distinct(symbols@, count as nat)) by {
+                assert forall|a: int, b: int| 0 <= a < count && 0 <= b < count && a != b
+                    implies symbols@[a] != symbols@[b] by {
+                    if a < index && b < index {} else if a == index {} else { assert(b == index); }
+                }
+            }
+        }
+        extra = simple_distinct_validation_metered(&symbols, count, budget)?;
+    }
+    Ok(index as u64 + extra)
+}
+
 impl CodeDescriptionDecoder {
     spec fn valid(&self) -> bool {
         &&& self.queue.valid()
@@ -3562,6 +4290,8 @@ impl CodeDescriptionDecoder {
                 _ => true,
             },
             r.status == CodeDescriptionStatus::NeedInput ==> {
+                &&& final(self).phase == old(self).phase
+                &&& code_phase_width(old(self).phase, old(self).alphabet_max) > 0
                 &&& !end_of_input
                 &&& r.consumed == input.len()
             },
@@ -4677,7 +5407,8 @@ fn reverse_installed_code(value: u16, width: u8) -> (r: u16)
         assert(reversed_installed_code(0, 0) == 0);
         assert(reversed_installed_code(current_value as nat, remaining) == 0);
         assert(pow2(remaining as nat) == 1);
-        assert(reversed as nat * pow2(remaining as nat) == reversed as nat);
+        assert(reversed as nat * pow2(remaining as nat) == reversed as nat) by (nonlinear_arith)
+            requires pow2(remaining as nat) == 1;
         assert(reversed as nat == reversed_installed_code(source_value as nat, width));
     }
     reversed
@@ -11033,6 +11764,15 @@ fn read_simple_symbols(
     Ok(symbols)
 }
 
+spec fn code_descriptor_store_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
+    &&& after.len() == before.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && !(b3b_scalar_base(window_bytes) + B3B_CODE_PHASE as int <= at
+            < b3b_scalar_base(window_bytes) + B3B_BUILDER_INITIALIZED as int)
+        && at != b3b_scalar_base(window_bytes) + B3B_PENDING_SPAN_LENGTH as int
+        ==> #[trigger] after[at] == before[at]
+}
+
 spec fn code_store_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
     &&& after.len() == before.len()
     &&& (serialized_context_data_ok(before, window_bytes)
@@ -11073,6 +11813,10 @@ fn write_simple_symbols(
     symbols: [u16; 4],
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        forall|at: int| 0 <= at < old(workspace)@.len()
+            && !(b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int <= at
+                < b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int + 8) ==>
+                    #[trigger] final(workspace)@[at] == old(workspace)@[at],
         code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         final(workspace)@.len() == old(workspace)@.len(),
         serialized_context_data_ok(old(workspace)@, window_bytes)
@@ -11100,6 +11844,10 @@ fn write_simple_symbols(
     while i < 4
         invariant i <= 4,
             original == old(workspace)@,
+            forall|at: int| 0 <= at < original.len()
+                && !(b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int <= at
+                    < b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int + 8) ==>
+                        #[trigger] workspace@[at] == original[at],
             workspace@.len() == original.len(),
             serialized_context_data_ok(original, window_bytes)
                 ==> serialized_context_data_ok(workspace@, window_bytes),
@@ -11136,14 +11884,31 @@ fn read_aux_lengths(
     workspace: &[u8],
     window_bytes: u32,
 ) -> (r: Result<[u8; 18], CompressedHeaderError>)
+    ensures
+        r.is_ok() ==> {
+            &&& b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+            &&& forall|i: int| 0 <= i < 18 ==> #[trigger] r.unwrap()@[i]
+                == workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i]
+            &&& forall|i: int| 0 <= i < 18 ==> r.unwrap()@[i] <= 5
+        },
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes) ==> {
+            &&& r.is_ok() == (forall|i: int| 0 <= i < 18 ==>
+                #[trigger] workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] <= 5)
+            &&& r.is_err() ==> r == Err(CompressedHeaderError::InternalState)
+        },
 {
+    proof { b3b_scalar_layout_is_exact(); }
     let mut lengths = [0u8; 18];
     let mut i: usize = 0;
     while i < 18
         invariant i <= 18,
+            forall|j: int| 0 <= j < i ==> #[trigger] lengths@[j]
+                == workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j],
+            forall|j: int| 0 <= j < i ==> lengths@[j] <= 5,
+            i > 0 ==> b3b_workspace_shape(workspace@.len() as nat, window_bytes),
         decreases 18 - i,
     {
-        lengths[i] = match read_b3b_state_byte(
+        let value = match read_b3b_state_byte(
             workspace,
             window_bytes,
             B3B_AUX_LENGTHS + i as u16,
@@ -11151,10 +11916,24 @@ fn read_aux_lengths(
             Ok(value) => value,
             Err(error) => return Err(CompressedHeaderError::Workspace(error)),
         };
-        if lengths[i] > 5 {
+        proof {
+            assert(value == workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i as int]);
+        }
+        lengths[i] = value;
+        if value > 5 {
+            proof {
+                assert(!(forall|j: int| 0 <= j < 18 ==> #[trigger]
+                    workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j] <= 5));
+            }
             return Err(CompressedHeaderError::InternalState);
         }
         i = i + 1;
+    }
+    proof {
+        assert forall|j: int| 0 <= j < 18 implies #[trigger]
+            workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j] <= 5 by {
+            assert(lengths@[j] <= 5);
+        }
     }
     Ok(lengths)
 }
@@ -11165,6 +11944,10 @@ fn write_aux_lengths(
     lengths: [u8; 18],
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        forall|at: int| 0 <= at < old(workspace)@.len()
+            && !(b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int <= at
+                < b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + 18) ==>
+                    #[trigger] final(workspace)@[at] == old(workspace)@[at],
         code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         final(workspace)@.len() == old(workspace)@.len(),
         serialized_context_data_ok(old(workspace)@, window_bytes)
@@ -11192,6 +11975,10 @@ fn write_aux_lengths(
     while i < 18
         invariant i <= 18,
             original == old(workspace)@,
+            forall|at: int| 0 <= at < original.len()
+                && !(b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int <= at
+                    < b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + 18) ==>
+                        #[trigger] workspace@[at] == original[at],
             workspace@.len() == original.len(),
             serialized_context_data_ok(original, window_bytes)
                 ==> serialized_context_data_ok(workspace@, window_bytes),
@@ -11228,6 +12015,7 @@ fn state_byte(
     workspace: &[u8], window_bytes: u32, relative: u16,
 ) -> (r: Result<u8, CompressedHeaderError>)
     ensures
+        r.is_err() ==> matches!(r.unwrap_err(), CompressedHeaderError::Workspace(_)),
         r.is_ok() ==> {
             &&& b3b_workspace_shape(workspace@.len() as nat, window_bytes)
             &&& r.unwrap() == b3b_scalar_byte_at(workspace@, window_bytes, relative)
@@ -11246,6 +12034,7 @@ fn state_u16(
     workspace: &[u8], window_bytes: u32, relative: u16,
 ) -> (r: Result<u16, CompressedHeaderError>)
     ensures
+        r.is_err() ==> matches!(r.unwrap_err(), CompressedHeaderError::Workspace(_)),
         r.is_ok() ==> {
             &&& b3b_workspace_shape(workspace@.len() as nat, window_bytes)
             &&& r.unwrap() as nat == b3b_scalar_u16_at(workspace@, window_bytes, relative)
@@ -11755,6 +12544,29 @@ fn store_installed_prefix_state(
     Ok(())
 }
 
+spec fn code_payload_rank(workspace: Seq<u8>, window_bytes: u32, tag: u8, limit: u16) -> nat {
+    match tag {
+        0 => 8 * limit as nat + 63,
+        1 => 7,
+        2 => (b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_COUNT) as int
+            - b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_INDEX) as int + 2) as nat,
+        3 => 1,
+        4 => (8 * limit as int + 8
+            - b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_AUX_PHASE) as int
+            + 3 * (18 - b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_INDEX) as int)) as nat,
+        5 => (8 * (limit as int - b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL) as int)
+            + 6 - b3b_scalar_byte_at(workspace, window_bytes, B3B_FINAL_PREFIX_WIDTH) as int) as nat,
+        6 => (8 * (limit as int - b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL) as int) + 1) as nat,
+        7 => (8 * (limit as int - b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL) as int) + 8) as nat,
+        _ => 0,
+    }
+}
+
+spec fn serialized_code_rank(workspace: Seq<u8>, window_bytes: u32, limit: u16) -> nat {
+    code_payload_rank(workspace, window_bytes,
+        b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_PHASE), limit)
+}
+
 fn load_code_description_decoder(
     workspace: &[u8],
     window_bytes: u32,
@@ -11763,6 +12575,12 @@ fn load_code_description_decoder(
     requires queue.valid(),
     ensures
         r.is_ok() ==> r.unwrap().valid(),
+        r.is_ok() ==> code_rank_aligned(r.unwrap().phase),
+        r.is_ok() ==> code_phase_rank(r.unwrap().phase, r.unwrap().alphabet_limit)
+            == serialized_code_rank(workspace@, window_bytes, r.unwrap().alphabet_limit),
+        r.is_ok() ==> r.unwrap().queue == queue,
+        r.is_ok() ==> forall|i: int| 0 <= i < 18 ==> #[trigger]
+            workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] <= 5,
         r.is_ok() ==> r.unwrap().alphabet_max as nat
             == b3b_scalar_u16_at(workspace@, window_bytes, B3B_ALPHABET_MAX),
         r.is_ok() ==> r.unwrap().alphabet_limit as nat
@@ -11979,6 +12797,7 @@ fn store_complex_code(
     code: ComplexCodeLengthAlphabet,
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         final(workspace)@.len() == old(workspace)@.len(),
         serialized_context_data_ok(old(workspace)@, window_bytes)
@@ -11996,6 +12815,7 @@ fn store_complex_code(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(code_descriptor_store_frame); }
     match put_state_byte(workspace, window_bytes, B3B_AUX_SKIP, code.skip) {
         Ok(()) => {}
         Err(error) => return Err(error),
@@ -12009,6 +12829,9 @@ fn store_complex_progress(
     progress: ComplexSymbolProgress,
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+        r.is_ok() ==> b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_FINAL_SYMBOL) == progress.symbol,
+        r.is_ok() ==> b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_FINAL_PREFIX_WIDTH) == progress.prefix_width,
         code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         final(workspace)@.len() == old(workspace)@.len(),
         serialized_context_data_ok(old(workspace)@, window_bytes)
@@ -12026,6 +12849,7 @@ fn store_complex_progress(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(code_descriptor_store_frame); }
     let ghost original = workspace@;
     proof {
         assert(original == old(workspace)@);
@@ -12038,6 +12862,7 @@ fn store_complex_progress(
     let mut i: usize = 0;
     while i < 5
         invariant i <= 5,
+            i >= 4 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_FINAL_PREFIX_WIDTH) == progress.prefix_width,
             original == old(workspace)@,
             workspace@.len() == original.len(),
             serialized_context_data_ok(original, window_bytes)
@@ -12055,6 +12880,7 @@ fn store_complex_progress(
             compressed_decoder_state_ok(original, window_bytes)
                 ==> compressed_decoder_state_ok(workspace@, window_bytes),
             code_store_frame(original, workspace@, window_bytes),
+            code_descriptor_store_frame(original, workspace@, window_bytes),
         decreases 5 - i,
     {
         let (offset, value) = if i == 0 {
@@ -12107,8 +12933,13 @@ fn store_simple_code_description_payload(
     window_bytes: u32,
     phase: CodeDescriptionPhase,
 ) -> (r: Result<u8, CompressedHeaderError>)
-    ensures code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+    ensures
+        code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes), code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+        r.is_ok() && code_rank_aligned(phase) ==> forall|limit: u16|
+            #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
+                == code_phase_rank(phase, limit),
 {
+    proof { reveal(code_descriptor_store_frame); }
     let tag = match phase {
         CodeDescriptionPhase::Selector => 0,
         CodeDescriptionPhase::SimpleSize => 1,
@@ -12145,8 +12976,13 @@ fn store_complex_code_description_payload(
     phase: CodeDescriptionPhase,
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
-    ensures code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+    ensures
+        code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes), code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+        r.is_ok() && code_rank_aligned(phase) ==> forall|limit: u16|
+            #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
+                == code_phase_rank(phase, limit),
 {
+    proof { reveal(code_descriptor_store_frame); }
     let tag = match phase {
         CodeDescriptionPhase::ComplexPrefix2(progress)
         | CodeDescriptionPhase::ComplexPrefix3(progress)
@@ -12219,8 +13055,13 @@ fn store_code_description_payload(
     phase: CodeDescriptionPhase,
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
-    ensures code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+    ensures
+        code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes), code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+        r.is_ok() && code_rank_aligned(phase) ==> forall|limit: u16|
+            #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
+                == code_phase_rank(phase, limit),
 {
+    proof { reveal(code_descriptor_store_frame); }
     match phase {
         CodeDescriptionPhase::Selector
         | CodeDescriptionPhase::SimpleSize
@@ -12239,6 +13080,10 @@ fn store_code_description_decoder(
 ) -> (r: Result<(), CompressedHeaderError>)
     requires decoder.valid(),
     ensures
+        code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+        r.is_ok() && code_rank_aligned(decoder.phase) ==>
+            serialized_code_rank(final(workspace)@, window_bytes, decoder.alphabet_limit)
+                == code_phase_rank(decoder.phase, decoder.alphabet_limit),
         final(workspace)@.len() == old(workspace)@.len(),
         serialized_context_data_ok(old(workspace)@, window_bytes)
             ==> serialized_context_data_ok(final(workspace)@, window_bytes),
@@ -12271,6 +13116,7 @@ fn store_code_description_decoder(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(code_descriptor_store_frame); }
     match put_state_byte(workspace, window_bytes, B3B_CODE_AUX_PHASE, 0) {
         Ok(()) => {}
         Err(error) => return Err(error),
@@ -12303,7 +13149,21 @@ fn store_code_description_decoder(
         Ok(value) => value,
         Err(error) => return Err(error),
     };
-    put_state_byte(workspace, window_bytes, B3B_CODE_PHASE, tag)
+    let ghost before_tag = workspace@;
+    let result = put_state_byte(workspace, window_bytes, B3B_CODE_PHASE, tag);
+    proof {
+        if result.is_ok() && code_rank_aligned(decoder.phase) {
+            assert(code_payload_rank(before_tag, window_bytes, tag, decoder.alphabet_limit)
+                == code_phase_rank(decoder.phase, decoder.alphabet_limit));
+            reveal(serialized_code_rank); reveal(code_payload_rank);
+            reveal(b3b_scalar_byte_at); reveal(b3b_scalar_u16_at); reveal(b3b_scalar_base);
+            b3b_scalar_layout_is_exact();
+            assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_CODE_PHASE) == tag);
+            assert(code_payload_rank(workspace@, window_bytes, tag, decoder.alphabet_limit)
+                == code_payload_rank(before_tag, window_bytes, tag, decoder.alphabet_limit));
+        }
+    }
+    result
 }
 
 fn map_code_description_error(error: CodeDescriptionError) -> (r: CompressedHeaderError)
@@ -12350,6 +13210,11 @@ fn acknowledge_serialized_pending_span(
         old(decoder).valid(),
         matches!(old(decoder).phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
     ensures
+        code_rank_aligned(old(decoder).phase) ==> {
+            &&& code_rank_aligned(final(decoder).phase)
+            &&& code_phase_rank(final(decoder).phase, final(decoder).alphabet_limit)
+                < code_phase_rank(old(decoder).phase, old(decoder).alphabet_limit)
+        },
         final(decoder).valid(),
         final(decoder).alphabet_max == old(decoder).alphabet_max,
         final(decoder).alphabet_limit == old(decoder).alphabet_limit,
@@ -12366,6 +13231,7 @@ fn acknowledge_serialized_pending_span(
             _ => false,
         },
 {
+    let ghost before = *decoder;
     let phase = decoder.phase;
     let after = match phase {
         CodeDescriptionPhase::ComplexPendingSpan { after, .. } => after,
@@ -12400,7 +13266,32 @@ fn acknowledge_serialized_pending_span(
         _ => CodeDescriptionStatus::Progress,
     };
     assert(decoder.valid());
+    proof {
+        if code_rank_aligned(before.phase) {
+            assert(code_transition_holds(before.phase, 0, before.alphabet_max, before.alphabet_limit, decoder.phase, status));
+            code_transition_rank_decreases(before, 0, *decoder, status);
+        }
+    }
     CodeDescriptionStep { consumed: 0, status }
+}
+
+spec fn pending_span_drain_effect(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, phase: CodeDescriptionPhase) -> bool {
+    match phase {
+            CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, .. } => {
+                &&& forall|i: int| start <= i < start as int + span_count as int ==>
+                    #[trigger] after[window_bytes as int
+                        + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] == length
+                &&& forall|at: int| 0 <= at < before.len()
+                    && !(window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int
+                        + start as int <= at < window_bytes as int
+                            + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int
+                            + start as int + span_count as int)
+                    && !(b3b_scalar_base(window_bytes) + B3B_BUILDER_INITIALIZED as int <= at
+                        < b3b_scalar_base(window_bytes) + B3B_BUILDER_INITIALIZED as int + 2)
+                    ==> #[trigger] after[at] == before[at]
+            },
+            _ => false,
+        }
 }
 
 fn drain_serialized_pending_span(
@@ -12413,6 +13304,17 @@ fn drain_serialized_pending_span(
         old(decoder).valid(),
         matches!(old(decoder).phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
     ensures
+        r.is_err() ==> final(workspace)@ == old(workspace)@ && *final(decoder) == *old(decoder),
+        r.is_ok() == match old(decoder).phase {
+            CodeDescriptionPhase::ComplexPendingSpan { start, .. } =>
+                b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) == start,
+            _ => false,
+        },
+        r.is_ok() && code_rank_aligned(old(decoder).phase) ==> {
+            &&& code_rank_aligned(final(decoder).phase)
+            &&& code_phase_rank(final(decoder).phase, final(decoder).alphabet_limit)
+                < code_phase_rank(old(decoder).phase, old(decoder).alphabet_limit)
+        },
         final(decoder).valid(),
         final(decoder).alphabet_max == old(decoder).alphabet_max,
         final(decoder).alphabet_limit == old(decoder).alphabet_limit,
@@ -12448,6 +13350,9 @@ fn drain_serialized_pending_span(
             == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_TREE_COUNT),
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
+        r.is_ok() ==> pending_span_drain_effect(
+            old(workspace)@, final(workspace)@, window_bytes, old(decoder).phase,
+        ),
         r.is_ok() ==> {
             &&& r.unwrap().consumed == 0
             &&& match old(decoder).phase {
@@ -12470,7 +13375,9 @@ fn drain_serialized_pending_span(
             }
         },
 {
+    proof { reveal(pending_span_drain_effect); }
     let ghost original = workspace@;
+    proof { reveal(b3b_workspace_shape); }
     let (start, span_count, length) = match decoder.phase {
         CodeDescriptionPhase::ComplexPendingSpan {
             start, span_count, length, ..
@@ -12495,6 +13402,17 @@ fn drain_serialized_pending_span(
     while written < span_count
         invariant
             written <= span_count,
+            initialized == start,
+            start as nat + span_count as nat <= decoder.alphabet_limit <= 704,
+            forall|i: int| start <= i < start as int + written as int ==>
+                #[trigger] workspace@[window_bytes as int
+                    + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] == length,
+            forall|at: int| 0 <= at < original.len()
+                && !(window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int
+                    + start as int <= at < window_bytes as int
+                        + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int
+                        + start as int + written as int)
+                ==> #[trigger] workspace@[at] == original[at],
             next_initialized as nat == initialized as nat + written as nat,
             original == old(workspace)@,
             *decoder == *old(decoder),
@@ -12548,6 +13466,22 @@ fn drain_serialized_pending_span(
             }
         };
         proof {
+            assert(workspace@ == before_length.update(window_bytes as int
+                + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int
+                + _old_initialized as int, length));
+            assert(_old_initialized as int == start as int + written as int);
+            assert forall|i: int| start <= i < start as int + written as int + 1 implies
+                #[trigger] workspace@[window_bytes as int
+                    + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] == length by {
+                let at = window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i;
+                if i == _old_initialized as int {
+                    assert(workspace@[at] == length);
+                } else {
+                    assert(i < start as int + written as int);
+                    assert(before_length[at] == length);
+                    assert(workspace@[at] == before_length[at]);
+                }
+            }
             builder_length_update_preserves_context_state(
                 before_length,
                 workspace@,
@@ -12558,6 +13492,7 @@ fn drain_serialized_pending_span(
         }
         written = written + 1;
     }
+    let ghost after_lengths = workspace@;
     match put_state_u16(
         workspace,
         window_bytes,
@@ -12567,6 +13502,15 @@ fn drain_serialized_pending_span(
         Ok(()) => {}
         Err(error) => {
             return Err(error);
+        }
+    }
+    proof {
+        reveal(b3b_scalar_base); reveal(b3b_workspace_shape);
+        assert forall|i: int| start <= i < start as int + span_count as int implies
+            #[trigger] workspace@[window_bytes as int
+                + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] == length by {
+            assert(after_lengths[window_bytes as int
+                + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] == length);
         }
     }
     let acknowledged = acknowledge_serialized_pending_span(decoder);
@@ -12579,6 +13523,26 @@ fn drain_serialized_pending_span(
     Ok(acknowledged)
 }
 
+spec fn pending_span_stored_effect(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, phase: CodeDescriptionPhase) -> bool {
+    match phase {
+            CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, .. } => {
+                &&& forall|i: int| start <= i < start as int + span_count as int ==>
+                    #[trigger] after[window_bytes as int
+                        + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] == length
+                &&& forall|at: int| 0 <= at < before.len()
+                    && !(window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int
+                        + start as int <= at < window_bytes as int
+                            + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int
+                            + start as int + span_count as int)
+                    && !(b3b_scalar_base(window_bytes) + B3B_CODE_PHASE as int <= at
+                        < b3b_scalar_base(window_bytes) + B3B_ACTIVE_REGION as int)
+                    && at != b3b_scalar_base(window_bytes) + B3B_PENDING_SPAN_LENGTH as int
+                    ==> #[trigger] after[at] == before[at]
+            },
+            _ => false,
+        }
+}
+
 fn drain_and_store_serialized_pending_span(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -12589,6 +13553,20 @@ fn drain_and_store_serialized_pending_span(
         old(decoder).valid(),
         matches!(old(decoder).phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
     ensures
+        r.is_ok() ==> pending_span_stored_effect(
+            old(workspace)@, final(workspace)@, window_bytes, old(decoder).phase,
+        ),
+        final(decoder).valid(),
+        final(decoder).alphabet_max == old(decoder).alphabet_max,
+        final(decoder).alphabet_limit == old(decoder).alphabet_limit,
+        r.is_ok() && code_rank_aligned(old(decoder).phase) ==> {
+            &&& code_rank_aligned(final(decoder).phase)
+            &&& code_phase_rank(final(decoder).phase, final(decoder).alphabet_limit)
+                < code_phase_rank(old(decoder).phase, old(decoder).alphabet_limit)
+        },
+        r.is_ok() && code_rank_aligned(old(decoder).phase) ==>
+            serialized_code_rank(final(workspace)@, window_bytes, final(decoder).alphabet_limit)
+                == code_phase_rank(final(decoder).phase, final(decoder).alphabet_limit),
         final(workspace)@.len() == old(workspace)@.len(),
         serialized_context_data_ok(old(workspace)@, window_bytes)
             ==> serialized_context_data_ok(final(workspace)@, window_bytes),
@@ -12621,11 +13599,29 @@ fn drain_and_store_serialized_pending_span(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(pending_span_stored_effect); reveal(pending_span_drain_effect); }
+    let ghost original_phase = decoder.phase;
     match drain_serialized_pending_span(workspace, window_bytes, decoder) {
         Ok(_) => {}
         Err(error) => return Err(error),
     }
-    store_code_description_decoder(workspace, window_bytes, *decoder)
+    let ghost after_span = workspace@;
+    let result = store_code_description_decoder(workspace, window_bytes, *decoder);
+    proof {
+        reveal(code_descriptor_store_frame); reveal(b3b_scalar_base);
+        reveal(CodeDescriptionDecoder::valid);
+        if let CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, .. } = original_phase {
+            assert(start as nat + span_count as nat <= old(decoder).alphabet_limit <= 704);
+            assert forall|i: int| start <= i < start as int + span_count as int implies
+                #[trigger] workspace@[window_bytes as int
+                    + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] == length by {
+                let at = window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i;
+                assert(after_span[at] == length);
+                assert(workspace@[at] == after_span[at]);
+            }
+        }
+    }
+    result
 }
 
 spec fn tree_metadata_complete(
@@ -13260,10 +14256,15 @@ fn advance_serialized_tree(
             B3B_ACTIVE_TREE,
         ));
     }
+    let ghost loop_limit = b3b_scalar_u16_at(original, window_bytes, B3B_ALPHABET_LIMIT) as u16;
     let mut consumed: usize = 0;
     let mut work: u16 = 0;
-    while work < 2_000
-        invariant consumed <= input.len(), work <= 2_000,
+    while work < 5_696
+        invariant consumed <= input.len(), work <= 5_696,
+            loop_limit == b3b_scalar_u16_at(original, window_bytes, B3B_ALPHABET_LIMIT) as u16,
+            work > 0 ==> work as nat + serialized_code_rank(workspace@, window_bytes, loop_limit) <= 5_695,
+            b3b_scalar_u16_at(workspace@, window_bytes, B3B_ALPHABET_LIMIT)
+                == b3b_scalar_u16_at(original, window_bytes, B3B_ALPHABET_LIMIT),
             original == old(workspace)@,
             b3b_scalar_byte_at(original, window_bytes, B3B_ACTIVE_REGION)
                 == tree_region_tag_spec(region),
@@ -13300,7 +14301,7 @@ fn advance_serialized_tree(
                 == b3b_scalar_u16_at(original, window_bytes, B3B_TREE_COUNT),
             compressed_decoder_state_ok(original, window_bytes)
                 ==> compressed_decoder_state_ok(workspace@, window_bytes),
-        decreases 2_000 - work,
+        decreases 5_696 - work,
     {
         let queue = match load_b3b_queue(workspace, window_bytes) {
             Ok(value) => value,
@@ -13322,12 +14323,36 @@ fn advance_serialized_tree(
                 B3B_ALPHABET_LIMIT,
             ));
         }
-        let step = decoder.advance_field(&input[consumed..], end_of_input);
+        proof {
+            assert(decoder.alphabet_limit == loop_limit);
+            code_phase_rank_is_bounded(decoder);
+            assert(work as nat + code_phase_rank(decoder.phase, loop_limit) <= 5_695);
+        }
+        let ghost before_field = decoder;
+        let step = if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+            CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress }
+        } else { decoder.advance_field(&input[consumed..], end_of_input) };
+        proof {
+            assert(matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) ==> decoder == before_field);
+        }
+        proof {
+            if !matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+                if !code_phase_terminal(before_field.phase) && step.status != CodeDescriptionStatus::NeedInput {
+                    code_field_rank_decreases(before_field, input@.skip(consumed as int), end_of_input, decoder, step);
+                }
+            }
+            assert(code_rank_aligned(decoder.phase));
+        }
         // The completed auxiliary alphabet is a transient B3a result, without
         // an E1 serialized tag. Enter its existing zero-input symbol state
         // before storing, rather than rejecting a valid complex tree.
         if matches!(decoder.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
-            let _ = decoder.advance_field(&[], false);
+            let ghost before_start = decoder;
+            let start_step = decoder.advance_field(&[], false);
+            proof {
+                assert(start_step.status != CodeDescriptionStatus::NeedInput);
+                code_field_rank_decreases(before_start, Seq::empty(), false, decoder, start_step);
+            }
         }
         consumed = consumed + step.consumed;
         match store_b3b_queue(workspace, window_bytes, &decoder.queue) {
@@ -13552,8 +14577,16 @@ fn advance_serialized_tree(
                 }
             }
         }
+        proof {
+            reveal(code_field_step_refines); reveal(code_transition_holds);
+            assert(!code_phase_terminal(before_field.phase));
+            assert(step.status != CodeDescriptionStatus::NeedInput);
+            assert(serialized_code_rank(workspace@, window_bytes, loop_limit)
+                < code_phase_rank(before_field.phase, loop_limit));
+        }
         work = work + 1;
     }
+    proof { assert(false); }
     SerializedTreeStep {
         consumed,
         status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),
@@ -13812,6 +14845,7 @@ fn advance_context_mtf_phase(
         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) == active_len,
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
     ensures
+        r.is_ok(),
         final(workspace)@.len() == old(workspace)@.len(),
         r.is_ok() ==> b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_OUTER_PHASE)
             == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE),
@@ -13824,6 +14858,11 @@ fn advance_context_mtf_phase(
                 == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE)
         },
 {
+    proof {
+        reveal(serialized_context_state_ok); reveal(serialized_context_data_ok);
+        reveal(serialized_context_phase_payload_ok); reveal(serialized_mtf_state_ok);
+        reveal(b3b_workspace_shape);
+    }
     let num_trees = match state_u16(workspace, window_bytes, B3B_MAP_TREES) {
         Ok(value) => value,
         Err(error) => return Err(error),
@@ -13975,6 +15014,10 @@ fn advance_context_coverage_phase(
         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) == active_len,
         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
     ensures
+        r.is_ok() == crate::brotli_prefix::context_tree_coverage(
+            crate::brotli_prefix::context_map_values(old(workspace)@, window_bytes, kind, active_len),
+            b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_TREES) as u16),
+        r.is_err() ==> r == Err(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapCoverage)),
         final(workspace)@.len() == old(workspace)@.len(),
         r.is_ok() ==> b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_OUTER_PHASE)
             == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE),
@@ -13987,6 +15030,11 @@ fn advance_context_coverage_phase(
                 == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE)
         },
 {
+    proof {
+        reveal(serialized_context_state_ok); reveal(serialized_context_data_ok);
+        reveal(serialized_context_phase_payload_ok); reveal(serialized_mtf_state_ok);
+        reveal(b3b_workspace_shape);
+    }
     let num_trees = match state_u16(workspace, window_bytes, B3B_MAP_TREES) {
         Ok(value) => value,
         Err(error) => return Err(error),
@@ -22390,6 +23438,17 @@ fn map_meta_error(error: MetaBlockError) -> CoreFailure {
 
 fn map_compressed_error(error: CompressedHeaderError) -> (r: CoreFailure)
     ensures (r == CoreFailure::Truncated) == (error == CompressedHeaderError::Truncated),
+        match error {
+            CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat)
+            | CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapValue)
+            | CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapCoverage) =>
+                r == CoreFailure::InvalidFormat(CoreFormatDetail::ContextMap),
+            CompressedHeaderError::Workspace(_) | CompressedHeaderError::InternalState =>
+                r == CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding),
+            CompressedHeaderError::Truncated => r == CoreFailure::Truncated,
+            CompressedHeaderError::UnsupportedMode => r == CoreFailure::UnsupportedMode,
+            _ => true,
+        },
 {
     match error {
         CompressedHeaderError::Truncated => CoreFailure::Truncated,
@@ -25659,24 +26718,89 @@ fn checked_planned_work_add(total: u64, amount: u64) -> (r: Result<u64, CoreFail
     }
 }
 
+spec fn canonical_plan_weight(lengths: Seq<u8>, limit: nat) -> nat
+    decreases limit,
+{
+    if limit == 0 { 0 } else {
+        canonical_plan_weight(lengths, (limit - 1) as nat)
+            + symbol_code_length_weight(lengths[limit as int - 1])
+    }
+}
+
+spec fn canonical_plan_nonzero(lengths: Seq<u8>, limit: nat) -> nat
+    decreases limit,
+{
+    if limit == 0 { 0 } else {
+        canonical_plan_nonzero(lengths, (limit - 1) as nat)
+            + if lengths[limit as int - 1] == 0 { 0nat } else { 1nat }
+    }
+}
+
+spec fn canonical_plan_index_sum(lengths: Seq<u8>, limit: nat) -> nat
+    decreases limit,
+{
+    if limit == 0 { 0 } else {
+        canonical_plan_index_sum(lengths, (limit - 1) as nat)
+            + if lengths[limit as int - 1] == 0 { 0nat } else { (limit - 1) as nat }
+    }
+}
+
+spec fn canonical_plan_scan_result(lengths: Seq<u8>, symbols: nat, visits: nat,
+    valid: bool) -> bool {
+    &&& 1 <= visits <= symbols <= lengths.len()
+    &&& if valid {
+        &&& visits == symbols
+        &&& forall|i: int| 0 <= i < symbols ==> lengths[i] <= 15
+        &&& canonical_plan_weight(lengths, symbols) == 32_768
+        &&& canonical_plan_nonzero(lengths, symbols) >= 2
+    } else {
+        let index = (visits - 1) as nat;
+        (visits == symbols
+            && (forall|i: int| 0 <= i < symbols ==> lengths[i] <= 15)
+            && canonical_plan_weight(lengths, symbols) <= 32_768
+            && (canonical_plan_weight(lengths, symbols) != 32_768
+                || canonical_plan_nonzero(lengths, symbols) < 2))
+        || ((forall|i: int| 0 <= i < index ==> lengths[i] <= 15)
+            && canonical_plan_weight(lengths, index) <= 32_768
+            && (lengths[index as int] > 15
+                || canonical_plan_weight(lengths, index)
+                    + symbol_code_length_weight(lengths[index as int]) > 32_768))
+    }
+}
+
 fn plan_canonical_tree_install(
     lengths: &[u8; 704],
     budget: &mut crate::brotli::RequestBudget,
     symbols: u16,
-) -> (r: Result<(u64, u64), CoreFailure>)
+) -> (r: Result<(u64, u64, bool), CoreFailure>)
     requires old(budget).valid(),
     ensures
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
         final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() ==> final(budget).work_remaining == old(budget).work_remaining - r.unwrap().0,
+        1 <= symbols <= 704 && r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r == Err(CoreFailure::ResourceLimit) ==> final(budget).work_remaining == 0,
+        1 <= symbols <= 704 && old(budget).work_remaining >= symbols ==> r.is_ok(),
+        r.is_ok() ==> {
+            &&& r.unwrap().0 <= 704
+            &&& r.unwrap().1 <= 300_000
+            &&& canonical_plan_scan_result(lengths@, symbols as nat, r.unwrap().0 as nat, r.unwrap().2)
+            &&& if r.unwrap().2 {
+                r.unwrap().1 as nat == 36 * symbols as nat
+                    + 6 * canonical_plan_nonzero(lengths@, symbols as nat)
+                    + canonical_plan_index_sum(lengths@, symbols as nat) + 1564 + 4 + 1
+            } else { r.unwrap().1 == r.unwrap().0 }
+        },
 {
     if symbols == 0 || symbols > 704 {
         return Err(core_state_failure());
     }
-    let planning_work = symbols as u64;
-    if !budget.charge_work(planning_work) {
-        return Err(CoreFailure::ResourceLimit);
-    }
+    let mut planning_work = 0u64;
     let mut symbol = 0u16;
     let mut nonzero = 0u16;
     let mut index_sum = 0u64;
@@ -25688,24 +26812,52 @@ fn plan_canonical_tree_install(
             index_sum <= 247_456,
             2 * index_sum as int <= symbol as int * (symbol as int - 1),
             space <= 32_768,
+            planning_work == symbol as u64,
+            space as nat + canonical_plan_weight(lengths@, symbol as nat) == 32_768,
+            nonzero as nat == canonical_plan_nonzero(lengths@, symbol as nat),
+            index_sum as nat == canonical_plan_index_sum(lengths@, symbol as nat),
+            forall|i: int| 0 <= i < symbol ==> lengths@[i] <= 15,
             budget.valid(),
             budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
             budget.work_remaining <= old(budget).work_remaining,
+            budget.work_remaining == old(budget).work_remaining - planning_work,
         decreases symbols - symbol,
     {
         let ghost previous_sum = index_sum;
+        if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+        planning_work += 1;
         let length = lengths[symbol as usize];
         if length > 15 {
-            return Err(core_state_failure());
+            return Ok((planning_work, planning_work, false));
         }
         if length != 0 {
             let amount = 1u32 << (15 - length);
+            proof {
+                assert(amount == if length == 1 { 16_384u32 }
+                    else if length == 2 { 8_192u32 } else if length == 3 { 4_096u32 }
+                    else if length == 4 { 2_048u32 } else if length == 5 { 1_024u32 }
+                    else if length == 6 { 512u32 } else if length == 7 { 256u32 }
+                    else if length == 8 { 128u32 } else if length == 9 { 64u32 }
+                    else if length == 10 { 32u32 } else if length == 11 { 16u32 }
+                    else if length == 12 { 8u32 } else if length == 13 { 4u32 }
+                    else if length == 14 { 2u32 } else { 1u32 }) by (bit_vector)
+                    requires 1 <= length <= 15, amount == (1u32 << ((15 - length) as u8));
+                assert(amount as nat == symbol_code_length_weight(length));
+            }
             if amount > space {
-                return Err(core_state_failure());
+                return Ok((planning_work, planning_work, false));
             }
             space -= amount;
             nonzero += 1;
             index_sum += symbol as u64;
+        }
+        proof {
+            reveal(canonical_plan_weight); reveal(canonical_plan_nonzero);
+            reveal(canonical_plan_index_sum);
         }
         proof {
             assert(2 * index_sum as int <= (symbol as int + 1) * symbol as int)
@@ -25724,9 +26876,196 @@ fn plan_canonical_tree_install(
         }
     }
     if nonzero < 2 || space != 0 {
-        return Err(core_state_failure());
+        return Ok((planning_work, planning_work, false));
     }
-    Ok((planning_work, canonical_tree_install_work(symbols, nonzero, index_sum)))
+    Ok((planning_work, canonical_tree_install_work(symbols, nonzero, index_sum), true))
+}
+
+spec fn saved_aux_copy_prefix(workspace: Seq<u8>, window_bytes: u32, limit: nat) -> bool {
+    forall|i: int| 0 <= i < limit ==>
+        #[trigger] workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] <= 5
+}
+
+spec fn saved_aux_copy_read_units(workspace: Seq<u8>, window_bytes: u32) -> nat {
+    let maximum = b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_MAX);
+    let limit = b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT);
+    if maximum == 0 || maximum > 704 || limit == 0 || limit > maximum { 0nat }
+    else if exists|bad: usize| bad < 18 && #[trigger] saved_aux_copy_prefix(workspace, window_bytes, bad as nat)
+        && workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + bad as int] > 5 {
+        let bad = choose|bad: usize| bad < 18 && #[trigger] saved_aux_copy_prefix(workspace, window_bytes, bad as nat)
+            && workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + bad as int] > 5;
+        (bad + 1) as nat
+    } else { 18nat }
+}
+
+proof fn saved_aux_bad_indices_agree(workspace: Seq<u8>, window_bytes: u32,
+    left: int, right: int)
+    requires 0 <= left < 18, 0 <= right < 18,
+        saved_aux_copy_prefix(workspace, window_bytes, left as nat),
+        saved_aux_copy_prefix(workspace, window_bytes, right as nat),
+        workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + left] > 5,
+        workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + right] > 5,
+    ensures left == right,
+{
+    reveal(saved_aux_copy_prefix);
+    if left < right {} else if right < left {}
+}
+
+fn plan_saved_aux_load(workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget,
+) -> (r: Result<u64, CoreFailure>)
+    requires old(budget).valid(), b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        r.is_ok() ==> {
+            &&& r.unwrap() <= 18
+            &&& r.unwrap() as nat == saved_aux_copy_read_units(workspace@, window_bytes)
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap()
+        },
+{
+    reveal(saved_aux_copy_read_units);
+    let maximum = state_u16(workspace, window_bytes, B3B_ALPHABET_MAX).map_err(map_compressed_error)?;
+    let limit = state_u16(workspace, window_bytes, B3B_ALPHABET_LIMIT).map_err(map_compressed_error)?;
+    if maximum == 0 || maximum > 704 || limit == 0 || limit > maximum { return Ok(0); }
+    let mut i = 0usize;
+    while i < 18
+        invariant i <= 18, b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+            maximum == b3b_scalar_u16_at(workspace@, window_bytes, B3B_ALPHABET_MAX),
+            limit == b3b_scalar_u16_at(workspace@, window_bytes, B3B_ALPHABET_LIMIT),
+            1 <= limit <= maximum <= 704,
+            saved_aux_copy_prefix(workspace@, window_bytes, i as nat),
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            i as u64 <= old(budget).work_remaining,
+            budget.work_remaining == old(budget).work_remaining - i as u64,
+        decreases 18 - i,
+    {
+        if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+        let value = state_byte(workspace, window_bytes, B3B_AUX_LENGTHS + i as u16)
+            .map_err(map_compressed_error)?;
+        proof {
+            reveal(b3b_scalar_byte_at);
+            assert(value == workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i as int]);
+        }
+        if value > 5 {
+            proof {
+                assert(exists|bad: usize| bad == i && bad < 18
+                    && #[trigger] saved_aux_copy_prefix(workspace@, window_bytes, bad as nat)
+                    && workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + bad as int] > 5);
+                let bad = choose|bad: usize| bad < 18 && #[trigger] saved_aux_copy_prefix(workspace@, window_bytes, bad as nat)
+                    && workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + bad as int] > 5;
+                saved_aux_bad_indices_agree(workspace@, window_bytes, i as int, bad as int);
+                reveal(saved_aux_copy_read_units);
+            }
+            return Ok(i as u64 + 1);
+        }
+        proof { reveal(saved_aux_copy_prefix); }
+        i += 1;
+    }
+    proof { reveal(saved_aux_copy_prefix); reveal(saved_aux_copy_read_units); }
+    Ok(18)
+}
+
+spec fn code_field_total_read_units(before: CodeDescriptionDecoder, input: Seq<u8>,
+    consumed: usize) -> nat {
+    let width = code_phase_width(before.phase, before.alphabet_max);
+    let available = before.queue.bits() + bytes_bits(input.take(consumed as int));
+    if available.len() < width { consumed as nat } else {
+        let field = bits_value(available.take(width as int)) as u64;
+        consumed as nat + width + if matches!(before.phase, CodeDescriptionPhase::SimpleSymbols { .. }) {
+            simple_field_table_read_units(before, field)
+        } else { complex_field_table_read_units(before, field) }
+    }
+}
+
+fn plan_code_description_field(decoder: &mut CodeDescriptionDecoder,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: Result<(CodeDescriptionStep, u64, u64), CoreFailure>)
+    requires old(decoder).valid(), old(budget).valid(),
+    ensures final(decoder).valid(),
+        final(decoder).alphabet_max == old(decoder).alphabet_max,
+        final(decoder).alphabet_limit == old(decoder).alphabet_limit,
+        final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> *final(decoder) == *old(decoder) && r == Err(CoreFailure::ResourceLimit),
+        r.is_ok() && r.unwrap().0.status == CodeDescriptionStatus::NeedInput ==> {
+            &&& final(decoder).phase == old(decoder).phase
+            &&& code_phase_width(old(decoder).phase, old(decoder).alphabet_max) > 0
+        },
+        r.is_ok() && code_rank_aligned(old(decoder).phase) ==> {
+            &&& code_rank_aligned(final(decoder).phase)
+            &&& (!code_phase_terminal(old(decoder).phase) && r.unwrap().0.status != CodeDescriptionStatus::NeedInput ==>
+                code_phase_rank(final(decoder).phase, final(decoder).alphabet_limit)
+                    < code_phase_rank(old(decoder).phase, old(decoder).alphabet_limit))
+        },
+        r.is_ok() ==> {
+            &&& r.unwrap().0.consumed <= input.len()
+            &&& code_field_step_refines(*old(decoder), input@, end_of_input, *final(decoder), r.unwrap().0)
+            &&& r.unwrap().2 as nat == code_field_total_read_units(*old(decoder), input@, r.unwrap().0.consumed)
+            &&& r.unwrap().2 <= 1701
+            &&& r.unwrap().1 == 2 * r.unwrap().2
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
+        },
+{
+    let before_work = budget.work_remaining;
+    let ghost start = *decoder;
+    let width = code_description_phase_width_exec(decoder.phase, decoder.alphabet_max);
+    let mut peek = decoder.queue;
+    let read_plan = plan_bit_read(peek, width, input.len());
+    if !budget.charge_work(read_plan.work) { return Err(CoreFailure::ResourceLimit); }
+    let read = peek.read_bits(width, input, end_of_input);
+    proof {
+        assert(read.consumed == read_plan.consumed);
+        bytes_bits_len(input@.take(read.consumed as int));
+        bytes_bits_len(input@);
+        assert(input@.take(input@.len() as int) =~= input@);
+        let source = start.queue.bits() + bytes_bits(input@.take(read.consumed as int));
+        assert(read_plan.complete == match read.status { BitReadStatus::Value(_) => true, _ => false });
+    }
+    let table_work = match read.status {
+        BitReadStatus::Value(value) => {
+            if matches!(decoder.phase, CodeDescriptionPhase::SimpleSymbols { .. }) {
+                plan_simple_field_table_reads(decoder, value, budget)?
+            } else { plan_complex_field_table_reads(decoder, value, budget)? }
+        },
+        _ => 0u64,
+    };
+    let replay_work = read_plan.work + table_work;
+    if !budget.charge_work(replay_work) { return Err(CoreFailure::ResourceLimit); }
+    let step = decoder.advance_field(input, end_of_input);
+    proof {
+        reveal(code_field_step_refines); reveal(code_field_total_read_units);
+        assert(step.consumed == read.consumed);
+        let available = start.queue.bits() + bytes_bits(input@.take(step.consumed as int));
+        match read.status {
+            BitReadStatus::Value(value) => {
+                assert(value as nat == bits_value(available.take(width as int)));
+                assert(replay_work as nat == code_field_total_read_units(start, input@, step.consumed));
+            },
+            _ => { assert(replay_work as nat == code_field_total_read_units(start, input@, step.consumed)); },
+        }
+    }
+    proof {
+        if code_rank_aligned(start.phase) {
+            if code_phase_terminal(start.phase) || step.status == CodeDescriptionStatus::NeedInput {
+                assert(decoder.phase == start.phase);
+            } else { code_field_rank_decreases(start, input@, end_of_input, *decoder, step); }
+        }
+    }
+    Ok((step, before_work - budget.work_remaining, replay_work))
 }
 
 fn plan_serialized_tree(
@@ -25740,7 +27079,16 @@ fn plan_serialized_tree(
     ensures
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
         final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() ==> r.unwrap().consumed <= input.len(),
+        r.is_ok() ==> r.unwrap().planning_work <= 100_000_000
+            && r.unwrap().execution_work <= 100_000_000,
+        r.is_ok() ==> final(budget).work_remaining as int
+            == old(budget).work_remaining as int - r.unwrap().planning_work as int,
 {
     let region_tag = match state_byte(workspace, window_bytes, B3B_ACTIVE_REGION) {
         Ok(value) => value,
@@ -25770,11 +27118,19 @@ fn plan_serialized_tree(
         Err(error) => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
             status: SerializedTreeStatus::Failed(error) }),
     };
+    proof { reveal(serialized_b3b_queue); }
+    let before_load_work = budget.work_remaining;
+    let saved_load_reads = plan_saved_aux_load(workspace, window_bytes, budget)?;
+    if !budget.charge_work(saved_load_reads) { return Err(CoreFailure::ResourceLimit); }
+    let initial_planning_work = before_load_work - budget.work_remaining;
     let mut decoder = match load_code_description_decoder(workspace, window_bytes, queue) {
         Ok(value) => value,
-        Err(error) => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
+        Err(error) => return Ok(SerializedTreePlan { planning_work: initial_planning_work,
+            execution_work: saved_load_reads, consumed: 0,
             status: SerializedTreeStatus::Failed(error) }),
     };
+    proof { code_phase_rank_is_bounded(decoder); }
+    let ghost initial_rank = code_phase_rank(decoder.phase, decoder.alphabet_limit);
     let mut builder_initialized = match state_u16(
         workspace,
         window_bytes,
@@ -25792,8 +27148,14 @@ fn plan_serialized_tree(
     while copied < copy_len
         invariant
             copied <= copy_len <= decoder.alphabet_limit <= 704,
+            budget.work_remaining as int == old(budget).work_remaining as int
+                - initial_planning_work as int - copied as int,
             budget.valid(),
             budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
             budget.work_remaining <= old(budget).work_remaining,
         decreases copy_len - copied,
     {
@@ -25809,38 +27171,58 @@ fn plan_serialized_tree(
         copied += 1;
     }
     let mut consumed = 0usize;
-    let mut planning_work = copy_len as u64;
+    let mut planning_work = initial_planning_work + copy_len as u64;
     let mut execution_work = 0u64;
     let mut iterations = 0u16;
-    while iterations < 2_000
+    while iterations < 5_696
         invariant
             consumed <= input.len(),
-            iterations <= 2_000,
+            iterations <= 5_696,
+            planning_work <= 740 + iterations as u64 * 8192,
+            execution_work <= iterations as u64 * 8192,
+            budget.work_remaining as int == old(budget).work_remaining as int
+                - planning_work as int,
             decoder.valid(),
+            code_rank_aligned(decoder.phase),
+            initial_rank <= 5_695,
+            iterations as nat + code_phase_rank(decoder.phase, decoder.alphabet_limit) <= initial_rank,
             decoder.alphabet_limit <= 704,
             budget.valid(),
             budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
             budget.work_remaining <= old(budget).work_remaining,
-        decreases 2_000 - iterations,
+        decreases 5_696 - iterations,
     {
-        let width = code_description_phase_width_exec(decoder.phase, decoder.alphabet_max);
-        let read_plan = plan_bit_read(decoder.queue, width, input.len() - consumed);
-        if !budget.charge_work(read_plan.work) {
-            return Err(CoreFailure::ResourceLimit);
+        let ghost before_iteration = decoder;
+        execution_work = checked_planned_work_add(execution_work, 18)?;
+        let (step, field_planning, field_reads) = if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+            (CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress }, 0u64, 0u64)
+        } else { plan_code_description_field(&mut decoder, budget, &input[consumed..], end_of_input)? };
+        proof {
+            assert(matches!(before_iteration.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) ==> decoder == before_iteration);
         }
-        planning_work = checked_planned_work_add(planning_work, read_plan.work)?;
-        let step = decoder.advance_field(&input[consumed..], end_of_input);
+        planning_work = checked_planned_work_add(planning_work, field_planning)?;
         if matches!(decoder.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
-            let _ = decoder.advance_field(&[], false);
-            execution_work = checked_planned_work_add(execution_work, 1)?;
-        }
-        if step.consumed != read_plan.consumed {
-            return Err(core_state_failure());
+            let ghost before_start = decoder;
+            let (start_step, start_planning, start_reads) = plan_code_description_field(
+                &mut decoder, budget, &[], false,
+            )?;
+            proof {
+                reveal(code_field_step_refines); reveal(code_transition_holds);
+                assert(start_step.status == CodeDescriptionStatus::Progress);
+                assert(code_phase_rank(decoder.phase, decoder.alphabet_limit)
+                    < code_phase_rank(before_start.phase, before_start.alphabet_limit));
+            }
+            planning_work = checked_planned_work_add(planning_work, start_planning)?;
+            execution_work = checked_planned_work_add(execution_work, start_reads + 1)?;
         }
         consumed += step.consumed;
         execution_work = checked_planned_work_add(
             execution_work,
-            read_plan.work + 10,
+            field_reads + 10,
         )?;
 
         match decoder.phase {
@@ -25909,7 +27291,7 @@ fn plan_serialized_tree(
                     return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
                         status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(error)) });
                 }
-                let (install_planning, install_execution) = plan_canonical_tree_install(
+                let (install_planning, install_execution, install_valid) = plan_canonical_tree_install(
                     &lengths,
                     budget,
                     decoded_symbols,
@@ -25922,6 +27304,11 @@ fn plan_serialized_tree(
                     execution_work,
                     install_execution,
                 )?;
+                if !install_valid {
+                    return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
+                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
+                            crate::brotli_prefix::WorkspaceError::InvalidCodeLength)) });
+                }
                 return Ok(SerializedTreePlan {
                     planning_work,
                     execution_work,
@@ -25942,7 +27329,7 @@ fn plan_serialized_tree(
                     execution_work,
                     code_description_store_writes(decoder.phase) + 1,
                 )?;
-                if step.status == CodeDescriptionStatus::NeedInput {
+                if matches!(step.status, CodeDescriptionStatus::NeedInput) {
                     return Ok(SerializedTreePlan {
                         planning_work,
                         execution_work,
@@ -25952,8 +27339,16 @@ fn plan_serialized_tree(
                 }
             }
         }
+        proof {
+            reveal(code_field_step_refines); reveal(code_transition_holds);
+            assert(!code_phase_terminal(before_iteration.phase));
+            assert(step.status != CodeDescriptionStatus::NeedInput);
+            assert(code_phase_rank(decoder.phase, decoder.alphabet_limit)
+                < code_phase_rank(before_iteration.phase, before_iteration.alphabet_limit));
+        }
         iterations += 1;
     }
+    proof { assert(false); }
     Err(core_state_failure())
 }
 
@@ -25973,6 +27368,13 @@ fn plan_block_tree_action(
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
         final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        r.is_ok() ==> r.unwrap().consumed <= input.len(),
+        r.is_ok() ==> final(budget).work_remaining as int
+            == old(budget).work_remaining as int - r.unwrap().planning_work as int,
 {
     let tree = plan_serialized_tree(
         workspace,
@@ -26138,6 +27540,13 @@ fn plan_tree_group_action(
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
         final(budget).work_remaining <= old(budget).work_remaining,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        r.is_ok() ==> r.unwrap().consumed <= input.len(),
+        r.is_ok() ==> final(budget).work_remaining as int
+            == old(budget).work_remaining as int - r.unwrap().planning_work as int,
 {
     let tree = plan_serialized_tree(
         workspace,
@@ -26328,6 +27737,16 @@ fn execute_fixed_compressed_plan(
     ensures
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        plan.consumed == 0 ==> final(budget).input_remaining == old(budget).input_remaining,
+        old(budget).work_remaining >= plan.execution_work ==>
+            final(budget).work_remaining == old(budget).work_remaining - plan.execution_work,
+        old(budget).work_remaining < plan.execution_work ==> {
+            &&& final(workspace)@ == old(workspace)@
+            &&& *final(budget) == *old(budget)
+        },
         final(budget).work_remaining <= old(budget).work_remaining,
         final(workspace)@.len() == old(workspace)@.len(),
         match r {
@@ -27915,12 +29334,72 @@ fn advance_planned_context_symbol(workspace: &mut [u8], window_bytes: u32,
         before_work - budget.work_remaining)
 }
 
+proof fn mtf_rank_work_extend(values: Seq<u8>, index: int)
+    requires 0 <= index < values.len(),
+    ensures crate::brotli_prefix::mtf_rank_work(values.take(index + 1))
+        == crate::brotli_prefix::mtf_rank_work(values.take(index)) + 2 * values[index] as nat + 6,
+    decreases index,
+{
+    reveal_with_fuel(crate::brotli_prefix::mtf_rank_work, 2);
+    if index > 0 {
+        mtf_rank_work_extend(values.skip(1), index - 1);
+        assert(values.take(index + 1).skip(1) =~= values.skip(1).take(index));
+        assert(values.take(index).skip(1) =~= values.skip(1).take(index - 1));
+    }
+}
+
+proof fn context_value_seen_extend(values: Seq<u8>, index: int, value: nat)
+    requires 0 <= index < values.len(),
+    ensures crate::brotli_prefix::value_seen(values, (index + 1) as nat, value)
+        == (crate::brotli_prefix::value_seen(values, index as nat, value)
+            || values[index] as nat == value),
+{
+    reveal(crate::brotli_prefix::value_seen);
+}
+
 fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
     budget: &mut crate::brotli::RequestBudget, outer_phase: CompressedOuterPhase,
 ) -> (r: Result<CompressedActionPlan, CoreFailure>)
     requires old(budget).valid(),
     ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        r.is_err() ==> (r == Err(CoreFailure::ResourceLimit)
+            || r == Err(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding))),
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
         final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_ok() ==> {
+            &&& r.unwrap().consumed == 0
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().planning_work
+        },
+        r.is_ok() && b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_PHASE) == 7 ==> {
+            let kind = if b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_KIND) == 0 {
+                crate::brotli_prefix::ContextMapKind::Literal
+            } else { crate::brotli_prefix::ContextMapKind::Distance };
+            let len = b3b_scalar_u16_at(workspace@, window_bytes, B3B_MAP_SIZE);
+            &&& r.unwrap().planning_work as nat == len
+            &&& r.unwrap().status.is_none()
+            &&& r.unwrap().execution_work as nat == 4 * (
+                b3b_scalar_byte_at(workspace@, window_bytes, B3B_MTF_UPPER_BOUND) as nat + 1)
+                + crate::brotli_prefix::mtf_rank_work(crate::brotli_prefix::context_map_values(
+                    workspace@, window_bytes, kind, len as u16)) + 3
+        },
+        r.is_ok() && b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_PHASE) == 8 ==> {
+            let kind = if b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_KIND) == 0 {
+                crate::brotli_prefix::ContextMapKind::Literal
+            } else { crate::brotli_prefix::ContextMapKind::Distance };
+            let len = b3b_scalar_u16_at(workspace@, window_bytes, B3B_MAP_SIZE);
+            let trees = b3b_scalar_u16_at(workspace@, window_bytes, B3B_MAP_TREES);
+            let covered = crate::brotli_prefix::context_tree_coverage(
+                crate::brotli_prefix::context_map_values(workspace@, window_bytes, kind, len as u16), trees as u16);
+            &&& r.unwrap().planning_work as nat == len + trees
+            &&& r.unwrap().status == if covered { None } else {
+                Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InvalidFormat(
+                    CompressedFormatError::ContextMapCoverage)))
+            }
+            &&& r.unwrap().execution_work as nat == 32 + 3 * len + trees + if covered { 2nat } else { 5nat }
+        },
 {
     let phase = state_byte(workspace, window_bytes, B3B_CONTEXT_PHASE).map_err(map_compressed_error)?;
     let kind = state_byte(workspace, window_bytes, B3B_CONTEXT_KIND).map_err(map_compressed_error)?;
@@ -27943,12 +29422,32 @@ fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
         let upper = state_byte(workspace, window_bytes, B3B_MTF_UPPER_BOUND).map_err(map_compressed_error)?;
         if upper > 63 { return Err(core_state_failure()); }
         execution_work = 4u64 * (upper as u64 + 1);
+        let context_kind = if kind == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+            else { crate::brotli_prefix::ContextMapKind::Distance };
+        let ghost values = crate::brotli_prefix::context_map_values(workspace@, window_bytes, context_kind, len);
         let mut index = 0u16;
         while index < len
             invariant index <= len <= 16_384,
+                phase == 7,
+                b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_PHASE) == 7,
                 execution_work <= 256 + 516 * index as u64,
                 planning_work == index as u64,
+                values.len() == len,
+                values == crate::brotli_prefix::context_map_values(workspace@, window_bytes, context_kind, len),
+                context_kind == if kind == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+                    else { crate::brotli_prefix::ContextMapKind::Distance },
+                kind == b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_KIND),
+                len as nat == b3b_scalar_u16_at(workspace@, window_bytes, B3B_MAP_SIZE),
+                upper == b3b_scalar_byte_at(workspace@, window_bytes, B3B_MTF_UPPER_BOUND),
+                base as nat == window_bytes as nat + crate::brotli_prefix::context_map_offset(context_kind),
+                execution_work as nat == 4 * (upper as nat + 1)
+                    + crate::brotli_prefix::mtf_rank_work(values.take(index as int)),
                 budget.valid(), budget.limits == old(budget).limits,
+                budget.input_remaining == old(budget).input_remaining,
+                budget.output_remaining == old(budget).output_remaining,
+                budget.calls_remaining == old(budget).calls_remaining,
+                budget.initializations_remaining == old(budget).initializations_remaining,
+                budget.work_remaining == old(budget).work_remaining - planning_work,
                 budget.work_remaining <= old(budget).work_remaining,
             decreases len - index,
         {
@@ -27959,17 +29458,45 @@ fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
             if at >= workspace.len() { return Err(core_state_failure()); }
             let rank = workspace[at];
             if rank as u16 >= trees { return Err(core_state_failure()); }
+            proof {
+                reveal(crate::brotli_prefix::context_map_values);
+                assert(values[index as int] == rank);
+                mtf_rank_work_extend(values, index as int);
+            }
             planning_work += 1;
             execution_work += 2 * rank as u64 + 6;
             index += 1;
         }
+        proof {
+            assert(values.take(len as int) =~= values);
+            assert(planning_work == len as u64);
+            assert(execution_work as nat == 4 * (upper as nat + 1)
+                + crate::brotli_prefix::mtf_rank_work(values));
+        }
         execution_work += 1 + 1 + 1;
+        proof {
+            assert(execution_work as nat == 4 * (upper as nat + 1)
+                + crate::brotli_prefix::mtf_rank_work(values) + 3);
+        }
     } else if phase == 8 {
+        let context_kind = if kind == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+            else { crate::brotli_prefix::ContextMapKind::Distance };
+        let ghost values = crate::brotli_prefix::context_map_values(workspace@, window_bytes, context_kind, len);
         let mut seen = [false; 256];
         let mut index = 0u16;
         while index < len
             invariant index <= len <= 16_384, planning_work == index as u64,
+                values.len() == len,
+                values == crate::brotli_prefix::context_map_values(workspace@, window_bytes, context_kind, len),
+                base as nat == window_bytes as nat + crate::brotli_prefix::context_map_offset(context_kind),
+                forall|tree: int| 0 <= tree < 256 ==> #[trigger] seen@[tree]
+                    == crate::brotli_prefix::value_seen(values, index as nat, tree as nat),
                 budget.valid(), budget.limits == old(budget).limits,
+                budget.input_remaining == old(budget).input_remaining,
+                budget.output_remaining == old(budget).output_remaining,
+                budget.calls_remaining == old(budget).calls_remaining,
+                budget.initializations_remaining == old(budget).initializations_remaining,
+                budget.work_remaining == old(budget).work_remaining - planning_work,
                 budget.work_remaining <= old(budget).work_remaining,
             decreases len - index,
         {
@@ -27980,6 +29507,16 @@ fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
             if at >= workspace.len() { return Err(core_state_failure()); }
             let value = workspace[at];
             if value as u16 >= trees { return Err(core_state_failure()); }
+            proof {
+                reveal(crate::brotli_prefix::context_map_values);
+                assert(values[index as int] == value);
+                assert forall|tree: int| 0 <= tree < 256 implies
+                    #[trigger] crate::brotli_prefix::value_seen(values, index as nat + 1, tree as nat)
+                        == (crate::brotli_prefix::value_seen(values, index as nat, tree as nat)
+                            || value as nat == tree) by {
+                    context_value_seen_extend(values, index as int, tree as nat);
+                }
+            }
             seen[value as usize] = true;
             planning_work += 1;
             index += 1;
@@ -27988,7 +29525,22 @@ fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
         let mut tree = 0u16;
         while tree < trees
             invariant tree <= trees <= 256, planning_work == len as u64 + tree as u64,
+                values == crate::brotli_prefix::context_map_values(workspace@, window_bytes, context_kind, len),
+                values.len() == len,
+                context_kind == if kind == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+                    else { crate::brotli_prefix::ContextMapKind::Distance },
+                kind == b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_KIND),
+                len as nat == b3b_scalar_u16_at(workspace@, window_bytes, B3B_MAP_SIZE),
+                trees as nat == b3b_scalar_u16_at(workspace@, window_bytes, B3B_MAP_TREES),
+                forall|index: int| 0 <= index < 256 ==> #[trigger] seen@[index]
+                    == crate::brotli_prefix::value_seen(values, len as nat, index as nat),
+                covered == (forall|index: int| 0 <= index < tree ==> #[trigger] seen@[index]),
                 budget.valid(), budget.limits == old(budget).limits,
+                budget.input_remaining == old(budget).input_remaining,
+                budget.output_remaining == old(budget).output_remaining,
+                budget.calls_remaining == old(budget).calls_remaining,
+                budget.initializations_remaining == old(budget).initializations_remaining,
+                budget.work_remaining == old(budget).work_remaining - planning_work,
                 budget.work_remaining <= old(budget).work_remaining,
             decreases trees - tree,
         {
@@ -27996,6 +29548,25 @@ fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
             if !seen[tree as usize] { covered = false; }
             planning_work += 1;
             tree += 1;
+        }
+        proof {
+            reveal(crate::brotli_prefix::context_tree_coverage);
+            assert(tree == trees);
+            if covered {
+                assert forall|required: int| 0 <= required < trees implies #[trigger]
+                    crate::brotli_prefix::value_seen(values, values.len(), required as nat) by {
+                    assert(seen@[required]);
+                    assert(crate::brotli_prefix::value_seen(values, len as nat, required as nat));
+                }
+            } else {
+                let missing = choose|required: int| 0 <= required < trees && !seen@[required];
+                assert(!crate::brotli_prefix::value_seen(values, len as nat, missing as nat));
+                if crate::brotli_prefix::context_tree_coverage(values, trees) {
+                    assert(crate::brotli_prefix::value_seen(values, values.len(), missing as nat));
+                    assert(false);
+                }
+            }
+            assert(covered == crate::brotli_prefix::context_tree_coverage(values, trees));
         }
         execution_work = 32 + 3 * len as u64 + trees as u64
             + if covered { 1 + 1 } else { 4 + 1 };
@@ -28023,6 +29594,28 @@ fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
 }
 
 
+spec fn context_tail_planning_units(before: Seq<u8>, window_bytes: u32) -> nat {
+    let len = b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE);
+    if b3b_scalar_byte_at(before, window_bytes, B3B_CONTEXT_PHASE) == 7 { len }
+    else { len + b3b_scalar_u16_at(before, window_bytes, B3B_MAP_TREES) }
+}
+
+spec fn context_tail_execution_units(before: Seq<u8>, window_bytes: u32) -> nat {
+    let kind = if b3b_scalar_byte_at(before, window_bytes, B3B_CONTEXT_KIND) == 0 {
+        crate::brotli_prefix::ContextMapKind::Literal
+    } else { crate::brotli_prefix::ContextMapKind::Distance };
+    let len = b3b_scalar_u16_at(before, window_bytes, B3B_MAP_SIZE);
+    let trees = b3b_scalar_u16_at(before, window_bytes, B3B_MAP_TREES);
+    let values = crate::brotli_prefix::context_map_values(before, window_bytes, kind, len as u16);
+    if b3b_scalar_byte_at(before, window_bytes, B3B_CONTEXT_PHASE) == 7 {
+        4 * (b3b_scalar_byte_at(before, window_bytes, B3B_MTF_UPPER_BOUND) as nat + 1)
+            + crate::brotli_prefix::mtf_rank_work(values) + 3
+    } else {
+        32 + 3 * len + trees
+            + if crate::brotli_prefix::context_tree_coverage(values, trees as u16) { 2nat } else { 5nat }
+    }
+}
+
 fn advance_planned_context_map_tail(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -28045,8 +29638,22 @@ fn advance_planned_context_map_tail(
             B3B_CONTEXT_PHASE,
         ) <= 9,
     ensures
+        7 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE) <= 8 ==> {
+            &&& (r == Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }) ==>
+                    final(workspace)@ == old(workspace)@)
+            &&& (r == Ok(0) || r == Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::ContextMap)) }) ==>
+                    (old(budget).work_remaining - final(budget).work_remaining) as nat
+                        == context_tail_planning_units(old(workspace)@, window_bytes)
+                            + context_tail_execution_units(old(workspace)@, window_bytes))
+        },
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
         final(budget).work_remaining <= old(budget).work_remaining,
         final(workspace)@.len() == old(workspace)@.len(),
         match r {
@@ -32608,6 +34215,503 @@ mod tests {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_mtf_and_coverage_tail_match_w1_with_exact_and_short_work() {
+        use crate::brotli_prefix::ContextMapKind;
+        for kind in [ContextMapKind::Literal, ContextMapKind::Distance] {
+            let outer = if kind == ContextMapKind::Literal {
+                CompressedOuterPhase::LiteralContextMap
+            } else {
+                CompressedOuterPhase::DistanceContextMap
+            };
+            let tag = if kind == ContextMapKind::Literal {
+                6
+            } else {
+                7
+            };
+            let maximum = if kind == ContextMapKind::Literal {
+                16_384usize
+            } else {
+                1_024usize
+            };
+            for len in [2usize, 64, maximum] {
+                for pattern in 0..3 {
+                    let values: Vec<u8> = (0..len)
+                        .map(|i| match pattern {
+                            0 => 0,
+                            1 => 1,
+                            _ => (i % 2) as u8,
+                        })
+                        .collect();
+                    for phase in [7u8, 8] {
+                        let (mut original, window) = fresh_b3b_workspace();
+                        put_state_byte(&mut original, window, B3B_OUTER_PHASE, tag).unwrap();
+                        write_context_values(&mut original, window, kind, &values, 2);
+                        put_state_byte(&mut original, window, B3B_CONTEXT_PHASE, phase).unwrap();
+                        let mut reference = original.clone();
+                        let expected = if phase == 7 {
+                            advance_context_mtf_phase(&mut reference, window, kind, len as u16)
+                        } else {
+                            advance_context_coverage_phase(&mut reference, window, kind, len as u16)
+                        };
+                        let expected = match expected {
+                            Ok(()) => Ok(0),
+                            Err(error) => {
+                                store_terminal_error(&mut reference, window, error).unwrap();
+                                Err(CompressedStep {
+                                    consumed: 0,
+                                    status: CompressedStatus::Failed(map_compressed_error(error)),
+                                })
+                            }
+                        };
+                        let planning = len as u64 + if phase == 8 { 2 } else { 0 };
+                        let execution = if phase == 7 {
+                            256 + values
+                                .iter()
+                                .map(|value| 2 * *value as u64 + 6)
+                                .sum::<u64>()
+                                + 3
+                        } else {
+                            32 + 3 * len as u64 + 2 + if pattern == 2 { 2 } else { 5 }
+                        };
+                        for short in [false, true] {
+                            let mut actual = original.clone();
+                            let mut budget =
+                                crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                                    max_input: 7,
+                                    max_output: 9,
+                                    max_work: planning + execution - u64::from(short),
+                                    max_calls: 11,
+                                    max_initializations: 13,
+                                    max_window_bits: 16,
+                                })
+                                .unwrap();
+                            let result = advance_planned_context_map_tail(
+                                &mut actual,
+                                window,
+                                &mut budget,
+                                outer,
+                                &[],
+                                false,
+                            );
+                            if short {
+                                assert_eq!(
+                                    result,
+                                    Err(CompressedStep {
+                                        consumed: 0,
+                                        status: CompressedStatus::Failed(
+                                            CoreFailure::ResourceLimit
+                                        )
+                                    })
+                                );
+                                assert_eq!(actual, original);
+                                assert_eq!(budget.work_remaining, execution - 1);
+                            } else {
+                                assert_eq!(result, expected);
+                                assert_eq!(actual, reference);
+                                assert_eq!(budget.work_remaining, 0);
+                            }
+                            assert_eq!(
+                                (
+                                    budget.input_remaining,
+                                    budget.output_remaining,
+                                    budget.calls_remaining,
+                                    budget.initializations_remaining
+                                ),
+                                (7, 9, 11, 13)
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_complex_tree_drains_implicit_trailing_zeros_before_install() {
+        use crate::brotli_prefix::TreeRegion;
+        let mut bits = vec![0u8, 0];
+        push_auxiliary_code_lengths(&mut bits, &[(0, 5), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]);
+        bits.extend([0, 0]); // Two length-one symbols fill the code space.
+        let input = pack_lsb_bits(&bits);
+        let (mut actual, window) = fresh_b3b_workspace();
+        start_serialized_tree(&mut actual, window, TreeRegion::Command, 0, 704, 704).unwrap();
+        let original = actual.clone();
+        let result = advance_serialized_tree(&mut actual, window, &input, true);
+        assert_eq!(
+            result.status,
+            SerializedTreeStatus::Complete,
+            "initialized={:?}, phase={:?}",
+            state_u16(&actual, window, B3B_BUILDER_INITIALIZED),
+            state_byte(&actual, window, B3B_CODE_PHASE)
+        );
+        let base = window as usize + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as usize;
+        assert_eq!(&actual[base..base + 2], &[1, 1]);
+        assert!(actual[base + 2..base + 704].iter().all(|value| *value == 0));
+        let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+            max_input: u64::MAX,
+            max_output: 0,
+            max_work: u64::MAX,
+            max_calls: 0,
+            max_initializations: 0,
+            max_window_bits: 16,
+        })
+        .unwrap();
+        let plan = plan_serialized_tree(&original, window, &mut budget, &input, true).unwrap();
+        assert_eq!(
+            (plan.consumed, plan.status),
+            (result.consumed, result.status)
+        );
+    }
+
+    #[test]
+    fn m1_maximum_alphabet_accepts_valid_long_direct_zero_descriptions() {
+        use crate::brotli_prefix::TreeRegion;
+        let mut bits = vec![0u8, 0];
+        // Complete auxiliary alphabet: weights 16 + 8 + 4 + 2 + 1 + 1.
+        // Symbol zero deliberately has a five-bit code; repetition is optional.
+        push_auxiliary_code_lengths(&mut bits, &[(0, 5), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]);
+        bits.push(0); // First final length is one.
+        for _ in 1..703 {
+            push_bits(&mut bits, 15, 5);
+        }
+        bits.push(0); // Last final length is one: exact complete code space.
+        let input = pack_lsb_bits(&bits);
+        let (mut workspace, window) = fresh_b3b_workspace();
+        start_serialized_tree(&mut workspace, window, TreeRegion::Command, 0, 704, 704).unwrap();
+        let original = workspace.clone();
+        let mut chunked = original.clone();
+        let mut chunked_status = SerializedTreeStatus::NeedInput;
+        for at in 0..input.len() {
+            let part = advance_serialized_tree(
+                &mut chunked,
+                window,
+                &input[at..at + 1],
+                at + 1 == input.len(),
+            );
+            chunked_status = part.status;
+            if chunked_status != SerializedTreeStatus::NeedInput {
+                break;
+            }
+        }
+        assert_eq!(
+            chunked_status,
+            SerializedTreeStatus::Complete,
+            "one-byte chunks must install the same valid 704-symbol tree"
+        );
+        let result = advance_serialized_tree(&mut workspace, window, &input, true);
+        assert_eq!(result.status, SerializedTreeStatus::Complete,
+            "whole consumed={}/{}; code phase={:?}; final symbol={:?}; initialized={:?}; prefix width={:?}; byte chunks={:?}",
+            result.consumed, input.len(), state_byte(&workspace, window, B3B_CODE_PHASE),
+            state_u16(&workspace, window, B3B_FINAL_SYMBOL), state_u16(&workspace, window, B3B_BUILDER_INITIALIZED),
+            state_byte(&workspace, window, B3B_FINAL_PREFIX_WIDTH), chunked_status);
+        let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+            max_input: u64::MAX,
+            max_output: 0,
+            max_work: u64::MAX,
+            max_calls: 0,
+            max_initializations: 0,
+            max_window_bits: 16,
+        })
+        .unwrap();
+        let plan = plan_serialized_tree(&original, window, &mut budget, &input, true).unwrap();
+        assert_eq!(
+            (plan.consumed, plan.status),
+            (result.consumed, result.status)
+        );
+        let base = window as usize + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as usize;
+        assert_eq!(workspace[base], 1);
+        assert_eq!(workspace[base + 703], 1);
+        assert!(workspace[base + 1..base + 703]
+            .iter()
+            .all(|value| *value == 0));
+    }
+
+    #[test]
+    fn m1_saved_auxiliary_loads_charge_exactly_the_inspected_prefix() {
+        use crate::brotli_prefix::{ContextMapKind, TreeRegion};
+        for bad in [None, Some(0usize), Some(5), Some(17)] {
+            let (mut workspace, window) = fresh_b3b_workspace();
+            put_state_byte(&mut workspace, window, B3B_OUTER_PHASE, 6).unwrap();
+            start_context_map(&mut workspace, window, ContextMapKind::Literal, 4).unwrap();
+            put_state_u16(&mut workspace, window, B3B_MAP_TREES, 2).unwrap();
+            start_serialized_tree(
+                &mut workspace,
+                window,
+                TreeRegion::TemporaryContext,
+                0,
+                2,
+                2,
+            )
+            .unwrap();
+            store_context_phase(&mut workspace, window, 3).unwrap();
+            if let Some(index) = bad {
+                put_state_byte(&mut workspace, window, B3B_AUX_LENGTHS + index as u16, 6).unwrap();
+            }
+            let expected_reads = bad.map_or(18u64, |index| index as u64 + 1);
+            for credit in 0..=expected_reads {
+                let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                    max_input: 7,
+                    max_output: 9,
+                    max_work: credit,
+                    max_calls: 11,
+                    max_initializations: 13,
+                    max_window_bits: 16,
+                })
+                .unwrap();
+                let result = plan_saved_aux_load(&workspace, window, &mut budget);
+                assert_eq!(
+                    result,
+                    if credit == expected_reads {
+                        Ok(expected_reads)
+                    } else {
+                        Err(CoreFailure::ResourceLimit)
+                    }
+                );
+                assert_eq!(budget.work_remaining, 0);
+                assert_eq!(
+                    (
+                        budget.input_remaining,
+                        budget.output_remaining,
+                        budget.calls_remaining,
+                        budget.initializations_remaining
+                    ),
+                    (7, 9, 11, 13)
+                );
+            }
+            if bad.is_some() {
+                let mut reference = workspace.clone();
+                let expected = advance_serialized_tree(&mut reference, window, &[], false);
+                let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                    max_input: 0,
+                    max_output: 0,
+                    max_work: u64::MAX,
+                    max_calls: 0,
+                    max_initializations: 0,
+                    max_window_bits: 16,
+                })
+                .unwrap();
+                let plan =
+                    plan_serialized_tree(&workspace, window, &mut budget, &[], false).unwrap();
+                assert_eq!(
+                    (plan.consumed, plan.status),
+                    (expected.consumed, expected.status)
+                );
+                assert_eq!(plan.planning_work, 2 * expected_reads);
+                assert_eq!(plan.execution_work, expected_reads);
+                assert_eq!(u64::MAX - budget.work_remaining, 2 * expected_reads);
+                store_terminal_error(&mut reference, window, CompressedHeaderError::InternalState)
+                    .unwrap();
+                for short in [false, true] {
+                    let mut actual = workspace.clone();
+                    let mut request =
+                        crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                            max_input: 0,
+                            max_output: 0,
+                            max_work: 3 * expected_reads + 5 - u64::from(short),
+                            max_calls: 0,
+                            max_initializations: 0,
+                            max_window_bits: 16,
+                        })
+                        .unwrap();
+                    let result =
+                        advance_planned_context_tree(&mut actual, window, &mut request, &[], false);
+                    if short {
+                        assert_eq!(
+                            result,
+                            Err(CompressedStep {
+                                consumed: 0,
+                                status: CompressedStatus::Failed(CoreFailure::ResourceLimit)
+                            })
+                        );
+                        assert_eq!(actual, workspace);
+                        assert_eq!(request.work_remaining, expected_reads + 4);
+                    } else {
+                        assert_eq!(
+                            result,
+                            Err(CompressedStep {
+                                consumed: 0,
+                                status: CompressedStatus::Failed(core_state_failure())
+                            })
+                        );
+                        assert_eq!(actual, reference);
+                        assert_eq!(request.work_remaining, 0);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_canonical_builder_errors_preserve_w1_status_and_images() {
+        use crate::brotli_prefix::{ContextMapKind, TreeRegion};
+        for lengths in [vec![16u8, 1], vec![1, 1, 1], vec![0, 0], vec![1, 0]] {
+            let symbols = lengths.len() as u16;
+            let (mut original, window) = fresh_b3b_workspace();
+            put_state_byte(&mut original, window, B3B_OUTER_PHASE, 6).unwrap();
+            start_context_map(&mut original, window, ContextMapKind::Literal, 4).unwrap();
+            put_state_u16(&mut original, window, B3B_MAP_TREES, symbols).unwrap();
+            start_serialized_tree(
+                &mut original,
+                window,
+                TreeRegion::TemporaryContext,
+                0,
+                symbols,
+                symbols,
+            )
+            .unwrap();
+            store_context_phase(&mut original, window, 3).unwrap();
+            let mut auxiliary = [0u8; 18];
+            auxiliary[..4].fill(2);
+            store_code_description_decoder(
+                &mut original,
+                window,
+                CodeDescriptionDecoder {
+                    queue: BitQueue::new(),
+                    alphabet_max: symbols,
+                    alphabet_limit: symbols,
+                    phase: CodeDescriptionPhase::CompleteComplex {
+                        code: ComplexCodeLengthAlphabet {
+                            skip: 0,
+                            lengths: auxiliary,
+                        },
+                        decoded_symbols: symbols,
+                    },
+                },
+            )
+            .unwrap();
+            put_state_byte(&mut original, window, B3B_PREVIOUS_LENGTH, 8).unwrap();
+            put_state_u16(&mut original, window, B3B_BUILDER_INITIALIZED, symbols).unwrap();
+            let base = window as usize + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as usize;
+            original[base..base + lengths.len()].copy_from_slice(&lengths);
+            let mut reference = original.clone();
+            let step = advance_serialized_tree(&mut reference, window, &[], false);
+            assert_eq!(step.consumed, 0);
+            assert_eq!(
+                step.status,
+                SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
+                    crate::brotli_prefix::WorkspaceError::InvalidCodeLength
+                ))
+            );
+            store_terminal_error(
+                &mut reference,
+                window,
+                CompressedHeaderError::Workspace(
+                    crate::brotli_prefix::WorkspaceError::InvalidCodeLength,
+                ),
+            )
+            .unwrap();
+            let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: 0,
+                max_output: 0,
+                max_work: u64::MAX,
+                max_calls: 0,
+                max_initializations: 0,
+                max_window_bits: 16,
+            })
+            .unwrap();
+            let plan = plan_serialized_tree(&original, window, &mut budget, &[], false).unwrap();
+            assert_eq!((plan.consumed, plan.status), (step.consumed, step.status));
+            let mut actual = original;
+            let actual_step =
+                advance_planned_context_tree(&mut actual, window, &mut budget, &[], false);
+            assert_eq!(
+                actual_step,
+                Err(CompressedStep {
+                    consumed: 0,
+                    status: CompressedStatus::Failed(map_compressed_error(
+                        CompressedHeaderError::Workspace(
+                            crate::brotli_prefix::WorkspaceError::InvalidCodeLength
+                        )
+                    ))
+                })
+            );
+            assert_eq!(actual, reference);
+        }
+    }
+
+    #[test]
+    fn m1_auxiliary_lookup_prepays_each_cell_and_matches_small_canonical_codes() {
+        let mut lengths = [0u8; 18];
+        lengths[..4].fill(2);
+        let code = ComplexCodeLengthAlphabet { skip: 0, lengths };
+        for (bits, symbol, expected_reads) in [(0, 0, 20u64), (2, 1, 41), (1, 2, 63), (3, 3, 86)] {
+            for credit in 0..=expected_reads {
+                let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                    max_input: 0,
+                    max_output: 0,
+                    max_work: credit,
+                    max_calls: 0,
+                    max_initializations: 0,
+                    max_window_bits: 16,
+                })
+                .unwrap();
+                let result = decode_auxiliary_symbol_metered(&code, bits, 2, &mut budget);
+                if credit == expected_reads {
+                    assert_eq!(result, Ok((Some(symbol), expected_reads)));
+                } else {
+                    assert_eq!(result, Err(CoreFailure::ResourceLimit));
+                }
+                assert_eq!(budget.work_remaining, 0);
+                assert_eq!(budget.input_remaining, 0);
+                assert_eq!(budget.output_remaining, 0);
+                assert_eq!(budget.calls_remaining, 0);
+                assert_eq!(budget.initializations_remaining, 0);
+            }
+        }
+    }
+
+    #[test]
+    fn m1_auxiliary_completion_reserves_both_scans_before_advancing_local_state() {
+        let mut lengths = [0u8; 18];
+        lengths[..4].fill(2);
+        let original = CodeDescriptionDecoder {
+            queue: BitQueue::new(),
+            alphabet_max: 2,
+            alphabet_limit: 2,
+            phase: CodeDescriptionPhase::CompleteComplexAlphabet(ComplexCodeLengthAlphabet {
+                skip: 0,
+                lengths,
+            }),
+        };
+        for credit in [17u64, 18, 35, 36] {
+            let mut decoder = original;
+            let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+                max_input: 0,
+                max_output: 0,
+                max_work: credit,
+                max_calls: 0,
+                max_initializations: 0,
+                max_window_bits: 16,
+            })
+            .unwrap();
+            let result = plan_code_description_field(&mut decoder, &mut budget, &[], false);
+            if credit == 36 {
+                let (step, planning, replay) = result.unwrap();
+                assert_eq!(
+                    step,
+                    CodeDescriptionStep {
+                        consumed: 0,
+                        status: CodeDescriptionStatus::Progress
+                    }
+                );
+                assert_eq!((planning, replay), (36, 18));
+                assert!(matches!(
+                    decoder.phase,
+                    CodeDescriptionPhase::ComplexSymbol(_)
+                ));
+                assert_eq!(budget.work_remaining, 0);
+            } else {
+                assert_eq!(result, Err(CoreFailure::ResourceLimit));
+                assert_eq!(decoder.phase, original.phase);
+                assert_eq!(decoder.queue.pending, original.queue.pending);
+                assert_eq!(decoder.queue.len, original.queue.len);
+                assert_eq!(decoder.queue.offset, original.queue.offset);
+                assert_eq!(budget.work_remaining, credit.saturating_sub(18));
             }
         }
     }

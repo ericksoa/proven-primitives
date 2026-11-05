@@ -2,38 +2,59 @@ verification results:: 2 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (50108,13): 'if' cannot be used in patterns.
-WARNING: (54257,5): 'if' cannot be used in patterns.
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-53825/src/brotli_input.rs:3825:21
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-11858/src/brotli_input.rs:4555:21
      |
-3825 |                     while i < index as usize
+4555 |                     while i < index as usize
      |                     ^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-53825/src/brotli_input.rs:3996:33
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-11858/src/brotli_input.rs:4726:33
      |
-3996 | ...                   assert(0u8 < (1u8 << 0)) by (bit_vector);
+4726 | ...                   assert(0u8 < (1u8 << 0)) by (bit_vector);
      |                       ^^^^^^
 
-note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-53825/src/brotli_input.rs:3530:5
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-11858/src/brotli_input.rs:4258:5
      |
-3530 | /     fn advance_field(
-3531 | |         &mut self,
-3532 | |         input: &[u8],
-3533 | |         end_of_input: bool,
-3534 | |     ) -> (r: CodeDescriptionStep)
+4258 | /     fn advance_field(
+4259 | |         &mut self,
+4260 | |         input: &[u8],
+4261 | |         end_of_input: bool,
+4262 | |     ) -> (r: CodeDescriptionStep)
+     | |________________________________^
+
+note: function body check finished in 2 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-11858/src/brotli_input.rs:4258:5
+     |
+4258 | /     fn advance_field(
+4259 | |         &mut self,
+4260 | |         input: &[u8],
+4261 | |         end_of_input: bool,
+4262 | |     ) -> (r: CodeDescriptionStep)
      | |________________________________^
 
 error: postcondition not satisfied
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-53825/src/brotli_input.rs:3537:13
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-11858/src/brotli_input.rs:4265:13
      |
-3537 |             code_field_step_refines(*old(self), input@, end_of_input, *final(self), r),
+4265 |             code_field_step_refines(*old(self), input@, end_of_input, *final(self), r),
      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
 ...
-4119 |         CodeDescriptionStep { consumed: read.consumed, status }
+4849 |         CodeDescriptionStep { consumed: read.consumed, status }
      |         ------------------------------------------------------- at the end of the function body
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-11858/src/brotli_input.rs:4258:5
+     |
+4258 | /     fn advance_field(
+4259 | |         &mut self,
+4260 | |         input: &[u8],
+4261 | |         end_of_input: bool,
+4262 | |     ) -> (r: CodeDescriptionStep)
+     | |________________________________^
 
 error: aborting due to 1 previous error
 

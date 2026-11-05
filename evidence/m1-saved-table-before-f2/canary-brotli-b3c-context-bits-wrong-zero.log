@@ -1,0 +1,69 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51051,13): 'if' cannot be used in patterns.
+WARNING: (55767,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:17160:29
+      |
+17160 | ...                   while initialized < target
+      |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: precondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:17259:37
+      |
+ 8624 | /         after == before.update(
+ 8625 | |             crate::brotli_prefix::context_entry_at(window_bytes, kind, initialized) as int,
+ 8626 | |             value,
+ 8627 | |         ),
+      | |_________- failed precondition
+...
+17259 | /                                     context_map_update_extends_valid_prefix(
+17260 | |                                         before_entry,
+17261 | |                                         workspace@,
+17262 | |                                         window_bytes,
+...     |
+17266 | |                                         num_trees,
+17267 | |                                     );
+      | |_____________________________________^
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:16783:1
+      |
+16783 | / fn advance_context_bits_phase(
+16784 | |     workspace: &mut [u8],
+16785 | |     window_bytes: u32,
+16786 | |     phase: u8,
+...     |
+16791 | |     end_of_input: bool,
+16792 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+      | |______________________________________________^
+
+note: function body check finished in 11 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:16783:1
+      |
+16783 | / fn advance_context_bits_phase(
+16784 | |     workspace: &mut [u8],
+16785 | |     window_bytes: u32,
+16786 | |     phase: u8,
+...     |
+16791 | |     end_of_input: bool,
+16792 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+      | |______________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-63611/src/brotli_input.rs:16783:1
+      |
+16783 | / fn advance_context_bits_phase(
+16784 | |     workspace: &mut [u8],
+16785 | |     window_bytes: u32,
+16786 | |     phase: u8,
+...     |
+16791 | |     end_of_input: bool,
+16792 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+      | |______________________________________________^
+
+error: aborting due to 1 previous error
+

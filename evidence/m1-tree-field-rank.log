@@ -1,0 +1,13 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (50943,13): 'if' cannot be used in patterns.
+WARNING: (55659,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26735:1
+      |
+26735 | / fn plan_code_description_field(decoder: &mut CodeDescriptionDecoder,
+26736 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+26737 | | ) -> (r: Result<(CodeDescriptionStep, u64, u64), CoreFailure>)
+      | |_____________________________________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

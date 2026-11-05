@@ -1,0 +1,37 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51338,13): 'if' cannot be used in patterns.
+WARNING: (56054,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-87327/src/brotli_input.rs:2167:5
+     |
+2167 |     while i < 18
+     |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-87327/src/brotli_input.rs:2151:1
+     |
+2151 | / fn decode_auxiliary_symbol(
+2152 | |     code: &ComplexCodeLengthAlphabet,
+2153 | |     bits: u8,
+2154 | |     width: u8,
+2155 | | ) -> (r: Option<u8>)
+     | |___________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-87327/src/brotli_input.rs:2158:9
+     |
+2158 | /         r.is_some() ==> {
+2159 | |             &&& r.unwrap() < 18
+2160 | |             &&& auxiliary_symbol_match(*code, bits, width, r.unwrap())
+2161 | |             &&& forall|earlier: u8| earlier < r.unwrap() ==> !auxiliary_symbol_match(*code, bits, width, earlier)
+2162 | |         },
+     | |_________^ failed this postcondition
+...
+2183 |                       return Some(i as u8);
+     |                       -------------------- at this exit
+
+error: aborting due to 1 previous error
+

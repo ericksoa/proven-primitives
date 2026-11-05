@@ -4137,6 +4137,11 @@ mod tests {
                 include_bytes!("../tests/fixtures/brotli/corpus/compression.compressed").as_slice(),
                 include_bytes!("../tests/fixtures/brotli/corpus/compression").as_slice(),
             ),
+            (
+                include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated.compressed")
+                    .as_slice(),
+                include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated").as_slice(),
+            ),
         ] {
             for split in 1..compressed.len() {
                 let mut budget = RequestBudget::new(RequestLimits {
@@ -4504,33 +4509,45 @@ mod tests {
     }
 
     #[test]
-    fn pinned_native_missing_coverage_fixtures_are_strictly_rejected() {
-        for (compressed, input_chunk, output_chunk) in [
-            (
-                include_bytes!("../tests/fixtures/brotli/corpus/monkey.compressed").as_slice(),
-                7usize,
-                31usize,
-            ),
-            (
-                include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated.compressed")
-                    .as_slice(),
-                1usize,
-                257usize,
-            ),
-        ] {
-            let (status, output) = decode_fixture(compressed, input_chunk, output_chunk);
-            assert_eq!(status, Status::Failed(StreamError::InvalidFormat));
-            assert!(output.is_empty());
+    fn pinned_native_quickfox_decodes_after_pending_span_drain() {
+        let compressed =
+            include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated.compressed");
+        let expected = include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated");
+        for input_chunk in [1usize, 7, compressed.len()] {
+            for output_chunk in [1usize, 31, expected.len(), expected.len() + 7] {
+                let (status, output) = decode_fixture(compressed, input_chunk, output_chunk);
+                assert_eq!(
+                    status,
+                    Status::Finished,
+                    "input={input_chunk} output={output_chunk}"
+                );
+                assert_eq!(
+                    output, expected,
+                    "input={input_chunk} output={output_chunk}"
+                );
+            }
         }
     }
 
     #[test]
-    fn pinned_native_strict_rejections_are_sticky() {
-        for compressed in [
-            include_bytes!("../tests/fixtures/brotli/corpus/monkey.compressed").as_slice(),
-            include_bytes!("../tests/fixtures/brotli/corpus/quickfox_repeated.compressed")
-                .as_slice(),
-        ] {
+    fn pinned_native_monkey_rejection_has_zero_output() {
+        // F2 retains this checkpoint's rejection. Native accepts these bytes;
+        // ContextMapRepeat is an unresolved disagreement, not a coverage case.
+        let compressed = include_bytes!("../tests/fixtures/brotli/corpus/monkey.compressed");
+        for input_chunk in [1usize, 7, compressed.len()] {
+            for output_chunk in [1usize, 31, 843] {
+                let (status, output) = decode_fixture(compressed, input_chunk, output_chunk);
+                assert_eq!(status, Status::Failed(StreamError::InvalidFormat));
+                assert!(output.is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn pinned_native_monkey_rejection_is_sticky() {
+        for compressed in
+            [include_bytes!("../tests/fixtures/brotli/corpus/monkey.compressed").as_slice()]
+        {
             let mut budget = RequestBudget::new(RequestLimits {
                 max_input: compressed.len() as u64 + 1,
                 max_output: 1_000_000,
