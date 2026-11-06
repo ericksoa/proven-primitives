@@ -2,21 +2,21 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-12906/src/brotli_input.rs:26679:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-41752/src/brotli_input.rs:26938:1
       |
-26679 | fn simple_tree_install_work(alphabet: u16, selector: u8) -> (r: u64)
+26938 | fn simple_tree_install_work(alphabet: u16, selector: u8) -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-12906/src/brotli_input.rs:26681:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-41752/src/brotli_input.rs:26940:13
       |
-26681 |     ensures r as nat == if selector == 0 { 5nat } else { 3 * alphabet as nat + 5 },
+26940 |     ensures r as nat == if selector == 0 { 5nat } else { 3 * alphabet as nat + 5 },
       |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
-26682 | {
-26683 |     if selector == 0 { 4 } else { 3 * alphabet as u64 + 5 }
+26941 | {
+26942 |     if selector == 0 { 4 } else { 3 * alphabet as u64 + 5 }
       |     ------------------------------------------------------- at the end of the function body
 
 error: aborting due to 1 previous error

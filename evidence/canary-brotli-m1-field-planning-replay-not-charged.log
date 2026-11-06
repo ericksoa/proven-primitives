@@ -2,34 +2,34 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-7447/src/brotli_input.rs:26990:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-38854/src/brotli_input.rs:27249:1
       |
-26990 | / fn plan_code_description_field(decoder: &mut CodeDescriptionDecoder,
-26991 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
-26992 | | ) -> (r: Result<(CodeDescriptionStep, u64, u64), CoreFailure>)
+27249 | / fn plan_code_description_field(decoder: &mut CodeDescriptionDecoder,
+27250 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+27251 | | ) -> (r: Result<(CodeDescriptionStep, u64, u64), CoreFailure>)
       | |_____________________________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-7447/src/brotli_input.rs:27014:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-38854/src/brotli_input.rs:27273:9
       |
-27014 | /         r.is_ok() ==> {
-27015 | |             &&& r.unwrap().0.consumed <= input.len()
-27016 | |             &&& code_field_step_refines(*old(decoder), input@, end_of_input, *final(decoder), r.unwrap().0)
-27017 | |             &&& r.unwrap().2 as nat == code_field_total_read_units(*old(decoder), input@, r.unwrap().0.consumed)
+27273 | /         r.is_ok() ==> {
+27274 | |             &&& r.unwrap().0.consumed <= input.len()
+27275 | |             &&& code_field_step_refines(*old(decoder), input@, end_of_input, *final(decoder), r.unwrap().0)
+27276 | |             &&& r.unwrap().2 as nat == code_field_total_read_units(*old(decoder), input@, r.unwrap().0.consumed)
 ...     |
-27020 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
-27021 | |         },
+27279 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
+27280 | |         },
       | |_________^ failed this postcondition
-27022 | / {
-27023 | |     let before_work = budget.work_remaining;
-27024 | |     let ghost start = *decoder;
-27025 | |     let width = code_description_phase_width_exec(decoder.phase, decoder.alphabet_max);
+27281 | / {
+27282 | |     let before_work = budget.work_remaining;
+27283 | |     let ghost start = *decoder;
+27284 | |     let width = code_description_phase_width_exec(decoder.phase, decoder.alphabet_max);
 ...     |
-27068 | |     Ok((step, before_work - budget.work_remaining, replay_work))
-27069 | | }
+27327 | |     Ok((step, before_work - budget.work_remaining, replay_work))
+27328 | | }
       | |_- at the end of the function body
 
 error: aborting due to 1 previous error

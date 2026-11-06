@@ -1,0 +1,57 @@
+from pathlib import Path
+import json,hashlib,datetime,os,subprocess,time,shutil
+root=Path('/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next');os.chdir(root)
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools')
+status=Path('/tmp/m1-block-count-publication-status.json');expected=json.loads(Path('evidence/m1-block-count-source-start.json').read_text())
+def state(value,**kw):
+ status.write_text(json.dumps(dict(status=value,updated_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),**kw),indent=2)+'\n');print(value,flush=True)
+def run(args):return subprocess.check_output(args,env=env,text=True).strip()
+try:
+ state('waiting_for_block_count_verification_and_controls')
+ while True:
+  p=Path('evidence/m1-block-count-source-freeze.json')
+  if p.exists():
+   f=json.loads(p.read_text())
+   if f['started_utc']==expected['started_utc']:
+    assert f['exit_code']==0 and f['source_unchanged'],'Whole-crate verification failed or source changed'
+    break
+  time.sleep(1)
+ while True:
+  p=Path('evidence/m1-block-count-validation-continuation.json')
+  if p.exists():
+   result=json.loads(p.read_text())
+   assert result['status'] not in ['controls_failed','stopped_without_positive'],'Defect controls failed'
+   if result['status']=='controls_passed':break
+  time.sleep(1)
+ assert all(hashlib.sha256(Path(p).read_bytes()).hexdigest()==h for p,h in expected['source_sha256'].items()),'Source changed'
+ assert run(['git','rev-parse','HEAD'])=='d6b6e23a52e3e19e268ecb19ae644c78bc79779b','Unexpected branch head'
+ assert run(['git','branch','--show-current'])=='codex/m1-saved-table-ledger'
+ v=json.loads(Path('evidence/brotli-b3c-m1-block-count-verification.json').read_text())['verification-results']
+ report=Path('BROTLI_B3C_METERING_ADDENDUM.md')
+ note=('\n### Final block-count-source validation\n\nThe unchanged source passed '+str(v['verified'])+' whole-crate checks with zero errors. All 96 release tests passed, followed by 124 semantic defect rejections across 20 suites. Exact source, harness, approvals, tool, compiled-artifact and transcript hashes are bound in `evidence/brotli-b3c-m1-block-count.json`. Full M1 and decoder release obligations remain open, and K1 remains held for human review.\n')
+ if '### Final block-count-source validation' not in report.read_text():report.write_text(report.read_text()+note)
+ else:assert note in report.read_text()
+ state('finalizing_block_count_evidence',verified=v['verified'])
+ shutil.copyfile('/tmp/m1_block_count_publish_when_validated.py','evidence/m1-block-count-publish-driver.py.txt')
+ subprocess.run(['python3','/tmp/m1_block_count_finalize.py'],env=env,check=True)
+ m=json.loads(Path('evidence/brotli-b3c-m1-block-count.json').read_text())
+ paths=set(m['artifact_sha256'])|set(m['approval_and_document_sha256'])|set(m['source_sha256'])|set(m['validation_source_sha256'])|{'evidence/brotli-b3c-m1-block-count.json'}
+ for p in run(['git','diff','--name-only']).splitlines():
+  assert p in paths or p.startswith('evidence/canary-') or p.startswith('evidence/positive-'),('Unexpected tracked change',p)
+  paths.add(p)
+ subprocess.run(['git','add','-f','--',*sorted(paths)],env=env,check=True)
+ subprocess.run(['git','diff','--cached','--check','--','.',':(exclude)evidence'],env=env,check=True)
+ state('committing_block_count_checkpoint')
+ subprocess.run(['git','commit','-m','Prove Brotli M1 block-count planning and execution agreement'],env=env,check=True)
+ commit=run(['git','rev-parse','HEAD']);state('pushing_block_count_checkpoint',commit=commit)
+ subprocess.run(['git','push','origin','codex/m1-saved-table-ledger'],env=env,check=True)
+ assert run(['git','ls-remote','--heads','origin','codex/m1-saved-table-ledger']).split()[0]==commit
+ for _ in range(5):
+  response=json.loads(run(['gh','api','repos/ericksoa/proven-primitives/commits/'+commit]));verification=response['commit']['verification']
+  if response['sha']==commit and verification['verified']:break
+  time.sleep(2)
+ assert verification['verified'] and verification['reason']=='valid',verification
+ assert not run(['git','status','--porcelain']),'Worktree not clean'
+ state('pushed_signature_verified',commit=commit,branch='codex/m1-saved-table-ledger',verified=v['verified'],errors=0,tests=96,defects=124,signature='valid')
+except BaseException as e:
+ state('stopped_without_success',reason=str(e),error_type=type(e).__name__);raise

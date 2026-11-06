@@ -2,36 +2,36 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-13031/src/brotli_input.rs:27973:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:28293:1
       |
-27973 | / fn plan_context_tree_count_action(
-27974 | |     workspace: &[u8],
-27975 | |     window_bytes: u32,
-27976 | |     budget: &mut crate::brotli::RequestBudget,
-27977 | |     input: &[u8],
-27978 | |     end_of_input: bool,
-27979 | | ) -> (r: Result<ContextTreeCountPlan, CoreFailure>)
+28293 | / fn plan_context_tree_count_action(
+28294 | |     workspace: &[u8],
+28295 | |     window_bytes: u32,
+28296 | |     budget: &mut crate::brotli::RequestBudget,
+28297 | |     input: &[u8],
+28298 | |     end_of_input: bool,
+28299 | | ) -> (r: Result<ContextTreeCountPlan, CoreFailure>)
       | |__________________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-13031/src/brotli_input.rs:27989:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:28309:9
       |
-27989 | /         r.is_ok() ==> {
-27990 | |             &&& context_tree_count_plan_valid(
-27991 | |                 workspace@, window_bytes, input@, end_of_input, r.unwrap(),
+28309 | /         r.is_ok() ==> {
+28310 | |             &&& context_tree_count_plan_valid(
+28311 | |                 workspace@, window_bytes, input@, end_of_input, r.unwrap(),
 ...     |
-27994 | |                 == old(budget).work_remaining - r.unwrap().read_work
-27995 | |         },
+28314 | |                 == old(budget).work_remaining - r.unwrap().read_work
+28315 | |         },
       | |_________^ failed this postcondition
 ...
-28033 | /     Ok(ContextTreeCountPlan {
-28034 | |         start_queue, start_phase, end_queue: queue, end_phase: phase,
-28035 | |         status: step.status, consumed: step.consumed,
-28036 | |         read_work: read.work, execution_work,
-28037 | |     })
+28353 | /     Ok(ContextTreeCountPlan {
+28354 | |         start_queue, start_phase, end_queue: queue, end_phase: phase,
+28355 | |         status: step.status, consumed: step.consumed,
+28356 | |         read_work: read.work, execution_work,
+28357 | |     })
       | |______- at the end of the function body
 
 error: aborting due to 1 previous error

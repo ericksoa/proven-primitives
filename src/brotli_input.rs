@@ -14180,6 +14180,9 @@ fn install_completed_simple_tree(
     Ok(meta)
 }
 
+// Isolate the existing bounded tree-progress proof from accumulated solver context.
+#[verifier::rlimit(600)]
+#[verifier::spinoff_prover]
 fn advance_serialized_tree(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -19368,6 +19371,31 @@ proof fn active_complete_implies_group_tree_complete(
     }
 }
 
+spec fn block_count_action_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, status: Option<CompressedHeaderStatus>) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    let kind = b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND);
+    let failed = status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated));
+    let tree = status.is_none() && b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 1;
+    let single = status.is_none() && b3b_scalar_byte_at(after, window_bytes, B3B_CURRENT_KIND) != kind;
+    &&& after.len() == before.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && !(kind >= 3 && at == base + B3B_OUTER_PHASE as int)
+        && !(kind < 3 && (
+            base <= at < base + B3B_OUTER_PHASE as int
+            || base + B3B_VAR_PHASE as int <= at < base + B3B_CONTEXT_PHASE as int
+            || (failed && (at == base + B3B_OUTER_PHASE as int || at == base + B3B_TERMINAL_ERROR as int
+                || base + B3B_ERROR_DETAIL as int <= at < base + B3B_ERROR_DETAIL as int + 2))
+            || (single && (at == base + B3B_CURRENT_KIND as int
+                || base + B3B_INITIAL_LENGTHS as int + 4 * kind as int <= at
+                    < base + B3B_INITIAL_LENGTHS as int + 4 * kind as int + 4))
+            || ((single || tree) && base + B3B_BLOCK_COUNTS as int + 2 * kind as int <= at
+                < base + B3B_BLOCK_COUNTS as int + 2 * kind as int + 2)
+            || (tree && (at == base + B3B_OUTER_PHASE as int
+                || base + B3B_CODE_PHASE as int <= at < base + B3B_BLOCK_LENGTH_PHASE as int
+                || at == base + B3B_PENDING_SPAN_LENGTH as int))))
+        ==> #[trigger] after[at] == before[at]
+}
+
 spec fn block_count_phase_refines(
     before: Seq<u8>,
     after: Seq<u8>,
@@ -19384,7 +19412,7 @@ spec fn block_count_phase_refines(
         &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 4
         &&& b3b_scalar_byte_at(after, window_bytes, B3B_CURRENT_KIND) == kind
     } else if match status {
-        Some(CompressedHeaderStatus::Failed(_)) => true,
+        Some(CompressedHeaderStatus::Failed(error)) => error != CompressedHeaderError::Truncated,
         _ => false,
     } {
         true
@@ -19420,16 +19448,14 @@ spec fn block_count_phase_refines(
             &&& match var_status {
                 VarUint8Status::NeedInput => status
                     == Some(CompressedHeaderStatus::NeedInput),
-                VarUint8Status::Truncated => match status {
-                    Some(CompressedHeaderStatus::Failed(_)) => true,
-                    _ => false,
-                },
+                VarUint8Status::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
                 VarUint8Status::Progress => {
                     &&& status.is_none()
                     &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 0
                     &&& b3b_scalar_byte_at(after, window_bytes, B3B_CURRENT_KIND) == kind
                 },
                 VarUint8Status::Value(raw) => {
+                    &&& block_count_value_applied(after, window_bytes, kind, raw)
                     &&& status.is_none()
                     &&& serialized_block_count_at(after, window_bytes, kind as int)
                         == raw as nat + 1
@@ -19450,6 +19476,28 @@ spec fn block_count_phase_refines(
             }
         }
     }
+}
+
+spec fn outer_phase_byte_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
+    &&& after.len() == before.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && at != b3b_scalar_base(window_bytes) + B3B_OUTER_PHASE as int
+        ==> #[trigger] after[at] == before[at]
+}
+
+spec fn block_count_value_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, kind: u8, raw: u16) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    &&& after.len() == before.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && !(base + B3B_BLOCK_COUNTS as int + 2 * kind as int <= at
+            < base + B3B_BLOCK_COUNTS as int + 2 * kind as int + 2)
+        && !(raw == 0 && (at == base + B3B_CURRENT_KIND as int
+            || base + B3B_INITIAL_LENGTHS as int + 4 * kind as int <= at
+                < base + B3B_INITIAL_LENGTHS as int + 4 * kind as int + 4))
+        && !(raw != 0 && (at == base + B3B_OUTER_PHASE as int
+            || base + B3B_CODE_PHASE as int <= at < base + B3B_BLOCK_LENGTH_PHASE as int
+            || at == base + B3B_PENDING_SPAN_LENGTH as int))
+        ==> #[trigger] after[at] == before[at]
 }
 
 spec fn block_count_value_applied(
@@ -19836,6 +19884,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                     compressed_outer_phase_tag_spec(phase),
                 ),
         ensures
+            outer_phase_byte_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes),
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -19977,6 +20026,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 final(self).workspace@[b3b_scalar_base(final(self).window_bytes) + i]
                     == old(self).workspace@[b3b_scalar_base(old(self).window_bytes) + i],
     {
+        proof { reveal(outer_phase_byte_frame); }
         match write_b3b_state_tag(
             self.workspace,
             self.window_bytes,
@@ -20197,6 +20247,8 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _var_phase,
             ),
         ensures
+            block_count_value_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, kind, raw),
+            r.is_ok(),
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -20231,6 +20283,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 raw,
             ),
     {
+        proof { reveal(block_count_value_frame); reveal(context_tree_start_frame); reveal(outer_phase_byte_frame); }
         let ghost original = self.workspace@;
         let count = raw + 1;
         proof { var_uint8_count_adds_one(raw); }
@@ -20369,6 +20422,14 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            (b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_CURRENT_KIND) >= 3
+                || (b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes)
+                    && var_uint8_encoding_valid(old(self).workspace@, old(self).window_bytes))) ==>
+                block_count_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1),
+            b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes)
+                && var_uint8_encoding_valid(old(self).workspace@, old(self).window_bytes) ==>
+                (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+                    || r.1 == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))),
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -20404,6 +20465,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 r.1,
             ),
     {
+        proof { reveal(block_count_action_frame); reveal(block_count_value_frame); reveal(block_count_value_applied); reveal(outer_phase_byte_frame); }
         let ghost original_workspace = self.workspace@;
         let mut consumed: usize = 0;
 
@@ -20632,8 +20694,25 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 }
                 return result;
             }
-            VarUint8Status::Truncated =>
-                return self.fail_phase(consumed, CompressedHeaderError::Truncated),
+            VarUint8Status::Truncated => {
+                let result = self.fail_phase(consumed, CompressedHeaderError::Truncated);
+                proof {
+                    reveal(terminal_error_frame);
+                    serialized_b3b_queue_from_frame(stored_cursor, self.workspace@, self.window_bytes, queue);
+                    reveal(serialized_var_uint8_phase); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
+                    assert(serialized_var_uint8_phase(self.workspace@, self.window_bytes, var_phase));
+                    reveal(block_count_phase_refines);
+                    assert(exists|sq: BitQueue, eq: BitQueue, sp: VarUint8Phase, ep: VarUint8Phase, vs: VarUint8Status| {
+                        &&& serialized_b3b_queue(original_workspace, self.window_bytes, sq)
+                        &&& serialized_var_uint8_phase(original_workspace, self.window_bytes, sp)
+                        &&& serialized_b3b_queue(self.workspace@, self.window_bytes, eq)
+                        &&& serialized_var_uint8_phase(self.workspace@, self.window_bytes, ep)
+                        &&& var_uint8_exact_step(sq, sp, input@, end_of_input, consumed, eq, ep, vs)
+                        &&& vs == VarUint8Status::Truncated
+                    });
+                }
+                return result;
+            },
             VarUint8Status::Progress => {}
             VarUint8Status::Value(raw) => {
                 if let Err(error) = self.apply_block_count_value(
@@ -21586,6 +21665,17 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            phase == CompressedOuterPhase::BlockCount
+                && (b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_CURRENT_KIND) >= 3
+                    || (b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes)
+                        && var_uint8_encoding_valid(old(self).workspace@, old(self).window_bytes))) ==>
+                block_count_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1),
+            phase == CompressedOuterPhase::BlockCount
+                && (b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_CURRENT_KIND) >= 3
+                    || (b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes)
+                        && var_uint8_encoding_valid(old(self).workspace@, old(self).window_bytes))) ==>
+                (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+                    || r.1 == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))),
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -21644,6 +21734,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                     );
                     consumed = old_consumed + used;
                     proof {
+                        reveal(block_count_phase_refines);
                         assert(block_count_phase_refines(
                             original_workspace,
                             self.workspace@,
@@ -24342,12 +24433,150 @@ struct CompressedActionPlan {
     status: Option<CompressedHeaderStatus>,
 }
 
+spec fn var_uint8_planning_read_units(queue: BitQueue, phase: VarUint8Phase, input_len: nat) -> nat {
+    let width = var_uint8_width(phase);
+    let taken = input_bytes_taken(queue.bits().len(), width, input_len);
+    taken + if queue.bits().len() + 8 * taken >= width { width } else { 0nat }
+}
+
+spec fn block_count_planning_read_valid(workspace: Seq<u8>, window_bytes: u32, input_len: nat, work: u64) -> bool {
+    if b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND) >= 3 { work == 0 }
+    else {
+        exists|queue: BitQueue, phase: VarUint8Phase| {
+            &&& serialized_b3b_queue(workspace, window_bytes, queue)
+            &&& serialized_var_uint8_phase(workspace, window_bytes, phase)
+            &&& work as nat == var_uint8_planning_read_units(queue, phase, input_len)
+        }
+    }
+}
+
+spec fn block_count_status_for_var(status: VarUint8Status) -> Option<CompressedHeaderStatus> {
+    match status {
+        VarUint8Status::NeedInput => Some(CompressedHeaderStatus::NeedInput),
+        VarUint8Status::Truncated => Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+        _ => None,
+    }
+}
+
+spec fn block_count_execution_units(read_work: nat, status: VarUint8Status) -> nat {
+    read_work + 13 + match status {
+        VarUint8Status::Truncated => 5nat,
+        VarUint8Status::Value(raw) => if raw == 0 { 8nat } else { 81nat },
+        _ => 0nat,
+    }
+}
+
+spec fn block_count_plan_valid(workspace: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool, plan: CompressedActionPlan) -> bool {
+    &&& plan.consumed <= input.len()
+    &&& block_count_planning_read_valid(workspace, window_bytes, input.len(), plan.planning_work)
+    &&& if b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND) >= 3 {
+        &&& plan.planning_work == 0
+        &&& plan.execution_work == 2
+        &&& plan.consumed == 0
+        &&& plan.status.is_none()
+    } else {
+        exists|start: BitQueue, next: BitQueue, phase: VarUint8Phase, next_phase: VarUint8Phase, status: VarUint8Status| {
+            &&& serialized_b3b_queue(workspace, window_bytes, start)
+            &&& serialized_var_uint8_phase(workspace, window_bytes, phase)
+            &&& next.valid() && next_phase.valid()
+            &&& var_uint8_exact_step(start, phase, input, end, plan.consumed, next, next_phase, status)
+            &&& plan.planning_work as nat == var_uint8_planning_read_units(start, phase, input.len())
+            &&& plan.planning_work as nat == plan.consumed as nat + match status {
+                VarUint8Status::NeedInput | VarUint8Status::Truncated => 0nat,
+                _ => var_uint8_width(phase),
+            }
+            &&& plan.planning_work <= 63
+            &&& plan.execution_work as nat == block_count_execution_units(plan.planning_work as nat, status)
+            &&& plan.status == block_count_status_for_var(status)
+        }
+    }
+}
+
+proof fn block_count_planning_reads_agree(workspace: Seq<u8>, window_bytes: u32, input_len: nat, left: u64, right: u64)
+    requires block_count_planning_read_valid(workspace, window_bytes, input_len, left),
+        block_count_planning_read_valid(workspace, window_bytes, input_len, right),
+    ensures left == right,
+{
+    reveal(block_count_planning_read_valid); reveal(var_uint8_planning_read_units);
+    if b3b_scalar_byte_at(workspace, window_bytes, B3B_CURRENT_KIND) < 3 {
+        let (lq, lp) = choose|q: BitQueue, p: VarUint8Phase| {
+            &&& serialized_b3b_queue(workspace, window_bytes, q)
+            &&& serialized_var_uint8_phase(workspace, window_bytes, p)
+            &&& left as nat == var_uint8_planning_read_units(q, p, input_len)
+        };
+        let (rq, rp) = choose|q: BitQueue, p: VarUint8Phase| {
+            &&& serialized_b3b_queue(workspace, window_bytes, q)
+            &&& serialized_var_uint8_phase(workspace, window_bytes, p)
+            &&& right as nat == var_uint8_planning_read_units(q, p, input_len)
+        };
+        serialized_var_uint8_starts_agree(workspace, window_bytes, lq, rq, lp, rp);
+    }
+}
+
+proof fn block_count_plan_matches_action(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: CompressedActionPlan, used: usize, status: Option<CompressedHeaderStatus>)
+    requires block_count_plan_valid(before, window_bytes, input, end, plan),
+        block_count_phase_refines(before, after, window_bytes, input, end, used, status),
+        status.is_none() || status == Some(CompressedHeaderStatus::NeedInput)
+            || status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+    ensures used == plan.consumed, status == plan.status,
+        block_count_phase_refines(before, after, window_bytes, input, end, plan.consumed, plan.status),
+{
+    reveal(block_count_plan_valid); reveal(block_count_phase_refines); reveal(block_count_status_for_var);
+    if b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) < 3 {
+        let (psq, peq, psp, pep, pvs) = choose|sq: BitQueue, eq: BitQueue, sp: VarUint8Phase, ep: VarUint8Phase, vs: VarUint8Status| {
+            &&& serialized_b3b_queue(before, window_bytes, sq)
+            &&& serialized_var_uint8_phase(before, window_bytes, sp)
+            &&& eq.valid() && ep.valid()
+            &&& var_uint8_exact_step(sq, sp, input, end, plan.consumed, eq, ep, vs)
+            &&& plan.planning_work as nat == var_uint8_planning_read_units(sq, sp, input.len())
+            &&& plan.planning_work as nat == plan.consumed as nat + match vs { VarUint8Status::NeedInput | VarUint8Status::Truncated => 0nat, _ => var_uint8_width(sp) }
+            &&& plan.planning_work <= 63
+            &&& plan.execution_work as nat == block_count_execution_units(plan.planning_work as nat, vs)
+            &&& plan.status == block_count_status_for_var(vs)
+        };
+        let (asq, aeq, asp, aep, avs) = choose|sq: BitQueue, eq: BitQueue, sp: VarUint8Phase, ep: VarUint8Phase, vs: VarUint8Status| {
+            &&& serialized_b3b_queue(before, window_bytes, sq)
+            &&& serialized_var_uint8_phase(before, window_bytes, sp)
+            &&& serialized_b3b_queue(after, window_bytes, eq)
+            &&& serialized_var_uint8_phase(after, window_bytes, ep)
+            &&& var_uint8_exact_step(sq, sp, input, end, used, eq, ep, vs)
+            &&& match vs {
+                VarUint8Status::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+                VarUint8Status::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+                VarUint8Status::Progress => {
+                    &&& status.is_none()
+                    &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 0
+                    &&& b3b_scalar_byte_at(after, window_bytes, B3B_CURRENT_KIND) == b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND)
+                },
+                VarUint8Status::Value(raw) => {
+                    &&& status.is_none()
+                    &&& serialized_block_count_at(after, window_bytes, b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as int) == raw as nat + 1
+                    &&& if raw == 0 {
+                        &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 0
+                        &&& b3b_scalar_byte_at(after, window_bytes, B3B_CURRENT_KIND) == b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) + 1
+                        &&& serialized_initial_length_at(after, window_bytes, b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) as int) == 1u32 << 24
+                    } else {
+                        &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 1
+                        &&& b3b_scalar_byte_at(after, window_bytes, B3B_CURRENT_KIND) == b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND)
+                    }
+                },
+            }
+        };
+        serialized_var_uint8_starts_agree(before, window_bytes, asq, psq, asp, psp);
+        var_uint8_steps_agree(asq, psq, asp, input, end, used, plan.consumed,
+            aeq, peq, aep, pep, avs, pvs);
+    }
+}
+
 fn block_count_planning_work(
     workspace: &[u8],
     window_bytes: u32,
     input_len: usize,
 ) -> (r: Result<u64, CompressedHeaderError>)
+    ensures r.is_ok() ==> block_count_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
 {
+    reveal(block_count_planning_read_valid); reveal(var_uint8_planning_read_units);
     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
     if kind >= 3 {
         return Ok(0);
@@ -24359,7 +24588,17 @@ fn block_count_planning_work(
         VarUint8Phase::Short => 3usize,
         VarUint8Phase::Long { width } => width as usize,
     };
-    Ok(plan_bit_read(queue, width, input_len).work)
+    let read = plan_bit_read(queue, width, input_len);
+    proof {
+        reveal(var_uint8_width);
+        assert(read.work as nat == var_uint8_planning_read_units(queue, phase, input_len as nat));
+        assert(exists|q: BitQueue, p: VarUint8Phase| {
+            &&& serialized_b3b_queue(workspace@, window_bytes, q)
+            &&& serialized_var_uint8_phase(workspace@, window_bytes, p)
+            &&& read.work as nat == var_uint8_planning_read_units(q, p, input_len as nat)
+        });
+    }
+    Ok(read.work)
 }
 
 fn plan_block_count_action(
@@ -24368,7 +24607,15 @@ fn plan_block_count_action(
     input: &[u8],
     end_of_input: bool,
 ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+    ensures
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+            && (b3b_scalar_byte_at(workspace@, window_bytes, B3B_CURRENT_KIND) >= 3
+                || (b3b_queue_encoding_valid(workspace@, window_bytes)
+                    && var_uint8_encoding_valid(workspace@, window_bytes))) ==> r.is_ok(),
+        r.is_ok() ==> block_count_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap()),
 {
+    reveal(block_count_plan_valid); reveal(block_count_planning_read_valid);
+    reveal(var_uint8_planning_read_units); reveal(block_count_execution_units); reveal(block_count_status_for_var);
     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
     if kind >= 3 {
         return Ok(CompressedActionPlan {
@@ -24386,12 +24633,24 @@ fn plan_block_count_action(
         VarUint8Phase::Short => 3usize,
         VarUint8Phase::Long { width } => width as usize,
     };
+    let ghost start_queue = queue;
+    let ghost start_phase = phase;
     let read_plan = plan_bit_read(queue, width, input.len());
     let step = advance_var_uint8(&mut queue, &mut phase, input, end_of_input);
     if step.consumed != read_plan.consumed {
         return Err(CompressedHeaderError::InternalState);
     }
 
+    proof {
+        reveal(var_uint8_exact_step); reveal(var_uint8_transition);
+        bytes_bits_len(input@.take(step.consumed as int));
+        assert(read_plan.complete == match step.status {
+            VarUint8Status::NeedInput | VarUint8Status::Truncated => false,
+            _ => true,
+        });
+        assert(read_plan.work as nat == var_uint8_planning_read_units(start_queue, start_phase, input@.len()));
+        assert(block_count_planning_read_valid(workspace@, window_bytes, input@.len(), read_plan.work));
+    }
     let mut execution_work = block_count_base_execution_work(read_plan.work);
     let status = match step.status {
         VarUint8Status::NeedInput => Some(CompressedHeaderStatus::NeedInput),
@@ -27718,6 +27977,22 @@ fn advance_planned_tree_group(
     Ok(used)
 }
 
+spec fn block_count_result_matches(plan: CompressedActionPlan, input_was_limited: bool, result: Result<usize, CompressedStep>) -> bool {
+    match (plan.status, result) {
+        (None, Ok(used)) => used == plan.consumed,
+        (Some(CompressedHeaderStatus::NeedInput), Err(step)) => {
+            &&& step.consumed == plan.consumed
+            &&& step.status == if input_was_limited { CompressedStatus::Failed(CoreFailure::ResourceLimit) }
+                else { CompressedStatus::NeedInput }
+        },
+        (Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)), Err(step)) => {
+            &&& step.consumed == plan.consumed
+            &&& step.status == CompressedStatus::Failed(CoreFailure::Truncated)
+        },
+        _ => false,
+    }
+}
+
 fn execute_fixed_compressed_plan(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -27735,6 +28010,17 @@ fn execute_fixed_compressed_plan(
         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE)
             == compressed_outer_phase_tag_spec(phase),
     ensures
+        phase == CompressedOuterPhase::BlockCount
+            && block_count_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan)
+            && old(budget).input_remaining >= plan.consumed as u64
+            && old(budget).work_remaining >= plan.execution_work ==> {
+                &&& block_count_result_matches(plan, input_was_limited, r)
+                &&& block_count_action_frame(old(workspace)@, final(workspace)@, window_bytes, plan.status)
+                &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+                &&& block_count_phase_refines(old(workspace)@, final(workspace)@, window_bytes, input@,
+                    end_of_input, plan.consumed, plan.status)
+                &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
+            },
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
         final(budget).output_remaining == old(budget).output_remaining,
@@ -27761,12 +28047,27 @@ fn execute_fixed_compressed_plan(
             },
         },
 {
+    proof {
+        if phase == CompressedOuterPhase::BlockCount
+            && block_count_plan_valid(workspace@, window_bytes, input@, end_of_input, plan)
+            && b3b_scalar_byte_at(workspace@, window_bytes, B3B_CURRENT_KIND) < 3 {
+            reveal(block_count_plan_valid); reveal(block_count_planning_read_valid);
+            let (q, p) = choose|q: BitQueue, p: VarUint8Phase| {
+                &&& serialized_b3b_queue(workspace@, window_bytes, q)
+                &&& serialized_var_uint8_phase(workspace@, window_bytes, p)
+                &&& plan.planning_work as nat == var_uint8_planning_read_units(q, p, input@.len())
+            };
+            serialized_queue_has_valid_encoding(workspace@, window_bytes, q);
+            serialized_var_uint8_has_valid_encoding(workspace@, window_bytes, p);
+        }
+    }
     if !budget.charge_work(plan.execution_work) {
         return Err(CompressedStep {
             consumed: 0,
             status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
         });
     }
+    proof { reveal(block_count_result_matches); }
     let ghost before_planned_action = workspace@;
     let (used, planned_status) = {
         let mut decoder = CompressedMetaBlockDecoder {
@@ -27793,7 +28094,26 @@ fn execute_fixed_compressed_plan(
         }
         result
     };
-    if used != plan.consumed || planned_status != plan.status {
+    proof {
+        if phase == CompressedOuterPhase::BlockCount
+            && block_count_plan_valid(before_planned_action, window_bytes, input@, end_of_input, plan) {
+            block_count_plan_matches_action(before_planned_action, workspace@, window_bytes,
+                input@, end_of_input, plan, used, planned_status);
+            assert(planned_status.is_none() || planned_status == Some(CompressedHeaderStatus::NeedInput)
+                || planned_status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)));
+        }
+    }
+    let statuses_disagree = match phase {
+        CompressedOuterPhase::BlockCount => match (planned_status, plan.status) {
+            (None, None)
+            | (Some(CompressedHeaderStatus::NeedInput), Some(CompressedHeaderStatus::NeedInput))
+            | (Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+                Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))) => false,
+            (left, right) => left != right,
+        },
+        _ => planned_status != plan.status,
+    };
+    if used != plan.consumed || statuses_disagree {
         return Err(CompressedStep {
             consumed: used,
             status: CompressedStatus::Failed(core_state_failure()),
@@ -27807,10 +28127,10 @@ fn execute_fixed_compressed_plan(
     }
     if let Some(status) = planned_status {
         let status = match status {
-            CompressedHeaderStatus::NeedInput if input_was_limited => {
-                CompressedStatus::Failed(CoreFailure::ResourceLimit)
-            }
-            CompressedHeaderStatus::NeedInput => CompressedStatus::NeedInput,
+            CompressedHeaderStatus::NeedInput => {
+                if input_was_limited { CompressedStatus::Failed(CoreFailure::ResourceLimit) }
+                else { CompressedStatus::NeedInput }
+            },
             CompressedHeaderStatus::Complete(_) => CompressedStatus::Complete,
             CompressedHeaderStatus::Failed(error) => {
                 CompressedStatus::Failed(map_compressed_error(error))
@@ -29831,14 +30151,23 @@ fn advance_planned_compressed_action(
             &input[..initial_allowed],
             end_of_input && initial_allowed == input.len(),
         ) {
-            Ok(value) if value.planning_work == planning_work => value,
-            _ => {
+            Ok(value) => value,
+            Err(_) => {
                 return Err(CompressedStep {
                     consumed: 0,
                     status: CompressedStatus::Failed(core_state_failure()),
                 });
             }
         };
+        proof {
+            reveal(block_count_plan_valid);
+            block_count_planning_reads_agree(workspace@, window_bytes, initial_allowed as nat,
+                planning_work, plan.planning_work);
+        }
+        if plan.planning_work != planning_work {
+            return Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()) });
+        }
         match execute_fixed_compressed_plan(
             workspace,
             window_bytes,
@@ -35002,6 +35331,117 @@ mod tests {
                     }
                     assert_eq!(consumed, bytes.len());
                     assert_eq!(&workspace[builder..builder + expected.len()], &expected);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_block_count_execution_matches_w1_and_reserves_before_writes() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        for kind in [0u8, 1, 2, 3, 255] {
+            for var_phase in [
+                VarUint8Phase::First,
+                VarUint8Phase::Short,
+                VarUint8Phase::Long { width: 1 },
+                VarUint8Phase::Long { width: 7 },
+            ] {
+                for pending in [None, Some(0u8), Some(0x80u8)] {
+                    let (mut original, window) = fresh_b3b_workspace();
+                    put_state_byte(&mut original, window, B3B_CURRENT_KIND, kind).unwrap();
+                    store_var_uint8_phase(&mut original, window, var_phase).unwrap();
+                    let mut queue = BitQueue::new();
+                    if let Some(byte) = pending {
+                        assert!(matches!(
+                            queue.read_bits(7, &[byte], false).status,
+                            BitReadStatus::Value(_)
+                        ));
+                    }
+                    store_b3b_queue(&mut original, window, &queue).unwrap();
+                    for input in [b"".as_slice(), &[0u8], &[0xffu8], &[0x55u8]] {
+                        for end in [false, true] {
+                            let plan =
+                                plan_block_count_action(&original, window, input, end).unwrap();
+                            assert_eq!(
+                                block_count_planning_work(&original, window, input.len()).unwrap(),
+                                plan.planning_work
+                            );
+                            let mut expected = original.clone();
+                            let reference = {
+                                let mut decoder = CompressedMetaBlockDecoder {
+                                    workspace: &mut expected,
+                                    window_bytes: window,
+                                };
+                                decoder.advance_outer_phase_once(
+                                    CompressedOuterPhase::BlockCount,
+                                    input,
+                                    end,
+                                )
+                            };
+                            assert_eq!((plan.consumed, plan.status), reference);
+                            for limited in [false, true] {
+                                for credit in [plan.execution_work - 1, plan.execution_work] {
+                                    let mut actual = original.clone();
+                                    let mut budget = RequestBudget::new(RequestLimits {
+                                        max_input: input.len() as u64,
+                                        max_output: 7,
+                                        max_work: credit,
+                                        max_calls: 9,
+                                        max_initializations: 3,
+                                        max_window_bits: 16,
+                                    })
+                                    .unwrap();
+                                    let result = execute_fixed_compressed_plan(
+                                        &mut actual,
+                                        window,
+                                        &mut budget,
+                                        CompressedOuterPhase::BlockCount,
+                                        input,
+                                        end,
+                                        limited,
+                                        plan,
+                                    );
+                                    assert_eq!(budget.output_remaining, 7);
+                                    assert_eq!(budget.calls_remaining, 9);
+                                    assert_eq!(budget.initializations_remaining, 3);
+                                    if credit < plan.execution_work {
+                                        assert_eq!(
+                                            result,
+                                            Err(CompressedStep {
+                                                consumed: 0,
+                                                status: CompressedStatus::Failed(
+                                                    CoreFailure::ResourceLimit
+                                                )
+                                            })
+                                        );
+                                        assert_eq!(actual, original);
+                                        assert_eq!(budget.work_remaining, credit);
+                                        assert_eq!(budget.input_remaining, input.len() as u64);
+                                    } else {
+                                        assert_eq!(actual, expected);
+                                        assert_eq!(budget.work_remaining, 0);
+                                        assert_eq!(
+                                            budget.input_remaining,
+                                            input.len() as u64 - plan.consumed as u64
+                                        );
+                                        let wanted = match reference.1 {
+                                            None => Ok(reference.0),
+                                            Some(CompressedHeaderStatus::NeedInput) => Err(CompressedStep {
+                                                consumed: reference.0, status: if limited {
+                                                    CompressedStatus::Failed(CoreFailure::ResourceLimit)
+                                                } else { CompressedStatus::NeedInput },
+                                            }),
+                                            Some(CompressedHeaderStatus::Failed(error)) => Err(CompressedStep {
+                                                consumed: reference.0, status: CompressedStatus::Failed(map_compressed_error(error)),
+                                            }),
+                                            Some(CompressedHeaderStatus::Complete(_)) => panic!("one block-count action cannot complete the whole header"),
+                                        };
+                                        assert_eq!(result, wanted);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

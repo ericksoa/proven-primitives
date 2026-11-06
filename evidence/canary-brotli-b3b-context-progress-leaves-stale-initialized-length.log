@@ -2,25 +2,25 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-7203/src/brotli_input.rs:14671:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-38563/src/brotli_input.rs:14674:1
       |
-14671 | / fn store_context_map_progress(
-14672 | |     workspace: &mut [u8],
-14673 | |     window_bytes: u32,
-14674 | |     progress: u16,
-14675 | | ) -> (r: Result<(), CompressedHeaderError>)
+14674 | / fn store_context_map_progress(
+14675 | |     workspace: &mut [u8],
+14676 | |     window_bytes: u32,
+14677 | |     progress: u16,
+14678 | | ) -> (r: Result<(), CompressedHeaderError>)
       | |__________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-7203/src/brotli_input.rs:14727:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-38563/src/brotli_input.rs:14730:9
       |
-14727 |         r.is_ok() ==> serialized_context_data_ok(final(workspace)@, window_bytes),
+14730 |         r.is_ok() ==> serialized_context_data_ok(final(workspace)@, window_bytes),
       |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
 ...
-14755 |     put_state_u16(workspace, window_bytes, B3B_MAP_INDEX, progress)
+14758 |     put_state_u16(workspace, window_bytes, B3B_MAP_INDEX, progress)
       |     --------------------------------------------------------------- at the end of the function body
 
 error: aborting due to 1 previous error

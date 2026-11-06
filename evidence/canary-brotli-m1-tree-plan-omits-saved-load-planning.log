@@ -2,56 +2,56 @@ verification results:: 3 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27148:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27407:5
       |
-27148 |     while copied < copy_len
+27407 |     while copied < copy_len
       |     ^^^^^^^^^^^^^^^^^^^^^^^
 
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27242:17
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27501:17
       |
-27242 |                 while at < start + span_count
+27501 |                 while at < start + span_count
       |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: while loop has been running for 2 seconds
       reporting errors as they are discovered (they may not be in source order)
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27177:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27436:5
       |
-27177 |     while iterations < 5_696
+27436 |     while iterations < 5_696
       |     ^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: while loop finished in 3 seconds
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27177:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27436:5
       |
-27177 |     while iterations < 5_696
+27436 |     while iterations < 5_696
       |     ^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27177:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27436:5
       |
-27177 |     while iterations < 5_696
+27436 |     while iterations < 5_696
       |     ^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: invariant not satisfied before loop
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27183:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27442:13
       |
-27183 | /             budget.work_remaining as int == old(budget).work_remaining as int
-27184 | |                 - planning_work as int,
+27442 | /             budget.work_remaining as int == old(budget).work_remaining as int
+27443 | |                 - planning_work as int,
       | |______________________________________^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27071:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27330:1
       |
-27071 | / fn plan_serialized_tree(
-27072 | |     workspace: &[u8],
-27073 | |     window_bytes: u32,
-27074 | |     budget: &mut crate::brotli::RequestBudget,
-27075 | |     input: &[u8],
-27076 | |     end_of_input: bool,
-27077 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+27330 | / fn plan_serialized_tree(
+27331 | |     workspace: &[u8],
+27332 | |     window_bytes: u32,
+27333 | |     budget: &mut crate::brotli::RequestBudget,
+27334 | |     input: &[u8],
+27335 | |     end_of_input: bool,
+27336 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
       | |________________________________________________^
 
 error: aborting due to 1 previous error

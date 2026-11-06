@@ -1,0 +1,17 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:20217:5
+      |
+20217 | /     fn apply_block_count_value(
+20218 | |         &mut self,
+20219 | |         kind: u8,
+20220 | |         raw: u16,
+20221 | |         _queue: BitQueue,
+20222 | |         _var_phase: VarUint8Phase,
+20223 | |     ) -> (r: Result<(), CompressedHeaderError>)
+      | |______________________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

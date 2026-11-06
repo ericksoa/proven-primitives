@@ -2,16 +2,16 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-7447/src/brotli_input.rs:11903:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-38854/src/brotli_input.rs:11903:5
       |
 11903 |     while i < 18
       |     ^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-7447/src/brotli_input.rs:11883:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-38854/src/brotli_input.rs:11883:1
       |
 11883 | / fn read_aux_lengths(
 11884 | |     workspace: &[u8],
@@ -20,7 +20,7 @@ note: function body check: not all errors may have been reported; rerun with a h
       | |________________________________________________^
 
 error: invariant not satisfied at end of loop body
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-7447/src/brotli_input.rs:11907:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-38854/src/brotli_input.rs:11907:13
       |
 11907 |             forall|j: int| 0 <= j < i ==> lengths@[j] <= 5,
       |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

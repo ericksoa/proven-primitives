@@ -2,20 +2,20 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-nested-reset-canary-8530/src/brotli_input.rs:24306:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-nested-reset-canary-39971/src/brotli_input.rs:24397:1
       |
-24306 | fn ready_switch_start_work() -> (r: u64)
+24397 | fn ready_switch_start_work() -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-nested-reset-canary-8530/src/brotli_input.rs:24307:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-nested-reset-canary-39971/src/brotli_input.rs:24398:13
       |
-24307 |     ensures r == 28 + 1,
+24398 |     ensures r == 28 + 1,
       |             ^^^^^^^^^^^ failed this postcondition
-24308 | { 28 }
+24399 | { 28 }
       |   -- at the end of the function body
 
 error: aborting due to 1 previous error

@@ -1,0 +1,28 @@
+
+from pathlib import Path
+import datetime, hashlib, json, os, subprocess, time
+root = Path('/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next')
+os.chdir(root)
+start_path = root / 'evidence/m1-block-count-source-start.json'
+start = json.loads(start_path.read_text())
+freeze_path = root / 'evidence/m1-block-count-source-freeze.json'
+state_path = root / 'evidence/m1-block-count-validation-continuation.json'
+def write(status, **extra):
+    state_path.write_text(json.dumps(dict(status=status, updated_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(), **extra), indent=2) + '\n')
+write('waiting_for_unchanged_whole_crate_positive', controls_script='/tmp/m1_block_count_controls.py')
+while True:
+    if freeze_path.exists():
+        frozen = json.loads(freeze_path.read_text())
+        if frozen.get('started_utc') == start['started_utc']:
+            break
+    time.sleep(1)
+if frozen['exit_code'] != 0 or not frozen['source_unchanged']:
+    write('stopped_without_positive', positive_exit_code=frozen['exit_code'], source_unchanged=frozen['source_unchanged'])
+    raise SystemExit(1)
+if frozen['source_sha256'] != start['source_sha256'] or not all(hashlib.sha256(Path(n).read_bytes()).hexdigest() == h for n,h in start['source_sha256'].items()):
+    write('stopped_without_positive', reason='Final source differs from starting snapshot')
+    raise SystemExit(1)
+write('running_20_suites_124_defects_after_positive')
+result = subprocess.run(['python3','/tmp/m1_block_count_controls.py'])
+write('controls_passed' if result.returncode == 0 else 'controls_failed', exit_code=result.returncode)
+raise SystemExit(result.returncode)

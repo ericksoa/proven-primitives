@@ -2,62 +2,62 @@ verification results:: 7 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:6689:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:6689:9
      |
 6689 |         assert(exact_work == iterations as u64 * (meta.symbols as u64 + 1)) by (nonlinear_arith)
      |         ^^^^^^
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:6731:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:6731:9
      |
 6731 |         assert(exact_work < 10_575) by (nonlinear_arith)
      |         ^^^^^^
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:6996:13
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:6996:13
      |
 6996 |             assert(next_bits as nat == installed_prefix_value(
      |             ^^^^^^
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:7101:13
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:7101:13
      |
 7101 |             assert(exact_work < 10_575) by (nonlinear_arith)
      |             ^^^^^^
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:7048:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:7048:9
      |
 7048 |         while symbol < meta.symbols
      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:7568:13
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:7568:13
      |
 7568 |             assert(exact_work
      |             ^^^^^^
 
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:6692:5
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:6692:5
      |
 6692 |     while iterations < 15
      |     ^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:6504:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:6504:1
      |
 6504 | / fn advance_installed_tree_symbol(
 6505 | |     workspace: &[u8],
@@ -69,7 +69,7 @@ note: function body check: not all errors may have been reported; rerun with a h
      | |____________________________^
 
 error: precondition not satisfied
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-14329/src/brotli_input.rs:6828:21
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-work-canary-42331/src/brotli_input.rs:6828:21
      |
 5972 | /         match step.status {
 5973 | |             InstalledSymbolStatus::NeedInput | InstalledSymbolStatus::Truncated => {

@@ -2,35 +2,35 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-13031/src/brotli_input.rs:28239:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:28559:1
       |
-28239 | / fn execute_planned_context_tree_count(
-28240 | |     workspace: &mut [u8],
-28241 | |     window_bytes: u32,
-28242 | |     budget: &mut crate::brotli::RequestBudget,
+28559 | / fn execute_planned_context_tree_count(
+28560 | |     workspace: &mut [u8],
+28561 | |     window_bytes: u32,
+28562 | |     budget: &mut crate::brotli::RequestBudget,
 ...     |
-28246 | |     plan: ContextTreeCountPlan,
-28247 | | ) -> (r: Result<usize, CompressedStep>)
+28566 | |     plan: ContextTreeCountPlan,
+28567 | | ) -> (r: Result<usize, CompressedStep>)
       | |______________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-13031/src/brotli_input.rs:28272:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:28592:9
       |
-28272 | /         old(budget).work_remaining < plan.execution_work ==> {
-28273 | |             &&& final(workspace)@ == old(workspace)@
-28274 | |             &&& *final(budget) == *old(budget)
-28275 | |             &&& r == Err(CompressedStep {
+28592 | /         old(budget).work_remaining < plan.execution_work ==> {
+28593 | |             &&& final(workspace)@ == old(workspace)@
+28594 | |             &&& *final(budget) == *old(budget)
+28595 | |             &&& r == Err(CompressedStep {
 ...     |
-28278 | |             })
-28279 | |         },
+28598 | |             })
+28599 | |         },
       | |_________^ failed this postcondition
 ...
-28341 | /         return Err(CompressedStep {
-28342 | |             consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
-28343 | |         });
+28661 | /         return Err(CompressedStep {
+28662 | |             consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
+28663 | |         });
       | |__________- at this exit
 
 error: aborting due to 1 previous error

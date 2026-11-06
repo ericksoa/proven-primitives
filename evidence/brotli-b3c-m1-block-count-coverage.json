@@ -1,0 +1,100 @@
+{
+  "component": "Brotli B3c M1 block-count continuation",
+  "generated_utc": "2026-11-06T03:00:18.065932+00:00",
+  "release_gate": "incomplete",
+  "validation_state": "named_contracts_checked_full_M1_open",
+  "base_commit": "d6b6e23a52e3e19e268ecb19ae644c78bc79779b",
+  "obligations": [
+    {
+      "id": "block-count-read-and-plan-model",
+      "state": "checked_named_contracts",
+      "roots": [
+        "var_uint8_planning_read_units",
+        "block_count_planning_read_valid",
+        "block_count_planning_reads_agree",
+        "block_count_plan_valid",
+        "block_count_planning_work",
+        "plan_block_count_action"
+      ],
+      "scope": "Exact pre-scan/detail read-cost agreement, decoded outcome, consumption and existing execution formula for valid successful planning loads."
+    },
+    {
+      "id": "block-count-action-and-executor",
+      "state": "checked_named_contracts",
+      "roots": [
+        "block_count_phase_refines",
+        "block_count_plan_matches_action",
+        "apply_block_count_value",
+        "advance_block_count_phase",
+        "advance_outer_phase_once",
+        "execute_fixed_compressed_plan",
+        "block_count_result_matches",
+        "advance_planned_compressed_action"
+      ],
+      "scope": "Supported status domain, total value application under existing preconditions, full truncation cursor relation, plan/action agreement, valid-plan input/work debits, limited-input mapping and failed-work-reservation atomicity."
+    },
+    {
+      "id": "block-count-byte-frames",
+      "state": "checked_named_contracts",
+      "roots": [
+        "outer_phase_byte_frame",
+        "block_count_value_frame",
+        "block_count_action_frame"
+      ],
+      "scope": "Unrelated-byte preservation for cursor progress/wait, count update, tree start, handoff and truncation."
+    }
+  ],
+  "remaining_gaps": [
+    "Malformed serialized-state outcome/ledger classification beyond the stated planning domain",
+    "Full source-operation ledger beyond approved formulas and exact planning/execution debits",
+    "Remaining header/body phase refinement and failure accounting"
+  ],
+  "later_required_phases": [
+    "Remaining B3c resource/public refinement/confidentiality/control gates",
+    "B3d arbitrary permitted call-sequence and source-observation induction",
+    "B4 quarantining caller and profile closure",
+    "Named independent human specification review and fail-closed release evidence"
+  ],
+  "k1_decision": {
+    "path": "BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md",
+    "status": "held_for_human_review_not_approved_not_implemented",
+    "human_answer": "Hold this proof-boundary change for review"
+  },
+  "runtime_tests": {
+    "path": "evidence/m1-block-count-release-tests.log",
+    "passed": 96,
+    "library": 85,
+    "primitives": 9,
+    "trust_scan": 1,
+    "upstream_comparison": 1
+  },
+  "earlier_failed_checks": [
+    {
+      "source_start": "evidence/m1-block-count-attempt1-source-start.json",
+      "source_freeze": "evidence/m1-block-count-attempt1-source-freeze.json",
+      "log": "evidence/m1-block-count-attempt1-whole-crate.log",
+      "outcome": "Resource limit at the unchanged advance_serialized_tree loop with global rlimit300; stopped without claiming a whole-crate positive or semantic rejection."
+    },
+    {
+      "source_start": "evidence/m1-block-count-attempt2-source-start.json",
+      "source_freeze": "evidence/m1-block-count-attempt2-source-freeze.json",
+      "log": "evidence/m1-block-count-attempt2-whole-crate.log",
+      "outcome": "Existing tree-loop proof exhausted per-function rlimit600 in shared solver context; selected root had passed at600. Preserved and stopped without any positive or semantic-negative claim."
+    }
+  ],
+  "offline_checker_effort": {
+    "global_rlimit": 300,
+    "advance_serialized_tree_rlimit": 600,
+    "runtime_budget_policy_changed": false,
+    "selected_check": "evidence/m1-block-count-tree-loop-600.log",
+    "advance_serialized_tree_spinoff_prover": true
+  },
+  "positive_control": {
+    "path": "evidence/brotli-b3c-m1-block-count-verification.json",
+    "sha256": "42f55510e4e5c5f7826e392b251be532f86daef72733920b5b601252934d6f08"
+  },
+  "negative_controls": {
+    "path": "evidence/brotli-b3c-m1-block-count-controls.json",
+    "sha256": "a5f6fa3dee1dd613872fd70a352fb1d5571b1831b66f5a6d1c9ea07bdec55c84"
+  }
+}

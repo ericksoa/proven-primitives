@@ -414,3 +414,50 @@ remain open. M1 and the supported-decoder release gate remain incomplete.
 ### Final F2-source validation
 
 The unchanged final source passed the entire pinned `--no-cheating` check: 1174 verified, zero errors. All 95 release tests passed, and all 118 deliberate defects across 19 suites were rejected after that positive. Exact source, harness, tool, compiled-artifact, approval and transcript identities are bound in `evidence/brotli-b3c-m1-f2.json`. The earlier resource-limited check is retained and is not counted as a semantic rejection. M1 and all later release gates remain incomplete.
+
+### Block-count plan and execution continuation
+
+Within the approved M1/E2 input-private boundary, the block-count planning
+pre-scan and detailed plan now share an exact VAR_UINT8 read model. A checked
+uniqueness lemma equates their work receipts before the adapter's runtime
+consistency check. The plan binds the initial serialized queue/field phase,
+the consumed prefix, the decoded VAR_UINT8 outcome and the existing execution
+formula. Valid serialized read state guarantees a plan; the `kind >= 3`
+handoff retains its existing zero-read, zero-consumption behavior.
+
+The existing W1 block-count transition now exposes truncation's actual queue
+and field-state effects instead of treating every failure as unconstrained.
+Its value action is total under its existing preconditions and retains the
+exact count, initial-length, next-kind and tree-start relations. Checked
+determinism connects the planner to that transition. The outer dispatcher
+preserves the relation, and B3c execution proves the predicted status,
+consumption, exact input/work debits and preservation of the other counters
+when the plan and input/work credits are valid. Insufficient execution work
+retains the existing unchanged-workspace and unchanged-budget result.
+
+Outcome-specific byte frames cover the cursor, count/initial-length update,
+tree-start image, handoff and truncation terminal image. Bytes outside those
+documented regions remain unchanged. The executor spells out its three
+supported block-count status comparisons and the existing limited-input
+NeedInput mapping; this exposes the unchanged behavior to the checker without
+altering its runtime interface or result representation.
+
+All **96 release tests** pass, including the new block-count matrix. It varies
+kind, VAR_UINT8 phase, retained bits, input, finality, limited-input mapping and
+exact/one-short execution credit, and compares both status and the complete
+workspace image with W1. Six new unchanged-specification controls target the
+pre-scan receipt, planned status/consumption, execution input debit,
+limited-input terminal mapping and an unrelated padding write. Final
+whole-crate verification and the expanded 20-suite/124-defect run are pending.
+
+The guarantees above apply to successful plans from their stated serialized
+read domain. They do not narrow executable inputs or finish malformed-state
+classification, the complete source-operation ledger, other header/body
+actions, B3d, B4 or independent human review. Fixed write/transition formulas
+remain the approved formulas; this continuation does not claim a complete
+witness of every source operation. K1 remains held for human review and its
+prefix-module proof boundary is unchanged.
+
+### Final block-count-source validation
+
+The unchanged source passed 1176 whole-crate checks with zero errors. All 96 release tests passed, followed by 124 semantic defect rejections across 20 suites. Exact source, harness, approvals, tool, compiled-artifact and transcript hashes are bound in `evidence/brotli-b3c-m1-block-count.json`. Full M1 and decoder release obligations remain open, and K1 remains held for human review.

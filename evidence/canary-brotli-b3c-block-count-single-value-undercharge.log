@@ -2,27 +2,27 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-11904/src/brotli_input.rs:24324:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-40630/src/brotli_input.rs:24415:1
       |
-24324 | fn block_count_value_execution_work(read_work: u64, raw: u16) -> (r: u64)
+24415 | fn block_count_value_execution_work(read_work: u64, raw: u16) -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-11904/src/brotli_input.rs:24326:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-40630/src/brotli_input.rs:24417:13
       |
-24326 |       ensures r == read_work + 10 + 2 + 1
+24417 |       ensures r == read_work + 10 + 2 + 1
       |  _____________^
-24327 | |         + if raw == 0 { 7 + 1 } else { 2 + 77 + 1 + 1 },
+24418 | |         + if raw == 0 { 7 + 1 } else { 2 + 77 + 1 + 1 },
       | |_______________________________________________________^ failed this postcondition
 ...
-24330 | /     if raw == 0 {
-24331 | |         base + 7
-24332 | |     } else {
-24333 | |         base + 2 + 77 + 1 + 1
-24334 | |     }
+24421 | /     if raw == 0 {
+24422 | |         base + 7
+24423 | |     } else {
+24424 | |         base + 2 + 77 + 1 + 1
+24425 | |     }
       | |_____- at the end of the function body
 
 error: aborting due to 1 previous error

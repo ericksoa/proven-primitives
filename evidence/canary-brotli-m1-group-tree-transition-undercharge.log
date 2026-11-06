@@ -2,20 +2,20 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-nested-reset-canary-8530/src/brotli_input.rs:24296:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-nested-reset-canary-39971/src/brotli_input.rs:24387:1
       |
-24296 | fn group_tree_start_work() -> (r: u64)
+24387 | fn group_tree_start_work() -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-nested-reset-canary-8530/src/brotli_input.rs:24298:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-nested-reset-canary-39971/src/brotli_input.rs:24389:13
       |
-24298 |     ensures r == 77 + 2 + 1 + 1,
+24389 |     ensures r == 77 + 2 + 1 + 1,
       |             ^^^^^^^^^^^^^^^^^^^ failed this postcondition
-24299 | { serialized_tree_start_work() + 2 + 1 }
+24390 | { serialized_tree_start_work() + 2 + 1 }
       |   ------------------------------------ at the end of the function body
 
 error: aborting due to 1 previous error

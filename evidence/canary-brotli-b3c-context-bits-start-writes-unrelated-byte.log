@@ -2,16 +2,16 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:11658:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:11658:5
       |
 11658 |     while relative < B3B_BLOCK_LENGTH_PHASE
       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:11580:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:11580:1
       |
 11580 | / fn initialize_code_description_state(
 11581 | |     workspace: &mut [u8],
@@ -23,7 +23,7 @@ note: function body check: not all errors may have been reported; rerun with a h
       | |__________________________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:11734:20
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:11734:20
       |
 11734 |               assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_GROUP_KIND)
       |  ____________________^
@@ -31,7 +31,7 @@ error: assertion failed
       | |_____________________________________________________________________________^ assertion failed
 
 note: recommendation not met
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:11691:56
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:11691:56
       |
 11691 |               forall|i: int| 0 <= i < B3B_GROUP_KIND ==> #[trigger]
       |  ________________________________________________________^
@@ -43,7 +43,7 @@ note: recommendation not met
       = note: recommendation not met
 
 note: recommendation not met
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:11644:52
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:11644:52
       |
 11644 |           forall|i: int| 0 <= i < B3B_GROUP_KIND ==> #[trigger]
       |  ____________________________________________________^

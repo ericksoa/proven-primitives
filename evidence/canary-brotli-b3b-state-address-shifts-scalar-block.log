@@ -2,10 +2,10 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-6861/src/brotli_input.rs:7915:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-38099/src/brotli_input.rs:7915:1
      |
 7915 | / fn b3b_state_address(
 7916 | |     workspace_len: usize,
@@ -16,7 +16,7 @@ note: function body check: not all errors may have been reported; rerun with a h
      | |____________________________________________________________^
 
 error: postcondition not satisfied
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-6861/src/brotli_input.rs:7922:13
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-38099/src/brotli_input.rs:7922:13
      |
 7922 |       ensures r.is_ok() ==> {
      |  _____________^

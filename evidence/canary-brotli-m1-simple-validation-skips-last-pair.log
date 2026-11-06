@@ -2,18 +2,18 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-7447/src/brotli_input.rs:3971:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-38854/src/brotli_input.rs:3971:9
      |
 3971 |         assert(work == count as u64 * (count as u64 - 1)) by (nonlinear_arith)
      |         ^^^^^^
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-7447/src/brotli_input.rs:3943:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-38854/src/brotli_input.rs:3943:1
      |
 3943 | / fn simple_distinct_validation_metered(symbols: &[u16; 4], count: u8,
 3944 | |     budget: &mut crate::brotli::RequestBudget,
@@ -21,7 +21,7 @@ note: function body check: not all errors may have been reported; rerun with a h
      | |_________________________________^
 
 error: postcondition not satisfied
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-7447/src/brotli_input.rs:3955:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-38854/src/brotli_input.rs:3955:9
      |
 3955 |           r.is_ok() == (old(budget).work_remaining >= count as u64 * (count as u64 - 1)),
      |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition

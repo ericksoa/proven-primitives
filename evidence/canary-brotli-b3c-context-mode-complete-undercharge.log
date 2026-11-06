@@ -2,21 +2,21 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-mode-metering-canary-12579/src/brotli_input.rs:24484:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-mode-metering-canary-41195/src/brotli_input.rs:24743:1
       |
-24484 | fn context_mode_complete_execution_work() -> (r: u64)
+24743 | fn context_mode_complete_execution_work() -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-mode-metering-canary-12579/src/brotli_input.rs:24485:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-mode-metering-canary-41195/src/brotli_input.rs:24744:13
       |
-24485 |     ensures r == 14 + 1 + 1 + 1 + 1,
+24744 |     ensures r == 14 + 1 + 1 + 1 + 1,
       |             ^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
-24486 | {
-24487 |     13 + 1 + 2
+24745 | {
+24746 |     13 + 1 + 2
       |     ---------- at the end of the function body
 
 error: aborting due to 1 previous error

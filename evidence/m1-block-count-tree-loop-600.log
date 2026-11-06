@@ -1,0 +1,35 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:14262:5
+      |
+14262 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 69 seconds
+     --> src/brotli_input.rs:14262:5
+      |
+14262 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:14262:5
+      |
+14262 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:14183:1
+      |
+14183 | / fn advance_serialized_tree(
+14184 | |     workspace: &mut [u8],
+14185 | |     window_bytes: u32,
+14186 | |     input: &[u8],
+14187 | |     end_of_input: bool,
+14188 | | ) -> (r: SerializedTreeStep)
+      | |___________________________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)

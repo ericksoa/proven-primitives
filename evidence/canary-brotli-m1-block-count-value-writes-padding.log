@@ -1,0 +1,35 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-37170/src/brotli_input.rs:20220:5
+      |
+20220 | /     fn apply_block_count_value(
+20221 | |         &mut self,
+20222 | |         kind: u8,
+20223 | |         raw: u16,
+20224 | |         _queue: BitQueue,
+20225 | |         _var_phase: VarUint8Phase,
+20226 | |     ) -> (r: Result<(), CompressedHeaderError>)
+      | |______________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-37170/src/brotli_input.rs:20250:13
+      |
+20250 |               block_count_value_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, kind, raw),
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+20285 | /     {
+20286 | |         proof { reveal(block_count_value_frame); reveal(context_tree_start_frame); reveal(outer_phase_byte_frame); }
+20287 | |         let ghost original = self.workspace@;
+20288 | |         put_state_byte(self.workspace, self.window_bytes, 175, 255)?;
+...     |
+20408 | |         Ok(())
+20409 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

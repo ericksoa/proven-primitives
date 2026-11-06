@@ -2,29 +2,29 @@ verification results:: 4 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:1636:17
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:1636:17
      |
 1636 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
      |                 ^^^^^
 
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:4555:21
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4555:21
      |
 4555 |                     while i < index as usize
      |                     ^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:4726:33
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4726:33
      |
 4726 | ...                   assert(0u8 < (1u8 << 0)) by (bit_vector);
      |                       ^^^^^^
 
 note: function body check has been running for 2 seconds
       reporting errors as they are discovered (they may not be in source order)
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:4258:5
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4258:5
      |
 4258 | /     fn advance_field(
 4259 | |         &mut self,
@@ -34,7 +34,7 @@ note: function body check has been running for 2 seconds
      | |________________________________^
 
 note: function body check finished in 5 seconds
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:4258:5
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4258:5
      |
 4258 | /     fn advance_field(
 4259 | |         &mut self,
@@ -44,7 +44,7 @@ note: function body check finished in 5 seconds
      | |________________________________^
 
 error: assertion failed
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:4818:16
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4818:16
      |
 4818 |           assert(code_transition_holds(
      |  ________________^
@@ -57,7 +57,7 @@ error: assertion failed
      | |_________^ assertion failed
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:4258:5
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4258:5
      |
 4258 | /     fn advance_field(
 4259 | |         &mut self,
@@ -67,7 +67,7 @@ note: function body check: not all errors may have been reported; rerun with a h
      | |________________________________^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-6105/src/brotli_input.rs:4225:5
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4225:5
      |
 4225 | /     fn from_meta(
 4226 | |         meta: MetaBlockDecoder,

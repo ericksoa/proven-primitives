@@ -2,30 +2,30 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:28484:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:28804:1
       |
-28484 | / fn context_bits_execution_work(read_work: u64, phase: u8, status: BitReadStatus,
-28485 | |     repeat: u32, remaining: u16) -> (r: u64)
+28804 | / fn context_bits_execution_work(read_work: u64, phase: u8, status: BitReadStatus,
+28805 | |     repeat: u32, remaining: u16) -> (r: u64)
       | |___________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-13319/src/brotli_input.rs:28487:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:28807:13
       |
-28487 |       ensures r as nat == context_bits_work_spec(read_work as nat, phase, status,
+28807 |       ensures r as nat == context_bits_work_spec(read_work as nat, phase, status,
       |  _____________^
-28488 | |         repeat as nat, remaining as nat), r <= 131_148,
+28808 | |         repeat as nat, remaining as nat), r <= 131_148,
       | |________________________________________^ failed this postcondition
 ...
-28491 | /     base + match status {
-28492 | |         BitReadStatus::NeedInput => 0,
-28493 | |         BitReadStatus::Truncated => 4 + 1,
-28494 | |         BitReadStatus::Value(value) => {
+28811 | /     base + match status {
+28812 | |         BitReadStatus::NeedInput => 0,
+28813 | |         BitReadStatus::Truncated => 4 + 1,
+28814 | |         BitReadStatus::Value(value) => {
 ...     |
-28500 | |         },
-28501 | |     }
+28820 | |         },
+28821 | |     }
       | |_____- at the end of the function body
 
 error: aborting due to 1 previous error

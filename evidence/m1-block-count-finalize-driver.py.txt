@@ -1,0 +1,41 @@
+from pathlib import Path
+import datetime,hashlib,json,os,re,subprocess,shutil
+root=Path.cwd()
+def digest(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p):return {'path':str(p),'sha256':digest(p)}
+def read(p):return json.loads(Path(p).read_text())
+f=read('evidence/m1-block-count-source-freeze.json');v=read('evidence/brotli-b3c-m1-block-count-verification.json')['verification-results'];c=read('evidence/brotli-b3c-m1-block-count-controls.json')
+assert f['exit_code']==0 and f['source_unchanged'] and all(digest(p)==h for p,h in f['source_sha256'].items())
+assert v['success'] and v['is-verifying-entire-crate'] and v['errors']==0 and not v['encountered-error']
+assert c['source_unchanged'] and c['suites_failed']==0 and c['suites_passed']==20 and c['rejected_mutations']==124
+assert c['positive_control']['sha256']==digest('evidence/brotli-b3c-m1-block-count-verification.json')
+for row in c['suites']:assert row['exit_code']==0 and digest(row['log'])==row['log_sha256']
+start=datetime.datetime.fromisoformat(f['started_utc']).timestamp()
+canaries=sorted(p for p in Path('evidence').glob('canary-brotli-*.log') if p.stat().st_mtime>=start)
+assert len(canaries)==124,(len(canaries),'new-source canaries')
+for p in canaries:
+ s=p.read_text();assert any(x in s for x in ['postcondition not satisfied','precondition not satisfied','requires not satisfied','invariant not satisfied','assertion failed']),p
+ assert not re.search(r'Resource limit .*exceeded|internal compiler error|thread .*panicked|timed out|error\[E\d+\]',s),p
+s=Path('evidence/m1-block-count-release-tests.log').read_text();assert 'test result: FAILED' not in s
+assert [int(n) for n in re.findall(r'test result: ok\. (\d+) passed;',s)]==[85,9,1,1,0]
+assert Path('evidence/m1-block-count-format-check.log').read_text()==''
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools')
+subprocess.run(['git','diff','--check','--','.',':(exclude)evidence'],env=env,check=True)
+previous=read('evidence/brotli-b3c-m1-f2.json')
+assert f['source_sha256']['src/brotli_prefix.rs']==previous['source_sha256']['src/brotli_prefix.rs'],'Held K1 boundary was changed'
+for name,p in [('verification','/tmp/m1_block_count_verify.py'),('controls','/tmp/m1_block_count_controls.py'),('wait','/tmp/m1_block_count_wait_positive_controls.py'),('finalize','/tmp/m1_block_count_finalize.py')]:
+ shutil.copyfile(p,'evidence/m1-block-count-'+name+'-driver.py.txt')
+coverage=read('evidence/brotli-b3c-m1-block-count-coverage.json');coverage['generated_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();coverage['validation_state']='named_contracts_checked_full_M1_open'
+for o in coverage['obligations']:o['state']='checked_named_contracts'
+coverage['positive_control']=ref('evidence/brotli-b3c-m1-block-count-verification.json');coverage['negative_controls']=ref('evidence/brotli-b3c-m1-block-count-controls.json');coverage.pop('negative_controls_pending',None)
+Path('evidence/brotli-b3c-m1-block-count-coverage.json').write_text(json.dumps(coverage,indent=2)+'\n')
+artifacts=set(canaries)
+for pattern in ['m1-block-count-*','brotli-b3c-m1-block-count-*.json']:
+ artifacts.update(p for p in Path('evidence').glob(pattern) if p.is_file())
+artifacts.add(Path('evidence/positive-brotli-m1-planner-cap-rank.log'))
+validation=sorted(Path(p) for p in subprocess.check_output(['git','ls-files','-z','tests'],env=env,text=True).split('\0') if p)
+documents=['AGENTS.md','BROTLI_B3C_PROPOSAL.md','BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md','BROTLI_B3C_METERING_ADDENDUM.md','BROTLI_M1_TRANSITION_RULE_DECISION.md','BROTLI_M1_TREE_ACTION_BOUND_DECISION.md','BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md']
+r={'component':'Brotli B3c M1 block-count continuation','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':'d6b6e23a52e3e19e268ecb19ae644c78bc79779b','claim':'Written block-count planning, status/consumption agreement, value/handoff/truncation effects, byte frames and valid-plan budget debits are checked on unchanged whole-crate source. Complete source-operation ledger and all remaining M1/decoder obligations remain open.','source_sha256':f['source_sha256'],'validation_source_sha256':{str(p):digest(p) for p in validation},'approval_and_document_sha256':{p:digest(p) for p in documents},'verifier':previous['verifier'],'verifier_binary':previous['verifier_binary'],'verification_options':f['command'][2:],'per_function_verifier_effort':{'advance_serialized_tree':{'rlimit':600,'spinoff_prover':True}},'verification_elapsed_seconds':f['elapsed_seconds'],'verification_results':v,'verification_evidence':ref('evidence/brotli-b3c-m1-block-count-verification.json'),'verification_log':ref('evidence/m1-block-count-whole-crate.log'),'source_freeze':ref('evidence/m1-block-count-source-freeze.json'),'negative_controls':{'evidence':ref('evidence/brotli-b3c-m1-block-count-controls.json'),'suites_passed':20,'rejected_mutations':124,'order':'All mutations started after the unchanged whole-crate positive. All 124 raw logs have semantic proof failures without resource/compiler failures.'},'runtime_tests':{'evidence':ref('evidence/m1-block-count-release-tests.log'),'passed':96,'library':85,'primitives':9,'trust_scan':1,'upstream_comparison':1},'compiled_artifact':ref('target/release/libproven_primitives.rlib'),'format_check':ref('evidence/m1-block-count-format-check.log'),'diff_check':{'scope':'Source, tests and documents; exact raw evidence bytes are preserved and hashed'},'coverage':ref('evidence/brotli-b3c-m1-block-count-coverage.json'),'artifact_sha256':{str(p):digest(p) for p in sorted(artifacts)},'previous_checkpoint':{'commit':'d6b6e23a52e3e19e268ecb19ae644c78bc79779b','evidence':ref('evidence/brotli-b3c-m1-f2.json')},'release_gate':'incomplete','not_established':coverage['remaining_gaps']+coverage['later_required_phases'],'trusted_components':previous['trusted_components'],'execution_environment':previous['execution_environment'],'held_decision':coverage['k1_decision'],'earlier_failed_checks':coverage.get('earlier_failed_checks',[])}
+assert digest(r['verifier_binary']['path'])==r['verifier_binary']['sha256']
+Path('evidence/brotli-b3c-m1-block-count.json').write_text(json.dumps(r,indent=2)+'\n')
+print(json.dumps({'verified':v['verified'],'errors':v['errors'],'tests':96,'defects':124,'release_gate':'incomplete'}))

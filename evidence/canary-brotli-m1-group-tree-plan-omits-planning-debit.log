@@ -2,33 +2,33 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51338,13): 'if' cannot be used in patterns.
-WARNING: (56054,5): 'if' cannot be used in patterns.
+WARNING: (51367,13): 'if' cannot be used in patterns.
+WARNING: (56781,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27531:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27790:1
       |
-27531 | / fn plan_tree_group_action(
-27532 | |     workspace: &[u8],
-27533 | |     window_bytes: u32,
-27534 | |     budget: &mut crate::brotli::RequestBudget,
-27535 | |     input: &[u8],
-27536 | |     end_of_input: bool,
-27537 | | ) -> (r: Result<CompressedActionPlan, CoreFailure>)
+27790 | / fn plan_tree_group_action(
+27791 | |     workspace: &[u8],
+27792 | |     window_bytes: u32,
+27793 | |     budget: &mut crate::brotli::RequestBudget,
+27794 | |     input: &[u8],
+27795 | |     end_of_input: bool,
+27796 | | ) -> (r: Result<CompressedActionPlan, CoreFailure>)
       | |__________________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-6104/src/brotli_input.rs:27548:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27807:9
       |
-27548 | /         r.is_ok() ==> final(budget).work_remaining as int
-27549 | |             == old(budget).work_remaining as int - r.unwrap().planning_work as int,
+27807 | /         r.is_ok() ==> final(budget).work_remaining as int
+27808 | |             == old(budget).work_remaining as int - r.unwrap().planning_work as int,
       | |__________________________________________________________________________________^ failed this postcondition
-27550 | / {
-27551 | |     let tree = plan_serialized_tree(
-27552 | |         workspace,
-27553 | |         window_bytes,
+27809 | / {
+27810 | |     let tree = plan_serialized_tree(
+27811 | |         workspace,
+27812 | |         window_bytes,
 ...     |
-27600 | |     })
-27601 | | }
+27859 | |     })
+27860 | | }
       | |_- at the end of the function body
 
 error: aborting due to 1 previous error
