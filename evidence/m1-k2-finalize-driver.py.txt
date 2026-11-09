@@ -72,6 +72,7 @@ artifacts=set(canaries)
 for pattern in ['m1-k2-*','m1-distance-*','brotli-b3c-m1-k2-*.json']:
  artifacts.update(p for p in Path('evidence').glob(pattern) if p.is_file())
 artifacts.add(Path('evidence/positive-brotli-m1-planner-cap-rank.log'))
+artifacts.add(Path('evidence/positive-brotli-b3c-repeat-bound-obligation.log'))
 documents=['AGENTS.md','BROTLI_B3C_PROPOSAL.md','BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md','BROTLI_B3C_METERING_ADDENDUM.md','BROTLI_M1_TRANSITION_RULE_DECISION.md','BROTLI_M1_TREE_ACTION_BOUND_DECISION.md','BROTLI_B3C_FIXTURE_F2_DECISION.md','BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md','BROTLI_M1_CONTEXT_MODE_PROOF_BOUNDARY_DECISION.md']
 r={'component':'Brotli B3c M1 distance, malformed-count and approved K2 pending-mode continuation',
  'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':base,

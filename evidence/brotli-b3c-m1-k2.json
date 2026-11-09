@@ -443,7 +443,7 @@
     "evidence/m1-k2-data-scheduling.json": "7b9475ddd3869e2aed2c179a4e72dadecdd4088973220fc7e1a0323f99c1aae2",
     "evidence/m1-k2-dispatcher-preflight-01.log": "22f4e1bcc181ad6343d137de2250ce2f3661f55de7a02da3b361b159e2ed7c30",
     "evidence/m1-k2-executor-preflight-01.log": "22f4e1bcc181ad6343d137de2250ce2f3661f55de7a02da3b361b159e2ed7c30",
-    "evidence/m1-k2-finalize-driver.py.txt": "1428949fc2613add15cc3aed430ecad95b6c0bc191b978d251bede03c0beeaf5",
+    "evidence/m1-k2-finalize-driver.py.txt": "253d51132e9a916964fa2080b381cf8496fe0cc321ba9832c8f3ea4b46393adc",
     "evidence/m1-k2-first-control-attempt.json": "75be94a1e4ace422c918a454598464f8fdd72304d21ba55c81e9b9fe5664b288",
     "evidence/m1-k2-first-control-runs.json": "ac971536fc829ad9b08456bd4afc340a293a6f7157b6826732ebe2794e9b7b1a",
     "evidence/m1-k2-format-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -472,7 +472,8 @@
     "evidence/m1-k2-verification-driver.py.txt": "9e6b694d52ea7b29cbe4461a1bc68229622fa2eca5e77d17b006e88ffa75175e",
     "evidence/m1-k2-whole-crate.log": "d111fb335bdae6b9f3e6f039bff6978a0c464ce818748f5baab2253901d1fd7d",
     "evidence/m1-k2-writer-preflight.log": "54e805325a7b781f824f4f6a17b255dfcdd51731c90eb0ba51cb04ce4d23f48e",
-    "evidence/positive-brotli-m1-planner-cap-rank.log": "a7ee09b14b09f8c350c00945714ab04ba03ae4ad812b2f7f8e49ee342a8d0775"
+    "evidence/positive-brotli-m1-planner-cap-rank.log": "a7ee09b14b09f8c350c00945714ab04ba03ae4ad812b2f7f8e49ee342a8d0775",
+    "evidence/positive-brotli-b3c-repeat-bound-obligation.log": "a69b15fcd92cd6c73e62dd943b441b9605c33c11177aa67fb293fb2248976052"
   },
   "previous_checkpoint": {
     "commit": "53a46b7505dd2a5bb8d73adecbe7c4f714cc16ed",
@@ -530,5 +531,9 @@
       "path": "evidence/m1-k2-resource-failure-canary-brotli-m1-block-count-limited-input-is-retryable.log",
       "status": "checker_resource_exhaustion_not_a_semantic_defect_rejection"
     }
-  ]
+  ],
+  "evidence_completion": {
+    "implementation_commit": "d0e7084b142e30f8487857d5ee33d0ea5242594e",
+    "scope": "Bind the fresh repeat-bound positive transcript generated during the completed controls. Library, harness, proof outcomes and release claims remain unchanged."
+  }
 }
