@@ -1,0 +1,62 @@
+from pathlib import Path
+import concurrent.futures, datetime, hashlib, json, os, shutil, subprocess, time
+root=Path.cwd();env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1',VERUS_ROOT='/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+suite='the_prover_rejects_six_m1_block_count_relation_and_debit_defects'
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def read(p):return json.loads(Path(p).read_text())
+def write(p,d):Path(p).write_text(json.dumps(d,indent=2)+'\n')
+def run(command,log):
+ with Path(log).open('w') as out:return subprocess.run(command,env=env,stdout=out,stderr=subprocess.STDOUT).returncode
+candidate=read('target/m1-k2-control-recovery.json')
+assert 'recovery_exit_code 0' in Path('evidence/m1-k2-control-recovery-candidate.log').read_text()
+while not Path('evidence/brotli-b3c-m1-k2-controls.json').exists():time.sleep(10)
+c=read('evidence/brotli-b3c-m1-k2-controls.json');f=read('evidence/m1-k2-source-freeze.json')
+failed=[r for r in c['suites'] if r['exit_code']!=0]
+assert len(failed)==1 and failed[0]['suite']==suite,failed
+assert f['exit_code']==0 and f['source_unchanged']
+assert all(sha(p)==h for section in ['source_sha256','validation_source_sha256'] for p,h in f[section].items())
+# Retain the actual positive that preceded every original mutant, and its harness.
+for old,new in [
+ ('evidence/m1-k2-source-freeze.json','evidence/m1-k2-pre-recovery-source-freeze.json'),
+ ('evidence/brotli-b3c-m1-k2-verification.json','evidence/m1-k2-pre-recovery-verification.json'),
+ ('evidence/m1-k2-whole-crate.log','evidence/m1-k2-pre-recovery-whole-crate.log'),
+ ('evidence/m1-k2-release-tests.log','evidence/m1-k2-pre-recovery-release-tests.log'),
+ ('evidence/brotli-b3c-m1-k2-controls.json','evidence/m1-k2-first-control-attempt.json'),
+ ('evidence/m1-k2-control-runs.json','evidence/m1-k2-first-control-runs.json'),
+ ('tests/proof_rejection.rs','evidence/m1-k2-pre-recovery-harness.rs.txt')]:shutil.copyfile(old,new)
+assert c['positive_control']['sha256']==sha('evidence/m1-k2-pre-recovery-verification.json')
+p=Path('tests/proof_rejection.rs');old=p.read_text();a=old.index('fn '+suite+'(');b=old.index('\n#[test]',a);selected=old[a:b]
+needle='"if false { CompressedStatus::Failed(CoreFailure::ResourceLimit) }"'
+replacement='"if input_was_limited && phase != CompressedOuterPhase::BlockCount { CompressedStatus::Failed(CoreFailure::ResourceLimit) }"'
+assert selected.count(needle)==1
+new=old[:a]+selected.replace(needle,replacement,1)+old[b:]
+assert hashlib.sha256(new.encode()).hexdigest()==candidate['harness_candidate_sha256']
+p.write_text(new)
+subprocess.run(['cargo','+1.99.1','fmt','--all'],env=env,check=True)
+assert p.read_text()==new,'Unexpected formatting delta'
+assert all(sha(p)==h for p,h in f['source_sha256'].items()),'Library changed'
+# Fresh whole-crate and release checks bind the final harness. Earlier passing
+# controls remain bound to the first unchanged-library positive, not reclassified.
+with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+ v=pool.submit(run,['python3','evidence/m1-k2-verification-driver.py.txt'],'evidence/m1-k2-verification-driver.log')
+ t=pool.submit(run,['cargo','+1.99.1','test','--locked','--release'],'evidence/m1-k2-release-tests.log')
+ assert v.result()==0 and t.result()==0,'Final verification or release checks failed'
+assert run(['cargo','+1.99.1','fmt','--all','--','--check'],'evidence/m1-k2-format-check.log')==0
+assert run(['cargo','+1.99.1','build','--locked','--release'],'evidence/m1-k2-release-build.log')==0
+fresh=read('evidence/m1-k2-source-freeze.json');assert fresh['source_sha256']==f['source_sha256']
+command=['cargo','+1.99.1','test','--locked','--release','--test','proof_rejection',suite,'--','--ignored','--exact','--nocapture']
+log='evidence/m1-k2-control-six_m1_block_count_relation_and_debit_defects.log';started=time.monotonic();exit_code=run(command,log)
+assert exit_code==0,'Repaired suite did not pass'
+row={'suite':suite,'expected_mutations':6,'exit_code':exit_code,'elapsed_seconds':time.monotonic()-started,'log':log,'log_sha256':sha(log),'command':command,'recovery':'Phase-specific mutant; every original library contract and admitted input remains unchanged.'}
+c['suites']=[row if r['suite']==suite else r for r in c['suites']]
+c.update(generated_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),source_unchanged=all(sha(p)==h for p,h in fresh['source_sha256'].items()),suites_passed=24,suites_failed=0,rejected_mutations=146)
+c['positive_control']['path']='evidence/m1-k2-pre-recovery-verification.json'
+c['positive_control']['source_freeze']='evidence/m1-k2-pre-recovery-source-freeze.json'
+c['final_harness_whole_positive']={'path':'evidence/brotli-b3c-m1-k2-verification.json','sha256':sha('evidence/brotli-b3c-m1-k2-verification.json')}
+c['recovery']={'earlier_failed_suite':'evidence/m1-k2-resource-failure-m1-k2-control-six_m1_block_count_relation_and_debit_defects.log','earlier_resource_output':'evidence/m1-k2-resource-failure-canary-brotli-m1-block-count-limited-input-is-retryable.log','harness_before':'evidence/m1-k2-pre-recovery-harness.rs.txt','harness_before_sha256':hashlib.sha256(old.encode()).hexdigest(),'harness_after_sha256':sha('tests/proof_rejection.rs'),'exact_old_literal':needle,'exact_new_literal':replacement,'library_and_root_contracts_unchanged':True,'failed_attempt_counted_as_semantic_rejection':False}
+write('evidence/m1-k2-control-runs.json',c['suites']);write('evidence/brotli-b3c-m1-k2-controls.json',c)
+coverage=read('evidence/brotli-b3c-m1-k2-coverage.json');coverage['earlier_failed_checks'].append({'path':c['recovery']['earlier_resource_output'],'status':'checker_resource_exhaustion_not_a_semantic_defect_rejection'});write('evidence/brotli-b3c-m1-k2-coverage.json',coverage)
+report=Path('BROTLI_B3C_METERING_ADDENDUM.md')
+with report.open('a') as out:out.write('\nThe broad block-count limited-input mutant exhausted the checker before producing a semantic failure. Its exact output and failed suite are retained and are not counted as rejections. Restricting that mutant to its named BlockCount phase produced the expected semantic failure under every unchanged original library contract. The final harness passed a fresh whole-crate positive and all 99 release tests; the repaired six-control suite then passed. Other passing controls retain their actual preceding positive, whose library hashes exactly equal the final source. No earlier failure is reclassified.\n')
+assert run(['python3','evidence/m1-k2-publication-driver.py.txt'],'target/m1-k2-publication.log')==0
+print('Recovery, final validation and authorized publication completed.',flush=True)

@@ -1,0 +1,5 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51431,13): 'if' cannot be used in patterns.
+WARNING: (57857,5): 'if' cannot be used in patterns.
+verification results:: 11 verified, 0 errors (partial verification with `--verify-*`)

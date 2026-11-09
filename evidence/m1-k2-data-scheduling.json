@@ -1,0 +1,25 @@
+{
+  "generated_utc": "2026-11-09T18:20:44.537667+00:00",
+  "functions": [
+    "command_entry_formula",
+    "command_entry",
+    "literal_context",
+    "dictionary_size_bits",
+    "dictionary_offset",
+    "transform_record",
+    "decoder_prefix_suffix",
+    "toggle_32",
+    "toggle_5",
+    "ferment",
+    "copy_affix",
+    "copy_dictionary_slice",
+    "dictionary_transform_plan",
+    "transform_dictionary_word"
+  ],
+  "only_addition": "#[verifier::spinoff_prover]",
+  "bodies_contracts_and_constants_unchanged": true,
+  "before_sha256": "188030151158d62799924dfb7b78879462e6f8410e1391fa773b02c63bbed54b",
+  "after_sha256": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+  "global_rlimit": 300,
+  "source_equality_when_only_added_annotations_are_removed": true
+}

@@ -2,16 +2,16 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-37843/src/brotli_input.rs:2167:5
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-11458/src/brotli_input.rs:2167:5
      |
 2167 |     while i < 18
      |     ^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-37843/src/brotli_input.rs:2151:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-11458/src/brotli_input.rs:2151:1
      |
 2151 | / fn decode_auxiliary_symbol(
 2152 | |     code: &ComplexCodeLengthAlphabet,
@@ -21,7 +21,7 @@ note: function body check: not all errors may have been reported; rerun with a h
      | |___________________^
 
 error: postcondition not satisfied
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-37843/src/brotli_input.rs:2158:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-reversal-canary-11458/src/brotli_input.rs:2158:9
      |
 2158 | /         r.is_some() ==> {
 2159 | |             &&& r.unwrap() < 18

@@ -1,0 +1,31 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-9975/src/brotli_input.rs:25267:1
+      |
+25267 | / fn plan_context_mode_action(
+25268 | |     workspace: &[u8],
+25269 | |     window_bytes: u32,
+25270 | |     input: &[u8],
+25271 | |     end_of_input: bool,
+25272 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+      | |____________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-9975/src/brotli_input.rs:25277:9
+      |
+25277 | /         b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+25278 | |         && context_mode_count_invalid(workspace@, window_bytes) ==>
+25279 | |         r.is_ok() && context_mode_bad_count_plan_valid(workspace@, window_bytes, r.unwrap()),
+      | |____________________________________________________________________________________________^ failed this postcondition
+...
+25288 | /         return Ok(CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+25289 | |             consumed: 0, status: None });
+      | |________________________________________- at this exit
+
+error: aborting due to 1 previous error
+

@@ -2,27 +2,27 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-41752/src/brotli_input.rs:26908:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-15599/src/brotli_input.rs:27428:1
       |
-26908 | fn code_description_payload_writes(phase: CodeDescriptionPhase) -> (r: u64)
+27428 | fn code_description_payload_writes(phase: CodeDescriptionPhase) -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-41752/src/brotli_input.rs:26909:22
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-15599/src/brotli_input.rs:27429:22
       |
-26909 |       ensures r <= 35, r == code_description_payload_writes_spec(phase),
+27429 |       ensures r <= 35, r == code_description_payload_writes_spec(phase),
       |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
-26910 |   {
-26911 | /     match phase {
-26912 | |         CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize => 0,
-26913 | |         CodeDescriptionPhase::SimpleSymbols { .. } => 12,
-26914 | |         CodeDescriptionPhase::SimpleShape { .. }
+27430 |   {
+27431 | /     match phase {
+27432 | |         CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize => 0,
+27433 | |         CodeDescriptionPhase::SimpleSymbols { .. } => 12,
+27434 | |         CodeDescriptionPhase::SimpleShape { .. }
 ...     |
-26928 | |         CodeDescriptionPhase::Failed(_) => 1,
-26929 | |     }
+27448 | |         CodeDescriptionPhase::Failed(_) => 1,
+27449 | |     }
       | |_____- at the end of the function body
 
 error: aborting due to 1 previous error

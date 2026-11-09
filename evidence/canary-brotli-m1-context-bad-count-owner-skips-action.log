@@ -1,0 +1,75 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+warning: unreachable expression
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-9975/src/brotli_input.rs:31018:9
+      |
+31017 |           return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) });
+      |           -------------------------------------------------------------------------------------------------- any code following this expression is unreachable
+31018 | /         match execute_fixed_compressed_plan(
+31019 | |             workspace,
+31020 | |             window_bytes,
+31021 | |             budget,
+...     |
+31029 | |             Err(step) => return Err(step),
+31030 | |         }
+      | |_________^ unreachable expression
+      |
+      = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-9975/src/brotli_input.rs:30666:1
+      |
+30666 | / fn advance_planned_compressed_action(
+30667 | |     workspace: &mut [u8],
+30668 | |     window_bytes: u32,
+30669 | |     budget: &mut crate::brotli::RequestBudget,
+30670 | |     input: &[u8],
+30671 | |     end_of_input: bool,
+30672 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+note: function body check finished in 37 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-9975/src/brotli_input.rs:30666:1
+      |
+30666 | / fn advance_planned_compressed_action(
+30667 | |     workspace: &mut [u8],
+30668 | |     window_bytes: u32,
+30669 | |     budget: &mut crate::brotli::RequestBudget,
+30670 | |     input: &[u8],
+30671 | |     end_of_input: bool,
+30672 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-9975/src/brotli_input.rs:30678:9
+      |
+30678 | /         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 5
+30679 | |             && context_mode_count_invalid(old(workspace)@, window_bytes) ==> {
+30680 | |                 &&& final(budget).input_remaining == old(budget).input_remaining
+30681 | |                 &&& final(budget).output_remaining == old(budget).output_remaining
+...     |
+30695 | |             },
+      | |_____________^ failed this postcondition
+...
+31017 |           return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) });
+      |           -------------------------------------------------------------------------------------------------- at this exit
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-9975/src/brotli_input.rs:30666:1
+      |
+30666 | / fn advance_planned_compressed_action(
+30667 | |     workspace: &mut [u8],
+30668 | |     window_bytes: u32,
+30669 | |     budget: &mut crate::brotli::RequestBudget,
+30670 | |     input: &[u8],
+30671 | |     end_of_input: bool,
+30672 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: aborting due to 1 previous error; 1 warning emitted
+

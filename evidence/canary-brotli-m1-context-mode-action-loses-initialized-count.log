@@ -1,0 +1,34 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-9768/src/brotli_input.rs:21254:5
+      |
+21254 | /     fn advance_context_modes_phase(
+21255 | |         &mut self,
+21256 | |         phase: CompressedOuterPhase,
+21257 | |         input: &[u8],
+21258 | |         end_of_input: bool,
+21259 | |     ) -> (r: (usize, Option<CompressedHeaderStatus>))
+      | |____________________________________________________^
+
+error: precondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-9768/src/brotli_input.rs:21440:37
+      |
+19522 | /         match read {
+19523 | |             BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+19524 | |             BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+19525 | |             BitReadStatus::Value(value) => status.is_none() && value < 4
+19526 | |                 && context_mode_value_applied(before, after, window_bytes, value as u8),
+19527 | |         },
+      | |_________- failed precondition
+...
+21440 | /                                     establish_context_mode_refinement(original, self.workspace@, self.window_bytes,
+21441 | |                                         input@, end_of_input, consumed, None, start_queue, queue, read.status);
+      | |______________________________________________________________________________________________________________^
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,34 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-9768/src/brotli_input.rs:25235:1
+      |
+25235 | / fn context_mode_planning_work(
+25236 | |     workspace: &[u8],
+25237 | |     window_bytes: u32,
+25238 | |     input_len: usize,
+25239 | | ) -> (r: Result<u64, CompressedHeaderError>)
+      | |___________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-9768/src/brotli_input.rs:25242:9
+      |
+25242 | /         r.is_ok() && context_mode_pending(workspace@, window_bytes) ==>
+25243 | |             context_mode_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+      | |____________________________________________________________________________________________________^ failed this postcondition
+...
+25246 | / {
+25247 | |     reveal(context_mode_count_invalid); reveal(context_mode_pending);
+25248 | |     reveal(context_mode_planning_read_valid); reveal(context_mode_read_units);
+25249 | |     let literal_count = state_u16(workspace, window_bytes, B3B_BLOCK_COUNTS)?;
+...     |
+25264 | |     Ok(0)
+25265 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

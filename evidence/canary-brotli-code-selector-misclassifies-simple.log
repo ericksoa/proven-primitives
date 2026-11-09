@@ -2,51 +2,16 @@ verification results:: 4 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:1636:17
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-10976/src/brotli_input.rs:1636:17
      |
 1636 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
      |                 ^^^^^
 
-note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4555:21
-     |
-4555 |                     while i < index as usize
-     |                     ^^^^^^^^^^^^^^^^^^^^^^^^
-
-note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4726:33
-     |
-4726 | ...                   assert(0u8 < (1u8 << 0)) by (bit_vector);
-     |                       ^^^^^^
-
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4258:5
-     |
-4258 | /     fn advance_field(
-4259 | |         &mut self,
-4260 | |         input: &[u8],
-4261 | |         end_of_input: bool,
-4262 | |     ) -> (r: CodeDescriptionStep)
-     | |________________________________^
-
-error: assertion failed
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4818:16
-     |
-4818 |           assert(code_transition_holds(
-     |  ________________^
-4819 | |             phase,
-4820 | |             field as nat,
-4821 | |             self.alphabet_max,
-...    |
-4824 | |             status,
-4825 | |         ));
-     | |_________^ assertion failed
-
-note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-37172/src/brotli_input.rs:4225:5
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-10976/src/brotli_input.rs:4225:5
      |
 4225 | /     fn from_meta(
 4226 | |         meta: MetaBlockDecoder,
@@ -54,6 +19,36 @@ note: function body check: not all errors may have been reported; rerun with a h
 4228 | |         alphabet_limit: u16,
 4229 | |     ) -> (r: Result<Self, CodeDescriptionError>)
      | |_______________________________________________^
+
+note: verifying module brotli_input, function lib::brotli_input::CodeDescriptionDecoder::advance_field (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-10976/src/brotli_input.rs:4556:21
+     |
+4556 |                     while i < index as usize
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-10976/src/brotli_input.rs:4727:33
+     |
+4727 | ...                   assert(0u8 < (1u8 << 0)) by (bit_vector);
+     |                       ^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-10976/src/brotli_input.rs:4259:5
+     |
+4259 | /     fn advance_field(
+4260 | |         &mut self,
+4261 | |         input: &[u8],
+4262 | |         end_of_input: bool,
+4263 | |     ) -> (r: CodeDescriptionStep)
+     | |________________________________^
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-code-canaries-10976/src/brotli_input.rs:4521:28
+     |
+4521 |                     assert(skip == 0 || skip == 2 || skip == 3);
+     |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
 
 error: aborting due to 1 previous error
 

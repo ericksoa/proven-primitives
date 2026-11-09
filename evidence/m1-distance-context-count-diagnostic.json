@@ -1,0 +1,13 @@
+{
+  "status": "observed_runtime_failure_not_a_proof",
+  "raw_log_sha256": "adf4ac6d628903263bd6563fb1354c581e98bcb20850adc00b77472124f691e9",
+  "raw_bytes": 12436348,
+  "gzip_path": "evidence/m1-distance-context-count-before-fix.log.gz",
+  "gzip_sha256": "a9fe2ad0543a81f3cc0fdf17002d7de4232d62ade7e3dc713fae513b11c1bea2",
+  "source_sha256": "a16a3e671657c9a7248aa9592b60929e64df63257d0d899cc24f30f0de1bec45",
+  "lines": [
+    "CTX_INVALID_COUNT expected=(0, Some(Failed(InternalState))) actual=Err(CompressedStep { consumed: 0, status: Failed(InvalidFormat(StateEncoding)) }) expected_outer=Ok(12) actual_outer=Ok(5) work_spent=0",
+    "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.04s"
+  ],
+  "original_gzip_path": "/tmp/m1-ctx-invalid-count-before-fix.log.gz"
+}

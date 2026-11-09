@@ -461,3 +461,107 @@ prefix-module proof boundary is unchanged.
 ### Final block-count-source validation
 
 The unchanged source passed 1176 whole-crate checks with zero errors. All 96 release tests passed, followed by 124 semantic defect rejections across 20 suites. Exact source, harness, approvals, tool, compiled-artifact and transcript hashes are bound in `evidence/brotli-b3c-m1-block-count.json`. Full M1 and decoder release obligations remain open, and K1 remains held for human review.
+
+### Distance and malformed-context-count continuation
+
+The existing six-bit distance-parameter transition now exposes the exact
+decoded postfix, direct-distance count, alphabet size, retained cursor,
+consumption and next phase. Its frames preserve every byte outside the queue,
+the three parameter fields and the applicable outer/terminal image. A shared
+read-cost model binds the pre-scan to the detailed plan, and determinism binds
+the plan to W1 execution. Valid-plan execution proves the expected core result,
+input/work debits and unchanged other counters, including the limited-input
+mapping and failed-work-reservation identity.
+
+A runtime comparison also exposed an admitted malformed-state discrepancy in
+the later context-mode path. For a zero/oversized literal count or an
+initialized count beyond it, W1 stores its InternalState terminal image. The
+adapter previously returned the corresponding core error before that action,
+leaving the B3b outer phase unchanged and spending zero work. The fix forecasts
+the existing four-write/one-transition failure, reserves its five units and
+invokes the unchanged W1 helper. Selected proofs cover that failure image,
+zero consumption, exact debit, and unchanged workspace/budget when credit is
+short. This is an internal admitted-state refinement issue, not a demonstrated
+wire-stream acceptance bug.
+
+The continuation passes **98 release tests** and a **732-check input-module
+preflight**. Neither substitutes for its pending whole-crate positive. Twelve
+new unchanged-specification controls cover distance receipt/status/consumption,
+parameter stores, and malformed-count planning/latching/error mapping. They
+remain gated on a fresh unchanged whole-crate positive, expanding the run to
+22 suites and 136 defects.
+
+The failed malformed-count comparison is retained as exact compressed output
+with its original byte hash and diagnostic source. The existing field-parser
+proof uses the repository's supported solver-context isolation at its existing
+effort limit; no logical contract, admitted input or runtime budget is changed
+by that checker configuration.
+
+At that checkpoint normal context-mode agreement still needed an additional
+success guarantee from the existing prefix writer contract. The human has now
+approved K2 as recorded below. K1's separate hold remains active. The complete
+operation ledger, remaining malformed-state paths, other phases, B3d, B4 and
+independent human review remain open; M1 and the release gate remain incomplete.
+
+### Approved K2 context-mode read continuation
+
+The human explicitly approved K2 on 2026-11-09. Its decision is recorded in
+`BROTLI_M1_CONTEXT_MODE_PROOF_BOUNDARY_DECISION.md`. The existing prefix writer
+now guarantees success for the stated valid workspace/window and index below
+256, under its unchanged requirements. Its executable body and signature are
+unchanged. The canonical-code definitions and installer contract held under K1
+are untouched.
+
+Input-local proofs bind a pending context-mode action to the exact two-bit
+read: the decoded value, next initialized count, retained cursor, consumed
+input, status, and outcome-specific byte frame. The admitted proof domain is
+`1 <= literal_count <= 256`, `initialized < literal_count`, with a valid
+serialized queue. Existing executable inputs and all existing requirements
+are unchanged. The previously added malformed-count guarantees remain intact.
+
+The pre-scan and detailed plan have the same checked read cost. Checked
+determinism connects a valid plan to W1 execution through the outer dispatcher.
+The existing prepaid executor guarantees the corresponding result, exact
+execution-work and input debits, unchanged other counters, limited-input
+mapping, and complete workspace/budget preservation on failed execution
+reservation. The work formulas remain `read_work + 11` for NeedInput,
+`read_work + 16` for truncation, and `read_work + 15` for a value. Planning work
+is charged separately, as already approved.
+
+One runtime matrix compares all four mode values, empty input, retained one-
+and two-bit queues, both EOF settings, first/interior/last initialized cells,
+limited-input mapping, and exact/one-short execution work with W1's entire
+workspace image. Ten new unchanged-contract controls target the K2 success
+guarantee, planning receipts, outcomes, stored value/count, input debit and
+limited-input mapping. They expand the combined distance/malformed-count/K2
+validation to 24 suites and 146 deliberate defects.
+
+The focused checks and all **99 release tests** pass. The fresh whole-crate
+positive and subsequent deliberate-defect run are pending. The earlier
+distance whole-crate attempt has no completion receipt and is retained as
+interrupted; it is not counted as a positive. The initial K2 attempt was also
+stopped before completion to correct a prefix-control extraction bug found by
+static inspection; no mutant ran before a whole-crate positive.
+
+The next whole-crate attempt completed the changed modules without reported
+errors but was still spending most of its time in serial constant-data proofs.
+It was stopped before completion. A global-isolation check did not eliminate
+that bottleneck. Fourteen existing data functions now use the same proof-only
+`spinoff_prover` annotation already used elsewhere in this crate, permitting
+independent solver scheduling. Removing just those annotations reproduces the
+entire original data source byte for byte. Their bodies, contracts and
+constants, the pinned tools and the global resource limit are unchanged.
+Final validation is restarted on the source containing these annotations;
+earlier incomplete attempts are retained and are not positives.
+
+These guarantees cover individual pending reads under the stated domain and
+valid-plan execution, not the complete context-mode-list handoff, all malformed
+queue states, an end-to-end source-operation ledger, or arbitrary sequences of
+public calls. Remaining M1, B3c/B3d/B4 and independent-review obligations stay
+open, and the supported-decoder release gate remains incomplete.
+
+The broad block-count limited-input mutant exhausted the checker before producing a semantic failure. Its exact output and failed suite are retained and are not counted as rejections. Restricting that mutant to its named BlockCount phase produced the expected semantic failure under every unchanged original library contract. The final harness passed a fresh whole-crate positive and all 99 release tests; the repaired six-control suite then passed. Other passing controls retain their actual preceding positive, whose library hashes exactly equal the final source. No earlier failure is reclassified.
+
+### Final distance and K2 source validation
+
+The unchanged source passed **1,182 whole-crate checks with zero errors**. All **99 release tests** passed. Across **24 suites, 146 distinct deliberate defects** were rejected after their recorded unchanged-library whole-crate positives. Every rejection has a retained semantic checker failure without resource/compiler failure. Exact source, harness, approved K2 delta, tool, compiled-artifact and transcript identities are bound in `evidence/brotli-b3c-m1-k2.json`. K1 remains held. The named pending-read and distance/malformed-count guarantees do not complete M1 or the decoder release obligations.

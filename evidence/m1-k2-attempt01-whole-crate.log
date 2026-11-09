@@ -1,0 +1,88 @@
+note: preparing crate for verification
+
+note: verifying root module
+
+note: verifying module base64
+
+note: verifying module brotli
+
+note: verifying module brotli_block
+
+note: verifying module brotli_data
+
+note: verifying module brotli_dictionary
+
+note: verifying module brotli_input
+
+note: verifying module brotli_prefix
+
+note: done with root module
+
+note: verifying module composition_demo
+
+note: done with module composition_demo
+
+note: verifying module lz4
+
+note: done with module brotli_block
+
+note: verifying module percent
+
+note: done with module percent
+
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree
+
+note: done with module lz4
+
+note: verifying module brotli_input, function lib::brotli_input::body_decrement_block_remaining
+
+WARNING: (53964,13): 'if' cannot be used in patterns.
+WARNING: (61852,5): 'if' cannot be used in patterns.
+note: done with module brotli_dictionary
+
+note: verifying module brotli_input, function lib::brotli_input::CodeDescriptionDecoder::advance_field
+
+note: done with module brotli_prefix
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: done with module base64
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::body_decrement_block_remaining
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::CodeDescriptionDecoder::advance_field
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.

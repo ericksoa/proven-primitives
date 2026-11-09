@@ -1,0 +1,9 @@
+{
+  "verified_utc": "2026-11-09T18:11:41.606420+00:00",
+  "base_commit": "53a46b7505dd2a5bb8d73adecbe7c4f714cc16ed",
+  "only_delta": "        window_bytes <= 16_777_216\n            && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES\n            && initialized < LITERAL_CONTEXT_MODES_BYTES ==> r.is_ok(),\n",
+  "base_prefix_sha256": "51aef479d715d4836ffce0a84ed73ea7f52aee827d182848ff96a7edb1a112c8",
+  "current_prefix_sha256": "da93deee6433c1dff55baafa6352c8b577bf67319a560b3b5883058105eae95a",
+  "executable_body_unchanged": true,
+  "K1_unchanged": true
+}

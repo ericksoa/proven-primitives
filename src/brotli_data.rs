@@ -81,6 +81,7 @@ pub(crate) open spec fn command_insert_code_spec(symbol: u16) -> nat {
     (position / 8) * 8 + (symbol as nat / 8) % 8
 }
 
+#[verifier::spinoff_prover]
 pub(crate) fn command_entry_formula(symbol: u16) -> (r: CommandEntry)
     requires symbol < COMMAND_SYMBOLS,
     ensures
@@ -842,6 +843,7 @@ pub(crate) const COMMAND_TABLE: [CommandEntry; COMMAND_SYMBOLS] = [
     CommandEntry { insert_extra_bits: 24, copy_extra_bits: 24, distance_mode: -1, distance_context: 3, insert_offset: 22594, copy_offset: 2118 },
 ];
 
+#[verifier::spinoff_prover]
 pub(crate) fn command_entry(symbol: u16) -> (r: CommandEntry)
     requires symbol < COMMAND_SYMBOLS,
     ensures r == COMMAND_TABLE@[symbol as int],
@@ -980,6 +982,7 @@ pub(crate) const LITERAL_CONTEXT_TABLE: [u8; 2048] = [
     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7,
 ];
 
+#[verifier::spinoff_prover]
 pub(crate) fn literal_context(mode: u8, previous: u8, second_previous: u8) -> (r: u8)
     requires mode < 4,
     ensures r == (LITERAL_CONTEXT_TABLE@[(mode as int) * 512 + previous as int]
@@ -1002,6 +1005,7 @@ pub(crate) const DICTIONARY_OFFSETS: [u32; 32] = [
     122016, 122784, 122784, 122784, 122784, 122784, 122784, 122784,
 ];
 
+#[verifier::spinoff_prover]
 pub(crate) fn dictionary_size_bits(length: u8) -> (r: u8)
     requires length < 32,
     ensures r == DICTIONARY_SIZE_BITS@[length as int],
@@ -1009,6 +1013,7 @@ pub(crate) fn dictionary_size_bits(length: u8) -> (r: u8)
     DICTIONARY_SIZE_BITS[length as usize]
 }
 
+#[verifier::spinoff_prover]
 pub(crate) fn dictionary_offset(length: u8) -> (r: u32)
     requires length < 32,
     ensures r == DICTIONARY_OFFSETS@[length as int],
@@ -1127,6 +1132,7 @@ pub(crate) fn distance_value_delta(symbol: u8) -> (r: i8)
     }
 }
 
+#[verifier::spinoff_prover]
 pub(crate) fn transform_record(index: u8) -> (r: (u8, u8, u8))
     requires index < TRANSFORM_COUNT,
     ensures r.0 == TRANSFORM_RECORDS@[(index as int) * 3],
@@ -1154,6 +1160,7 @@ fn decoder_transform_record(index: u8) -> (r: (u8, u8, u8))
     }
 }
 
+#[verifier::spinoff_prover]
 fn decoder_prefix_suffix(id: u8) -> (r: (usize, usize))
     requires id < 50,
     ensures
@@ -1218,6 +1225,7 @@ pub(crate) open spec fn toggle_5_spec(byte: u8) -> nat {
         else { 2nat }
 }
 
+#[verifier::spinoff_prover]
 fn toggle_32(byte: u8) -> (r: u8)
     ensures r as nat == toggle_32_spec(byte),
 {
@@ -1235,6 +1243,7 @@ fn toggle_32(byte: u8) -> (r: u8)
     }
 }
 
+#[verifier::spinoff_prover]
 fn toggle_5(byte: u8) -> (r: u8)
     ensures r as nat == toggle_5_spec(byte),
 {
@@ -1317,6 +1326,7 @@ pub(crate) open spec fn ferment_all_spec(
     }
 }
 
+#[verifier::spinoff_prover]
 fn ferment(bytes: &mut [u8; 40], start: usize, len: usize, position: usize) -> (r: usize)
     requires start + len <= 40, position < len,
     ensures
@@ -1343,6 +1353,7 @@ fn ferment(bytes: &mut [u8; 40], start: usize, len: usize, position: usize) -> (
     }
 }
 
+#[verifier::spinoff_prover]
 fn copy_affix(
     output: &mut [u8; 40],
     output_start: usize,
@@ -1382,6 +1393,7 @@ fn copy_affix(
     }
 }
 
+#[verifier::spinoff_prover]
 fn copy_dictionary_slice(
     output: &mut [u8; 40],
     output_start: usize,
@@ -1623,6 +1635,7 @@ fn zero_length_dictionary_transform_plan() -> (r: DictionaryTransformPlan)
     }
 }
 
+#[verifier::spinoff_prover]
 fn dictionary_transform_plan(
     length: u8,
     transform_index: u8,
@@ -1687,6 +1700,7 @@ fn dictionary_transform_plan(
     Ok(plan)
 }
 
+#[verifier::spinoff_prover]
 pub(crate) fn transform_dictionary_word(
     length: u8,
     word_index: u32,

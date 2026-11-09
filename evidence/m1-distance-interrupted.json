@@ -1,0 +1,10 @@
+{
+  "status": "interrupted_no_completion_receipt",
+  "observed_utc": "2026-11-09T18:08:00.676034+00:00",
+  "log": "evidence/m1-distance-whole-crate.log",
+  "log_sha256": "0835ace5a634b35dde4a26fa2b3f7c0d1f8ee4c4b795eefc5ef182efa3200f4a",
+  "source_start": "evidence/m1-distance-source-start.json",
+  "source_start_sha256": "48de166083ab2bd6577d303de331a96caa98cda574ccc4f4ed8aea7905a55fd2",
+  "entire_crate_positive": false,
+  "reason": "No process survived and no whole-crate completion result or source-freeze receipt exists. Temporary control/publication workers are also absent. Superseded by the K2 validation on the updated source."
+}

@@ -2,34 +2,34 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-41752/src/brotli_input.rs:26614:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-15599/src/brotli_input.rs:27134:1
       |
-26614 | / fn initial_symbol_execution_work(
-26615 | |     planning_work: u64,
-26616 | |     status: InstalledSymbolStatus,
-26617 | | ) -> (r: Result<u64, CoreFailure>)
+27134 | / fn initial_symbol_execution_work(
+27135 | |     planning_work: u64,
+27136 | |     status: InstalledSymbolStatus,
+27137 | | ) -> (r: Result<u64, CoreFailure>)
       | |_________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-41752/src/brotli_input.rs:26619:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-15599/src/brotli_input.rs:27139:9
       |
-26619 | /         ({
-26620 | |             let amount: nat = planning_work as nat + 10 + 5 + 1
-26621 | |                 + match status {
-26622 | |                     InstalledSymbolStatus::Symbol(_) => 1nat + 3 + 1,
+27139 | /         ({
+27140 | |             let amount: nat = planning_work as nat + 10 + 5 + 1
+27141 | |                 + match status {
+27142 | |                     InstalledSymbolStatus::Symbol(_) => 1nat + 3 + 1,
 ...     |
-26627 | |             &&& r.is_ok() ==> r.unwrap() as nat == amount
-26628 | |         }),
+27147 | |             &&& r.is_ok() ==> r.unwrap() as nat == amount
+27148 | |         }),
       | |__________^ failed this postcondition
-26629 | / {
-26630 | |     let base = checked_planned_work_add(planning_work, 10 + 4 + 1)?;
-26631 | |     match status {
-26632 | |         InstalledSymbolStatus::Symbol(_) => checked_planned_work_add(base, 1 + 3 + 1),
+27149 | / {
+27150 | |     let base = checked_planned_work_add(planning_work, 10 + 4 + 1)?;
+27151 | |     match status {
+27152 | |         InstalledSymbolStatus::Symbol(_) => checked_planned_work_add(base, 1 + 3 + 1),
 ...     |
-26638 | | }
+27158 | | }
       | |_- at the end of the function body
 
 error: aborting due to 1 previous error

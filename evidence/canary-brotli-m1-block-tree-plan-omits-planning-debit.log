@@ -2,33 +2,33 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27614:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-10943/src/brotli_input.rs:28134:1
       |
-27614 | / fn plan_block_tree_action(
-27615 | |     workspace: &[u8],
-27616 | |     window_bytes: u32,
-27617 | |     budget: &mut crate::brotli::RequestBudget,
+28134 | / fn plan_block_tree_action(
+28135 | |     workspace: &[u8],
+28136 | |     window_bytes: u32,
+28137 | |     budget: &mut crate::brotli::RequestBudget,
 ...     |
-27620 | |     end_of_input: bool,
-27621 | | ) -> (r: Result<CompressedActionPlan, CoreFailure>)
+28140 | |     end_of_input: bool,
+28141 | | ) -> (r: Result<CompressedActionPlan, CoreFailure>)
       | |__________________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-37169/src/brotli_input.rs:27635:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-10943/src/brotli_input.rs:28155:9
       |
-27635 | /         r.is_ok() ==> final(budget).work_remaining as int
-27636 | |             == old(budget).work_remaining as int - r.unwrap().planning_work as int,
+28155 | /         r.is_ok() ==> final(budget).work_remaining as int
+28156 | |             == old(budget).work_remaining as int - r.unwrap().planning_work as int,
       | |__________________________________________________________________________________^ failed this postcondition
-27637 | / {
-27638 | |     let tree = plan_serialized_tree(
-27639 | |         workspace,
-27640 | |         window_bytes,
+28157 | / {
+28158 | |     let tree = plan_serialized_tree(
+28159 | |         workspace,
+28160 | |         window_bytes,
 ...     |
-27669 | |     })
-27670 | | }
+28189 | |     })
+28190 | | }
       | |_- at the end of the function body
 
 error: aborting due to 1 previous error

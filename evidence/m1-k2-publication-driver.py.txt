@@ -1,0 +1,53 @@
+from pathlib import Path
+import datetime, hashlib, json, os, subprocess, time
+root=Path.cwd();env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools')
+status=root/'target/m1-k2-publication-status.json'
+def save(stage,**extra):
+ status.parent.mkdir(exist_ok=True)
+ status.write_text(json.dumps({'stage':stage,'updated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),**extra},indent=2)+'\n')
+def run(args,**kw): return subprocess.run(args,env=env,check=True,**kw)
+def output(args): return subprocess.check_output(args,env=env,text=True).strip()
+def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+base='53a46b7505dd2a5bb8d73adecbe7c4f714cc16ed';branch='codex/m1-saved-table-ledger'
+try:
+ save('waiting_for_full_verification_and_controls')
+ while not (root/'evidence/brotli-b3c-m1-k2-controls.json').exists():
+  if (root/'evidence/m1-k2-source-freeze.json').exists():
+   f=json.loads((root/'evidence/m1-k2-source-freeze.json').read_text())
+   assert f['exit_code']==0 and f['source_unchanged'],'Whole verification did not pass on unchanged source'
+  # A failed control is a real stop. Never publish partial suite results.
+  rows_path=root/'evidence/m1-k2-control-runs.json'
+  if rows_path.exists(): assert all(r['exit_code']==0 for r in json.loads(rows_path.read_text())),'A control suite failed'
+  time.sleep(10)
+ save('validating_final_evidence')
+ run(['python3','evidence/m1-k2-finalize-driver.py.txt'])
+ m=json.loads((root/'evidence/brotli-b3c-m1-k2.json').read_text())
+ assert output(['git','rev-parse','HEAD'])==base and output(['git','branch','--show-current'])==branch
+ assert all(sha(p)==h for section in ['source_sha256','validation_source_sha256','approval_and_document_sha256','artifact_sha256'] for p,h in m[section].items())
+ assert output(['git','ls-remote','origin','refs/heads/'+branch]).split()[0]==base,'Remote branch changed; inspect before publication'
+ allowed=set(m['artifact_sha256'])|set(m['approval_and_document_sha256'])|{'src/brotli_input.rs','src/brotli_prefix.rs','src/brotli_data.rs','tests/proof_rejection.rs','evidence/brotli-b3c-m1-k2.json'}
+ # Exclude unchanged documents from the staged diff naturally. No global add.
+ run(['git','add','-f','--',*sorted(allowed)])
+ run(['git','diff','--cached','--check','--','.',':(exclude)evidence'])
+ staged=set(output(['git','diff','--cached','--name-only']).splitlines())
+ assert staged <= allowed and {'src/brotli_input.rs','src/brotli_prefix.rs','src/brotli_data.rs','tests/proof_rejection.rs'}<=staged,staged
+ save('committing_validated_source',staged_files=len(staged))
+ run(['git','commit','-S','-m','Prove Brotli M1 distance and approved K2 context-mode refinement'])
+ commit=output(['git','rev-parse','HEAD'])
+ save('pushing_validated_commit',commit=commit)
+ run(['git','push','origin','HEAD:refs/heads/'+branch])
+ remote=output(['git','ls-remote','origin','refs/heads/'+branch]).split()[0]
+ assert remote==commit,(remote,commit)
+ verification=None
+ for attempt in range(12):
+  verification=json.loads(output(['gh','api','repos/ericksoa/proven-primitives/commits/'+commit,'--jq','.commit.verification | {verified,reason}']))
+  if verification['verified'] and verification['reason']=='valid':break
+  time.sleep(5)
+ assert verification['verified'] and verification['reason']=='valid',verification
+ remaining=output(['git','status','--porcelain'])
+ assert not remaining,remaining
+ save('published',commit=commit,remote=remote,signature=verification,worktree_clean=True,release_gate='incomplete')
+ print(json.dumps({'commit':commit,'signature':verification,'worktree_clean':True,'release_gate':'incomplete'}),flush=True)
+except Exception as exc:
+ save('stopped_without_claiming_completion',error=str(exc))
+ raise

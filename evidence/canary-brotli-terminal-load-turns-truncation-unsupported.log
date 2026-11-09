@@ -2,30 +2,30 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-38099/src/brotli_input.rs:11466:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-12058/src/brotli_input.rs:11467:1
       |
-11466 | / fn load_terminal_error(
-11467 | |     workspace: &[u8],
-11468 | |     window_bytes: u32,
-11469 | | ) -> (r: Result<CompressedHeaderError, CompressedHeaderError>)
+11467 | / fn load_terminal_error(
+11468 | |     workspace: &[u8],
+11469 | |     window_bytes: u32,
+11470 | | ) -> (r: Result<CompressedHeaderError, CompressedHeaderError>)
       | |_____________________________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-38099/src/brotli_input.rs:11471:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-12058/src/brotli_input.rs:11472:9
       |
-11471 |           r.is_ok() ==> serialized_terminal_error(workspace@, window_bytes, r.unwrap()),
+11472 |           r.is_ok() ==> serialized_terminal_error(workspace@, window_bytes, r.unwrap()),
       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
 ...
-11490 | /     match tag {
-11491 | |         1 => match decode_compressed_format_error(detail) {
-11492 | |             Some(error) => Ok(CompressedHeaderError::InvalidFormat(error)),
-11493 | |             None => Err(CompressedHeaderError::InternalState),
+11491 | /     match tag {
+11492 | |         1 => match decode_compressed_format_error(detail) {
+11493 | |             Some(error) => Ok(CompressedHeaderError::InvalidFormat(error)),
+11494 | |             None => Err(CompressedHeaderError::InternalState),
 ...     |
-11502 | |         _ => Err(CompressedHeaderError::InternalState),
-11503 | |     }
+11503 | |         _ => Err(CompressedHeaderError::InternalState),
+11504 | |     }
       | |_____- at the end of the function body
 
 error: aborting due to 1 previous error

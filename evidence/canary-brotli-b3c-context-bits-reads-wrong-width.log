@@ -2,37 +2,37 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:17293:29
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:17294:29
       |
-17293 | ...                   while initialized < target
+17294 | ...                   while initialized < target
       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:16916:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:16917:1
       |
-16916 | / fn advance_context_bits_phase(
-16917 | |     workspace: &mut [u8],
-16918 | |     window_bytes: u32,
-16919 | |     phase: u8,
+16917 | / fn advance_context_bits_phase(
+16918 | |     workspace: &mut [u8],
+16919 | |     window_bytes: u32,
+16920 | |     phase: u8,
 ...     |
-16924 | |     end_of_input: bool,
-16925 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+16925 | |     end_of_input: bool,
+16926 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
       | |______________________________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-41827/src/brotli_input.rs:17016:28
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:17017:28
       |
-17016 |                       assert(bit_read_exact_step(
+17017 |                       assert(bit_read_exact_step(
       |  ____________________________^
-17017 | |                         start_queue,
-17018 | |                         input@,
-17019 | |                         end_of_input,
+17018 | |                         start_queue,
+17019 | |                         input@,
+17020 | |                         end_of_input,
 ...     |
-17023 | |                         read.status,
-17024 | |                     ));
+17024 | |                         read.status,
+17025 | |                     ));
       | |_____________________^ assertion failed
 
 error: aborting due to 1 previous error

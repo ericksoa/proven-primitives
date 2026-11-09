@@ -2,34 +2,59 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
-note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-37170/src/brotli_input.rs:27996:1
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:28524:1
       |
-27996 | / fn execute_fixed_compressed_plan(
-27997 | |     workspace: &mut [u8],
-27998 | |     window_bytes: u32,
-27999 | |     budget: &mut crate::brotli::RequestBudget,
+28524 | / fn execute_fixed_compressed_plan(
+28525 | |     workspace: &mut [u8],
+28526 | |     window_bytes: u32,
+28527 | |     budget: &mut crate::brotli::RequestBudget,
 ...     |
-28004 | |     plan: CompressedActionPlan,
-28005 | | ) -> (r: Result<usize, CompressedStep>)
+28532 | |     plan: CompressedActionPlan,
+28533 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+note: function body check finished in 10 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:28524:1
+      |
+28524 | / fn execute_fixed_compressed_plan(
+28525 | |     workspace: &mut [u8],
+28526 | |     window_bytes: u32,
+28527 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+28532 | |     plan: CompressedActionPlan,
+28533 | | ) -> (r: Result<usize, CompressedStep>)
       | |______________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-37170/src/brotli_input.rs:28013:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:28561:9
       |
-28013 | /         phase == CompressedOuterPhase::BlockCount
-28014 | |             && block_count_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan)
-28015 | |             && old(budget).input_remaining >= plan.consumed as u64
-28016 | |             && old(budget).work_remaining >= plan.execution_work ==> {
+28561 | /         phase == CompressedOuterPhase::DistanceParameters
+28562 | |             && distance_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan)
+28563 | |             && old(budget).input_remaining >= plan.consumed as u64
+28564 | |             && old(budget).work_remaining >= plan.execution_work ==> {
 ...     |
-28022 | |                 &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
-28023 | |             },
+28570 | |                 &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
+28571 | |             },
       | |_____________^ failed this postcondition
 ...
-28139 |           return Err(CompressedStep { consumed: used, status });
+28754 |           return Err(CompressedStep { consumed: used, status });
       |           ----------------------------------------------------- at this exit
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:28524:1
+      |
+28524 | / fn execute_fixed_compressed_plan(
+28525 | |     workspace: &mut [u8],
+28526 | |     window_bytes: u32,
+28527 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+28532 | |     plan: CompressedActionPlan,
+28533 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
 
 error: aborting due to 1 previous error
 

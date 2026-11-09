@@ -1,0 +1,174 @@
+{
+  "component": "Brotli B3c M1 distance and malformed-context-count continuation",
+  "generated_utc": "2026-11-09T18:48:06.173754+00:00",
+  "base_commit": "53a46b7505dd2a5bb8d73adecbe7c4f714cc16ed",
+  "release_gate": "incomplete",
+  "validation_state": "named_contracts_checked_full_M1_open",
+  "obligations": [
+    {
+      "id": "distance-plan-action",
+      "state": "checked_named_contracts",
+      "roots": [
+        "distance_value_applied",
+        "distance_phase_refines",
+        "establish_distance_refinement",
+        "distance_read_units",
+        "distance_planning_read_valid",
+        "distance_plan_valid",
+        "distance_planning_reads_agree",
+        "distance_plan_matches_action",
+        "plan_distance_action",
+        "advance_distance_parameters_phase",
+        "advance_outer_phase_once",
+        "execute_fixed_compressed_plan",
+        "advance_planned_compressed_action"
+      ],
+      "scope": "Valid serialized queue, six-bit wire value, parameter effects, cursor/status/consumption agreement, predicted execution debits and limited-input mapping."
+    },
+    {
+      "id": "distance-byte-frame",
+      "state": "checked_named_contracts",
+      "roots": [
+        "distance_action_frame"
+      ],
+      "scope": "Queue and parameter writes, outer/terminal image; unrelated bytes preserved."
+    },
+    {
+      "id": "malformed-context-count-terminal-action",
+      "state": "checked_named_contracts",
+      "roots": [
+        "context_mode_count_invalid",
+        "context_mode_bad_count_plan_valid",
+        "context_mode_planning_work",
+        "plan_context_mode_action",
+        "advance_context_modes_phase",
+        "advance_outer_phase_once",
+        "execute_fixed_compressed_plan",
+        "advance_planned_compressed_action"
+      ],
+      "scope": "Admitted invalid count states forecast and execute W1 terminal image with five-unit reservation, zero input, correct core error and failed-reservation identity."
+    },
+    {
+      "id": "K2-writer-total-success",
+      "state": "checked_named_contracts",
+      "roots": [
+        "brotli_prefix::write_next_context_mode"
+      ],
+      "scope": "Existing requirements unchanged; valid window, workspace and index below 256 guarantee success. Executable body unchanged."
+    },
+    {
+      "id": "normal-pending-context-mode-plan-action",
+      "state": "checked_named_contracts",
+      "roots": [
+        "context_mode_pending",
+        "context_mode_value_applied",
+        "context_mode_action_frame",
+        "context_mode_phase_refines",
+        "establish_context_mode_refinement",
+        "context_mode_read_units",
+        "context_mode_planning_read_valid",
+        "context_mode_plan_valid",
+        "context_mode_planning_reads_agree",
+        "context_mode_plan_matches_action",
+        "context_mode_planning_work",
+        "plan_context_mode_action",
+        "advance_context_modes_phase",
+        "advance_outer_phase_once",
+        "execute_fixed_compressed_plan"
+      ],
+      "scope": "Count 1..256, initialized below count and valid queue: exact two-bit value/cursor/status/consumption, per-outcome frame, plan agreement and valid-plan execution debits. Insufficient execution work preserves workspace and budget."
+    }
+  ],
+  "remaining_gaps": [
+    "Malformed serialized-state outcome/ledger classification beyond the stated planning domain",
+    "Full source-operation ledger beyond approved formulas and exact planning/execution debits",
+    "Remaining header/body phase refinement and failure accounting",
+    "Complete context-mode-list handoff and malformed queue classification beyond pending reads in the stated valid domain"
+  ],
+  "later_required_phases": [
+    "Remaining B3c resource/public refinement/confidentiality/control gates",
+    "B3d arbitrary permitted call-sequence and source-observation induction",
+    "B4 quarantining caller and profile closure",
+    "Named independent human specification review and fail-closed release evidence"
+  ],
+  "k1_decision": {
+    "path": "BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md",
+    "status": "held_for_human_review_not_approved_not_implemented",
+    "human_answer": "Hold this proof-boundary change for review"
+  },
+  "k2_decision": {
+    "path": "BROTLI_M1_CONTEXT_MODE_PROOF_BOUNDARY_DECISION.md",
+    "status": "explicitly_approved_2026-11-09_implemented_named_contracts_checked",
+    "human_answer": "Approve K2 please"
+  },
+  "runtime_tests": {
+    "path": "evidence/m1-k2-release-tests.log",
+    "passed": 99,
+    "library": 88,
+    "primitives": 9,
+    "trust_scan": 1,
+    "upstream_comparison": 1
+  },
+  "offline_checker_effort": {
+    "global_rlimit": 300,
+    "advance_serialized_tree": {
+      "rlimit": 600,
+      "spinoff": true
+    },
+    "CodeDescriptionDecoder::advance_field": {
+      "rlimit": 500,
+      "spinoff": true
+    },
+    "brotli_data": {
+      "spinoff_functions": [
+        "command_entry_formula",
+        "command_entry",
+        "literal_context",
+        "dictionary_size_bits",
+        "dictionary_offset",
+        "transform_record",
+        "decoder_prefix_suffix",
+        "toggle_32",
+        "toggle_5",
+        "ferment",
+        "copy_affix",
+        "copy_dictionary_slice",
+        "dictionary_transform_plan",
+        "transform_dictionary_word"
+      ],
+      "rlimit": 300,
+      "bodies_contracts_constants_unchanged": true
+    }
+  },
+  "diagnostic": {
+    "metadata": "evidence/m1-distance-context-count-diagnostic.json",
+    "raw_gzip": "evidence/m1-distance-context-count-before-fix.log.gz",
+    "source": "evidence/m1-distance-context-count-diagnostic-test.rs.txt"
+  },
+  "earlier_failed_checks": [
+    {
+      "path": "evidence/m1-distance-interrupted.json",
+      "status": "interrupted_no_whole_crate_positive"
+    },
+    {
+      "path": "evidence/m1-k2-attempt01-interrupted.json",
+      "status": "stopped_for_static_harness_correction_not_a_positive"
+    },
+    {
+      "path": "evidence/m1-k2-attempt02-interrupted.json",
+      "status": "stopped_for_proof_only_data_scheduling_not_a_positive"
+    },
+    {
+      "path": "evidence/m1-k2-resource-failure-canary-brotli-m1-block-count-limited-input-is-retryable.log",
+      "status": "checker_resource_exhaustion_not_a_semantic_defect_rejection"
+    }
+  ],
+  "positive_control": {
+    "path": "evidence/brotli-b3c-m1-k2-verification.json",
+    "sha256": "2886892878cf3f189cd6457610870fc72e9b72ad670a2dc5525796f344d75c09"
+  },
+  "negative_controls": {
+    "path": "evidence/brotli-b3c-m1-k2-controls.json",
+    "sha256": "efdf56201288ea9aacd6bf2a94a9f7cebdba99356fbed76d64104fcd3b3ff750"
+  }
+}

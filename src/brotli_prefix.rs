@@ -2704,6 +2704,9 @@ pub(crate) fn write_next_context_mode(
 ) -> (r: Result<u16, WorkspaceError>)
     requires initialized <= LITERAL_CONTEXT_MODES_BYTES, value < 4,
     ensures
+        window_bytes <= 16_777_216
+            && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES
+            && initialized < LITERAL_CONTEXT_MODES_BYTES ==> r.is_ok(),
         r.is_ok() ==> {
             let at = context_mode_at(window_bytes, initialized);
             &&& initialized < LITERAL_CONTEXT_MODES_BYTES

@@ -3,26 +3,26 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
 
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-39686/src/brotli_input.rs:14265:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-14024/src/brotli_input.rs:14266:5
       |
-14265 |     while work < 5_696
+14266 |     while work < 5_696
       |     ^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-39686/src/brotli_input.rs:14186:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-14024/src/brotli_input.rs:14187:1
       |
-14186 | / fn advance_serialized_tree(
-14187 | |     workspace: &mut [u8],
-14188 | |     window_bytes: u32,
-14189 | |     input: &[u8],
-14190 | |     end_of_input: bool,
-14191 | | ) -> (r: SerializedTreeStep)
+14187 | / fn advance_serialized_tree(
+14188 | |     workspace: &mut [u8],
+14189 | |     window_bytes: u32,
+14190 | |     input: &[u8],
+14191 | |     end_of_input: bool,
+14192 | | ) -> (r: SerializedTreeStep)
       | |___________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-39686/src/brotli_input.rs:14339:20
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-14024/src/brotli_input.rs:14340:20
       |
-14339 |             assert(matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) ==> decoder == before_field);
+14340 |             assert(matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) ==> decoder == before_field);
       |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
 
 error: aborting due to 1 previous error

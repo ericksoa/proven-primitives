@@ -4255,6 +4255,7 @@ impl CodeDescriptionDecoder {
     }
 
     #[verifier::rlimit(500)]
+    #[verifier::spinoff_prover]
     fn advance_field(
         &mut self,
         input: &[u8],
@@ -19396,6 +19397,150 @@ spec fn block_count_action_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: 
         ==> #[trigger] after[at] == before[at]
 }
 
+spec fn distance_value_applied(after: Seq<u8>, window_bytes: u32, value: u8) -> bool {
+    &&& value < 64
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 5
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_DISTANCE_POSTFIX) == value % 4
+    &&& b3b_scalar_u16_at(after, window_bytes, B3B_DIRECT_DISTANCE)
+        == (value / 4) as nat * distance_postfix_scale(value % 4)
+    &&& b3b_scalar_u16_at(after, window_bytes, B3B_ALPHABET_MAX) == normal_distance_alphabet(value)
+}
+
+spec fn distance_action_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, status: Option<CompressedHeaderStatus>) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    &&& after.len() == before.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && !(base <= at < base + B3B_OUTER_PHASE as int)
+        && !(status.is_none() && (at == base + B3B_OUTER_PHASE as int
+            || at == base + B3B_DISTANCE_POSTFIX as int
+            || base + B3B_DIRECT_DISTANCE as int <= at < base + B3B_DIRECT_DISTANCE as int + 2
+            || base + B3B_ALPHABET_MAX as int <= at < base + B3B_ALPHABET_MAX as int + 2))
+        && !(status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))
+            && (at == base + B3B_OUTER_PHASE as int || at == base + B3B_TERMINAL_ERROR as int
+                || base + B3B_ERROR_DETAIL as int <= at < base + B3B_ERROR_DETAIL as int + 2))
+        ==> #[trigger] after[at] == before[at]
+}
+
+spec fn distance_phase_refines(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<CompressedHeaderStatus>) -> bool {
+    if match status { Some(CompressedHeaderStatus::Failed(error)) => error != CompressedHeaderError::Truncated, _ => false } { true }
+    else {
+        exists|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+            &&& serialized_b3b_queue(before, window_bytes, sq)
+            &&& serialized_b3b_queue(after, window_bytes, eq)
+            &&& bit_read_exact_step(sq, input, end, 6, used, eq, read)
+            &&& match read {
+                BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+                BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+                BitReadStatus::Value(value) => status.is_none() && value < 64
+                    && distance_value_applied(after, window_bytes, value as u8),
+            }
+        }
+    }
+}
+
+proof fn establish_distance_refinement(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<CompressedHeaderStatus>,
+    sq: BitQueue, eq: BitQueue, read: BitReadStatus)
+    requires serialized_b3b_queue(before, window_bytes, sq),
+        serialized_b3b_queue(after, window_bytes, eq),
+        bit_read_exact_step(sq, input, end, 6, used, eq, read),
+        match read {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value < 64
+                && distance_value_applied(after, window_bytes, value as u8),
+        },
+    ensures distance_phase_refines(before, after, window_bytes, input, end, used, status),
+{
+    reveal(distance_phase_refines);
+    assert(exists|start: BitQueue, next: BitQueue, outcome: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, start)
+        &&& serialized_b3b_queue(after, window_bytes, next)
+        &&& bit_read_exact_step(start, input, end, 6, used, next, outcome)
+        &&& match outcome {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value < 64
+                && distance_value_applied(after, window_bytes, value as u8),
+        }
+    });
+}
+
+spec fn context_mode_pending(before: Seq<u8>, window_bytes: u32) -> bool {
+    let count = b3b_scalar_u16_at(before, window_bytes, B3B_BLOCK_COUNTS);
+    let initialized = b3b_scalar_u16_at(before, window_bytes, B3B_MODES_INITIALIZED);
+    1 <= count <= 256 && initialized < count
+}
+
+spec fn context_mode_value_applied(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, value: u8) -> bool {
+    let initialized = b3b_scalar_u16_at(before, window_bytes, B3B_MODES_INITIALIZED);
+    &&& value < 4
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 5
+    &&& b3b_scalar_u16_at(after, window_bytes, B3B_MODES_INITIALIZED) == initialized + 1
+    &&& after[crate::brotli_prefix::context_mode_at(window_bytes, initialized as u16) as int] == value
+}
+
+spec fn context_mode_action_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, status: Option<CompressedHeaderStatus>) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    let initialized = b3b_scalar_u16_at(before, window_bytes, B3B_MODES_INITIALIZED);
+    &&& after.len() == before.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && !(base <= at < base + B3B_OUTER_PHASE as int)
+        && !(status.is_none() && (base + B3B_MODES_INITIALIZED as int <= at < base + B3B_MODES_INITIALIZED as int + 2
+            || at == crate::brotli_prefix::context_mode_at(window_bytes, initialized as u16) as int))
+        && !(status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))
+            && (at == base + B3B_OUTER_PHASE as int || at == base + B3B_TERMINAL_ERROR as int
+                || base + B3B_ERROR_DETAIL as int <= at < base + B3B_ERROR_DETAIL as int + 2))
+        ==> #[trigger] after[at] == before[at]
+}
+
+spec fn context_mode_phase_refines(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<CompressedHeaderStatus>) -> bool {
+    if match status { Some(CompressedHeaderStatus::Failed(error)) => error != CompressedHeaderError::Truncated, _ => false } { true }
+    else {
+        exists|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+            &&& serialized_b3b_queue(before, window_bytes, sq)
+            &&& serialized_b3b_queue(after, window_bytes, eq)
+            &&& bit_read_exact_step(sq, input, end, 2, used, eq, read)
+            &&& match read {
+                BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+                BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+                BitReadStatus::Value(value) => status.is_none() && value < 4
+                    && context_mode_value_applied(before, after, window_bytes, value as u8),
+            }
+        }
+    }
+}
+
+proof fn establish_context_mode_refinement(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<CompressedHeaderStatus>,
+    sq: BitQueue, eq: BitQueue, read: BitReadStatus)
+    requires serialized_b3b_queue(before, window_bytes, sq),
+        serialized_b3b_queue(after, window_bytes, eq),
+        bit_read_exact_step(sq, input, end, 2, used, eq, read),
+        match read {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value < 4
+                && context_mode_value_applied(before, after, window_bytes, value as u8),
+        },
+    ensures context_mode_phase_refines(before, after, window_bytes, input, end, used, status),
+{
+    reveal(context_mode_phase_refines);
+    assert(exists|start: BitQueue, next: BitQueue, outcome: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, start)
+        &&& serialized_b3b_queue(after, window_bytes, next)
+        &&& bit_read_exact_step(start, input, end, 2, used, next, outcome)
+        &&& match outcome {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value < 4
+                && context_mode_value_applied(before, after, window_bytes, value as u8),
+        }
+    });
+}
+
 spec fn block_count_phase_refines(
     before: Seq<u8>,
     after: Seq<u8>,
@@ -21005,6 +21150,12 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            distance_phase_refines(old(self).workspace@, final(self).workspace@, old(self).window_bytes, input@, end_of_input, r.0, r.1),
+            b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes) ==> {
+                &&& (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+                    || r.1 == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)))
+                &&& distance_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1)
+            },
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -21031,22 +21182,42 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _ => true,
             },
     {
+        proof { reveal(distance_value_applied); reveal(distance_action_frame); reveal(outer_phase_byte_frame); }
+        let ghost original = self.workspace@;
         let mut consumed: usize = 0;
 
                     let mut queue = match load_b3b_queue(self.workspace, self.window_bytes) {
                         Ok(value) => value,
                         Err(error) => return self.fail_phase(consumed, error),
                     };
-                    let read = queue.read_bits(6, &input[consumed..], end_of_input);
+                    let ghost start_queue = queue;
+                    let remaining = &input[consumed..];
+                    proof { assert(remaining@ == input@); }
+                    let read = queue.read_bits(6, remaining, end_of_input);
+                    proof { assert(bit_read_exact_step(start_queue, input@, end_of_input, 6, read.consumed, queue, read.status)); }
                     consumed = consumed + read.consumed;
                     if let Err(error) = store_b3b_queue(
                         self.workspace, self.window_bytes, &queue) {
                         return self.fail_phase(consumed, error);
                     }
+                    let ghost stored_queue = self.workspace@;
                     match read.status {
-                        BitReadStatus::NeedInput => return (consumed, Some(CompressedHeaderStatus::NeedInput)),
-                        BitReadStatus::Truncated =>
-                            return self.fail_phase(consumed, CompressedHeaderError::Truncated),
+                        BitReadStatus::NeedInput => {
+                            let result = (consumed, Some(CompressedHeaderStatus::NeedInput));
+                            proof { establish_distance_refinement(original, self.workspace@, self.window_bytes,
+                                input@, end_of_input, consumed, result.1, start_queue, queue, read.status); }
+                            return result;
+                        },
+                        BitReadStatus::Truncated => {
+                            let result = self.fail_phase(consumed, CompressedHeaderError::Truncated);
+                            proof {
+                                reveal(terminal_error_frame);
+                                serialized_b3b_queue_from_frame(stored_queue, self.workspace@, self.window_bytes, queue);
+                                establish_distance_refinement(original, self.workspace@, self.window_bytes,
+                                    input@, end_of_input, consumed, result.1, start_queue, queue, read.status);
+                            }
+                            return result;
+                        },
                         BitReadStatus::Value(value) => {
                             proof {
                                 lemma2_to64();
@@ -21070,6 +21241,11 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                                 CompressedOuterPhase::ContextModes) {
                                 return self.fail_phase(consumed, error);
                             }
+                            proof {
+                                serialized_b3b_queue_from_frame(stored_queue, self.workspace@, self.window_bytes, queue);
+                                establish_distance_refinement(original, self.workspace@, self.window_bytes,
+                                    input@, end_of_input, consumed, None, start_queue, queue, read.status);
+                            }
                         }
                     }
                         (consumed, None)
@@ -21090,6 +21266,18 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            context_mode_pending(old(self).workspace@, old(self).window_bytes)
+                && b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes) ==> {
+                    &&& context_mode_phase_refines(old(self).workspace@, final(self).workspace@,
+                        old(self).window_bytes, input@, end_of_input, r.0, r.1)
+                    &&& (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+                        || r.1 == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)))
+                    &&& context_mode_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1)
+                },
+            context_mode_count_invalid(old(self).workspace@, old(self).window_bytes) ==> {
+                &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
+                &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+            },
             final(old(self).workspace)@ == final(final(self).workspace)@,
             final(self).workspace@.len() == old(self).workspace@.len(),
             final(self).window_bytes == old(self).window_bytes,
@@ -21148,6 +21336,12 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _ => true,
             },
     {
+        proof {
+            reveal(context_mode_count_invalid); reveal(context_mode_pending);
+            reveal(context_mode_value_applied); reveal(context_mode_action_frame);
+            reveal(outer_phase_byte_frame);
+        }
+        let ghost original = self.workspace@;
         let mut consumed: usize = 0;
 
                     let literal_count = match state_u16(
@@ -21182,16 +21376,34 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                             Ok(value) => value,
                             Err(error) => return self.fail_phase(consumed, error),
                         };
-                        let read = queue.read_bits(2, &input[consumed..], end_of_input);
+                        let ghost start_queue = queue;
+                        let remaining = &input[consumed..];
+                        proof { assert(remaining@ == input@); }
+                        let read = queue.read_bits(2, remaining, end_of_input);
+                        proof { assert(bit_read_exact_step(start_queue, input@, end_of_input, 2, read.consumed, queue, read.status)); }
                         consumed = consumed + read.consumed;
                         if let Err(error) = store_b3b_queue(
                             self.workspace, self.window_bytes, &queue) {
                             return self.fail_phase(consumed, error);
                         }
+                        let ghost stored_queue = self.workspace@;
                         match read.status {
-                            BitReadStatus::NeedInput => return (consumed, Some(CompressedHeaderStatus::NeedInput)),
-                            BitReadStatus::Truncated =>
-                                return self.fail_phase(consumed, CompressedHeaderError::Truncated),
+                            BitReadStatus::NeedInput => {
+                                let result = (consumed, Some(CompressedHeaderStatus::NeedInput));
+                                proof { establish_context_mode_refinement(original, self.workspace@, self.window_bytes,
+                                    input@, end_of_input, consumed, result.1, start_queue, queue, read.status); }
+                                return result;
+                            },
+                            BitReadStatus::Truncated => {
+                                let result = self.fail_phase(consumed, CompressedHeaderError::Truncated);
+                                proof {
+                                    reveal(terminal_error_frame);
+                                    serialized_b3b_queue_from_frame(stored_queue, self.workspace@, self.window_bytes, queue);
+                                    establish_context_mode_refinement(original, self.workspace@, self.window_bytes,
+                                        input@, end_of_input, consumed, result.1, start_queue, queue, read.status);
+                                }
+                                return result;
+                            },
                             BitReadStatus::Value(value) => {
                                 proof {
                                     lemma2_to64();
@@ -21224,6 +21436,9 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                                     return self.fail_phase(consumed, error);
                                 }
                                 proof {
+                                    serialized_b3b_queue_from_frame(stored_queue, self.workspace@, self.window_bytes, queue);
+                                    establish_context_mode_refinement(original, self.workspace@, self.window_bytes,
+                                        input@, end_of_input, consumed, None, start_queue, queue, read.status);
                                     reveal(compressed_decoder_state_ok);
                                     reveal(b3b_scalar_byte_at);
                                     reveal(b3b_scalar_base);
@@ -21665,6 +21880,29 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            phase == CompressedOuterPhase::ContextModes
+                && context_mode_pending(old(self).workspace@, old(self).window_bytes)
+                && b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes) ==> {
+                    &&& context_mode_phase_refines(old(self).workspace@, final(self).workspace@,
+                        old(self).window_bytes, input@, end_of_input, r.0, r.1)
+                    &&& (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+                        || r.1 == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)))
+                    &&& context_mode_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1)
+                },
+            phase == CompressedOuterPhase::ContextModes
+                && context_mode_count_invalid(old(self).workspace@, old(self).window_bytes) ==> {
+                    &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
+                    &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+                },
+            phase == CompressedOuterPhase::DistanceParameters ==>
+                distance_phase_refines(old(self).workspace@, final(self).workspace@, old(self).window_bytes,
+                    input@, end_of_input, r.0, r.1),
+            phase == CompressedOuterPhase::DistanceParameters
+                && b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes) ==> {
+                    &&& (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+                        || r.1 == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)))
+                    &&& distance_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1)
+                },
             phase == CompressedOuterPhase::BlockCount
                 && (b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_CURRENT_KIND) >= 3
                     || (b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes)
@@ -21779,12 +22017,16 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 }
                 CompressedOuterPhase::DistanceParameters => {
                     let old_consumed = consumed;
+                    let remaining = &input[old_consumed..];
+                    proof { assert(old_consumed == 0); assert(remaining@ == input@); }
                     let (used, status) = self.advance_distance_parameters_phase(
                         phase,
-                        &input[old_consumed..],
+                        remaining,
                         end_of_input,
                     );
                     consumed = old_consumed + used;
+                    proof { assert(distance_phase_refines(original_workspace, self.workspace@,
+                        self.window_bytes, input@, end_of_input, consumed, status)); }
                     match status {
                         Some(status) => return (consumed, Some(status)),
                         None => {}
@@ -21792,9 +22034,11 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 }
                 CompressedOuterPhase::ContextModes => {
                     let old_consumed = consumed;
+                    let remaining = &input[old_consumed..];
+                    proof { assert(old_consumed == 0); assert(remaining@ == input@); }
                     let (used, status) = self.advance_context_modes_phase(
                         phase,
-                        &input[old_consumed..],
+                        remaining,
                         end_of_input,
                     );
                     consumed = old_consumed + used;
@@ -24695,14 +24939,105 @@ fn distance_value_execution_work(read_work: u64) -> (r: u64)
     distance_base_execution_work(read_work) + 1 + 2 + 2 + 1 + 1
 }
 
+spec fn distance_read_units(queue: BitQueue, input_len: nat) -> nat {
+    let taken = input_bytes_taken(queue.bits().len(), 6, input_len);
+    taken + if queue.bits().len() + 8 * taken >= 6 { 6nat } else { 0nat }
+}
+
+spec fn distance_planning_read_valid(before: Seq<u8>, window_bytes: u32, input_len: nat, work: u64) -> bool {
+    exists|q: BitQueue| serialized_b3b_queue(before, window_bytes, q)
+        && work as nat == distance_read_units(q, input_len)
+}
+
+spec fn distance_read_status(status: BitReadStatus) -> Option<CompressedHeaderStatus> {
+    match status {
+        BitReadStatus::NeedInput => Some(CompressedHeaderStatus::NeedInput),
+        BitReadStatus::Truncated => Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+        _ => None,
+    }
+}
+
+spec fn distance_execution_units(read_work: nat, read: BitReadStatus) -> nat {
+    read_work + 11 + match read { BitReadStatus::Value(_) => 7nat, BitReadStatus::Truncated => 5nat, _ => 0nat }
+}
+
+spec fn distance_plan_valid(before: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool, plan: CompressedActionPlan) -> bool {
+    &&& plan.consumed <= input.len()
+    &&& distance_planning_read_valid(before, window_bytes, input.len(), plan.planning_work)
+    &&& exists|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& eq.valid()
+        &&& bit_read_exact_step(sq, input, end, 6, plan.consumed, eq, read)
+        &&& plan.planning_work as nat == distance_read_units(sq, input.len())
+        &&& plan.planning_work as nat == plan.consumed as nat + match read { BitReadStatus::Value(_) => 6nat, _ => 0nat }
+        &&& plan.planning_work <= 63
+        &&& plan.execution_work as nat == distance_execution_units(plan.planning_work as nat, read)
+        &&& plan.status == distance_read_status(read)
+    }
+}
+
+proof fn distance_planning_reads_agree(before: Seq<u8>, window_bytes: u32, input_len: nat, left: u64, right: u64)
+    requires distance_planning_read_valid(before, window_bytes, input_len, left),
+        distance_planning_read_valid(before, window_bytes, input_len, right),
+    ensures left == right,
+{
+    reveal(distance_planning_read_valid); reveal(distance_read_units);
+    let l = choose|q: BitQueue| serialized_b3b_queue(before, window_bytes, q) && left as nat == distance_read_units(q, input_len);
+    let r = choose|q: BitQueue| serialized_b3b_queue(before, window_bytes, q) && right as nat == distance_read_units(q, input_len);
+    serialized_bit_queues_agree(before, window_bytes, l, r);
+}
+
+proof fn distance_plan_matches_action(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: CompressedActionPlan, used: usize, status: Option<CompressedHeaderStatus>)
+    requires distance_plan_valid(before, window_bytes, input, end, plan),
+        distance_phase_refines(before, after, window_bytes, input, end, used, status),
+        status.is_none() || status == Some(CompressedHeaderStatus::NeedInput)
+            || status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+    ensures used == plan.consumed, status == plan.status,
+        distance_phase_refines(before, after, window_bytes, input, end, plan.consumed, plan.status),
+{
+    reveal(distance_plan_valid); reveal(distance_phase_refines); reveal(distance_read_status);
+    let (pq, peq, prs) = choose|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& eq.valid()
+        &&& bit_read_exact_step(sq, input, end, 6, plan.consumed, eq, read)
+        &&& plan.planning_work as nat == distance_read_units(sq, input.len())
+        &&& plan.planning_work as nat == plan.consumed as nat + match read { BitReadStatus::Value(_) => 6nat, _ => 0nat }
+        &&& plan.planning_work <= 63
+        &&& plan.execution_work as nat == distance_execution_units(plan.planning_work as nat, read)
+        &&& plan.status == distance_read_status(read)
+    };
+    let (aq, aeq, ars) = choose|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& serialized_b3b_queue(after, window_bytes, eq)
+        &&& bit_read_exact_step(sq, input, end, 6, used, eq, read)
+        &&& match read {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value < 64 && distance_value_applied(after, window_bytes, value as u8),
+        }
+    };
+    serialized_bit_queues_agree(before, window_bytes, aq, pq);
+    bit_read_steps_agree(aq, pq, input, end, 6, used, plan.consumed, aeq, peq, ars, prs);
+}
+
 fn distance_planning_work(
     workspace: &[u8],
     window_bytes: u32,
     input_len: usize,
 ) -> (r: Result<u64, CompressedHeaderError>)
+    ensures r.is_ok() ==> distance_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
 {
+    reveal(distance_planning_read_valid); reveal(distance_read_units);
     let queue = load_b3b_queue(workspace, window_bytes)?;
-    Ok(plan_bit_read(queue, 6, input_len).work)
+    let read = plan_bit_read(queue, 6, input_len);
+    proof {
+        assert(read.work as nat == distance_read_units(queue, input_len as nat));
+        assert(exists|q: BitQueue| serialized_b3b_queue(workspace@, window_bytes, q)
+            && read.work as nat == distance_read_units(q, input_len as nat));
+        assert(distance_planning_read_valid(workspace@, window_bytes, input_len as nat, read.work));
+    }
+    Ok(read.work)
 }
 
 fn plan_distance_action(
@@ -24711,13 +25046,26 @@ fn plan_distance_action(
     input: &[u8],
     end_of_input: bool,
 ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+    ensures b3b_queue_encoding_valid(workspace@, window_bytes) ==> r.is_ok(),
+        r.is_ok() ==> distance_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap()),
 {
+    reveal(distance_plan_valid); reveal(distance_planning_read_valid); reveal(distance_read_units);
+    reveal(distance_execution_units); reveal(distance_read_status);
     let mut queue = load_b3b_queue(workspace, window_bytes)?;
+    let ghost start = queue;
     let read_plan = plan_bit_read(queue, 6, input.len());
     let read = queue.read_bits(6, input, end_of_input);
     if read.consumed != read_plan.consumed {
         return Err(CompressedHeaderError::InternalState);
     }
+    proof {
+        bytes_bits_len(input@.take(read.consumed as int));
+        reveal(bit_read_exact_step);
+        assert(read_plan.complete == match read.status { BitReadStatus::Value(_) => true, _ => false });
+        assert(read_plan.work as nat == distance_read_units(start, input@.len()));
+        assert(distance_planning_read_valid(workspace@, window_bytes, input@.len(), read_plan.work));
+    }
+    proof { assert(bit_read_exact_step(start, input@, end_of_input, 6, read.consumed, queue, read.status)); }
     let (execution_work, status) = match read.status {
         BitReadStatus::NeedInput => (
             distance_base_execution_work(read_plan.work),
@@ -24732,12 +25080,32 @@ fn plan_distance_action(
             None,
         ),
     };
-    Ok(CompressedActionPlan {
+    let result = CompressedActionPlan {
         planning_work: read_plan.work,
         execution_work,
         consumed: read.consumed,
         status,
-    })
+    };
+    proof {
+        assert(serialized_b3b_queue(workspace@, window_bytes, start));
+        assert(queue.valid());
+        assert(bit_read_exact_step(start, input@, end_of_input, 6, result.consumed, queue, read.status));
+        assert(result.planning_work as nat == distance_read_units(start, input@.len()));
+        assert(result.planning_work as nat == result.consumed as nat + match read.status { BitReadStatus::Value(_) => 6nat, _ => 0nat });
+        assert(result.execution_work as nat == distance_execution_units(result.planning_work as nat, read.status));
+        assert(result.status == distance_read_status(read.status));
+        assert(exists|sq: BitQueue, eq: BitQueue, outcome: BitReadStatus| {
+            &&& serialized_b3b_queue(workspace@, window_bytes, sq)
+            &&& eq.valid()
+            &&& bit_read_exact_step(sq, input@, end_of_input, 6, result.consumed, eq, outcome)
+            &&& result.planning_work as nat == distance_read_units(sq, input@.len())
+            &&& result.planning_work as nat == result.consumed as nat + match outcome { BitReadStatus::Value(_) => 6nat, _ => 0nat }
+            &&& result.planning_work <= 63
+            &&& result.execution_work as nat == distance_execution_units(result.planning_work as nat, outcome)
+            &&& result.status == distance_read_status(outcome)
+        });
+    }
+    Ok(result)
 }
 
 fn context_mode_complete_execution_work() -> (r: u64)
@@ -24767,22 +25135,133 @@ fn context_mode_value_execution_work(read_work: u64) -> (r: u64)
     context_mode_base_execution_work(read_work) + 1 + 2 + 1
 }
 
+spec fn context_mode_count_invalid(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let count = b3b_scalar_u16_at(workspace, window_bytes, B3B_BLOCK_COUNTS);
+    let initialized = b3b_scalar_u16_at(workspace, window_bytes, B3B_MODES_INITIALIZED);
+    count == 0 || count > 256 || initialized > count
+}
+
+spec fn context_mode_bad_count_plan_valid(workspace: Seq<u8>, window_bytes: u32, plan: CompressedActionPlan) -> bool {
+    &&& context_mode_count_invalid(workspace, window_bytes)
+    &&& plan.planning_work == 0
+    &&& plan.execution_work == 5
+    &&& plan.consumed == 0
+    &&& plan.status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState))
+}
+
+spec fn context_mode_read_units(queue: BitQueue, input_len: nat) -> nat {
+    let taken = input_bytes_taken(queue.bits().len(), 2, input_len);
+    taken + if queue.bits().len() + 8 * taken >= 2 { 2nat } else { 0nat }
+}
+
+spec fn context_mode_planning_read_valid(before: Seq<u8>, window_bytes: u32, input_len: nat, work: u64) -> bool {
+    exists|q: BitQueue| serialized_b3b_queue(before, window_bytes, q)
+        && work as nat == context_mode_read_units(q, input_len)
+}
+
+spec fn context_mode_read_status(status: BitReadStatus) -> Option<CompressedHeaderStatus> {
+    match status {
+        BitReadStatus::NeedInput => Some(CompressedHeaderStatus::NeedInput),
+        BitReadStatus::Truncated => Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+        _ => None,
+    }
+}
+
+spec fn context_mode_execution_units(read_work: nat, read: BitReadStatus) -> nat {
+    read_work + 11 + match read { BitReadStatus::Value(_) => 4nat, BitReadStatus::Truncated => 5nat, _ => 0nat }
+}
+
+spec fn context_mode_plan_valid(before: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool, plan: CompressedActionPlan) -> bool {
+    &&& context_mode_pending(before, window_bytes)
+    &&& plan.consumed <= input.len()
+    &&& context_mode_planning_read_valid(before, window_bytes, input.len(), plan.planning_work)
+    &&& exists|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& eq.valid()
+        &&& bit_read_exact_step(sq, input, end, 2, plan.consumed, eq, read)
+        &&& plan.planning_work as nat == context_mode_read_units(sq, input.len())
+        &&& plan.planning_work as nat == plan.consumed as nat + match read { BitReadStatus::Value(_) => 2nat, _ => 0nat }
+        &&& plan.planning_work <= 63
+        &&& plan.execution_work as nat == context_mode_execution_units(plan.planning_work as nat, read)
+        &&& plan.status == context_mode_read_status(read)
+    }
+}
+
+proof fn context_mode_planning_reads_agree(before: Seq<u8>, window_bytes: u32, input_len: nat, left: u64, right: u64)
+    requires context_mode_planning_read_valid(before, window_bytes, input_len, left),
+        context_mode_planning_read_valid(before, window_bytes, input_len, right),
+    ensures left == right,
+{
+    reveal(context_mode_planning_read_valid); reveal(context_mode_read_units);
+    let l = choose|q: BitQueue| serialized_b3b_queue(before, window_bytes, q) && left as nat == context_mode_read_units(q, input_len);
+    let r = choose|q: BitQueue| serialized_b3b_queue(before, window_bytes, q) && right as nat == context_mode_read_units(q, input_len);
+    serialized_bit_queues_agree(before, window_bytes, l, r);
+}
+
+proof fn context_mode_plan_matches_action(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: CompressedActionPlan, used: usize, status: Option<CompressedHeaderStatus>)
+    requires context_mode_plan_valid(before, window_bytes, input, end, plan),
+        context_mode_phase_refines(before, after, window_bytes, input, end, used, status),
+        status.is_none() || status == Some(CompressedHeaderStatus::NeedInput)
+            || status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+    ensures used == plan.consumed, status == plan.status,
+        context_mode_phase_refines(before, after, window_bytes, input, end, plan.consumed, plan.status),
+{
+    reveal(context_mode_plan_valid); reveal(context_mode_phase_refines); reveal(context_mode_read_status);
+    let (pq, peq, prs) = choose|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& eq.valid()
+        &&& bit_read_exact_step(sq, input, end, 2, plan.consumed, eq, read)
+        &&& plan.planning_work as nat == context_mode_read_units(sq, input.len())
+        &&& plan.planning_work as nat == plan.consumed as nat + match read { BitReadStatus::Value(_) => 2nat, _ => 0nat }
+        &&& plan.planning_work <= 63
+        &&& plan.execution_work as nat == context_mode_execution_units(plan.planning_work as nat, read)
+        &&& plan.status == context_mode_read_status(read)
+    };
+    let (aq, aeq, ars) = choose|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& serialized_b3b_queue(after, window_bytes, eq)
+        &&& bit_read_exact_step(sq, input, end, 2, used, eq, read)
+        &&& match read {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value < 4 && context_mode_value_applied(before, after, window_bytes, value as u8),
+        }
+    };
+    serialized_bit_queues_agree(before, window_bytes, aq, pq);
+    bit_read_steps_agree(aq, pq, input, end, 2, used, plan.consumed, aeq, peq, ars, prs);
+}
+
 fn context_mode_planning_work(
     workspace: &[u8],
     window_bytes: u32,
     input_len: usize,
 ) -> (r: Result<u64, CompressedHeaderError>)
+    ensures
+        context_mode_pending(workspace@, window_bytes) && b3b_queue_encoding_valid(workspace@, window_bytes) ==> r.is_ok(),
+        r.is_ok() && context_mode_pending(workspace@, window_bytes) ==>
+            context_mode_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+        && context_mode_count_invalid(workspace@, window_bytes) ==> r == Ok(0),
 {
+    reveal(context_mode_count_invalid); reveal(context_mode_pending);
+    reveal(context_mode_planning_read_valid); reveal(context_mode_read_units);
     let literal_count = state_u16(workspace, window_bytes, B3B_BLOCK_COUNTS)?;
     let initialized = state_u16(workspace, window_bytes, B3B_MODES_INITIALIZED)?;
     if literal_count == 0 || literal_count > 256 || initialized > literal_count {
-        return Err(CompressedHeaderError::InternalState);
+        return Ok(0);
     }
     if initialized == literal_count {
         return Ok(0);
     }
     let queue = load_b3b_queue(workspace, window_bytes)?;
-    Ok(plan_bit_read(queue, 2, input_len).work)
+    let read = plan_bit_read(queue, 2, input_len);
+    proof {
+        assert(read.work as nat == context_mode_read_units(queue, input_len as nat));
+        assert(exists|q: BitQueue| serialized_b3b_queue(workspace@, window_bytes, q)
+            && read.work as nat == context_mode_read_units(q, input_len as nat));
+    }
+    Ok(read.work)
 }
 
 fn plan_context_mode_action(
@@ -24791,11 +25270,23 @@ fn plan_context_mode_action(
     input: &[u8],
     end_of_input: bool,
 ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+    ensures
+        context_mode_pending(workspace@, window_bytes) && b3b_queue_encoding_valid(workspace@, window_bytes) ==> r.is_ok(),
+        r.is_ok() && context_mode_pending(workspace@, window_bytes) ==>
+            context_mode_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap()),
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+        && context_mode_count_invalid(workspace@, window_bytes) ==>
+        r.is_ok() && context_mode_bad_count_plan_valid(workspace@, window_bytes, r.unwrap()),
 {
+    reveal(context_mode_count_invalid); reveal(context_mode_bad_count_plan_valid);
+    reveal(context_mode_pending); reveal(context_mode_plan_valid);
+    reveal(context_mode_planning_read_valid); reveal(context_mode_read_units);
+    reveal(context_mode_execution_units); reveal(context_mode_read_status);
     let literal_count = state_u16(workspace, window_bytes, B3B_BLOCK_COUNTS)?;
     let initialized = state_u16(workspace, window_bytes, B3B_MODES_INITIALIZED)?;
     if literal_count == 0 || literal_count > 256 || initialized > literal_count {
-        return Err(CompressedHeaderError::InternalState);
+        return Ok(CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+            consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) });
     }
     if initialized == literal_count {
         return Ok(CompressedActionPlan {
@@ -24806,11 +25297,20 @@ fn plan_context_mode_action(
         });
     }
     let mut queue = load_b3b_queue(workspace, window_bytes)?;
+    let ghost start = queue;
     let read_plan = plan_bit_read(queue, 2, input.len());
     let read = queue.read_bits(2, input, end_of_input);
     if read.consumed != read_plan.consumed {
         return Err(CompressedHeaderError::InternalState);
     }
+    proof {
+        bytes_bits_len(input@.take(read.consumed as int));
+        reveal(bit_read_exact_step);
+        assert(read_plan.complete == match read.status { BitReadStatus::Value(_) => true, _ => false });
+        assert(read_plan.work as nat == context_mode_read_units(start, input@.len()));
+        assert(context_mode_planning_read_valid(workspace@, window_bytes, input@.len(), read_plan.work));
+    }
+    proof { assert(bit_read_exact_step(start, input@, end_of_input, 2, read.consumed, queue, read.status)); }
     let (execution_work, status) = match read.status {
         BitReadStatus::NeedInput => (
             context_mode_base_execution_work(read_plan.work),
@@ -24825,12 +25325,32 @@ fn plan_context_mode_action(
             None,
         ),
     };
-    Ok(CompressedActionPlan {
+    let result = CompressedActionPlan {
         planning_work: read_plan.work,
         execution_work,
         consumed: read.consumed,
         status,
-    })
+    };
+    proof {
+        assert(serialized_b3b_queue(workspace@, window_bytes, start));
+        assert(queue.valid());
+        assert(bit_read_exact_step(start, input@, end_of_input, 2, result.consumed, queue, read.status));
+        assert(result.planning_work as nat == context_mode_read_units(start, input@.len()));
+        assert(result.planning_work as nat == result.consumed as nat + match read.status { BitReadStatus::Value(_) => 2nat, _ => 0nat });
+        assert(result.execution_work as nat == context_mode_execution_units(result.planning_work as nat, read.status));
+        assert(result.status == context_mode_read_status(read.status));
+        assert(exists|sq: BitQueue, eq: BitQueue, outcome: BitReadStatus| {
+            &&& serialized_b3b_queue(workspace@, window_bytes, sq)
+            &&& eq.valid()
+            &&& bit_read_exact_step(sq, input@, end_of_input, 2, result.consumed, eq, outcome)
+            &&& result.planning_work as nat == context_mode_read_units(sq, input@.len())
+            &&& result.planning_work as nat == result.consumed as nat + match outcome { BitReadStatus::Value(_) => 2nat, _ => 0nat }
+            &&& result.planning_work <= 63
+            &&& result.execution_work as nat == context_mode_execution_units(result.planning_work as nat, outcome)
+            &&& result.status == context_mode_read_status(outcome)
+        });
+    }
+    Ok(result)
 }
 
 fn initial_suffix_base_execution_work(read_work: u64) -> (r: u64)
@@ -27993,6 +28513,14 @@ spec fn block_count_result_matches(plan: CompressedActionPlan, input_was_limited
     }
 }
 
+spec fn distance_result_matches(plan: CompressedActionPlan, limited: bool, result: Result<usize, CompressedStep>) -> bool {
+    block_count_result_matches(plan, limited, result)
+}
+
+spec fn context_mode_result_matches(plan: CompressedActionPlan, limited: bool, result: Result<usize, CompressedStep>) -> bool {
+    block_count_result_matches(plan, limited, result)
+}
+
 fn execute_fixed_compressed_plan(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -28010,6 +28538,37 @@ fn execute_fixed_compressed_plan(
         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE)
             == compressed_outer_phase_tag_spec(phase),
     ensures
+        phase == CompressedOuterPhase::ContextModes
+            && context_mode_bad_count_plan_valid(old(workspace)@, window_bytes, plan)
+            && old(budget).work_remaining >= plan.execution_work ==> {
+                &&& r == Err(CompressedStep { consumed: 0,
+                    status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
+                &&& terminal_error_frame(old(workspace)@, final(workspace)@, window_bytes)
+                &&& serialized_terminal_error(final(workspace)@, window_bytes, CompressedHeaderError::InternalState)
+                &&& final(budget).input_remaining == old(budget).input_remaining
+            },
+        phase == CompressedOuterPhase::ContextModes
+            && context_mode_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan)
+            && old(budget).input_remaining >= plan.consumed as u64
+            && old(budget).work_remaining >= plan.execution_work ==> {
+                &&& context_mode_result_matches(plan, input_was_limited, r)
+                &&& context_mode_phase_refines(old(workspace)@, final(workspace)@, window_bytes, input@,
+                    end_of_input, plan.consumed, plan.status)
+                &&& context_mode_action_frame(old(workspace)@, final(workspace)@, window_bytes, plan.status)
+                &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+                &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
+            },
+        phase == CompressedOuterPhase::DistanceParameters
+            && distance_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan)
+            && old(budget).input_remaining >= plan.consumed as u64
+            && old(budget).work_remaining >= plan.execution_work ==> {
+                &&& distance_result_matches(plan, input_was_limited, r)
+                &&& distance_phase_refines(old(workspace)@, final(workspace)@, window_bytes, input@,
+                    end_of_input, plan.consumed, plan.status)
+                &&& distance_action_frame(old(workspace)@, final(workspace)@, window_bytes, plan.status)
+                &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+                &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
+            },
         phase == CompressedOuterPhase::BlockCount
             && block_count_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan)
             && old(budget).input_remaining >= plan.consumed as u64
@@ -28030,6 +28589,7 @@ fn execute_fixed_compressed_plan(
         old(budget).work_remaining >= plan.execution_work ==>
             final(budget).work_remaining == old(budget).work_remaining - plan.execution_work,
         old(budget).work_remaining < plan.execution_work ==> {
+            &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
             &&& final(workspace)@ == old(workspace)@
             &&& *final(budget) == *old(budget)
         },
@@ -28059,6 +28619,26 @@ fn execute_fixed_compressed_plan(
             };
             serialized_queue_has_valid_encoding(workspace@, window_bytes, q);
             serialized_var_uint8_has_valid_encoding(workspace@, window_bytes, p);
+        }
+    }
+    proof {
+        reveal(distance_result_matches);
+        if phase == CompressedOuterPhase::DistanceParameters
+            && distance_plan_valid(workspace@, window_bytes, input@, end_of_input, plan) {
+            reveal(distance_plan_valid); reveal(distance_planning_read_valid);
+            let q = choose|q: BitQueue| serialized_b3b_queue(workspace@, window_bytes, q)
+                && plan.planning_work as nat == distance_read_units(q, input@.len());
+            serialized_queue_has_valid_encoding(workspace@, window_bytes, q);
+        }
+    }
+    proof {
+        reveal(context_mode_result_matches);
+        if phase == CompressedOuterPhase::ContextModes
+            && context_mode_plan_valid(workspace@, window_bytes, input@, end_of_input, plan) {
+            reveal(context_mode_plan_valid); reveal(context_mode_planning_read_valid);
+            let q = choose|q: BitQueue| serialized_b3b_queue(workspace@, window_bytes, q)
+                && plan.planning_work as nat == context_mode_read_units(q, input@.len());
+            serialized_queue_has_valid_encoding(workspace@, window_bytes, q);
         }
     }
     if !budget.charge_work(plan.execution_work) {
@@ -28103,12 +28683,47 @@ fn execute_fixed_compressed_plan(
                 || planned_status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)));
         }
     }
+    proof {
+        if phase == CompressedOuterPhase::DistanceParameters
+            && distance_plan_valid(before_planned_action, window_bytes, input@, end_of_input, plan) {
+            distance_plan_matches_action(before_planned_action, workspace@, window_bytes,
+                input@, end_of_input, plan, used, planned_status);
+            assert(planned_status.is_none() || planned_status == Some(CompressedHeaderStatus::NeedInput)
+                || planned_status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)));
+        }
+    }
+    proof {
+        if phase == CompressedOuterPhase::ContextModes
+            && context_mode_plan_valid(before_planned_action, window_bytes, input@, end_of_input, plan) {
+            context_mode_plan_matches_action(before_planned_action, workspace@, window_bytes,
+                input@, end_of_input, plan, used, planned_status);
+            assert(planned_status.is_none() || planned_status == Some(CompressedHeaderStatus::NeedInput)
+                || planned_status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)));
+        }
+    }
+    proof {
+        if phase == CompressedOuterPhase::ContextModes
+            && context_mode_bad_count_plan_valid(before_planned_action, window_bytes, plan) {
+            reveal(context_mode_bad_count_plan_valid);
+            assert(used == 0);
+            assert(planned_status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)));
+        }
+    }
     let statuses_disagree = match phase {
-        CompressedOuterPhase::BlockCount => match (planned_status, plan.status) {
+        CompressedOuterPhase::BlockCount | CompressedOuterPhase::DistanceParameters => match (planned_status, plan.status) {
             (None, None)
             | (Some(CompressedHeaderStatus::NeedInput), Some(CompressedHeaderStatus::NeedInput))
             | (Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
                 Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))) => false,
+            (left, right) => left != right,
+        },
+        CompressedOuterPhase::ContextModes => match (planned_status, plan.status) {
+            (None, None)
+            | (Some(CompressedHeaderStatus::NeedInput), Some(CompressedHeaderStatus::NeedInput))
+            | (Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+                Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))) => false,
+            (Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)),
+                Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState))) => false,
             (left, right) => left != right,
         },
         _ => planned_status != plan.status,
@@ -30060,6 +30675,24 @@ fn advance_planned_compressed_action(
         b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
         compressed_decoder_state_ok(old(workspace)@, window_bytes),
     ensures
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 5
+            && context_mode_count_invalid(old(workspace)@, window_bytes) ==> {
+                &&& final(budget).input_remaining == old(budget).input_remaining
+                &&& final(budget).output_remaining == old(budget).output_remaining
+                &&& final(budget).calls_remaining == old(budget).calls_remaining
+                &&& final(budget).initializations_remaining == old(budget).initializations_remaining
+                &&& if old(budget).work_remaining >= 5 {
+                    &&& r == Err(CompressedStep { consumed: 0,
+                        status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
+                    &&& final(budget).work_remaining == old(budget).work_remaining - 5
+                    &&& terminal_error_frame(old(workspace)@, final(workspace)@, window_bytes)
+                    &&& serialized_terminal_error(final(workspace)@, window_bytes, CompressedHeaderError::InternalState)
+                } else {
+                    &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+                    &&& *final(budget) == *old(budget)
+                    &&& final(workspace)@ == old(workspace)@
+                }
+            },
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
         final(budget).work_remaining <= old(budget).work_remaining,
@@ -30076,6 +30709,7 @@ fn advance_planned_compressed_action(
             },
         },
 {
+    proof { reveal(context_mode_bad_count_plan_valid); }
     let initial_allowed = if budget.input_remaining > usize::MAX as u64 {
         input.len()
     } else {
@@ -30297,14 +30931,23 @@ fn advance_planned_compressed_action(
             &input[..initial_allowed],
             end_of_input && initial_allowed == input.len(),
         ) {
-            Ok(value) if value.planning_work == planning_work => value,
-            _ => {
+            Ok(value) => value,
+            Err(_) => {
                 return Err(CompressedStep {
                     consumed: 0,
                     status: CompressedStatus::Failed(core_state_failure()),
                 });
             }
         };
+        proof {
+            reveal(distance_plan_valid);
+            distance_planning_reads_agree(workspace@, window_bytes, initial_allowed as nat,
+                planning_work, plan.planning_work);
+        }
+        if plan.planning_work != planning_work {
+            return Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()) });
+        }
         match execute_fixed_compressed_plan(
             workspace,
             window_bytes,
@@ -30352,14 +30995,25 @@ fn advance_planned_compressed_action(
             &input[..initial_allowed],
             end_of_input && initial_allowed == input.len(),
         ) {
-            Ok(value) if value.planning_work == planning_work => value,
-            _ => {
+            Ok(value) => value,
+            Err(_) => {
                 return Err(CompressedStep {
                     consumed: 0,
                     status: CompressedStatus::Failed(core_state_failure()),
                 });
             }
         };
+        proof {
+            if context_mode_pending(workspace@, window_bytes) {
+                reveal(context_mode_plan_valid);
+                context_mode_planning_reads_agree(workspace@, window_bytes, initial_allowed as nat,
+                    planning_work, plan.planning_work);
+            }
+        }
+        if plan.planning_work != planning_work {
+            return Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()) });
+        }
         match execute_fixed_compressed_plan(
             workspace,
             window_bytes,
@@ -35541,6 +36195,137 @@ mod tests {
     }
 
     #[test]
+    fn m1_distance_plan_matches_w1_and_independent_parameter_values() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        for pending in [None, Some(0u8), Some(0x80u8)] {
+            let (mut original, window) = fresh_b3b_workspace();
+            put_state_byte(&mut original, window, B3B_OUTER_PHASE, 4).unwrap();
+            let mut queue = BitQueue::new();
+            if let Some(byte) = pending {
+                queue.read_bits(7, &[byte], false);
+            }
+            store_b3b_queue(&mut original, window, &queue).unwrap();
+            for code in 0u8..=64 {
+                let byte = [code];
+                let input = if code == 64 { &byte[..0] } else { &byte[..] };
+                for end in [false, true] {
+                    let plan = plan_distance_action(&original, window, input, end).unwrap();
+                    assert_eq!(
+                        distance_planning_work(&original, window, input.len()).unwrap(),
+                        plan.planning_work
+                    );
+                    let mut expected = original.clone();
+                    let reference = {
+                        let mut decoder = CompressedMetaBlockDecoder {
+                            workspace: &mut expected,
+                            window_bytes: window,
+                        };
+                        decoder.advance_outer_phase_once(
+                            CompressedOuterPhase::DistanceParameters,
+                            input,
+                            end,
+                        )
+                    };
+                    assert_eq!((plan.consumed, plan.status), reference);
+                    if reference.1.is_none() {
+                        assert!(code < 64);
+                        let value = match pending {
+                            None => code,
+                            Some(cached) => (cached >> 7) | ((code & 31) << 1),
+                        };
+                        let postfix = value & 3;
+                        let direct = ((value >> 2) as u16) << postfix;
+                        let alphabet = 16 + direct + (48u16 << postfix);
+                        assert_eq!(
+                            state_byte(&expected, window, B3B_DISTANCE_POSTFIX),
+                            Ok(postfix)
+                        );
+                        assert_eq!(
+                            state_u16(&expected, window, B3B_DIRECT_DISTANCE),
+                            Ok(direct)
+                        );
+                        assert_eq!(state_u16(&expected, window, B3B_ALPHABET_MAX), Ok(alphabet));
+                        assert_eq!(state_byte(&expected, window, B3B_OUTER_PHASE), Ok(5));
+                    }
+                    for limited in [false, true] {
+                        for credit in [plan.execution_work - 1, plan.execution_work] {
+                            let mut actual = original.clone();
+                            let mut budget = RequestBudget::new(RequestLimits {
+                                max_input: input.len() as u64,
+                                max_output: 7,
+                                max_work: credit,
+                                max_calls: 9,
+                                max_initializations: 3,
+                                max_window_bits: 16,
+                            })
+                            .unwrap();
+                            let result = execute_fixed_compressed_plan(
+                                &mut actual,
+                                window,
+                                &mut budget,
+                                CompressedOuterPhase::DistanceParameters,
+                                input,
+                                end,
+                                limited,
+                                plan,
+                            );
+                            assert_eq!(budget.output_remaining, 7);
+                            assert_eq!(budget.calls_remaining, 9);
+                            assert_eq!(budget.initializations_remaining, 3);
+                            if credit < plan.execution_work {
+                                assert_eq!(
+                                    result,
+                                    Err(CompressedStep {
+                                        consumed: 0,
+                                        status: CompressedStatus::Failed(
+                                            CoreFailure::ResourceLimit
+                                        )
+                                    })
+                                );
+                                assert_eq!(actual, original);
+                                assert_eq!(budget.work_remaining, credit);
+                                assert_eq!(budget.input_remaining, input.len() as u64);
+                            } else {
+                                assert_eq!(actual, expected);
+                                assert_eq!(budget.work_remaining, 0);
+                                assert_eq!(
+                                    budget.input_remaining,
+                                    input.len() as u64 - plan.consumed as u64
+                                );
+                                let wanted = match reference.1 {
+                                    None => Ok(reference.0),
+                                    Some(CompressedHeaderStatus::NeedInput) => {
+                                        Err(CompressedStep {
+                                            consumed: reference.0,
+                                            status: if limited {
+                                                CompressedStatus::Failed(CoreFailure::ResourceLimit)
+                                            } else {
+                                                CompressedStatus::NeedInput
+                                            },
+                                        })
+                                    }
+                                    Some(CompressedHeaderStatus::Failed(error)) => {
+                                        Err(CompressedStep {
+                                            consumed: reference.0,
+                                            status: CompressedStatus::Failed(map_compressed_error(
+                                                error,
+                                            )),
+                                        })
+                                    }
+                                    Some(CompressedHeaderStatus::Complete(_)) => {
+                                        panic!("distance parameters are not a complete header")
+                                    }
+                                };
+                                assert_eq!(result, wanted);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn b3c_distance_plan_reserves_exact_work_before_mutation() {
         let window_bits = 16u8;
         let window_bytes = 1u32 << window_bits;
@@ -35648,6 +36433,225 @@ mod tests {
         assert_eq!(empty_exact.consumed, 0);
         assert_eq!(empty_exact.status, CompressedStatus::NeedInput);
         assert_eq!(empty_exact_budget.work_remaining, 0);
+    }
+
+    #[test]
+    fn m1_context_mode_plan_matches_w1_values_cursor_and_credit() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        for (count, initialized) in [(1u16, 0u16), (2, 1), (256, 0), (256, 255)] {
+            for pending in [None, Some((7usize, 0u8)), Some((7, 0x80)), Some((6, 0xc0))] {
+                let (mut original, window) = fresh_b3b_workspace();
+                put_state_byte(&mut original, window, B3B_OUTER_PHASE, 5).unwrap();
+                put_state_u16(&mut original, window, B3B_BLOCK_COUNTS, count).unwrap();
+                put_state_u16(&mut original, window, B3B_MODES_INITIALIZED, initialized).unwrap();
+                let mut queue = BitQueue::new();
+                if let Some((width, byte)) = pending {
+                    queue.read_bits(width, &[byte], false);
+                }
+                store_b3b_queue(&mut original, window, &queue).unwrap();
+                for code in 0u8..=4 {
+                    let byte = [code];
+                    let input = if code == 4 { &byte[..0] } else { &byte[..] };
+                    for end in [false, true] {
+                        let plan = plan_context_mode_action(&original, window, input, end).unwrap();
+                        assert_eq!(
+                            context_mode_planning_work(&original, window, input.len()).unwrap(),
+                            plan.planning_work
+                        );
+                        let mut expected = original.clone();
+                        let reference = {
+                            let mut decoder = CompressedMetaBlockDecoder {
+                                workspace: &mut expected,
+                                window_bytes: window,
+                            };
+                            decoder.advance_outer_phase_once(
+                                CompressedOuterPhase::ContextModes,
+                                input,
+                                end,
+                            )
+                        };
+                        assert_eq!((plan.consumed, plan.status), reference);
+                        if reference.1.is_none() {
+                            let value = match pending {
+                                None => code & 3,
+                                Some((7, cached)) => (cached >> 7) | ((code & 1) << 1),
+                                Some((6, cached)) => (cached >> 6) & 3,
+                                _ => unreachable!(),
+                            };
+                            let at = window as usize
+                                + crate::brotli_prefix::LITERAL_CONTEXT_MODES_OFFSET as usize
+                                + initialized as usize;
+                            assert_eq!(expected[at], value);
+                            assert_eq!(
+                                state_u16(&expected, window, B3B_MODES_INITIALIZED),
+                                Ok(initialized + 1)
+                            );
+                            assert_eq!(state_byte(&expected, window, B3B_OUTER_PHASE), Ok(5));
+                        }
+                        for limited in [false, true] {
+                            for credit in [plan.execution_work - 1, plan.execution_work] {
+                                let mut actual = original.clone();
+                                let mut budget = RequestBudget::new(RequestLimits {
+                                    max_input: input.len() as u64,
+                                    max_output: 7,
+                                    max_work: credit,
+                                    max_calls: 9,
+                                    max_initializations: 3,
+                                    max_window_bits: 16,
+                                })
+                                .unwrap();
+                                let result = execute_fixed_compressed_plan(
+                                    &mut actual,
+                                    window,
+                                    &mut budget,
+                                    CompressedOuterPhase::ContextModes,
+                                    input,
+                                    end,
+                                    limited,
+                                    plan,
+                                );
+                                assert_eq!(budget.output_remaining, 7);
+                                assert_eq!(budget.calls_remaining, 9);
+                                assert_eq!(budget.initializations_remaining, 3);
+                                if credit < plan.execution_work {
+                                    assert_eq!(
+                                        result,
+                                        Err(CompressedStep {
+                                            consumed: 0,
+                                            status: CompressedStatus::Failed(
+                                                CoreFailure::ResourceLimit
+                                            )
+                                        })
+                                    );
+                                    assert_eq!(actual, original);
+                                    assert_eq!(budget.work_remaining, credit);
+                                    assert_eq!(budget.input_remaining, input.len() as u64);
+                                } else {
+                                    assert_eq!(actual, expected);
+                                    assert_eq!(budget.work_remaining, 0);
+                                    assert_eq!(
+                                        budget.input_remaining,
+                                        input.len() as u64 - plan.consumed as u64
+                                    );
+                                    let wanted = match reference.1 {
+                                        None => Ok(reference.0),
+                                        Some(CompressedHeaderStatus::NeedInput) => {
+                                            Err(CompressedStep {
+                                                consumed: reference.0,
+                                                status: if limited {
+                                                    CompressedStatus::Failed(
+                                                        CoreFailure::ResourceLimit,
+                                                    )
+                                                } else {
+                                                    CompressedStatus::NeedInput
+                                                },
+                                            })
+                                        }
+                                        Some(CompressedHeaderStatus::Failed(error)) => {
+                                            Err(CompressedStep {
+                                                consumed: reference.0,
+                                                status: CompressedStatus::Failed(
+                                                    map_compressed_error(error),
+                                                ),
+                                            })
+                                        }
+                                        Some(CompressedHeaderStatus::Complete(_)) => {
+                                            panic!("context mode is not a complete header")
+                                        }
+                                    };
+                                    assert_eq!(result, wanted);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_context_mode_invalid_count_preserves_w1_terminal_image() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        for (count, initialized) in [(0u16, 0u16), (257, 0), (1, 2), (256, 257)] {
+            for invalid_queue in [false, true] {
+                let (mut original, window) = fresh_b3b_workspace();
+                put_state_byte(&mut original, window, B3B_OUTER_PHASE, 5).unwrap();
+                put_state_u16(&mut original, window, B3B_BLOCK_COUNTS, count).unwrap();
+                put_state_u16(&mut original, window, B3B_MODES_INITIALIZED, initialized).unwrap();
+                if invalid_queue {
+                    put_state_byte(&mut original, window, B3B_QUEUE_LEN, 255).unwrap();
+                }
+                for end in [false, true] {
+                    let mut reference = original.clone();
+                    let expected = {
+                        let mut decoder = CompressedMetaBlockDecoder {
+                            workspace: &mut reference,
+                            window_bytes: window,
+                        };
+                        decoder.advance_outer_phase_once(
+                            CompressedOuterPhase::ContextModes,
+                            &[0xff],
+                            end,
+                        )
+                    };
+                    assert_eq!(
+                        expected,
+                        (
+                            0,
+                            Some(CompressedHeaderStatus::Failed(
+                                CompressedHeaderError::InternalState
+                            ))
+                        )
+                    );
+                    for credit in [0u64, 4, 5] {
+                        let mut actual = original.clone();
+                        let mut budget = RequestBudget::new(RequestLimits {
+                            max_input: 1,
+                            max_output: 7,
+                            max_work: credit,
+                            max_calls: 9,
+                            max_initializations: 3,
+                            max_window_bits: 16,
+                        })
+                        .unwrap();
+                        let result = advance_planned_compressed_action(
+                            &mut actual,
+                            window,
+                            &mut budget,
+                            &[0xff],
+                            end,
+                        );
+                        assert_eq!(budget.input_remaining, 1);
+                        assert_eq!(budget.output_remaining, 7);
+                        assert_eq!(budget.calls_remaining, 9);
+                        assert_eq!(budget.initializations_remaining, 3);
+                        if credit < 5 {
+                            assert_eq!(
+                                result,
+                                Err(CompressedStep {
+                                    consumed: 0,
+                                    status: CompressedStatus::Failed(CoreFailure::ResourceLimit)
+                                })
+                            );
+                            assert_eq!(actual, original);
+                            assert_eq!(budget.work_remaining, credit);
+                        } else {
+                            assert_eq!(
+                                result,
+                                Err(CompressedStep {
+                                    consumed: 0,
+                                    status: CompressedStatus::Failed(CoreFailure::InvalidFormat(
+                                        CoreFormatDetail::StateEncoding
+                                    ))
+                                })
+                            );
+                            assert_eq!(actual, reference);
+                            assert_eq!(budget.work_remaining, 0);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     #[test]

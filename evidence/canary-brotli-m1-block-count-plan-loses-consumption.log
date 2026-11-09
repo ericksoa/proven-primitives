@@ -2,31 +2,31 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-37170/src/brotli_input.rs:24604:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:24848:1
       |
-24604 | / fn plan_block_count_action(
-24605 | |     workspace: &[u8],
-24606 | |     window_bytes: u32,
-24607 | |     input: &[u8],
-24608 | |     end_of_input: bool,
-24609 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+24848 | / fn plan_block_count_action(
+24849 | |     workspace: &[u8],
+24850 | |     window_bytes: u32,
+24851 | |     input: &[u8],
+24852 | |     end_of_input: bool,
+24853 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
       | |____________________________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-37170/src/brotli_input.rs:24615:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:24859:9
       |
-24615 |           r.is_ok() ==> block_count_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap()),
+24859 |           r.is_ok() ==> block_count_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap()),
       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
-24616 | / {
-24617 | |     reveal(block_count_plan_valid); reveal(block_count_planning_read_valid);
-24618 | |     reveal(var_uint8_planning_read_units); reveal(block_count_execution_units); reveal(block_count_status_for_var);
-24619 | |     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
+24860 | / {
+24861 | |     reveal(block_count_plan_valid); reveal(block_count_planning_read_valid);
+24862 | |     reveal(var_uint8_planning_read_units); reveal(block_count_execution_units); reveal(block_count_status_for_var);
+24863 | |     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
 ...     |
-24674 | |     })
-24675 | | }
+24918 | |     })
+24919 | | }
       | |_- at the end of the function body
 
 error: aborting due to 1 previous error

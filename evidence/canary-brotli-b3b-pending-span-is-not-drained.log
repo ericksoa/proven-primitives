@@ -2,41 +2,41 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-38563/src/brotli_input.rs:13402:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-12217/src/brotli_input.rs:13403:5
       |
-13402 |     while written < span_count
+13403 |     while written < span_count
       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-38563/src/brotli_input.rs:13297:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-12217/src/brotli_input.rs:13298:1
       |
-13297 | / fn drain_serialized_pending_span(
-13298 | |     workspace: &mut [u8],
-13299 | |     window_bytes: u32,
-13300 | |     decoder: &mut CodeDescriptionDecoder,
-13301 | | ) -> (r: Result<CodeDescriptionStep, CompressedHeaderError>)
+13298 | / fn drain_serialized_pending_span(
+13299 | |     workspace: &mut [u8],
+13300 | |     window_bytes: u32,
+13301 | |     decoder: &mut CodeDescriptionDecoder,
+13302 | | ) -> (r: Result<CodeDescriptionStep, CompressedHeaderError>)
       | |___________________________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-38563/src/brotli_input.rs:13313:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-12217/src/brotli_input.rs:13314:9
       |
-13313 | /         r.is_ok() && code_rank_aligned(old(decoder).phase) ==> {
-13314 | |             &&& code_rank_aligned(final(decoder).phase)
-13315 | |             &&& code_phase_rank(final(decoder).phase, final(decoder).alphabet_limit)
-13316 | |                 < code_phase_rank(old(decoder).phase, old(decoder).alphabet_limit)
-13317 | |         },
+13314 | /         r.is_ok() && code_rank_aligned(old(decoder).phase) ==> {
+13315 | |             &&& code_rank_aligned(final(decoder).phase)
+13316 | |             &&& code_phase_rank(final(decoder).phase, final(decoder).alphabet_limit)
+13317 | |                 < code_phase_rank(old(decoder).phase, old(decoder).alphabet_limit)
+13318 | |         },
       | |_________^ failed this postcondition
 ...
-13377 | / {
-13378 | |     proof { reveal(pending_span_drain_effect); }
-13379 | |     let ghost original = workspace@;
-13380 | |     proof { reveal(b3b_workspace_shape); }
+13378 | / {
+13379 | |     proof { reveal(pending_span_drain_effect); }
+13380 | |     let ghost original = workspace@;
+13381 | |     proof { reveal(b3b_workspace_shape); }
 ...     |
-13523 | |     Ok(acknowledged)
-13524 | | }
+13524 | |     Ok(acknowledged)
+13525 | | }
       | |_- at the end of the function body
 
 error: aborting due to 1 previous error

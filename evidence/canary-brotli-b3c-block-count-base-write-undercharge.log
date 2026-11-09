@@ -2,21 +2,21 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-40630/src/brotli_input.rs:24401:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-14704/src/brotli_input.rs:24645:1
       |
-24401 | fn block_count_base_execution_work(read_work: u64) -> (r: u64)
+24645 | fn block_count_base_execution_work(read_work: u64) -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-40630/src/brotli_input.rs:24403:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-14704/src/brotli_input.rs:24647:13
       |
-24403 |     ensures r == read_work + 10 + 2 + 1,
+24647 |     ensures r == read_work + 10 + 2 + 1,
       |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
-24404 | {
-24405 |     read_work + 10 + 2
+24648 | {
+24649 |     read_work + 10 + 2
       |     ------------------ at the end of the function body
 
 error: aborting due to 1 previous error

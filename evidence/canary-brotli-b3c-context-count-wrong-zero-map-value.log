@@ -2,51 +2,51 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:17823:29
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17824:29
       |
-17823 | ...                   while initialized < active_len
+17824 | ...                   while initialized < active_len
       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:17606:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17607:1
       |
-17606 | / fn advance_context_tree_count_phase(
-17607 | |     workspace: &mut [u8],
-17608 | |     window_bytes: u32,
-17609 | |     kind_tag: u8,
+17607 | / fn advance_context_tree_count_phase(
+17608 | |     workspace: &mut [u8],
+17609 | |     window_bytes: u32,
+17610 | |     kind_tag: u8,
 ...     |
-17613 | |     end_of_input: bool,
-17614 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+17614 | |     end_of_input: bool,
+17615 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
       | |______________________________________________^
 
 error: precondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:17916:37
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17917:37
       |
- 8624 | /         after == before.update(
- 8625 | |             crate::brotli_prefix::context_entry_at(window_bytes, kind, initialized) as int,
- 8626 | |             value,
- 8627 | |         ),
+ 8625 | /         after == before.update(
+ 8626 | |             crate::brotli_prefix::context_entry_at(window_bytes, kind, initialized) as int,
+ 8627 | |             value,
+ 8628 | |         ),
       | |_________- failed precondition
 ...
-17916 | /                                     context_map_update_extends_valid_prefix(
-17917 | |                                         before_entry,
-17918 | |                                         workspace@,
-17919 | |                                         window_bytes,
+17917 | /                                     context_map_update_extends_valid_prefix(
+17918 | |                                         before_entry,
+17919 | |                                         workspace@,
+17920 | |                                         window_bytes,
 ...     |
-17923 | |                                         1,
-17924 | |                                     );
+17924 | |                                         1,
+17925 | |                                     );
       | |_____________________________________^
 
 note: recommendation not met
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:17869:48
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17870:48
       |
-17869 |   ...                   == after_tree_count[
+17870 |   ...                   == after_tree_count[
       |  __________________________^
-17870 | | ...                       b3b_scalar_base(window_bytes) + i
-17871 | | ...                   ],
+17871 | | ...                       b3b_scalar_base(window_bytes) + i
+17872 | | ...                   ],
       | |_______________________^
       |
      --> seq.rs:980:12

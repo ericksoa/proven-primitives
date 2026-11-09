@@ -118,6 +118,13 @@ K1 remains unapproved: do not expose its named prefix-code mathematical
 definitions or constant, or implement its proposed installer-contract change.
 This hold does not pause the approved F2 validation and publication.
 
+The human explicitly approved Candidate K2 in
+`BROTLI_M1_CONTEXT_MODE_PROOF_BOUNDARY_DECISION.md` on 2026-11-09. Strengthen
+only `write_next_context_mode`'s success guarantee for the existing valid
+window/workspace and initialized index below 256, then prove normal context-mode
+agreement within the input-private boundary. Preserve its signature,
+requirements, executable body, budgets and workspace. K1 remains held.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

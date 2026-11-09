@@ -1,0 +1,5 @@
+{
+  "status": "stopped_before_completion_not_a_positive",
+  "time_utc": "2026-11-09T18:20:44.523768+00:00",
+  "reason": "All changed modules finished without reported errors; the unchanged data module was still serial. Restart with existing proof-only per-function solver scheduling. The global-isolation experiment was also stopped without claiming a whole positive. No mutant had run."
+}

@@ -1,0 +1,30 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:30666:1
+      |
+30666 | / fn advance_planned_compressed_action(
+30667 | |     workspace: &mut [u8],
+30668 | |     window_bytes: u32,
+30669 | |     budget: &mut crate::brotli::RequestBudget,
+30670 | |     input: &[u8],
+30671 | |     end_of_input: bool,
+30672 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+note: function body check finished in 2 seconds
+     --> src/brotli_input.rs:30666:1
+      |
+30666 | / fn advance_planned_compressed_action(
+30667 | |     workspace: &mut [u8],
+30668 | |     window_bytes: u32,
+30669 | |     budget: &mut crate::brotli::RequestBudget,
+30670 | |     input: &[u8],
+30671 | |     end_of_input: bool,
+30672 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

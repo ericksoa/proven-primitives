@@ -2,33 +2,33 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-38563/src/brotli_input.rs:21888:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-12217/src/brotli_input.rs:22132:9
       |
-21888 |         while transitions < 100_000
+22132 |         while transitions < 100_000
       |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-38563/src/brotli_input.rs:21848:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-12217/src/brotli_input.rs:22092:1
       |
-21848 | fn step(&mut self, input: &[u8], end_of_input: bool) -> (r: CompressedHeaderStep)
+22092 | fn step(&mut self, input: &[u8], end_of_input: bool) -> (r: CompressedHeaderStep)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-38563/src/brotli_input.rs:21864:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-12217/src/brotli_input.rs:22108:13
       |
-21864 | /             forall|error: CompressedHeaderError| serialized_terminal_error(
-21865 | |                 old(self).workspace@,
-21866 | |                 old(self).window_bytes,
-21867 | |                 error,
+22108 | /             forall|error: CompressedHeaderError| serialized_terminal_error(
+22109 | |                 old(self).workspace@,
+22110 | |                 old(self).window_bytes,
+22111 | |                 error,
 ...     |
-21874 | |                 })
-21875 | |             },
+22118 | |                 })
+22119 | |             },
       | |_____________^ failed this postcondition
 ...
-21933 |                       return CompressedHeaderStep { consumed: input.len(), status: CompressedHeaderStatus::Failed(error) };
+22177 |                       return CompressedHeaderStep { consumed: input.len(), status: CompressedHeaderStatus::Failed(error) };
       |                       ---------------------------------------------------------------------------------------------------- at this exit
 
 error: aborting due to 1 previous error

@@ -1,0 +1,96 @@
+from pathlib import Path
+import datetime, hashlib, json, os, re, subprocess
+root=Path.cwd()
+def digest(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p): return {'path':str(p),'sha256':digest(p)}
+def read(p): return json.loads(Path(p).read_text())
+def write(p,d): Path(p).write_text(json.dumps(d,indent=2)+'\n')
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools')
+base='53a46b7505dd2a5bb8d73adecbe7c4f714cc16ed'
+f=read('evidence/m1-k2-source-freeze.json')
+v=read('evidence/brotli-b3c-m1-k2-verification.json')['verification-results']
+c=read('evidence/brotli-b3c-m1-k2-controls.json')
+assert f['exit_code']==0 and f['source_unchanged']
+assert all(digest(p)==h for section in ['source_sha256','validation_source_sha256'] for p,h in f[section].items())
+assert v['success'] and v['is-verifying-entire-crate'] and v['errors']==0 and not v['encountered-error'] and not v['encountered-vir-error']
+assert c['source_unchanged'] and c['suites_failed']==0 and c['suites_passed']==24 and c['rejected_mutations']==146
+assert c['positive_control']['sha256']==digest(c['positive_control']['path'])
+preceding=read(c['positive_control'].get('source_freeze','evidence/m1-k2-source-freeze.json'))
+assert preceding['source_sha256']==f['source_sha256']
+assert preceding['exit_code']==0 and preceding['source_unchanged']
+pv=read(c['positive_control']['path'])['verification-results']
+assert pv['success'] and pv['is-verifying-entire-crate'] and pv['errors']==0
+if 'recovery' in c:
+    recovery=c['recovery']
+    old_harness=Path(recovery['harness_before']).read_text()
+    assert digest(recovery['harness_before'])==recovery['harness_before_sha256']
+    assert digest('tests/proof_rejection.rs')==recovery['harness_after_sha256']
+    assert old_harness.count(recovery['exact_old_literal'])==1
+    assert old_harness.replace(recovery['exact_old_literal'],recovery['exact_new_literal'],1)==Path('tests/proof_rejection.rs').read_text()
+for row in c['suites']: assert row['exit_code']==0 and digest(row['log'])==row['log_sha256']
+cutoff=datetime.datetime.fromisoformat(preceding['started_utc']).timestamp()
+canaries=sorted(p for p in Path('evidence').glob('canary-brotli-*.log') if p.stat().st_mtime>=cutoff)
+assert len(canaries)==146,(len(canaries),'fresh canary count')
+for p in canaries:
+ text=p.read_text()
+ assert any(x in text for x in ['postcondition not satisfied','precondition not satisfied','requires not satisfied','invariant not satisfied','assertion failed']),p
+ assert not re.search(r'Resource limit .*exceeded|internal compiler error|thread .*panicked|timed out|error\[E\d+\]',text),p
+text=Path('evidence/m1-k2-release-tests.log').read_text()
+assert 'test result: FAILED' not in text
+assert [int(n) for n in re.findall(r'test result: ok\. (\d+) passed;',text)]==[88,9,1,1,0]
+assert Path('evidence/m1-k2-format-check.log').read_text()==''
+assert 'Finished `release` profile' in Path('evidence/m1-k2-release-build.log').read_text()
+assert subprocess.check_output(['git','rev-parse','HEAD'],env=env,text=True).strip()==base
+assert subprocess.check_output(['git','branch','--show-current'],env=env,text=True).strip()=='codex/m1-saved-table-ledger'
+subprocess.run(['git','diff','--check','--','.',':(exclude)evidence'],env=env,check=True)
+schedule=read('evidence/m1-k2-data-scheduling.json')
+assert digest('src/brotli_data.rs')==schedule['after_sha256']
+assert hashlib.sha256(Path('src/brotli_data.rs').read_text().replace('#[verifier::spinoff_prover]\n','').encode()).hexdigest()==schedule['before_sha256']
+boundary=read('evidence/m1-k2-prefix-boundary.json')
+assert boundary['K1_unchanged'] and boundary['executable_body_unchanged']
+prefix=Path('src/brotli_prefix.rs').read_text()
+assert prefix.count(boundary['only_delta'])==1
+assert hashlib.sha256(prefix.replace(boundary['only_delta'],'',1).encode()).hexdigest()==boundary['base_prefix_sha256']
+assert digest('src/brotli_prefix.rs')==boundary['current_prefix_sha256']
+coverage=read('evidence/brotli-b3c-m1-k2-coverage.json')
+coverage['generated_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+coverage['validation_state']='named_contracts_checked_full_M1_open'
+for obligation in coverage['obligations']: obligation['state']='checked_named_contracts'
+coverage['k2_decision']['status']='explicitly_approved_2026-11-09_implemented_named_contracts_checked'
+coverage['positive_control']=ref('evidence/brotli-b3c-m1-k2-verification.json')
+coverage['negative_controls']=ref('evidence/brotli-b3c-m1-k2-controls.json')
+coverage.pop('negative_controls_pending',None)
+write('evidence/brotli-b3c-m1-k2-coverage.json',coverage)
+report=Path('BROTLI_B3C_METERING_ADDENDUM.md')
+heading='### Final distance and K2 source validation'
+assert heading not in report.read_text(),'Already finalized; inspect before repeating.'
+with report.open('a') as out:
+ out.write(f'\n{heading}\n\nThe unchanged source passed **{v["verified"]:,} whole-crate checks with zero errors**. All **99 release tests** passed. Across **24 suites, 146 distinct deliberate defects** were rejected after their recorded unchanged-library whole-crate positives. Every rejection has a retained semantic checker failure without resource/compiler failure. Exact source, harness, approved K2 delta, tool, compiled-artifact and transcript identities are bound in `evidence/brotli-b3c-m1-k2.json`. K1 remains held. The named pending-read and distance/malformed-count guarantees do not complete M1 or the decoder release obligations.\n')
+previous=read('evidence/brotli-b3c-m1-block-count.json')
+assert digest(previous['verifier_binary']['path'])==previous['verifier_binary']['sha256']
+artifacts=set(canaries)
+for pattern in ['m1-k2-*','m1-distance-*','brotli-b3c-m1-k2-*.json']:
+ artifacts.update(p for p in Path('evidence').glob(pattern) if p.is_file())
+artifacts.add(Path('evidence/positive-brotli-m1-planner-cap-rank.log'))
+documents=['AGENTS.md','BROTLI_B3C_PROPOSAL.md','BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md','BROTLI_B3C_METERING_ADDENDUM.md','BROTLI_M1_TRANSITION_RULE_DECISION.md','BROTLI_M1_TREE_ACTION_BOUND_DECISION.md','BROTLI_B3C_FIXTURE_F2_DECISION.md','BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md','BROTLI_M1_CONTEXT_MODE_PROOF_BOUNDARY_DECISION.md']
+r={'component':'Brotli B3c M1 distance, malformed-count and approved K2 pending-mode continuation',
+ 'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':base,
+ 'claim':'Named distance and pending-context-mode planning, W1 effects, per-outcome frames and valid-plan execution debits, plus malformed context-count terminal refinement, are checked on unchanged whole-crate source. The K2 success guarantee is checked under unchanged requirements and executable body. Full M1 and all decoder release obligations remain open.',
+ 'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],
+ 'approval_and_document_sha256':{p:digest(p) for p in documents},'verifier':previous['verifier'],'verifier_binary':previous['verifier_binary'],
+ 'verification_options':f['command'][2:],
+ 'per_function_verifier_effort':{'advance_serialized_tree':{'rlimit':600,'spinoff_prover':True},'CodeDescriptionDecoder::advance_field':{'rlimit':500,'spinoff_prover':True},**{'brotli_data::'+name:{'rlimit':300,'spinoff_prover':True} for name in read('evidence/m1-k2-data-scheduling.json')['functions']}},
+ 'verification_elapsed_seconds':f['elapsed_seconds'],'verification_results':v,
+ 'verification_evidence':ref('evidence/brotli-b3c-m1-k2-verification.json'),'verification_log':ref('evidence/m1-k2-whole-crate.log'),'source_freeze':ref('evidence/m1-k2-source-freeze.json'),
+ 'negative_controls':{'evidence':ref('evidence/brotli-b3c-m1-k2-controls.json'),'suites_passed':24,'rejected_mutations':146,'order':'Every mutation started after a recorded whole-crate positive on this exact library. The retained 140 controls use the earlier positive; the repaired six-control suite also followed the final harness positive. Each counted raw log has a semantic proof failure without resource/compiler failure.' if 'recovery' in c else 'Every mutation started after the unchanged whole-crate positive. Each raw log has a semantic proof failure without resource/compiler failure.','preceding_positive':c['positive_control'],'recovery':c.get('recovery')},
+ 'runtime_tests':{'evidence':ref('evidence/m1-k2-release-tests.log'),'passed':99,'library':88,'primitives':9,'trust_scan':1,'upstream_comparison':1},
+ 'compiled_artifact':ref('target/release/libproven_primitives.rlib'),'release_build':ref('evidence/m1-k2-release-build.log'),
+ 'format_check':ref('evidence/m1-k2-format-check.log'),'diff_check':{'scope':'Source, tests and documents; exact raw evidence bytes preserved'},
+ 'coverage':ref('evidence/brotli-b3c-m1-k2-coverage.json'),'prefix_boundary':ref('evidence/m1-k2-prefix-boundary.json'),
+ 'artifact_sha256':{str(p):digest(p) for p in sorted(artifacts)},
+ 'previous_checkpoint':{'commit':base,'evidence':ref('evidence/brotli-b3c-m1-block-count.json')},
+ 'release_gate':'incomplete','not_established':coverage['remaining_gaps']+coverage['later_required_phases'],
+ 'trusted_components':previous['trusted_components'],'execution_environment':previous['execution_environment'],
+ 'held_decision':coverage['k1_decision'],'approved_decision':coverage['k2_decision'],'earlier_failed_checks':coverage['earlier_failed_checks']}
+write('evidence/brotli-b3c-m1-k2.json',r)
+print(json.dumps({'verified':v['verified'],'errors':v['errors'],'tests':99,'defects':146,'release_gate':'incomplete'}))

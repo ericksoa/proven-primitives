@@ -1,0 +1,335 @@
+Diff in /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/src/brotli_input.rs:36439:
+     fn m1_context_mode_plan_matches_w1_values_cursor_and_credit() {
+         use crate::brotli::{RequestBudget, RequestLimits};
+         for (count, initialized) in [(1u16, 0u16), (2, 1), (256, 0), (256, 255)] {
+-        for pending in [None, Some((7usize, 0u8)), Some((7, 0x80)), Some((6, 0xc0))] {
+-            let (mut original, window) = fresh_b3b_workspace();
+-            put_state_byte(&mut original, window, B3B_OUTER_PHASE, 5).unwrap();
+-            put_state_u16(&mut original, window, B3B_BLOCK_COUNTS, count).unwrap();
+-            put_state_u16(&mut original, window, B3B_MODES_INITIALIZED, initialized).unwrap();
+-            let mut queue = BitQueue::new();
+-            if let Some((width, byte)) = pending {
+-                queue.read_bits(width, &[byte], false);
+-            }
+-            store_b3b_queue(&mut original, window, &queue).unwrap();
+-            for code in 0u8..=4 {
+-                let byte = [code];
+-                let input = if code == 4 { &byte[..0] } else { &byte[..] };
+-                for end in [false, true] {
+-                    let plan = plan_context_mode_action(&original, window, input, end).unwrap();
+-                    assert_eq!(
+-                        context_mode_planning_work(&original, window, input.len()).unwrap(),
+-                        plan.planning_work
+-                    );
+-                    let mut expected = original.clone();
+-                    let reference = {
+-                        let mut decoder = CompressedMetaBlockDecoder {
+-                            workspace: &mut expected,
+-                            window_bytes: window,
+-                        };
+-                        decoder.advance_outer_phase_once(
+-                            CompressedOuterPhase::ContextModes,
+-                            input,
+-                            end,
+-                        )
+-                    };
+-                    assert_eq!((plan.consumed, plan.status), reference);
+-                    if reference.1.is_none() {
+-                        let value = match pending {
+-                            None => code & 3,
+-                            Some((7, cached)) => (cached >> 7) | ((code & 1) << 1),
+-                            Some((6, cached)) => (cached >> 6) & 3,
+-                            _ => unreachable!(),
+-                        };
+-                        let at = window as usize + crate::brotli_prefix::LITERAL_CONTEXT_MODES_OFFSET as usize + initialized as usize;
+-                        assert_eq!(expected[at], value);
+-                        assert_eq!(state_u16(&expected, window, B3B_MODES_INITIALIZED), Ok(initialized + 1));
+-                        assert_eq!(state_byte(&expected, window, B3B_OUTER_PHASE), Ok(5));
+-                    }
+-                    for limited in [false, true] {
+-                        for credit in [plan.execution_work - 1, plan.execution_work] {
+-                            let mut actual = original.clone();
+-                            let mut budget = RequestBudget::new(RequestLimits {
+-                                max_input: input.len() as u64,
+-                                max_output: 7,
+-                                max_work: credit,
+-                                max_calls: 9,
+-                                max_initializations: 3,
+-                                max_window_bits: 16,
+-                            })
+-                            .unwrap();
+-                            let result = execute_fixed_compressed_plan(
+-                                &mut actual,
+-                                window,
+-                                &mut budget,
++            for pending in [None, Some((7usize, 0u8)), Some((7, 0x80)), Some((6, 0xc0))] {
++                let (mut original, window) = fresh_b3b_workspace();
++                put_state_byte(&mut original, window, B3B_OUTER_PHASE, 5).unwrap();
++                put_state_u16(&mut original, window, B3B_BLOCK_COUNTS, count).unwrap();
++                put_state_u16(&mut original, window, B3B_MODES_INITIALIZED, initialized).unwrap();
++                let mut queue = BitQueue::new();
++                if let Some((width, byte)) = pending {
++                    queue.read_bits(width, &[byte], false);
++                }
++                store_b3b_queue(&mut original, window, &queue).unwrap();
++                for code in 0u8..=4 {
++                    let byte = [code];
++                    let input = if code == 4 { &byte[..0] } else { &byte[..] };
++                    for end in [false, true] {
++                        let plan = plan_context_mode_action(&original, window, input, end).unwrap();
++                        assert_eq!(
++                            context_mode_planning_work(&original, window, input.len()).unwrap(),
++                            plan.planning_work
++                        );
++                        let mut expected = original.clone();
++                        let reference = {
++                            let mut decoder = CompressedMetaBlockDecoder {
++                                workspace: &mut expected,
++                                window_bytes: window,
++                            };
++                            decoder.advance_outer_phase_once(
+                                 CompressedOuterPhase::ContextModes,
+                                 input,
+                                 end,
+Diff in /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/src/brotli_input.rs:36505:
+-                                limited,
+-                                plan,
++                            )
++                        };
++                        assert_eq!((plan.consumed, plan.status), reference);
++                        if reference.1.is_none() {
++                            let value = match pending {
++                                None => code & 3,
++                                Some((7, cached)) => (cached >> 7) | ((code & 1) << 1),
++                                Some((6, cached)) => (cached >> 6) & 3,
++                                _ => unreachable!(),
++                            };
++                            let at = window as usize
++                                + crate::brotli_prefix::LITERAL_CONTEXT_MODES_OFFSET as usize
++                                + initialized as usize;
++                            assert_eq!(expected[at], value);
++                            assert_eq!(
++                                state_u16(&expected, window, B3B_MODES_INITIALIZED),
++                                Ok(initialized + 1)
+                             );
+-                            assert_eq!(budget.output_remaining, 7);
+-                            assert_eq!(budget.calls_remaining, 9);
+-                            assert_eq!(budget.initializations_remaining, 3);
+-                            if credit < plan.execution_work {
+-                                assert_eq!(
+-                                    result,
+-                                    Err(CompressedStep {
+-                                        consumed: 0,
+-                                        status: CompressedStatus::Failed(
+-                                            CoreFailure::ResourceLimit
+-                                        )
+-                                    })
++                            assert_eq!(state_byte(&expected, window, B3B_OUTER_PHASE), Ok(5));
++                        }
++                        for limited in [false, true] {
++                            for credit in [plan.execution_work - 1, plan.execution_work] {
++                                let mut actual = original.clone();
++                                let mut budget = RequestBudget::new(RequestLimits {
++                                    max_input: input.len() as u64,
++                                    max_output: 7,
++                                    max_work: credit,
++                                    max_calls: 9,
++                                    max_initializations: 3,
++                                    max_window_bits: 16,
++                                })
++                                .unwrap();
++                                let result = execute_fixed_compressed_plan(
++                                    &mut actual,
++                                    window,
++                                    &mut budget,
++                                    CompressedOuterPhase::ContextModes,
++                                    input,
++                                    end,
++                                    limited,
++                                    plan,
+                                 );
+-                                assert_eq!(actual, original);
+-                                assert_eq!(budget.work_remaining, credit);
+-                                assert_eq!(budget.input_remaining, input.len() as u64);
+-                            } else {
+-                                assert_eq!(actual, expected);
+-                                assert_eq!(budget.work_remaining, 0);
+-                                assert_eq!(
+-                                    budget.input_remaining,
+-                                    input.len() as u64 - plan.consumed as u64
+-                                );
+-                                let wanted = match reference.1 {
+-                                    None => Ok(reference.0),
+-                                    Some(CompressedHeaderStatus::NeedInput) => {
++                                assert_eq!(budget.output_remaining, 7);
++                                assert_eq!(budget.calls_remaining, 9);
++                                assert_eq!(budget.initializations_remaining, 3);
++                                if credit < plan.execution_work {
++                                    assert_eq!(
++                                        result,
+                                         Err(CompressedStep {
+-                                            consumed: reference.0,
+-                                            status: if limited {
+-                                                CompressedStatus::Failed(CoreFailure::ResourceLimit)
+-                                            } else {
+-                                                CompressedStatus::NeedInput
+-                                            },
++                                            consumed: 0,
++                                            status: CompressedStatus::Failed(
++                                                CoreFailure::ResourceLimit
++                                            )
+                                         })
+-                                    }
+-                                    Some(CompressedHeaderStatus::Failed(error)) => {
+-                                        Err(CompressedStep {
+-                                            consumed: reference.0,
+-                                            status: CompressedStatus::Failed(map_compressed_error(
+-                                                error,
+-                                            )),
+-                                        })
+-                                    }
+-                                    Some(CompressedHeaderStatus::Complete(_)) => {
+-                                        panic!("context mode is not a complete header")
+-                                    }
+-                                };
+-                                assert_eq!(result, wanted);
++                                    );
++                                    assert_eq!(actual, original);
++                                    assert_eq!(budget.work_remaining, credit);
++                                    assert_eq!(budget.input_remaining, input.len() as u64);
++                                } else {
++                                    assert_eq!(actual, expected);
++                                    assert_eq!(budget.work_remaining, 0);
++                                    assert_eq!(
++                                        budget.input_remaining,
++                                        input.len() as u64 - plan.consumed as u64
++                                    );
++                                    let wanted = match reference.1 {
++                                        None => Ok(reference.0),
++                                        Some(CompressedHeaderStatus::NeedInput) => {
++                                            Err(CompressedStep {
++                                                consumed: reference.0,
++                                                status: if limited {
++                                                    CompressedStatus::Failed(
++                                                        CoreFailure::ResourceLimit,
++                                                    )
++                                                } else {
++                                                    CompressedStatus::NeedInput
++                                                },
++                                            })
++                                        }
++                                        Some(CompressedHeaderStatus::Failed(error)) => {
++                                            Err(CompressedStep {
++                                                consumed: reference.0,
++                                                status: CompressedStatus::Failed(
++                                                    map_compressed_error(error),
++                                                ),
++                                            })
++                                        }
++                                        Some(CompressedHeaderStatus::Complete(_)) => {
++                                            panic!("context mode is not a complete header")
++                                        }
++                                    };
++                                    assert_eq!(result, wanted);
++                                }
+                             }
+                         }
+                     }
+Diff in /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/src/brotli_input.rs:36559:
+                 }
+             }
+         }
+-        }
+     }
+-
+ 
+     #[test]
+     fn m1_context_mode_invalid_count_preserves_w1_terminal_image() {
+Diff in /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/tests/proof_rejection.rs:4092:
+     let path = temporary.join("src/brotli_input.rs");
+     let original = fs::read_to_string(&path).unwrap();
+     for (name, function, old, new) in [
+-        ("brotli-m1-context-mode-prepass-omits-read-work", "context_mode_planning_work", "Ok(read.work)", "Ok(0)"),
+-        ("brotli-m1-context-mode-plan-loses-need-input", "plan_context_mode_action", "Some(CompressedHeaderStatus::NeedInput),", "None,"),
+-        ("brotli-m1-context-mode-plan-loses-consumption", "plan_context_mode_action", "consumed: read.consumed,", "consumed: 0,"),
+-        ("brotli-m1-context-mode-plan-omits-value-writes", "plan_context_mode_action", "context_mode_value_execution_work(read_plan.work)", "context_mode_base_execution_work(read_plan.work)"),
+-        ("brotli-m1-context-mode-action-writes-wrong-value", "advance_context_modes_phase", "                                    value as u8,
+-                                )", "                                    (value as u8) ^ 1,
+-                                )"),
+-        ("brotli-m1-context-mode-action-loses-initialized-count", "advance_context_modes_phase", "B3B_MODES_INITIALIZED, next)", "B3B_MODES_INITIALIZED, initialized)"),
++        (
++            "brotli-m1-context-mode-prepass-omits-read-work",
++            "context_mode_planning_work",
++            "Ok(read.work)",
++            "Ok(0)",
++        ),
++        (
++            "brotli-m1-context-mode-plan-loses-need-input",
++            "plan_context_mode_action",
++            "Some(CompressedHeaderStatus::NeedInput),",
++            "None,",
++        ),
++        (
++            "brotli-m1-context-mode-plan-loses-consumption",
++            "plan_context_mode_action",
++            "consumed: read.consumed,",
++            "consumed: 0,",
++        ),
++        (
++            "brotli-m1-context-mode-plan-omits-value-writes",
++            "plan_context_mode_action",
++            "context_mode_value_execution_work(read_plan.work)",
++            "context_mode_base_execution_work(read_plan.work)",
++        ),
++        (
++            "brotli-m1-context-mode-action-writes-wrong-value",
++            "advance_context_modes_phase",
++            "                                    value as u8,
++                                )",
++            "                                    (value as u8) ^ 1,
++                                )",
++        ),
++        (
++            "brotli-m1-context-mode-action-loses-initialized-count",
++            "advance_context_modes_phase",
++            "B3B_MODES_INITIALIZED, next)",
++            "B3B_MODES_INITIALIZED, initialized)",
++        ),
+     ] {
+         let start = original
+             .find(&format!("fn {function}("))
+Diff in /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/tests/proof_rejection.rs:4145:
+     fs::remove_dir_all(temporary).unwrap();
+ }
+ 
+-
+ #[test]
+ #[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+ fn the_prover_rejects_two_k2_context_mode_success_guarantee_defects() {
+Diff in /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/tests/proof_rejection.rs:4167:
+     let path = temporary.join("src/brotli_prefix.rs");
+     let original = fs::read_to_string(&path).unwrap();
+     for (name, function, old, new) in [
+-        ("brotli-k2-writer-rejects-last-valid-index", "write_next_context_mode", "initialized >= LITERAL_CONTEXT_MODES_BYTES as u16", "initialized >= LITERAL_CONTEXT_MODES_BYTES as u16 - 1"),
+-        ("brotli-k2-writer-rejects-valid-window", "write_next_context_mode", "if window_bytes > 16_777_216", "if window_bytes >= 16_777_216"),
++        (
++            "brotli-k2-writer-rejects-last-valid-index",
++            "write_next_context_mode",
++            "initialized >= LITERAL_CONTEXT_MODES_BYTES as u16",
++            "initialized >= LITERAL_CONTEXT_MODES_BYTES as u16 - 1",
++        ),
++        (
++            "brotli-k2-writer-rejects-valid-window",
++            "write_next_context_mode",
++            "if window_bytes > 16_777_216",
++            "if window_bytes >= 16_777_216",
++        ),
+     ] {
+         let start = original
+             .find(&format!("fn {function}("))
+Diff in /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/tests/proof_rejection.rs:4213:
+     }
+     fs::remove_dir_all(temporary).unwrap();
+ }
+-
+ 

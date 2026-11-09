@@ -2,30 +2,30 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-37170/src/brotli_input.rs:24572:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:24816:1
       |
-24572 | / fn block_count_planning_work(
-24573 | |     workspace: &[u8],
-24574 | |     window_bytes: u32,
-24575 | |     input_len: usize,
-24576 | | ) -> (r: Result<u64, CompressedHeaderError>)
+24816 | / fn block_count_planning_work(
+24817 | |     workspace: &[u8],
+24818 | |     window_bytes: u32,
+24819 | |     input_len: usize,
+24820 | | ) -> (r: Result<u64, CompressedHeaderError>)
       | |___________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-37170/src/brotli_input.rs:24577:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:24821:13
       |
-24577 |       ensures r.is_ok() ==> block_count_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+24821 |       ensures r.is_ok() ==> block_count_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
       |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
-24578 | / {
-24579 | |     reveal(block_count_planning_read_valid); reveal(var_uint8_planning_read_units);
-24580 | |     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
-24581 | |     if kind >= 3 {
+24822 | / {
+24823 | |     reveal(block_count_planning_read_valid); reveal(var_uint8_planning_read_units);
+24824 | |     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
+24825 | |     if kind >= 3 {
 ...     |
-24601 | |     Ok(0)
-24602 | | }
+24845 | |     Ok(0)
+24846 | | }
       | |_- at the end of the function body
 
 error: aborting due to 1 previous error

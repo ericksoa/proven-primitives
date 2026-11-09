@@ -1,0 +1,9 @@
+{
+  "temporary": "/var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/m1-k2-block-control-recovery-49ftmym_",
+  "change": "Limit the retryable-NeedInput mutant to BlockCount, retaining all original contracts and admitted inputs.",
+  "library_unchanged": true,
+  "old_mutation": "\"if false { CompressedStatus::Failed(CoreFailure::ResourceLimit) }\"",
+  "new_mutation": "if input_was_limited && phase != CompressedOuterPhase::BlockCount",
+  "harness_before_sha256": "b0bfb3dd16cbb24605851a25039a329a721ad7972a978f6bd8e52b9ffc4276d5",
+  "harness_candidate_sha256": "3bf42d077263aaa2966a280727723a2f357502df6fc8c6dd82ea98183473130a"
+}

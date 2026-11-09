@@ -2,44 +2,39 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51367,13): 'if' cannot be used in patterns.
-WARNING: (56781,5): 'if' cannot be used in patterns.
+WARNING: (51433,13): 'if' cannot be used in patterns.
+WARNING: (57873,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:17823:29
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17824:29
       |
-17823 | ...                   while initialized < active_len
+17824 | ...                   while initialized < active_len
       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:17606:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17607:1
       |
-17606 | / fn advance_context_tree_count_phase(
-17607 | |     workspace: &mut [u8],
-17608 | |     window_bytes: u32,
-17609 | |     kind_tag: u8,
+17607 | / fn advance_context_tree_count_phase(
+17608 | |     workspace: &mut [u8],
+17609 | |     window_bytes: u32,
+17610 | |     kind_tag: u8,
 ...     |
-17613 | |     end_of_input: bool,
-17614 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+17614 | |     end_of_input: bool,
+17615 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
       | |______________________________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:17809:36
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17788:36
       |
-17809 |   ...                   assert(b3b_scalar_u16_at(
-      |  ______________________________^
-17810 | | ...                       workspace@,
-17811 | | ...                       window_bytes,
-17812 | | ...                       B3B_MAP_TREES,
-17813 | | ...                   ) == raw as nat + 1);
-      | |_________________________________________^ assertion failed
+17788 | ...                   assert(num_trees == 1 <==> raw == 0);
+      |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
 
 note: recommendation not met
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-41791/src/brotli_input.rs:17869:48
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17870:48
       |
-17869 |   ...                   == after_tree_count[
+17870 |   ...                   == after_tree_count[
       |  __________________________^
-17870 | | ...                       b3b_scalar_base(window_bytes) + i
-17871 | | ...                   ],
+17871 | | ...                       b3b_scalar_base(window_bytes) + i
+17872 | | ...                   ],
       | |_______________________^
       |
      --> seq.rs:980:12

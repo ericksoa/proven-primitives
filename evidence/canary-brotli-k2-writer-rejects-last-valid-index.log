@@ -1,0 +1,17 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k2-writer-canary-9769/src/brotli_prefix.rs:2707:9
+     |
+2707 | /         window_bytes <= 16_777_216
+2708 | |             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES
+2709 | |             && initialized < LITERAL_CONTEXT_MODES_BYTES ==> r.is_ok(),
+     | |______________________________________________________________________^ failed this postcondition
+...
+2720 |           return Err(WorkspaceError::InvalidSymbol);
+     |           ----------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

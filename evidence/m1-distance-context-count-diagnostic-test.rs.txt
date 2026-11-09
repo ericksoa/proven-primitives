@@ -1,0 +1,21 @@
+    #[test]
+    fn diagnostic_context_mode_invalid_count_terminal_image() {
+        let (mut original, window) = fresh_b3b_workspace();
+        put_state_byte(&mut original, window, B3B_OUTER_PHASE, 5).unwrap();
+        put_state_u16(&mut original, window, B3B_BLOCK_COUNTS, 0).unwrap();
+        let mut reference = original.clone();
+        let expected = {
+            let mut decoder = CompressedMetaBlockDecoder { workspace: &mut reference, window_bytes: window };
+            decoder.advance_outer_phase_once(CompressedOuterPhase::ContextModes, &[], false)
+        };
+        let mut actual = original.clone();
+        let mut budget = crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
+            max_input: 0, max_output: 0, max_work: 1000, max_calls: 0,
+            max_initializations: 0, max_window_bits: 16,
+        }).unwrap();
+        let result = advance_planned_compressed_action(&mut actual, window, &mut budget, &[], false);
+        println!("CTX_INVALID_COUNT expected={expected:?} actual={result:?} expected_outer={:?} actual_outer={:?} work_spent={}",
+            state_byte(&reference, window, B3B_OUTER_PHASE), state_byte(&actual, window, B3B_OUTER_PHASE), 1000-budget.work_remaining);
+        assert_eq!(actual, reference, "M1 must preserve W1's terminal state image for the admitted malformed count state");
+    }
+

@@ -1,0 +1,5 @@
+{
+  "status": "stopped_before_completion_not_a_positive",
+  "time_utc": "2026-11-09T18:10:04.163990+00:00",
+  "reason": "Static anchor review found the new prefix-control extractor counted visibility text as indentation. No mutant had run. Correct the harness and rerun verification with its final hash."
+}
