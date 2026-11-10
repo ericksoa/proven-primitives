@@ -1,0 +1,14 @@
+note: verifying module brotli_input, function lib::brotli_input::plan_block_count_action (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:25363:1
+      |
+25363 | / fn plan_block_count_action(
+25364 | |     workspace: &[u8],
+25365 | |     window_bytes: u32,
+25366 | |     input: &[u8],
+25367 | |     end_of_input: bool,
+25368 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+      | |____________________________________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

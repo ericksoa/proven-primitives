@@ -1,0 +1,56 @@
+{
+  "observed_utc": "2026-11-09T23:23:48.906832+00:00",
+  "kind": "actual_runtime_regression_not_a_proof",
+  "source_sha256": {
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "3ef55dbbbddc2d9faf7e1d5858226aac145a86898a5e303f3bc054ef20d171d5",
+    "src/brotli_prefix.rs": "b0b1ace05f345af70c1db2ddb364a77ee89db904c4cd9eb3bbd3643bc8b28a77",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+  },
+  "log": {
+    "path": "evidence/m1-repeat-class-switch-before-fix.log",
+    "sha256": "1f43ca9017b0e836d426d59ed507291d58964777c2521d1449d0273105e26058"
+  },
+  "source_snapshot": {
+    "path": "evidence/m1-repeat-class-switch-before-fix-source.rs.gz",
+    "sha256": "7f2f05f7846917792ce43f80593030a598d495b770661aa300de10d2465850d1"
+  },
+  "case": {
+    "auxiliary_symbols": [
+      7,
+      8,
+      16,
+      17
+    ],
+    "auxiliary_lengths": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "decoded_prefix_hex": "c6",
+    "previous_repeat_count": 3,
+    "previous_repeat_length_before": 8,
+    "previous_repeat_length_after": 0,
+    "current_repeat_length": 0,
+    "expected_span": [
+      4,
+      3,
+      0
+    ],
+    "actual_span": [
+      4,
+      8,
+      0
+    ]
+  },
+  "full_stream_witness": false,
+  "fix_status": "K4_proposed_not_implemented"
+}

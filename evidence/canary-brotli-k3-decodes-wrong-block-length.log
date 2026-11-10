@@ -1,0 +1,23 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-88998/src/brotli_prefix.rs:60:9
+   |
+60 | /         r.is_ok() ==> {
+61 | |         &&& symbol < 26
+62 | |         &&& suffix < (1u32 << BLOCK_LENGTH_EXTRA_BITS@[symbol as int])
+63 | |         &&& r.unwrap() as nat == block_length_value(symbol, suffix)
+64 | |         &&& r.unwrap() > 0
+65 | |     },
+   | |_____^ failed this postcondition
+...
+78 | /     match offset.checked_add(suffix) {
+79 | |         Some(value) => Ok(value + 1),
+80 | |         None => Err(PrefixError::BlockLengthOverflow),
+81 | |     }
+   | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

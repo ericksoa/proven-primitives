@@ -1,0 +1,202 @@
+note: preparing crate for verification
+
+note: verifying root module
+
+note: verifying module base64
+
+note: verifying module brotli
+
+note: verifying module brotli_block
+
+note: verifying module brotli_data
+
+note: verifying module brotli_dictionary
+
+note: verifying module brotli_input
+
+note: verifying module brotli_prefix
+
+note: done with root module
+
+note: verifying module composition_demo
+
+note: done with module composition_demo
+
+note: verifying module lz4
+
+note: done with module brotli_block
+
+note: verifying module percent
+
+note: done with module percent
+
+note: verifying module brotli_data, function lib::brotli_data::command_entry
+
+note: done with module lz4
+
+note: verifying module brotli_data, function lib::brotli_data::command_entry_formula
+
+warning: this reveal/fuel statement has no effect because no verification condition in this module depends on this function
+   --> src/brotli_data.rs:105:9
+    |
+105 |         reveal(command_cell_position_spec);
+    |         ^^^^^^
+    |
+    = help: to suppress this warning, use `#[verifier::allow(dead_reveal)]` on the surrounding function, datatype, or module or `#![verifier::allow(dead_reveal)]` in the module or crate
+
+warning: this reveal/fuel statement has no effect because no verification condition in this module depends on this function
+   --> src/brotli_data.rs:106:9
+    |
+106 |         reveal(command_copy_code_spec);
+    |         ^^^^^^
+    |
+    = help: to suppress this warning, use `#[verifier::allow(dead_reveal)]` on the surrounding function, datatype, or module or `#![verifier::allow(dead_reveal)]` in the module or crate
+
+warning: this reveal/fuel statement has no effect because no verification condition in this module depends on this function
+   --> src/brotli_data.rs:107:9
+    |
+107 |         reveal(command_insert_code_spec);
+    |         ^^^^^^
+    |
+    = help: to suppress this warning, use `#[verifier::allow(dead_reveal)]` on the surrounding function, datatype, or module or `#![verifier::allow(dead_reveal)]` in the module or crate
+
+note: done with module brotli_data, function lib::brotli_data::command_entry
+
+note: verifying module brotli_data, function lib::brotli_data::copy_affix
+
+WARNING: (54417,13): 'if' cannot be used in patterns.
+note: done with module brotli_data, function lib::brotli_data::command_entry_formula
+
+note: verifying module brotli_data, function lib::brotli_data::copy_dictionary_slice
+
+WARNING: (63220,5): 'if' cannot be used in patterns.
+note: done with module brotli_data, function lib::brotli_data::copy_affix
+
+note: verifying module brotli_data, function lib::brotli_data::decoder_prefix_suffix
+
+note: done with module brotli_data, function lib::brotli_data::decoder_prefix_suffix
+
+note: verifying module brotli_data, function lib::brotli_data::dictionary_offset
+
+note: done with module brotli_data, function lib::brotli_data::dictionary_offset
+
+note: verifying module brotli_data, function lib::brotli_data::dictionary_size_bits
+
+note: done with module brotli_data, function lib::brotli_data::dictionary_size_bits
+
+note: verifying module brotli_data, function lib::brotli_data::dictionary_transform_plan
+
+note: done with module brotli_data, function lib::brotli_data::dictionary_transform_plan
+
+note: verifying module brotli_data, function lib::brotli_data::ferment
+
+note: done with module brotli_data, function lib::brotli_data::ferment
+
+note: verifying module brotli_data, function lib::brotli_data::literal_context
+
+note: done with module brotli_dictionary
+
+note: verifying module brotli_data, function lib::brotli_data::toggle_32
+
+note: done with module brotli_data, function lib::brotli_data::toggle_32
+
+note: verifying module brotli_data, function lib::brotli_data::toggle_5
+
+note: done with module brotli_data, function lib::brotli_data::toggle_5
+
+note: verifying module brotli_data, function lib::brotli_data::transform_dictionary_word
+
+note: done with module brotli_prefix
+
+note: verifying module brotli_data, function lib::brotli_data::transform_record
+
+note: done with module brotli_data, function lib::brotli_data::transform_record
+
+note: verifying module brotli_input, function lib::brotli_input::advance_planned_compressed_action
+
+note: done with module brotli_data, function lib::brotli_data::copy_dictionary_slice
+
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree
+
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+note: done with module brotli_data, function lib::brotli_data::literal_context
+
+note: verifying module brotli_input, function lib::brotli_input::body_decrement_block_remaining
+
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::advance_planned_compressed_action
+
+note: verifying module brotli_input, function lib::brotli_input::CodeDescriptionDecoder::advance_field
+
+note: done with module base64
+
+note: verifying module brotli_input, function lib::brotli_input::plan_block_count_action
+
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::plan_block_count_action
+
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+note: done with module brotli_data
+
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::body_decrement_block_remaining
+
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::CodeDescriptionDecoder::advance_field
+
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+note: done with module brotli_input, function lib::brotli_input::advance_serialized_tree
+
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+WARNING: (51886,13): 'if' cannot be used in patterns.
+WARNING: (59241,5): 'if' cannot be used in patterns.
+note: done with module brotli
+
+note: done with module brotli_data, function lib::brotli_data::transform_dictionary_word
+

@@ -16,7 +16,7 @@ verus! {
 
 pub(crate) const MAX_SYMBOLS: usize = 258;
 pub(crate) const MAX_BITS: u8 = 15;
-const CODE_SPACE: u32 = 1 << 15;
+pub(crate) const CODE_SPACE: u32 = 1 << 15;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum PrefixError {
@@ -54,7 +54,10 @@ fn block_length_range(symbol: u8) -> (r: (u32, u8))
 }
 
 pub(crate) fn decode_block_length(symbol: u8, suffix: u32) -> (r: Result<u32, PrefixError>)
-    ensures r.is_ok() ==> {
+    ensures
+        symbol < 26 && suffix < (1u32 << BLOCK_LENGTH_EXTRA_BITS@[symbol as int])
+            ==> r.is_ok(),
+        r.is_ok() ==> {
         &&& symbol < 26
         &&& suffix < (1u32 << BLOCK_LENGTH_EXTRA_BITS@[symbol as int])
         &&& r.unwrap() as nat == block_length_value(symbol, suffix)
@@ -68,13 +71,17 @@ pub(crate) fn decode_block_length(symbol: u8, suffix: u32) -> (r: Result<u32, Pr
     if suffix >= (1u32 << width) {
         return Err(PrefixError::InvalidBlockLengthSuffix);
     }
+    proof {
+        assert((1u32 << width) <= 16_777_216u32) by (bit_vector)
+            requires width <= 24;
+    }
     match offset.checked_add(suffix) {
         Some(value) => Ok(value),
         None => Err(PrefixError::BlockLengthOverflow),
     }
 }
 
-spec fn code_weight(length: u8) -> nat {
+pub(crate) open spec fn code_weight(length: u8) -> nat {
     if length == 1 { 16_384 }
     else if length == 2 { 8_192 }
     else if length == 3 { 4_096 }
@@ -93,7 +100,7 @@ spec fn code_weight(length: u8) -> nat {
     else { 0 }
 }
 
-spec fn used_space(lengths: Seq<u8>) -> nat
+pub(crate) open spec fn used_space(lengths: Seq<u8>) -> nat
     decreases lengths.len(),
 {
     if lengths.len() == 0 {
@@ -103,7 +110,7 @@ spec fn used_space(lengths: Seq<u8>) -> nat
     }
 }
 
-spec fn nonzero_count(lengths: Seq<u8>) -> nat
+pub(crate) open spec fn nonzero_count(lengths: Seq<u8>) -> nat
     decreases lengths.len(),
 {
     if lengths.len() == 0 {
@@ -213,6 +220,98 @@ proof fn lemma_count_concat(a: Seq<u8>, b: Seq<u8>, length: u8)
     } else {
         assert(a =~= Seq::<u8>::empty());
     }
+}
+
+proof fn canonical_code_space_value()
+    ensures CODE_SPACE == 32_768u32,
+{
+    assert((1u32 << 15) == 32_768u32) by (bit_vector);
+}
+
+proof fn builder_space_prefix_le(lengths: Seq<u8>, limit: int)
+    requires 0 <= limit <= lengths.len(),
+    ensures used_space(lengths.take(limit)) <= used_space(lengths),
+{
+    assert(lengths =~= lengths.take(limit) + lengths.skip(limit));
+    lemma_used_space_concat(lengths.take(limit), lengths.skip(limit));
+}
+
+proof fn first_code_concat(left: Seq<u8>, right: Seq<u8>, length: nat)
+    ensures first_code(left + right, length) == first_code(left, length) + first_code(right, length),
+    decreases length,
+{
+    reveal(first_code);
+    if length > 1 {
+        first_code_concat(left, right, (length - 1) as nat);
+        lemma_count_concat(left, right, (length - 1) as u8);
+    }
+}
+
+proof fn singleton_first_code_zero(value: u8, length: u8)
+    requires 1 <= length <= 15, value >= length,
+    ensures first_code(seq![value], length as nat) == 0,
+    decreases length,
+{
+    reveal(first_code); reveal_with_fuel(count_length, 2);
+    if length > 1 { singleton_first_code_zero(value, (length - 1) as u8); }
+}
+
+proof fn singleton_first_code_space_bound(value: u8, length: u8)
+    requires 1 <= length <= 15,
+    ensures first_code(seq![value], length as nat) * code_weight(length) <= code_weight(value),
+    decreases length,
+{
+    reveal(first_code); reveal_with_fuel(count_length, 2); reveal(code_weight);
+    if length > 1 {
+        assert(code_weight((length - 1) as u8) == 2 * code_weight(length));
+        if value == length - 1 {
+            singleton_first_code_zero(value, (length - 1) as u8);
+        } else {
+            singleton_first_code_space_bound(value, (length - 1) as u8);
+            let previous = first_code(seq![value], (length - 1) as nat);
+            let old_weight = code_weight((length - 1) as u8);
+            let new_weight = code_weight(length);
+            assert((2 * previous) * new_weight <= code_weight(value)) by (nonlinear_arith)
+                requires previous * old_weight <= code_weight(value), old_weight == 2 * new_weight;
+        }
+    }
+}
+
+proof fn first_code_space_bound(lengths: Seq<u8>, length: u8)
+    requires 1 <= length <= 15,
+    ensures first_code(lengths, length as nat) * code_weight(length) <= used_space(lengths),
+        first_code(lengths, length as nat) <= used_space(lengths),
+    decreases lengths.len(),
+{
+    reveal(code_weight);
+    if lengths.len() > 0 {
+        let head = seq![lengths[0]];
+        let tail = lengths.skip(1);
+        assert(lengths =~= head + tail);
+        first_code_concat(head, tail, length as nat);
+        singleton_first_code_space_bound(lengths[0], length);
+        first_code_space_bound(tail, length);
+        reveal(used_space);
+        let left = first_code(head, length as nat);
+        let right = first_code(tail, length as nat);
+        let scale = code_weight(length);
+        assert(first_code(lengths, length as nat) == left + right);
+        assert(used_space(lengths) == code_weight(lengths[0]) + used_space(tail));
+        assert((left + right) * scale <= code_weight(lengths[0]) + used_space(tail)) by (nonlinear_arith)
+            requires left * scale <= code_weight(lengths[0]), right * scale <= used_space(tail);
+        assert(first_code(lengths, length as nat) * code_weight(length) <= used_space(lengths));
+    } else {
+        assert(lengths =~= Seq::<u8>::empty());
+        assert(lengths + lengths =~= lengths);
+        first_code_concat(lengths, lengths, length as nat);
+        assert(first_code(lengths, length as nat) == 0);
+        reveal(used_space);
+    }
+    let code = first_code(lengths, length as nat);
+    let scale = code_weight(length);
+    assert(scale >= 1);
+    assert(code <= used_space(lengths)) by (nonlinear_arith)
+        requires code * scale <= used_space(lengths), scale >= 1, code >= 0;
 }
 
 fn weight(length: u8) -> (r: u32)
@@ -666,7 +765,7 @@ pub(crate) open spec fn builder_next_code_byte_sequence(
     })
 }
 
-pub(crate) closed spec fn valid_builder_lengths(lengths: Seq<u8>) -> bool {
+pub(crate) open spec fn valid_builder_lengths(lengths: Seq<u8>) -> bool {
     &&& 1 <= lengths.len() <= BUILDER_CODE_LENGTHS
     &&& forall|i: int| 0 <= i < lengths.len() ==> lengths[i] <= MAX_BITS
     &&& nonzero_count(lengths) >= 2
@@ -4673,6 +4772,21 @@ pub(crate) fn install_builder_canonical_tree(
 ) -> (r: Result<(), WorkspaceError>)
     requires old(meta).valid_for(region),
     ensures
+        window_bytes <= 16_777_216
+            && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+            && (tree as nat) < tree_region_count(region)
+            && old(meta).storage == (TreeStorageState::Canonical { initialized: 0 })
+            && 1 <= old(meta).symbols <= BUILDER_CODE_LENGTHS
+            && old(meta).symbols as nat <= tree_region_symbols(region)
+            && lengths_initialized == old(meta).symbols ==> {
+            let lengths = builder_length_sequence(old(workspace)@, window_bytes, old(meta).symbols);
+            &&& r.is_ok() == valid_builder_lengths(lengths)
+            &&& (!valid_builder_lengths(lengths) ==> {
+                &&& r == Err(WorkspaceError::InvalidCodeLength)
+                &&& final(workspace)@ == old(workspace)@
+                &&& *final(meta) == *old(meta)
+            })
+        },
         canonical_installer_frame(
             old(workspace)@,
             final(workspace)@,
@@ -4715,6 +4829,7 @@ pub(crate) fn install_builder_canonical_tree(
             )
         },
 {
+    proof { canonical_code_space_value(); }
     if window_bytes > 16_777_216 {
         return Err(WorkspaceError::InvalidWindowBits);
     }
@@ -4756,6 +4871,7 @@ pub(crate) fn install_builder_canonical_tree(
     let ghost mut used: nat = 0;
     while symbol < symbols
         invariant
+            CODE_SPACE == 32_768u32,
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -4817,11 +4933,17 @@ pub(crate) fn install_builder_canonical_tree(
             nonzero_step(lengths, symbol as int);
         }
         if length > MAX_BITS {
+            proof { reveal(valid_builder_lengths); assert(!valid_builder_lengths(lengths)); }
             return Err(WorkspaceError::InvalidCodeLength);
         }
         if length != 0 {
             let amount = weight(length);
             if amount > space {
+                proof {
+                    builder_space_prefix_le(lengths, symbol as int + 1);
+                    reveal(valid_builder_lengths);
+                    assert(!valid_builder_lengths(lengths));
+                }
                 return Err(WorkspaceError::InvalidCodeLength);
             }
             space = space - amount;
@@ -4834,6 +4956,7 @@ pub(crate) fn install_builder_canonical_tree(
         assert(lengths.take(symbol as int) =~= lengths);
     }
     if nonzero < 2 || space != 0 {
+        proof { reveal(valid_builder_lengths); assert(!valid_builder_lengths(lengths)); }
         return Err(WorkspaceError::InvalidCodeLength);
     }
     proof {
@@ -4852,6 +4975,8 @@ pub(crate) fn install_builder_canonical_tree(
     let mut count_initialized: u16 = 0;
     while count_initialized < BUILDER_COUNTS
         invariant
+            CODE_SPACE == 32_768u32,
+            valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -4892,6 +5017,8 @@ pub(crate) fn install_builder_canonical_tree(
         let mut count: u16 = 0;
         while scan < symbols
             invariant
+            CODE_SPACE == 32_768u32,
+            valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -5027,6 +5154,9 @@ pub(crate) fn install_builder_canonical_tree(
     let mut chain_initialized: u16 = 0;
     while chain_initialized < BUILDER_SYMBOL_CHAIN_ENTRIES
         invariant
+            CODE_SPACE == 32_768u32,
+            count_initialized == BUILDER_COUNTS,
+            valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -5073,6 +5203,10 @@ pub(crate) fn install_builder_canonical_tree(
     let mut chain_length: u16 = 1;
     while chain_length <= MAX_BITS as u16
         invariant
+            CODE_SPACE == 32_768u32,
+            chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
+            count_initialized == BUILDER_COUNTS,
+            valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -5109,6 +5243,10 @@ pub(crate) fn install_builder_canonical_tree(
         let mut scan: u16 = 0;
         while scan < symbols
             invariant
+            CODE_SPACE == 32_768u32,
+            chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
+            count_initialized == BUILDER_COUNTS,
+            valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -5195,11 +5333,17 @@ pub(crate) fn install_builder_canonical_tree(
     let mut code: u64 = 0;
     while next_initialized < BUILDER_NEXT_CODES
         invariant
+            CODE_SPACE == 32_768u32,
+            chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
+            count_initialized == BUILDER_COUNTS,
+            valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
             1 <= next_initialized <= BUILDER_NEXT_CODES,
             code <= u32::MAX as u64,
+            code <= CODE_SPACE as u64,
+            code <= 32_768u64,
             window_bytes <= 16_777_216,
             workspace@.len() == original_workspace.len(),
             original_workspace.len()
@@ -5275,6 +5419,11 @@ pub(crate) fn install_builder_canonical_tree(
                 ));
             }
             let expanded = (code + previous_count as u64) * 2;
+            proof {
+                assert(code <= 32_768u64);
+                assert(previous_count <= 65_535u16);
+                assert(expanded <= 196_606u64);
+            }
             if expanded > u32::MAX as u64 {
                 return Err(WorkspaceError::InvalidCodeLength);
             }
@@ -5282,12 +5431,18 @@ pub(crate) fn install_builder_canonical_tree(
             proof {
                 reveal(first_code);
                 assert(code as nat == first_code(lengths, next_initialized as nat));
+                first_code_space_bound(lengths, next_initialized as u8);
+                reveal(valid_builder_lengths);
+                assert(code <= CODE_SPACE as u64);
             }
         } else {
             proof {
                 assert(next_initialized == 1);
                 reveal(first_code);
                 assert(code as nat == first_code(lengths, next_initialized as nat));
+                first_code_space_bound(lengths, next_initialized as u8);
+                reveal(valid_builder_lengths);
+                assert(code <= CODE_SPACE as u64);
             }
         }
         let ghost before_next_write = workspace@;
@@ -5326,6 +5481,11 @@ pub(crate) fn install_builder_canonical_tree(
     symbol = 0;
     while symbol < symbols
         invariant
+            CODE_SPACE == 32_768u32,
+            next_initialized == BUILDER_NEXT_CODES,
+            chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
+            count_initialized == BUILDER_COUNTS,
+            valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -5407,6 +5567,11 @@ pub(crate) fn install_builder_canonical_tree(
             let mut rank: u16 = 0;
             while scan < symbol
                 invariant
+            CODE_SPACE == 32_768u32,
+            next_initialized == BUILDER_NEXT_CODES,
+            chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
+            count_initialized == BUILDER_COUNTS,
+            valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -5490,7 +5655,17 @@ pub(crate) fn install_builder_canonical_tree(
                 assert(base as nat + rank as nat
                     == canonical_code(lengths, symbol as int));
             }
+            proof {
+                reveal(valid_builder_lengths);
+                first_code_space_bound(lengths, length);
+                assert(base as nat <= CODE_SPACE);
+            }
             let combined = base as u64 + rank as u64;
+            proof {
+                assert(base as u64 <= 32_768u64);
+                assert(rank <= 704u16);
+                assert(combined <= 33_472u64);
+            }
             if combined > u16::MAX as u64 {
                 return Err(WorkspaceError::InvalidCodeLength);
             }

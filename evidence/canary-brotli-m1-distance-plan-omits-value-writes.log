@@ -2,23 +2,23 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-9767/src/brotli_input.rs:25043:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-35529/src/brotli_input.rs:25177:1
       |
-25043 | / fn plan_distance_action(
-25044 | |     workspace: &[u8],
-25045 | |     window_bytes: u32,
-25046 | |     input: &[u8],
-25047 | |     end_of_input: bool,
-25048 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+25177 | / fn plan_distance_action(
+25178 | |     workspace: &[u8],
+25179 | |     window_bytes: u32,
+25180 | |     input: &[u8],
+25181 | |     end_of_input: bool,
+25182 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
       | |____________________________________________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-9767/src/brotli_input.rs:25095:16
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-35529/src/brotli_input.rs:25229:16
       |
-25095 |         assert(result.execution_work as nat == distance_execution_units(result.planning_work as nat, read.status));
+25229 |         assert(result.execution_work as nat == distance_execution_units(result.planning_work as nat, read.status));
       |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
 
 error: aborting due to 1 previous error

@@ -1,0 +1,33 @@
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:14480:5
+      |
+14480 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 120 seconds
+     --> src/brotli_input.rs:14480:5
+      |
+14480 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:14480:5
+      |
+14480 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:14400:1
+      |
+14400 | / fn advance_serialized_tree(
+14401 | |     workspace: &mut [u8],
+14402 | |     window_bytes: u32,
+14403 | |     input: &[u8],
+14404 | |     end_of_input: bool,
+14405 | | ) -> (r: SerializedTreeStep)
+      | |___________________________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)

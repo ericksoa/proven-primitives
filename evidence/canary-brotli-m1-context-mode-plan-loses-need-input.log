@@ -2,23 +2,23 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-9768/src/brotli_input.rs:25267:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-34942/src/brotli_input.rs:25416:1
       |
-25267 | / fn plan_context_mode_action(
-25268 | |     workspace: &[u8],
-25269 | |     window_bytes: u32,
-25270 | |     input: &[u8],
-25271 | |     end_of_input: bool,
-25272 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+25416 | / fn plan_context_mode_action(
+25417 | |     workspace: &[u8],
+25418 | |     window_bytes: u32,
+25419 | |     input: &[u8],
+25420 | |     end_of_input: bool,
+25421 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
       | |____________________________________________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-9768/src/brotli_input.rs:25341:16
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-34942/src/brotli_input.rs:25494:16
       |
-25341 |         assert(result.status == context_mode_read_status(read.status));
+25494 |         assert(result.status == context_mode_read_status(read.status));
       |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
 
 error: aborting due to 1 previous error

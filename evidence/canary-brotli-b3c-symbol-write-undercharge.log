@@ -2,29 +2,29 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-write-canary-16596/src/brotli_input.rs:31755:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-write-canary-43203/src/brotli_input.rs:31968:1
       |
-31755 | / fn completed_body_symbol_work(
-31756 | |     scan_work: u64,
-31757 | |     consumed: usize,
-31758 | | ) -> (r: Option<u64>)
+31968 | / fn completed_body_symbol_work(
+31969 | |     scan_work: u64,
+31970 | |     consumed: usize,
+31971 | | ) -> (r: Option<u64>)
       | |____________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-write-canary-16596/src/brotli_input.rs:31759:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-symbol-write-canary-43203/src/brotli_input.rs:31972:13
       |
-31759 |       ensures match r {
+31972 |       ensures match r {
       |  _____________^
-31760 | |         Some(value) => value as nat
-31761 | |             == scan_work as nat + consumed as nat + 15 + 1,
-31762 | |         None => scan_work as nat + consumed as nat + 15 + 1 > u64::MAX as nat,
-31763 | |     },
+31973 | |         Some(value) => value as nat
+31974 | |             == scan_work as nat + consumed as nat + 15 + 1,
+31975 | |         None => scan_work as nat + consumed as nat + 15 + 1 > u64::MAX as nat,
+31976 | |     },
       | |_____^ failed this postcondition
 ...
-31771 |       scanned_and_read_work.checked_add(SERIALIZED_WRITE_WORK + TRANSITION_WORK)
+31984 |       scanned_and_read_work.checked_add(SERIALIZED_WRITE_WORK + TRANSITION_WORK)
       |       -------------------------------------------------------------------------- at the end of the function body
 
 error: aborting due to 1 previous error

@@ -1,8 +1,9 @@
 # Canonical-builder proof boundary
 
-Status: **held for review by the human on 2026-11-04:**
-“Hold this proof-boundary change for review.” K1 remains unapproved and no
-change below has been implemented.
+Status: **explicitly approved as written by the human on 2026-11-09:**
+“Approve K1 as written.” This lifts the earlier 2026-11-04 hold. Implementation
+and verification are authorized only within the exact scope below; approval
+does not establish that the new proof obligations have been discharged.
 
 The M1 planner in `brotli_input` has an exact mathematical classification of
 canonical length validation, including the inspected failing prefix. The
@@ -66,5 +67,26 @@ serialized-tree replay, every header/body outcome, B3d, B4 or the independent
 human review. Approval would authorize this proof-boundary change and its
 verification, not establish that its new proof obligations already hold.
 
-The human selected retaining the current proof boundary while this proposal
-is reviewed. Current F2 validation and publication can finish independently.
+The earlier choice to retain the existing boundary during review has been
+superseded by the direct approval above. The source review is recorded in
+`BROTLI_M1_K1_REVIEW.md`; it is not the independent human specification review
+required for release.
+
+## Implementation evidence
+
+The description above records the pre-implementation boundary and the exact
+approved scope. The approved visibility and installer-contract changes are now
+implemented. Private proofs establish the existing planner/installer weight,
+nonzero-count and validity agreement, including invalid lengths' unchanged
+workspace and metadata. The original admitted inputs, signatures, executable
+algorithm, error priority and canonical-record/frame guarantees remain intact.
+
+The final library passed **1,207 whole-crate checks, zero errors**, using the
+pinned checker with `--no-cheating`; see
+`evidence/brotli-b3c-m1-k1-k3-attempt03-verification.json`. All **33 deliberate defects across five affected suites** were rejected after
+their recorded whole-crate positives on identical library bytes. Eight are new
+K1/K3 controls and 25 cover the existing builder, table-read/canonical-planning
+and suffix-formula behavior. Exact transcripts and ordering are recorded in
+`evidence/brotli-b3c-m1-k1-k3-controls.json`. This is scoped proof evidence, not M1 or
+decoder completion. The known repeat-state regression and loader-accounting
+findings are recorded separately, and K4 remains unapproved.

@@ -3660,8 +3660,8 @@ fn the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects() {
         ("brotli-m1-canonical-validation-read-not-charged", "plan_canonical_tree_install",
             "budget.charge_work(1)", "budget.charge_work(0)"),
         ("brotli-m1-canonical-accepts-invalid-length", "plan_canonical_tree_install",
-            "if length > 15 {\n            return Ok((planning_work, planning_work, false));",
-            "if length > 15 {\n            return Ok((planning_work, planning_work, true));"),
+            "if length > 15 {\n            proof { k1_canonical_classification_agrees(lengths@, symbols as nat, planning_work as nat, false); }\n            return Ok((planning_work, planning_work, false));",
+            "if length > 15 {\n            proof { k1_canonical_classification_agrees(lengths@, symbols as nat, planning_work as nat, false); }\n            return Ok((planning_work, planning_work, true));"),
         ("brotli-m1-canonical-accepts-incomplete-space", "plan_canonical_tree_install",
             "if nonzero < 2 || space != 0 {", "if nonzero < 2 {"),
     ] {
@@ -4256,6 +4256,401 @@ fn the_prover_rejects_two_k2_context_mode_success_guarantee_defects() {
                 || log.contains("assertion failed"),
             "expected a proof rejection, not a tooling error: {log}"
         );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_five_k1_k3_success_and_preservation_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-k1-k3-canary-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_prefix.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-k1-installer-rejects-valid-two-symbol-tree",
+            "install_builder_canonical_tree",
+            "    let mut symbol: u16 = 0;\n    let mut space: u32 = CODE_SPACE;",
+            "    if symbols == 2 { return Err(WorkspaceError::InvalidCodeLength); }\n    let mut symbol: u16 = 0;\n    let mut space: u32 = CODE_SPACE;",
+        ),
+        (
+            "brotli-k1-invalid-length-changes-metadata",
+            "install_builder_canonical_tree",
+            "            return Err(WorkspaceError::InvalidCodeLength);\n        }\n        if length != 0 {",
+            "            meta.symbols = 0;\n            return Err(WorkspaceError::InvalidCodeLength);\n        }\n        if length != 0 {",
+        ),
+        (
+            "brotli-k1-invalid-length-changes-builder",
+            "install_builder_canonical_tree",
+            "            return Err(WorkspaceError::InvalidCodeLength);\n        }\n        if length != 0 {",
+            "            workspace[window_bytes as usize + BUILDER_CODE_LENGTHS_OFFSET as usize] = 0;\n            return Err(WorkspaceError::InvalidCodeLength);\n        }\n        if length != 0 {",
+        ),
+        (
+            "brotli-k3-rejects-valid-symbol-and-suffix",
+            "decode_block_length",
+            "    match offset.checked_add(suffix) {",
+            "    if symbol == 0 && suffix == 0 { return Err(PrefixError::InvalidBlockLengthSuffix); }\n    match offset.checked_add(suffix) {",
+        ),
+        (
+            "brotli-k3-decodes-wrong-block-length",
+            "decode_block_length",
+            "Some(value) => Ok(value)",
+            "Some(value) => Ok(value + 1)",
+        ),
+    ] {
+        let start = original.find(&format!("fn {function}(")).unwrap();
+        let end = start + original[start..].find("\n}\n").unwrap() + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").expect("executable body");
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let result = check_brotli_prefix_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        let lower = log.to_ascii_lowercase();
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied") || log.contains("precondition not satisfied")
+                || log.contains("invariant not satisfied") || log.contains("assertion failed"),
+            "expected a semantic proof rejection: {log}"
+        );
+        assert!(
+            !lower.contains("resource limit") && !lower.contains("panicked")
+                && !lower.contains("expected rlimit-count"),
+            "tool/resource failure is not a semantic rejection: {log}"
+        );
+        println!("REJECTED {name}: deliberate source defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_three_k3_suffix_plan_relation_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-k3-suffix-canary-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    let function = "plan_initial_suffix_action";
+    let start = original.find(&format!("fn {function}(")).unwrap();
+    let end = start + original[start..].find("\n}\n").unwrap() + 3;
+    let selected = &original[start..end];
+    let body = selected.find("\n{\n").unwrap();
+    for (name, old, new) in [
+        (
+            "brotli-k3-suffix-plan-loses-consumption",
+            "let result = CompressedActionPlan { planning_work, execution_work, consumed: read.consumed, status };",
+            "let result = CompressedActionPlan { planning_work, execution_work, consumed: 0, status };",
+        ),
+        (
+            "brotli-k3-suffix-plan-loses-success",
+            "Ok(_) => None,",
+            "Ok(_) => Some(CompressedHeaderStatus::NeedInput),",
+        ),
+        (
+            "brotli-k3-suffix-plan-undercharges-value-tables",
+            "if !budget.charge_work(2)",
+            "if !budget.charge_work(1)",
+        ),
+    ] {
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        let lower = log.to_ascii_lowercase();
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied") || log.contains("assertion failed"),
+            "expected a semantic proof rejection: {log}");
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count"), "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate source defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_m1_context_mode_handoff_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-context-mode-handoff-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-m1-handoff-reset-writes-wrong-var-phase",
+            "start_context_map",
+            "store_var_uint8_phase(workspace, window_bytes, VarUint8Phase::First)",
+            "store_var_uint8_phase(workspace, window_bytes, VarUint8Phase::Short)",
+        ),
+        (
+            "brotli-m1-handoff-reset-writes-wrong-pending-run",
+            "start_context_map",
+            "B3B_PENDING_RUN, 255)?;",
+            "B3B_PENDING_RUN, 0)?;",
+        ),
+        (
+            "brotli-m1-handoff-plan-undercharges-one",
+            "plan_context_mode_action",
+            "execution_work: context_mode_complete_execution_work(),",
+            "execution_work: context_mode_complete_execution_work() - 1,",
+        ),
+        (
+            "brotli-m1-handoff-plan-consumes-input",
+            "plan_context_mode_action",
+            "execution_work: context_mode_complete_execution_work(),\n            consumed: 0,",
+            "execution_work: context_mode_complete_execution_work(),\n            consumed: 1,",
+        ),
+        (
+            "brotli-m1-handoff-action-skips-literal-map",
+            "advance_context_modes_phase",
+            "CompressedOuterPhase::LiteralContextMap) {",
+            "CompressedOuterPhase::DistanceContextMap) {",
+        ),
+        (
+            "brotli-m1-handoff-reset-writes-padding",
+            "start_context_map",
+            "let kind_tag = match kind {",
+            "put_state_byte(workspace, window_bytes, 175, 255)?;\n    let kind_tag = match kind {",
+        ),
+    ] {
+        let start = original
+            .find(&format!("fn {function}("))
+            .expect("selected function exists");
+        let indent = original[..start].rsplit('\n').next().unwrap().len();
+        let closing = format!("\n{}}}\n", " ".repeat(indent));
+        let end = start
+            + original[start..]
+                .find(&closing)
+                .expect("selected function ends")
+            + closing.len();
+        let selected = &original[start..end];
+        assert_eq!(
+            selected.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        let mutated = format!(
+            "{}{}{}",
+            &original[..start],
+            selected.replacen(old, new, 1),
+            &original[end..]
+        );
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied")
+                || log.contains("precondition not satisfied")
+                || log.contains("invariant not satisfied")
+                || log.contains("requires not satisfied")
+                || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}"
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_m1_bad_fixed_cursor_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-bad-fixed-cursor-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-m1-cursor-tag-rejects-with-wrong-error", "read_b3b_state_tag", "return Err(crate::brotli_prefix::WorkspaceError::InvalidSymbol);", "return Err(crate::brotli_prefix::WorkspaceError::InvalidTree);"),
+        ("brotli-m1-cursor-distance-prepass-forgets-rejection", "distance_planning_work", "let queue = load_b3b_queue(workspace, window_bytes)?;", "let queue = match load_b3b_queue(workspace, window_bytes) { Ok(value) => value, Err(_) => return Ok(0) };"),
+        ("brotli-m1-cursor-block-prepass-forgets-var-rejection", "block_count_planning_work", "let phase = load_var_uint8_phase(workspace, window_bytes)?;", "let phase = match load_var_uint8_phase(workspace, window_bytes) { Ok(value) => value, Err(_) => return Ok(0) };"),
+        ("brotli-m1-cursor-block-forecast-omits-terminal-work", "advance_planned_compressed_action", "let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,\n                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };\n                return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::BlockCount,", "let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 0,\n                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };\n                return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::BlockCount,"),
+        ("brotli-m1-cursor-context-owner-skips-terminal-action", "advance_planned_compressed_action", "return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::ContextModes,", "return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) });\n                return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::ContextModes,"),
+        ("brotli-m1-cursor-executor-forgets-terminal-work-debit", "execute_fixed_compressed_plan", "if !budget.charge_work(plan.execution_work) {", "if !budget.charge_work(if plan.execution_work == 5 { 0 } else { plan.execution_work }) {"),
+    ] {
+        let start = original
+            .find(&format!("fn {function}("))
+            .expect("selected function exists");
+        let indent = original[..start].rsplit('\n').next().unwrap().len();
+        let closing = format!("\n{}}}\n", " ".repeat(indent));
+        let end = start
+            + original[start..]
+                .find(&closing)
+                .expect("selected function ends")
+            + closing.len();
+        let selected = &original[start..end];
+        assert_eq!(
+            selected.matches(old).count(),
+            1,
+            "unique mutation anchor for {name}"
+        );
+        let mutated = format!(
+            "{}{}{}",
+            &original[..start],
+            selected.replacen(old, new, 1),
+            &original[end..]
+        );
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(
+            project.join("evidence").join(format!("canary-{name}.log")),
+            &log,
+        )
+        .unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(
+            log.contains("postcondition not satisfied")
+                || log.contains("precondition not satisfied")
+                || log.contains("invariant not satisfied")
+                || log.contains("requires not satisfied")
+                || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}"
+        );
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_k4_repeat_codec_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-k4-repeat-canary-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-k4-repeat-store-overwrites-history",
+            "store_complex_code_description_payload",
+            "CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {\n            store_complex_progress(workspace, window_bytes, progress)?;\n            put_state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH, length)?;",
+            "CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {\n            store_complex_progress(workspace, window_bytes, progress)?;\n            put_state_byte(workspace, window_bytes, B3B_REPEATED_LENGTH, length)?;",
+        ),
+        (
+            "brotli-k4-repeat-load-current-from-history",
+            "load_code_description_decoder",
+            "let repeat_length = match state_byte(\n                        workspace, window_bytes, B3B_PENDING_SPAN_LENGTH) {",
+            "let repeat_length = match state_byte(\n                        workspace, window_bytes, B3B_REPEATED_LENGTH) {",
+        ),
+        (
+            "brotli-k4-progress-stores-previous-code-in-history",
+            "store_complex_progress",
+            "(B3B_REPEATED_LENGTH, progress.repeat_code_len)",
+            "(B3B_REPEATED_LENGTH, progress.prev_code_len)",
+        ),
+        (
+            "brotli-k4-repeat-load-history-from-current",
+            "load_code_description_decoder",
+            "let repeated = match state_byte(workspace, window_bytes, B3B_REPEATED_LENGTH) {",
+            "let repeated = match state_byte(workspace, window_bytes, if tag == 6 { B3B_PENDING_SPAN_LENGTH } else { B3B_REPEATED_LENGTH }) {",
+        ),
+        (
+            "brotli-k4-repeat-width-uses-old-class",
+            "load_code_description_decoder",
+            "let extra_bits = if repeat_length == 0 { 3 } else { 2 };",
+            "let extra_bits = if repeated == 0 { 3 } else { 2 };",
+        ),
+        (
+            "brotli-k4-repeat-rejects-valid-length-fifteen",
+            "load_code_description_decoder",
+            "if repeat_length > 15 {",
+            "if repeat_length >= 15 {",
+        ),
+    ] {
+        let start = original.find(&format!("fn {function}(")).unwrap();
+        let end = start + original[start..].find("\n}\n").unwrap() + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").unwrap();
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        let lower = log.to_ascii_lowercase();
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(lower.contains("postcondition not satisfied") || lower.contains("precondition not satisfied")
+            || lower.contains("invariant not satisfied") || lower.contains("assertion failed"),
+            "expected a semantic proof rejection: {log}");
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count"), "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate source defect, unchanged specification");
         fs::write(&path, &original).unwrap();
     }
     fs::remove_dir_all(temporary).unwrap();

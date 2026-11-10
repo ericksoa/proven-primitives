@@ -225,12 +225,18 @@ transition loads a local value, applies the already-checked transition, and
 stores the exact next value before returning or continuing. Persistent Rust
 fields do not shadow it.
 
-Byte 174 is `pending_span_length`: it is `0..=15` only during `PendingSpan` and
-zero otherwise. During a pending span, `span_start` is the builder initialized
-count, `span_count` is `final_symbol_index - builder_initialized`, and byte 174
-is the exact emitted length. This includes generated trailing-zero spans and
-allows direct zero-length spans to resume without shadow state. Checked padding
-therefore begins at byte 175.
+Under the human-approved K4 correction, byte 174 has a tag-dependent meaning.
+For tag six (`ComplexRepeat`), it stores the current repeat length in `0..=15`;
+byte 71 retains the previous repeat length used for chaining. The loader rejects
+current lengths above 15 as the existing `InternalState` and derives three
+suffix bits for zero or two otherwise. For tag seven (`PendingSpan`), byte 174
+retains its existing exact emitted-length meaning. It is zero in other tags.
+
+During a pending span, `span_start` is the builder initialized count and
+`span_count` is `final_symbol_index - builder_initialized`. This includes
+generated trailing-zero spans and allows direct zero-length spans to resume
+without shadow state. Checked padding still begins at byte 175. The existing
+initial zeroing and the number of subsequent writes are unchanged.
 
 For simple trees, source symbols receive these exact lengths:
 

@@ -1,0 +1,33 @@
+verification results:: 9 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-88998/src/brotli_prefix.rs:4872:5
+     |
+4872 |     while symbol < symbols
+     |     ^^^^^^^^^^^^^^^^^^^^^^
+
+error: possible arithmetic underflow/overflow
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-88998/src/brotli_prefix.rs:4937:23
+     |
+4937 |             workspace[window_bytes as usize + BUILDER_CODE_LENGTHS_OFFSET as usize] = 0;
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-88998/src/brotli_prefix.rs:4790:9
+     |
+4790 | /         canonical_installer_frame(
+4791 | |             old(workspace)@,
+4792 | |             final(workspace)@,
+4793 | |             window_bytes,
+...    |
+4796 | |             old(meta).symbols,
+4797 | |         ),
+     | |_________^ failed this postcondition
+...
+4938 |               return Err(WorkspaceError::InvalidCodeLength);
+     |               --------------------------------------------- at this exit
+
+error: aborting due to 2 previous errors
+

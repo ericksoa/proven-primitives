@@ -2,30 +2,30 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-9767/src/brotli_input.rs:25024:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-35529/src/brotli_input.rs:25153:1
       |
-25024 | / fn distance_planning_work(
-25025 | |     workspace: &[u8],
-25026 | |     window_bytes: u32,
-25027 | |     input_len: usize,
-25028 | | ) -> (r: Result<u64, CompressedHeaderError>)
+25153 | / fn distance_planning_work(
+25154 | |     workspace: &[u8],
+25155 | |     window_bytes: u32,
+25156 | |     input_len: usize,
+25157 | | ) -> (r: Result<u64, CompressedHeaderError>)
       | |___________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-9767/src/brotli_input.rs:25029:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-35529/src/brotli_input.rs:25162:12
       |
-25029 |       ensures r.is_ok() ==> distance_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
-      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
-25030 | / {
-25031 | |     reveal(distance_planning_read_valid); reveal(distance_read_units);
-25032 | |     let queue = load_b3b_queue(workspace, window_bytes)?;
-25033 | |     let read = plan_bit_read(queue, 6, input_len);
+25162 |           }, r.is_ok() ==> distance_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+      |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+25163 | / {
+25164 | |     reveal(fixed_phase_bad_cursor); reveal(context_mode_pending);
+25165 | |     reveal(distance_planning_read_valid); reveal(distance_read_units);
+25166 | |     let queue = load_b3b_queue(workspace, window_bytes)?;
 ...     |
-25040 | |     Ok(0)
-25041 | | }
+25174 | |     Ok(0)
+25175 | | }
       | |_- at the end of the function body
 
 error: aborting due to 1 previous error

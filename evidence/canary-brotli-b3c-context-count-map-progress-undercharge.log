@@ -2,33 +2,33 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:28843:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-42081/src/brotli_input.rs:29020:1
       |
-28843 | / fn context_tree_count_execution_work(
-28844 | |     read_work: u64,
-28845 | |     active_len: u16,
-28846 | |     status: VarUint8Status,
-28847 | | ) -> (r: u64)
+29020 | / fn context_tree_count_execution_work(
+29021 | |     read_work: u64,
+29022 | |     active_len: u16,
+29023 | |     status: VarUint8Status,
+29024 | | ) -> (r: u64)
       | |____________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:28850:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-42081/src/brotli_input.rs:29027:9
       |
-28850 | /         r as nat == context_tree_count_work_spec(
-28851 | |             read_work as nat, active_len as nat, status,
-28852 | |         ),
+29027 | /         r as nat == context_tree_count_work_spec(
+29028 | |             read_work as nat, active_len as nat, status,
+29029 | |         ),
       | |_________^ failed this postcondition
 ...
-28856 | /     match status {
-28857 | |         VarUint8Status::Value(raw) => base + 2 + if raw == 0 {
-28858 | |             active_len as u64 + 3 + 1 + 1
-28859 | |         } else {
+29033 | /     match status {
+29034 | |         VarUint8Status::Value(raw) => base + 2 + if raw == 0 {
+29035 | |             active_len as u64 + 3 + 1 + 1
+29036 | |         } else {
 ...     |
-28863 | |         _ => base,
-28864 | |     }
+29040 | |         _ => base,
+29041 | |     }
       | |_____- at the end of the function body
 
 error: aborting due to 1 previous error

@@ -2,10 +2,10 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51874,13): 'if' cannot be used in patterns.
+WARNING: (59229,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-12058/src/brotli_input.rs:10174:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-4341/src/brotli_input.rs:10174:1
       |
 10174 | / fn write_b3b_state_u16(
 10175 | |     workspace: &mut [u8],
@@ -16,7 +16,7 @@ note: function body check: not all errors may have been reported; rerun with a h
       | |_________________________________________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-12058/src/brotli_input.rs:10260:17
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-4341/src/brotli_input.rs:10260:17
       |
 10260 | /                 #[trigger] workspace@[i] == before
 10261 | |                     .update(spec_at, (value % 256) as u8)
@@ -24,7 +24,7 @@ error: assertion failed
       | |________________________________________________________________^ assertion failed
 
 note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-12058/src/brotli_input.rs:10250:21
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-4341/src/brotli_input.rs:10250:21
       |
 10250 |     workspace[at] = value as u8;
       |                     ^^^^^

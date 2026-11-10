@@ -2,40 +2,40 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:11659:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-42115/src/brotli_input.rs:11665:5
       |
-11659 |     while relative < B3B_BLOCK_LENGTH_PHASE
+11665 |     while relative < B3B_BLOCK_LENGTH_PHASE
       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:11581:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-42115/src/brotli_input.rs:11587:1
       |
-11581 | / fn initialize_code_description_state(
-11582 | |     workspace: &mut [u8],
-11583 | |     window_bytes: u32,
-11584 | |     region: crate::brotli_prefix::TreeRegion,
+11587 | / fn initialize_code_description_state(
+11588 | |     workspace: &mut [u8],
+11589 | |     window_bytes: u32,
+11590 | |     region: crate::brotli_prefix::TreeRegion,
 ...     |
-11587 | |     alphabet_limit: u16,
-11588 | | ) -> (r: Result<(), CompressedHeaderError>)
+11593 | |     alphabet_limit: u16,
+11594 | | ) -> (r: Result<(), CompressedHeaderError>)
       | |__________________________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:11735:20
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-42115/src/brotli_input.rs:11741:20
       |
-11735 |               assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_GROUP_KIND)
+11741 |               assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_GROUP_KIND)
       |  ____________________^
-11736 | |                 == b3b_scalar_byte_at(original, window_bytes, B3B_GROUP_KIND));
+11742 | |                 == b3b_scalar_byte_at(original, window_bytes, B3B_GROUP_KIND));
       | |_____________________________________________________________________________^ assertion failed
 
 note: recommendation not met
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:11692:56
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-42115/src/brotli_input.rs:11698:56
       |
-11692 |               forall|i: int| 0 <= i < B3B_GROUP_KIND ==> #[trigger]
+11698 |               forall|i: int| 0 <= i < B3B_GROUP_KIND ==> #[trigger]
       |  ________________________________________________________^
-11693 | |                 workspace@[b3b_scalar_base(window_bytes) + i]
+11699 | |                 workspace@[b3b_scalar_base(window_bytes) + i]
       | |_____________________________________________________________^
       |
      --> seq.rs:980:12
@@ -43,11 +43,11 @@ note: recommendation not met
       = note: recommendation not met
 
 note: recommendation not met
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:11645:52
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-42115/src/brotli_input.rs:11651:52
       |
-11645 |           forall|i: int| 0 <= i < B3B_GROUP_KIND ==> #[trigger]
+11651 |           forall|i: int| 0 <= i < B3B_GROUP_KIND ==> #[trigger]
       |  ____________________________________________________^
-11646 | |             final(workspace)@[b3b_scalar_base(window_bytes) + i]
+11652 | |             final(workspace)@[b3b_scalar_base(window_bytes) + i]
       | |________________________________________________________________^
       |
      --> seq.rs:980:12

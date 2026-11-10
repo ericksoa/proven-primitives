@@ -1,0 +1,83 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51874,13): 'if' cannot be used in patterns.
+WARNING: (59229,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12961:1
+      |
+12961 | / fn store_complex_code(
+12962 | |     workspace: &mut [u8],
+12963 | |     window_bytes: u32,
+12964 | |     code: ComplexCodeLengthAlphabet,
+12965 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13034:5
+      |
+13034 |     while i < 5
+      |     ^^^^^^^^^^^
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:12995:1
+      |
+12995 | / fn store_complex_progress(
+12996 | |     workspace: &mut [u8],
+12997 | |     window_bytes: u32,
+12998 | |     progress: ComplexSymbolProgress,
+12999 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check finished in 4 seconds
+     --> src/brotli_input.rs:12995:1
+      |
+12995 | / fn store_complex_progress(
+12996 | |     workspace: &mut [u8],
+12997 | |     window_bytes: u32,
+12998 | |     progress: ComplexSymbolProgress,
+12999 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12995:1
+      |
+12995 | / fn store_complex_progress(
+12996 | |     workspace: &mut [u8],
+12997 | |     window_bytes: u32,
+12998 | |     progress: ComplexSymbolProgress,
+12999 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:13150:1
+      |
+13150 | / fn store_complex_code_description_payload(
+13151 | |     workspace: &mut [u8],
+13152 | |     window_bytes: u32,
+13153 | |     phase: CodeDescriptionPhase,
+13154 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check finished in 5 seconds
+     --> src/brotli_input.rs:13150:1
+      |
+13150 | / fn store_complex_code_description_payload(
+13151 | |     workspace: &mut [u8],
+13152 | |     window_bytes: u32,
+13153 | |     phase: CodeDescriptionPhase,
+13154 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13150:1
+      |
+13150 | / fn store_complex_code_description_payload(
+13151 | |     workspace: &mut [u8],
+13152 | |     window_bytes: u32,
+13153 | |     phase: CodeDescriptionPhase,
+13154 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+verification results:: 4 verified, 0 errors (partial verification with `--verify-*`)

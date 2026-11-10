@@ -10499,7 +10499,11 @@ fn read_b3b_state_tag(
     relative: u16,
     variants: u8,
 ) -> (r: Result<u8, crate::brotli_prefix::WorkspaceError>)
-    ensures r.is_ok() ==> {
+    ensures
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+            && relative as nat + 1 <= B3B_SCALAR_BYTES && r.is_err()
+            ==> r == Err(crate::brotli_prefix::WorkspaceError::InvalidSymbol),
+        r.is_ok() ==> {
         let at = window_bytes as int + B3B_SCALAR_OFFSET as int + relative as int;
         &&& b3b_workspace_shape(workspace@.len() as nat, window_bytes)
         &&& r.unwrap() < variants
@@ -11127,6 +11131,8 @@ fn load_var_uint8_phase(
     window_bytes: u32,
 ) -> (r: Result<VarUint8Phase, CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes) && r.is_err()
+            ==> r == Err(CompressedHeaderError::InternalState),
         r.is_ok() == var_uint8_encoding_valid(workspace@, window_bytes),
         r.is_ok() ==> serialized_var_uint8_phase(
             workspace@, window_bytes, r.unwrap(),
@@ -11745,6 +11751,7 @@ fn read_simple_symbols(
     workspace: &[u8],
     window_bytes: u32,
 ) -> (r: Result<[u16; 4], CompressedHeaderError>)
+    ensures b3b_workspace_shape(workspace@.len(), window_bytes) ==> r.is_ok(),
 {
     let mut symbols = [0u16; 4];
     let mut i: usize = 0;
@@ -11945,6 +11952,10 @@ fn write_aux_lengths(
     lengths: [u8; 18],
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==> r.is_ok(),
+        r.is_ok() ==> b3b_workspace_shape(final(workspace)@.len(), window_bytes),
+        r.is_ok() ==> forall|i: int| 0 <= i < 18 ==> #[trigger]
+            final(workspace)@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] == lengths@[i],
         forall|at: int| 0 <= at < old(workspace)@.len()
             && !(b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int <= at
                 < b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + 18) ==>
@@ -11975,6 +11986,9 @@ fn write_aux_lengths(
     let mut i: usize = 0;
     while i < 18
         invariant i <= 18,
+            i > 0 ==> b3b_workspace_shape(workspace@.len(), window_bytes),
+            forall|j: int| 0 <= j < i ==> #[trigger]
+                workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j] == lengths@[j],
             original == old(workspace)@,
             forall|at: int| 0 <= at < original.len()
                 && !(b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int <= at
@@ -12006,6 +12020,11 @@ fn write_aux_lengths(
         ) {
             Ok(()) => {}
             Err(error) => return Err(CompressedHeaderError::Workspace(error)),
+        }
+        proof {
+            reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
+            b3b_scalar_layout_is_exact();
+            assert(workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i as int] == lengths@[i as int]);
         }
         i = i + 1;
     }
@@ -12568,6 +12587,122 @@ spec fn serialized_code_rank(workspace: Seq<u8>, window_bytes: u32, limit: u16) 
         b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_PHASE), limit)
 }
 
+#[verifier::opaque]
+spec fn k4_complex_code_values(workspace: Seq<u8>, window_bytes: u32,
+    code: ComplexCodeLengthAlphabet) -> bool {
+    &&& b3b_workspace_shape(workspace.len(), window_bytes)
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SKIP) == code.skip
+    &&& forall|i: int| 0 <= i < 18 ==> #[trigger]
+        workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] == code.lengths@[i]
+}
+
+#[verifier::opaque]
+spec fn k4_complex_progress_values(workspace: Seq<u8>, window_bytes: u32,
+    progress: ComplexSymbolProgress) -> bool {
+    &&& k4_complex_code_values(workspace, window_bytes, progress.code)
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL) == progress.symbol
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_PREVIOUS_LENGTH) == progress.prev_code_len
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_REPEATED_LENGTH) == progress.repeat_code_len
+    &&& b3b_scalar_u32_at(workspace, window_bytes, B3B_CHAINED_REPEAT) == progress.repeat
+    &&& b3b_scalar_u32_at(workspace, window_bytes, B3B_FINAL_SPACE) == progress.space
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_FINAL_PREFIX_BITS) == progress.prefix_bits
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_FINAL_PREFIX_WIDTH) == progress.prefix_width
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SINGLETON) == progress.singleton
+}
+
+#[verifier::opaque]
+spec fn k4_repeat_values(workspace: Seq<u8>, window_bytes: u32, phase: CodeDescriptionPhase) -> bool {
+    match phase {
+        CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {
+            &&& k4_complex_progress_values(workspace, window_bytes, progress)
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH) == length
+        },
+        _ => false,
+    }
+}
+
+#[verifier::opaque]
+spec fn k4_repeat_width_agrees(phase: CodeDescriptionPhase) -> bool {
+    match phase {
+        CodeDescriptionPhase::ComplexRepeat { length, extra_bits, .. } =>
+            extra_bits == if length == 0 { 3u8 } else { 2u8 },
+        _ => false,
+    }
+}
+
+proof fn k4_repeat_phase_values_are_unique(workspace: Seq<u8>, window_bytes: u32,
+    left: CodeDescriptionPhase, right: CodeDescriptionPhase)
+    requires k4_repeat_values(workspace, window_bytes, left),
+        k4_repeat_values(workspace, window_bytes, right),
+        k4_repeat_width_agrees(left), k4_repeat_width_agrees(right),
+    ensures left == right,
+{
+    reveal(k4_repeat_values); reveal(k4_complex_progress_values); reveal(k4_complex_code_values);
+    reveal(k4_repeat_width_agrees);
+    match (left, right) {
+        (CodeDescriptionPhase::ComplexRepeat { progress: a, .. },
+            CodeDescriptionPhase::ComplexRepeat { progress: b, .. }) => {
+            assert forall|i: int| 0 <= i < 18 implies #[trigger] a.code.lengths@[i] == b.code.lengths@[i] by {
+                assert(workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] == a.code.lengths@[i]);
+                assert(workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] == b.code.lengths@[i]);
+            }
+            assert(a.code.lengths@ =~= b.code.lengths@);
+            assert(a.code.lengths == b.code.lengths);
+        },
+        _ => {},
+    }
+}
+
+#[verifier::opaque]
+spec fn k4_repeat_decoder_image(workspace: Seq<u8>, window_bytes: u32,
+    queue: BitQueue, expected: CodeDescriptionDecoder) -> bool {
+    &&& expected.valid()
+    &&& expected.queue == queue
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_PHASE) == 6
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_MAX) == expected.alphabet_max
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT) == expected.alphabet_limit
+    &&& k4_repeat_values(workspace, window_bytes, expected.phase)
+}
+
+proof fn k4_repeat_image_rebases_queue(workspace: Seq<u8>, window_bytes: u32,
+    original: CodeDescriptionDecoder, queue: BitQueue)
+    requires k4_repeat_decoder_image(workspace, window_bytes, original.queue, original), queue.valid(),
+    ensures k4_repeat_decoder_image(workspace, window_bytes, queue, CodeDescriptionDecoder {
+        queue, alphabet_max: original.alphabet_max, alphabet_limit: original.alphabet_limit,
+        phase: original.phase,
+    }),
+{
+    reveal(k4_repeat_decoder_image); reveal(CodeDescriptionDecoder::valid);
+}
+
+proof fn k4_repeat_reloaded_field_refines_original(workspace: Seq<u8>, window_bytes: u32,
+    original: CodeDescriptionDecoder, loaded: CodeDescriptionDecoder,
+    input: Seq<u8>, end: bool, after: CodeDescriptionDecoder, step: CodeDescriptionStep)
+    requires k4_repeat_decoder_image(workspace, window_bytes, original.queue, original),
+        k4_repeat_decoder_image(workspace, window_bytes, loaded.queue, loaded),
+        serialized_b3b_queue(workspace, window_bytes, original.queue),
+        serialized_b3b_queue(workspace, window_bytes, loaded.queue),
+        code_field_step_refines(loaded, input, end, after, step),
+    ensures original.phase == loaded.phase,
+        original.alphabet_max == loaded.alphabet_max, original.alphabet_limit == loaded.alphabet_limit,
+        original.queue.bits() == loaded.queue.bits(),
+        code_field_step_refines(original, input, end, after, step),
+{
+    reveal(k4_repeat_decoder_image); reveal(CodeDescriptionDecoder::valid);
+    reveal(k4_repeat_values); reveal(k4_repeat_width_agrees);
+    k4_repeat_phase_values_are_unique(workspace, window_bytes, original.phase, loaded.phase);
+    serialized_bit_queues_agree(workspace, window_bytes, original.queue, loaded.queue);
+    reveal(serialized_b3b_queue);
+    assert forall|i: int| 0 <= i < original.queue.len implies
+        #[trigger] original.queue.pending@[i] == loaded.queue.pending@[i] by {
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == original.queue.pending@[i]);
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == loaded.queue.pending@[i]);
+    }
+    assert(original.queue.pending@.take(original.queue.len as int)
+        =~= loaded.queue.pending@.take(loaded.queue.len as int));
+    reveal(code_field_step_refines); reveal(bit_queue_read_image);
+}
+
 fn load_code_description_decoder(
     workspace: &[u8],
     window_bytes: u32,
@@ -12575,6 +12710,16 @@ fn load_code_description_decoder(
 ) -> (r: Result<CodeDescriptionDecoder, CompressedHeaderError>)
     requires queue.valid(),
     ensures
+        b3b_workspace_shape(workspace@.len(), window_bytes)
+            && b3b_scalar_byte_at(workspace@, window_bytes, B3B_CODE_PHASE) == 6
+            && b3b_scalar_byte_at(workspace@, window_bytes, B3B_PENDING_SPAN_LENGTH) > 15 ==>
+                r == Err(CompressedHeaderError::InternalState),
+        forall|expected: CodeDescriptionDecoder| #[trigger]
+            k4_repeat_decoder_image(workspace@, window_bytes, queue, expected) ==> r == Ok(expected),
+        r.is_ok() && b3b_scalar_byte_at(workspace@, window_bytes, B3B_CODE_PHASE) == 6 ==> {
+            &&& k4_repeat_values(workspace@, window_bytes, r.unwrap().phase)
+            &&& k4_repeat_width_agrees(r.unwrap().phase)
+        },
         r.is_ok() ==> r.unwrap().valid(),
         r.is_ok() ==> code_rank_aligned(r.unwrap().phase),
         r.is_ok() ==> code_phase_rank(r.unwrap().phase, r.unwrap().alphabet_limit)
@@ -12587,6 +12732,11 @@ fn load_code_description_decoder(
         r.is_ok() ==> r.unwrap().alphabet_limit as nat
             == b3b_scalar_u16_at(workspace@, window_bytes, B3B_ALPHABET_LIMIT),
 {
+    proof {
+        reveal(k4_repeat_values); reveal(k4_complex_progress_values);
+        reveal(k4_complex_code_values); reveal(k4_repeat_width_agrees);
+        reveal(k4_repeat_decoder_image); reveal(CodeDescriptionDecoder::valid);
+    }
     let alphabet_max = match state_u16(workspace, window_bytes, B3B_ALPHABET_MAX) {
         Ok(value) => value,
         Err(error) => return Err(error),
@@ -12730,7 +12880,14 @@ fn load_code_description_decoder(
                 if tag == 5 {
                     CodeDescriptionPhase::ComplexSymbol(progress)
                 } else if tag == 6 {
-                    let repeat_length = repeated;
+                    let repeat_length = match state_byte(
+                        workspace, window_bytes, B3B_PENDING_SPAN_LENGTH) {
+                        Ok(value) => value,
+                        Err(error) => return Err(error),
+                    };
+                    if repeat_length > 15 {
+                        return Err(CompressedHeaderError::InternalState);
+                    }
                     let extra_bits = if repeat_length == 0 { 3 } else { 2 };
                     CodeDescriptionPhase::ComplexRepeat {
                         progress, length: repeat_length, extra_bits,
@@ -12784,6 +12941,15 @@ fn load_code_description_decoder(
         }
         _ => return Err(CompressedHeaderError::InternalState),
     };
+    proof {
+        if tag == 6 {
+            assert forall|expected: CodeDescriptionDecoder|
+                #[trigger] k4_repeat_decoder_image(workspace@, window_bytes, queue, expected)
+                implies phase == expected.phase by {
+                k4_repeat_phase_values_are_unique(workspace@, window_bytes, phase, expected.phase);
+            }
+        }
+    }
     if !code_description_phase_valid_exec(&phase, alphabet_max, alphabet_limit) {
         return Err(CompressedHeaderError::InternalState);
     }
@@ -12798,6 +12964,8 @@ fn store_complex_code(
     code: ComplexCodeLengthAlphabet,
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==> r.is_ok(),
+        r.is_ok() ==> k4_complex_code_values(final(workspace)@, window_bytes, code),
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         final(workspace)@.len() == old(workspace)@.len(),
@@ -12816,7 +12984,7 @@ fn store_complex_code(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
-    proof { reveal(code_descriptor_store_frame); }
+    proof { reveal(code_descriptor_store_frame); reveal(k4_complex_code_values); }
     match put_state_byte(workspace, window_bytes, B3B_AUX_SKIP, code.skip) {
         Ok(()) => {}
         Err(error) => return Err(error),
@@ -12830,6 +12998,8 @@ fn store_complex_progress(
     progress: ComplexSymbolProgress,
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==> r.is_ok(),
+        r.is_ok() ==> k4_complex_progress_values(final(workspace)@, window_bytes, progress),
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         r.is_ok() ==> b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_FINAL_SYMBOL) == progress.symbol,
         r.is_ok() ==> b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_FINAL_PREFIX_WIDTH) == progress.prefix_width,
@@ -12850,7 +13020,7 @@ fn store_complex_progress(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
-    proof { reveal(code_descriptor_store_frame); }
+    proof { reveal(code_descriptor_store_frame); reveal(k4_complex_progress_values); reveal(k4_complex_code_values); }
     let ghost original = workspace@;
     proof {
         assert(original == old(workspace)@);
@@ -12863,6 +13033,11 @@ fn store_complex_progress(
     let mut i: usize = 0;
     while i < 5
         invariant i <= 5,
+            k4_complex_code_values(workspace@, window_bytes, progress.code),
+            i >= 1 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_PREVIOUS_LENGTH) == progress.prev_code_len,
+            i >= 2 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_REPEATED_LENGTH) == progress.repeat_code_len,
+            i >= 3 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_FINAL_PREFIX_BITS) == progress.prefix_bits,
+            i >= 5 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_AUX_SINGLETON) == progress.singleton,
             i >= 4 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_FINAL_PREFIX_WIDTH) == progress.prefix_width,
             original == old(workspace)@,
             workspace@.len() == original.len(),
@@ -12884,6 +13059,7 @@ fn store_complex_progress(
             code_descriptor_store_frame(original, workspace@, window_bytes),
         decreases 5 - i,
     {
+        proof { reveal(k4_complex_code_values); }
         let (offset, value) = if i == 0 {
             (B3B_PREVIOUS_LENGTH, progress.prev_code_len)
         } else if i == 1 {
@@ -12978,12 +13154,21 @@ fn store_complex_code_description_payload(
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes)
+            && matches!(phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> r.is_ok(),
+        r.is_ok() && matches!(phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> {
+            &&& r.unwrap() == 6
+            &&& k4_repeat_values(final(workspace)@, window_bytes, phase)
+        },
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes), code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         r.is_ok() && code_rank_aligned(phase) ==> forall|limit: u16|
             #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
                 == code_phase_rank(phase, limit),
 {
-    proof { reveal(code_descriptor_store_frame); }
+    proof {
+        reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
+        reveal(k4_complex_progress_values); reveal(k4_complex_code_values);
+    }
     let tag = match phase {
         CodeDescriptionPhase::ComplexPrefix2(progress)
         | CodeDescriptionPhase::ComplexPrefix3(progress)
@@ -13007,7 +13192,7 @@ fn store_complex_code_description_payload(
         }
         CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {
             store_complex_progress(workspace, window_bytes, progress)?;
-            put_state_byte(workspace, window_bytes, B3B_REPEATED_LENGTH, length)?;
+            put_state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH, length)?;
             6
         }
         CodeDescriptionPhase::ComplexPendingSpan {
@@ -13057,12 +13242,21 @@ fn store_code_description_payload(
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes)
+            && matches!(phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> r.is_ok(),
+        r.is_ok() && matches!(phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> {
+            &&& r.unwrap() == 6
+            &&& k4_repeat_values(final(workspace)@, window_bytes, phase)
+        },
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes), code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         r.is_ok() && code_rank_aligned(phase) ==> forall|limit: u16|
             #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
                 == code_phase_rank(phase, limit),
 {
-    proof { reveal(code_descriptor_store_frame); }
+    proof {
+        reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
+        reveal(k4_complex_progress_values); reveal(k4_complex_code_values);
+    }
     match phase {
         CodeDescriptionPhase::Selector
         | CodeDescriptionPhase::SimpleSize
@@ -13081,6 +13275,18 @@ fn store_code_description_decoder(
 ) -> (r: Result<(), CompressedHeaderError>)
     requires decoder.valid(),
     ensures
+        serialized_b3b_queue(old(workspace)@, window_bytes, decoder.queue) ==>
+            serialized_b3b_queue(final(workspace)@, window_bytes, decoder.queue),
+        r.is_ok() && matches!(decoder.phase, CodeDescriptionPhase::ComplexRepeat { .. })
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_MAX) == decoder.alphabet_max
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == decoder.alphabet_limit ==>
+                k4_repeat_decoder_image(final(workspace)@, window_bytes, decoder.queue, decoder),
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes)
+            && matches!(decoder.phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> r.is_ok(),
+        r.is_ok() && matches!(decoder.phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> {
+            &&& b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_CODE_PHASE) == 6
+            &&& k4_repeat_values(final(workspace)@, window_bytes, decoder.phase)
+        },
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         r.is_ok() && code_rank_aligned(decoder.phase) ==>
             serialized_code_rank(final(workspace)@, window_bytes, decoder.alphabet_limit)
@@ -13117,7 +13323,11 @@ fn store_code_description_decoder(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
-    proof { reveal(code_descriptor_store_frame); }
+    proof {
+        reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
+        reveal(k4_repeat_decoder_image);
+        reveal(k4_complex_progress_values); reveal(k4_complex_code_values);
+    }
     match put_state_byte(workspace, window_bytes, B3B_CODE_AUX_PHASE, 0) {
         Ok(()) => {}
         Err(error) => return Err(error),
@@ -13162,6 +13372,15 @@ fn store_code_description_decoder(
             assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_CODE_PHASE) == tag);
             assert(code_payload_rank(workspace@, window_bytes, tag, decoder.alphabet_limit)
                 == code_payload_rank(before_tag, window_bytes, tag, decoder.alphabet_limit));
+        }
+    }
+    proof {
+        if serialized_b3b_queue(old(workspace)@, window_bytes, decoder.queue) {
+            reveal(code_descriptor_store_frame); reveal(b3b_workspace_shape); reveal(b3b_scalar_base);
+            b3b_scalar_layout_is_exact();
+            assert forall|i: int| 0 <= i < B3B_QUEUE_OFFSET_BYTE + 1 implies #[trigger]
+                workspace@[b3b_scalar_base(window_bytes) + i] == old(workspace)@[b3b_scalar_base(window_bytes) + i] by {}
+            serialized_b3b_queue_from_frame(old(workspace)@, workspace@, window_bytes, decoder.queue);
         }
     }
     result
@@ -14263,8 +14482,16 @@ fn advance_serialized_tree(
     let ghost loop_limit = b3b_scalar_u16_at(original, window_bytes, B3B_ALPHABET_LIMIT) as u16;
     let mut consumed: usize = 0;
     let mut work: u16 = 0;
+    let ghost mut previous_repeat: Option<CodeDescriptionDecoder> = None;
     while work < 5_696
         invariant consumed <= input.len(), work <= 5_696,
+            previous_repeat.is_some() ==> {
+                &&& previous_repeat.unwrap().valid()
+                &&& matches!(previous_repeat.unwrap().phase, CodeDescriptionPhase::ComplexRepeat { .. })
+                &&& k4_repeat_decoder_image(workspace@, window_bytes,
+                    previous_repeat.unwrap().queue, previous_repeat.unwrap())
+                &&& serialized_b3b_queue(workspace@, window_bytes, previous_repeat.unwrap().queue)
+            },
             loop_limit == b3b_scalar_u16_at(original, window_bytes, B3B_ALPHABET_LIMIT) as u16,
             work > 0 ==> work as nat + serialized_code_rank(workspace@, window_bytes, loop_limit) <= 5_695,
             b3b_scalar_u16_at(workspace@, window_bytes, B3B_ALPHABET_LIMIT)
@@ -14311,10 +14538,21 @@ fn advance_serialized_tree(
             Ok(value) => value,
             Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
         };
-        let mut decoder = match load_code_description_decoder(workspace, window_bytes, queue) {
+        let loaded = load_code_description_decoder(workspace, window_bytes, queue);
+        proof {
+            if let Some(previous) = previous_repeat {
+                k4_repeat_image_rebases_queue(workspace@, window_bytes, previous, queue);
+                assert(loaded == Ok(CodeDescriptionDecoder { queue,
+                    alphabet_max: previous.alphabet_max, alphabet_limit: previous.alphabet_limit,
+                    phase: previous.phase }));
+            }
+        }
+        let mut decoder = match loaded {
             Ok(value) => value,
             Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
         };
+        let ghost reloaded_repeat = previous_repeat;
+        proof { previous_repeat = None; }
         proof {
             assert(decoder.alphabet_limit as nat == b3b_scalar_u16_at(
                 workspace@,
@@ -14338,6 +14576,12 @@ fn advance_serialized_tree(
         } else { decoder.advance_field(&input[consumed..], end_of_input) };
         proof {
             assert(matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) ==> decoder == before_field);
+        }
+        proof {
+            if let Some(previous) = reloaded_repeat {
+                k4_repeat_reloaded_field_refines_original(workspace@, window_bytes, previous,
+                    before_field, input@.skip(consumed as int), end_of_input, decoder, step);
+            }
         }
         proof {
             if !matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
@@ -14576,6 +14820,13 @@ fn advance_serialized_tree(
                     Ok(()) => {}
                     Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
                 }
+                proof {
+                    if matches!(decoder.phase, CodeDescriptionPhase::ComplexRepeat { .. }) {
+                        assert(k4_repeat_decoder_image(workspace@, window_bytes, decoder.queue, decoder));
+                        assert(serialized_b3b_queue(workspace@, window_bytes, decoder.queue));
+                        previous_repeat = Some(decoder);
+                    }
+                }
                 if matches!(step.status, CodeDescriptionStatus::NeedInput) {
                     return SerializedTreeStep { consumed, status: SerializedTreeStatus::NeedInput };
                 }
@@ -14597,6 +14848,35 @@ fn advance_serialized_tree(
     }
 }
 
+spec fn context_map_start_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    &&& before.len() == after.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && !(at == base + B3B_CONTEXT_PHASE as int
+            || at == base + B3B_CONTEXT_KIND as int
+            || at == base + B3B_MAX_RUN_PREFIX as int
+            || at == base + B3B_PENDING_RUN as int
+            || base + B3B_MAP_TREES as int <= at < base + B3B_MAP_TREES as int + 2
+            || base + B3B_MAP_SIZE as int <= at < base + B3B_MAP_SIZE as int + 2
+            || base + B3B_MAP_INDEX as int <= at < base + B3B_MAP_INDEX as int + 2
+            || base + B3B_MAP_INITIALIZED as int <= at < base + B3B_MAP_INITIALIZED as int + 2
+            || at == base + B3B_VAR_PHASE as int || at == base + B3B_VAR_WIDTH as int)
+        ==> #[trigger] after[at] == before[at]
+}
+
+spec fn context_map_start_image(after: Seq<u8>, window_bytes: u32, kind: crate::brotli_prefix::ContextMapKind, active_len: u16) -> bool {
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_PHASE) == 0
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_CONTEXT_KIND)
+        == match kind { crate::brotli_prefix::ContextMapKind::Literal => 0u8, _ => 1u8 }
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_MAX_RUN_PREFIX) == 0
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_PENDING_RUN) == 255
+    &&& b3b_scalar_u16_at(after, window_bytes, B3B_MAP_TREES) == 0
+    &&& b3b_scalar_u16_at(after, window_bytes, B3B_MAP_SIZE) == active_len
+    &&& b3b_scalar_u16_at(after, window_bytes, B3B_MAP_INDEX) == 0
+    &&& b3b_scalar_u16_at(after, window_bytes, B3B_MAP_INITIALIZED) == 0
+    &&& serialized_var_uint8_phase(after, window_bytes, VarUint8Phase::First)
+}
+
 fn start_context_map(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -14607,6 +14887,9 @@ fn start_context_map(
         serialized_mtf_state_ok(old(workspace)@, window_bytes),
         1 <= active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
     ensures
+        r.is_ok(),
+        context_map_start_frame(old(workspace)@, final(workspace)@, window_bytes),
+        context_map_start_image(final(workspace)@, window_bytes, kind, active_len),
         final(workspace)@.len() == old(workspace)@.len(),
         serialized_mtf_state_ok(old(workspace)@, window_bytes)
             ==> serialized_mtf_state_ok(final(workspace)@, window_bytes),
@@ -14637,6 +14920,7 @@ fn start_context_map(
             2,
         ) == serialized_block_count_at(old(workspace)@, window_bytes, 2),
 {
+    reveal(context_map_start_frame); reveal(context_map_start_image);
     let ghost original = workspace@;
     let kind_tag = match kind {
         crate::brotli_prefix::ContextMapKind::Literal => 0u8,
@@ -19467,6 +19751,151 @@ proof fn establish_distance_refinement(before: Seq<u8>, after: Seq<u8>, window_b
     });
 }
 
+proof fn initial_suffix_shift_matches(width: u8)
+    requires width <= 24,
+    ensures pow2(width as nat) == (1u32 << width) as nat,
+{
+    pow2_matches_distance_shift(width);
+    assert((1u64 << width) == (1u32 << width) as u64) by (bit_vector)
+        requires width <= 24;
+}
+
+spec fn initial_suffix_read_domain(before: Seq<u8>, window_bytes: u32) -> bool {
+    let symbol = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SYMBOL);
+    &&& b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) < 3
+    &&& b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_PHASE) == 1
+    &&& symbol < 26
+    &&& b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH)
+        == crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS@[symbol as int]
+    &&& b3b_queue_encoding_valid(before, window_bytes)
+}
+
+spec fn initial_suffix_value_applied(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, suffix: u32) -> bool {
+    let kind = b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND);
+    let symbol = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SYMBOL);
+    &&& b3b_scalar_u32_at(after, window_bytes, (B3B_INITIAL_LENGTHS + 4 * kind) as u16)
+        == crate::brotli_prefix::block_length_value(symbol, suffix)
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_CURRENT_KIND) == kind + 1
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 0
+}
+
+spec fn initial_suffix_action_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, status: Option<CompressedHeaderStatus>) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    let kind = b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND);
+    &&& after.len() == before.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && !(base <= at < base + B3B_OUTER_PHASE as int)
+        && !(status.is_none() && (at == base + B3B_OUTER_PHASE as int
+            || at == base + B3B_CURRENT_KIND as int
+            || base + B3B_INITIAL_LENGTHS as int + 4 * kind <= at
+                < base + B3B_INITIAL_LENGTHS as int + 4 * kind + 4))
+        && !(status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))
+            && (at == base + B3B_OUTER_PHASE as int || at == base + B3B_TERMINAL_ERROR as int
+                || base + B3B_ERROR_DETAIL as int <= at < base + B3B_ERROR_DETAIL as int + 2))
+        ==> #[trigger] after[at] == before[at]
+}
+
+spec fn initial_suffix_phase_refines(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<CompressedHeaderStatus>) -> bool {
+    let width = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat;
+    exists|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& serialized_b3b_queue(after, window_bytes, eq)
+        &&& bit_read_exact_step(sq, input, end, width, used, eq, read)
+        &&& match read {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value <= u32::MAX
+                && initial_suffix_value_applied(before, after, window_bytes, value as u32),
+        }
+    }
+}
+
+proof fn establish_initial_suffix_refinement(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, used: usize, status: Option<CompressedHeaderStatus>,
+    sq: BitQueue, eq: BitQueue, read: BitReadStatus)
+    requires serialized_b3b_queue(before, window_bytes, sq),
+        serialized_b3b_queue(after, window_bytes, eq),
+        bit_read_exact_step(sq, input, end,
+            b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat, used, eq, read),
+        match read {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value <= u32::MAX
+                && initial_suffix_value_applied(before, after, window_bytes, value as u32),
+        },
+    ensures initial_suffix_phase_refines(before, after, window_bytes, input, end, used, status),
+{
+    reveal(initial_suffix_phase_refines);
+    assert(exists|start: BitQueue, next: BitQueue, outcome: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, start)
+        &&& serialized_b3b_queue(after, window_bytes, next)
+        &&& bit_read_exact_step(start, input, end,
+            b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat, used, next, outcome)
+        &&& match outcome {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value <= u32::MAX
+                && initial_suffix_value_applied(before, after, window_bytes, value as u32),
+        }
+    });
+}
+
+spec fn fixed_phase_bad_cursor(before: Seq<u8>, window_bytes: u32, phase: CompressedOuterPhase) -> bool {
+    match phase {
+        CompressedOuterPhase::BlockCount => b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) < 3
+            && (!b3b_queue_encoding_valid(before, window_bytes) || !var_uint8_encoding_valid(before, window_bytes)),
+        CompressedOuterPhase::DistanceParameters => !b3b_queue_encoding_valid(before, window_bytes),
+        CompressedOuterPhase::ContextModes => context_mode_pending(before, window_bytes)
+            && !b3b_queue_encoding_valid(before, window_bytes),
+        _ => false,
+    }
+}
+
+spec fn fixed_outer_bad_cursor(before: Seq<u8>, window_bytes: u32) -> bool {
+    match b3b_scalar_byte_at(before, window_bytes, B3B_OUTER_PHASE) {
+        0 => fixed_phase_bad_cursor(before, window_bytes, CompressedOuterPhase::BlockCount),
+        4 => fixed_phase_bad_cursor(before, window_bytes, CompressedOuterPhase::DistanceParameters),
+        5 => fixed_phase_bad_cursor(before, window_bytes, CompressedOuterPhase::ContextModes),
+        _ => false,
+    }
+}
+
+spec fn fixed_bad_cursor_plan_valid(before: Seq<u8>, window_bytes: u32, phase: CompressedOuterPhase, plan: CompressedActionPlan) -> bool {
+    &&& fixed_phase_bad_cursor(before, window_bytes, phase)
+    &&& plan.planning_work == 0
+    &&& plan.execution_work == 5
+    &&& plan.consumed == 0
+    &&& plan.status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState))
+}
+
+spec fn context_mode_handoff_domain(before: Seq<u8>, window_bytes: u32) -> bool {
+    let count = b3b_scalar_u16_at(before, window_bytes, B3B_BLOCK_COUNTS);
+    1 <= count <= 256 && b3b_scalar_u16_at(before, window_bytes, B3B_MODES_INITIALIZED) == count
+}
+
+spec fn context_mode_handoff_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
+    let base = b3b_scalar_base(window_bytes);
+    &&& after.len() == before.len()
+    &&& forall|at: int| 0 <= at < before.len()
+        && at != base + B3B_OUTER_PHASE as int
+        && !(at == base + B3B_CONTEXT_PHASE as int || at == base + B3B_CONTEXT_KIND as int
+            || at == base + B3B_MAX_RUN_PREFIX as int || at == base + B3B_PENDING_RUN as int
+            || base + B3B_MAP_TREES as int <= at < base + B3B_MAP_TREES as int + 2
+            || base + B3B_MAP_SIZE as int <= at < base + B3B_MAP_SIZE as int + 2
+            || base + B3B_MAP_INDEX as int <= at < base + B3B_MAP_INDEX as int + 2
+            || base + B3B_MAP_INITIALIZED as int <= at < base + B3B_MAP_INITIALIZED as int + 2
+            || at == base + B3B_VAR_PHASE as int || at == base + B3B_VAR_WIDTH as int)
+        ==> #[trigger] after[at] == before[at]
+}
+
+spec fn context_mode_handoff_applied(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
+    &&& b3b_scalar_byte_at(after, window_bytes, B3B_OUTER_PHASE) == 6
+    &&& context_map_start_image(after, window_bytes, crate::brotli_prefix::ContextMapKind::Literal,
+        (64 * b3b_scalar_u16_at(before, window_bytes, B3B_BLOCK_COUNTS)) as u16)
+    &&& context_mode_handoff_frame(before, after, window_bytes)
+}
+
 spec fn context_mode_pending(before: Seq<u8>, window_bytes: u32) -> bool {
     let count = b3b_scalar_u16_at(before, window_bytes, B3B_BLOCK_COUNTS);
     let initialized = b3b_scalar_u16_at(before, window_bytes, B3B_MODES_INITIALIZED);
@@ -20567,6 +20996,10 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            fixed_phase_bad_cursor(old(self).workspace@, old(self).window_bytes, CompressedOuterPhase::BlockCount) ==> {
+                &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
+                &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+            },
             (b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_CURRENT_KIND) >= 3
                 || (b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes)
                     && var_uint8_encoding_valid(old(self).workspace@, old(self).window_bytes))) ==>
@@ -20610,6 +21043,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 r.1,
             ),
     {
+        proof { reveal(fixed_phase_bad_cursor); reveal(context_mode_pending); }
         proof { reveal(block_count_action_frame); reveal(block_count_value_frame); reveal(block_count_value_applied); reveal(outer_phase_byte_frame); }
         let ghost original_workspace = self.workspace@;
         let mut consumed: usize = 0;
@@ -21011,6 +21445,13 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            initial_suffix_read_domain(old(self).workspace@, old(self).window_bytes) ==> {
+                &&& initial_suffix_phase_refines(old(self).workspace@, final(self).workspace@,
+                    old(self).window_bytes, input@, end_of_input, r.0, r.1)
+                &&& initial_suffix_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1)
+                &&& (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+                    || r.1 == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)))
+            },
             b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_BLOCK_LENGTH_PHASE) == 0
                 ==> initial_symbol_action_refines(old(self).workspace@, final(self).workspace@,
                     old(self).window_bytes, input@, end_of_input, r.0, r.1),
@@ -21042,6 +21483,11 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _ => true,
             },
     {
+        proof {
+            reveal(initial_suffix_read_domain); reveal(initial_suffix_value_applied);
+            reveal(initial_suffix_action_frame); reveal(outer_phase_byte_frame);
+        }
+        let ghost suffix_original = self.workspace@;
         reveal(initial_symbol_action_refines); reveal(initial_symbol_early_error);
         let mut consumed: usize = 0;
 
@@ -21078,16 +21524,41 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                             Ok(value) => value,
                             Err(error) => return self.fail_phase(consumed, error),
                         };
-                        let read = queue.read_bits(width as usize, &input[consumed..], end_of_input);
+                        let ghost suffix_start_queue = queue;
+                        let remaining = &input[consumed..];
+                        proof { assert(remaining@ == input@); }
+                        let read = queue.read_bits(width as usize, remaining, end_of_input);
+                        proof { assert(bit_read_exact_step(suffix_start_queue, input@, end_of_input,
+                            width as nat, read.consumed, queue, read.status)); }
                         consumed = consumed + read.consumed;
                         if let Err(error) = store_b3b_queue(
                             self.workspace, self.window_bytes, &queue) {
                             return self.fail_phase(consumed, error);
                         }
+                        let ghost suffix_stored_queue = self.workspace@;
                         match read.status {
-                            BitReadStatus::NeedInput => return (consumed, Some(CompressedHeaderStatus::NeedInput)),
-                            BitReadStatus::Truncated =>
-                                return self.fail_phase(consumed, CompressedHeaderError::Truncated),
+                            BitReadStatus::NeedInput => {
+                                let result = (consumed, Some(CompressedHeaderStatus::NeedInput));
+                                proof {
+                                    if initial_suffix_read_domain(suffix_original, self.window_bytes) {
+                                        establish_initial_suffix_refinement(suffix_original, self.workspace@, self.window_bytes,
+                                            input@, end_of_input, consumed, result.1, suffix_start_queue, queue, read.status);
+                                    }
+                                }
+                                return result;
+                            },
+                            BitReadStatus::Truncated => {
+                                let result = self.fail_phase(consumed, CompressedHeaderError::Truncated);
+                                proof {
+                                    reveal(terminal_error_frame);
+                                    serialized_b3b_queue_from_frame(suffix_stored_queue, self.workspace@, self.window_bytes, queue);
+                                    if initial_suffix_read_domain(suffix_original, self.window_bytes) {
+                                        establish_initial_suffix_refinement(suffix_original, self.workspace@, self.window_bytes,
+                                            input@, end_of_input, consumed, result.1, suffix_start_queue, queue, read.status);
+                                    }
+                                }
+                                return result;
+                            },
                             BitReadStatus::Value(suffix) => {
                                 proof {
                                     lemma2_to64();
@@ -21095,6 +21566,8 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                                     lemma_pow2_strictly_increases(width as nat, 32);
                                     assert(suffix <= u32::MAX);
                                     bounded_u64_fits_u32(suffix);
+                                    initial_suffix_shift_matches(width);
+                                    assert((suffix as u32) < (1u32 << width));
                                 }
                                 let length = match crate::brotli_prefix::decode_block_length(
                                     symbol,
@@ -21127,6 +21600,13 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                                     CompressedOuterPhase::BlockCount) {
                                     return self.fail_phase(consumed, error);
                                 }
+                                proof {
+                                    serialized_b3b_queue_from_frame(suffix_stored_queue, self.workspace@, self.window_bytes, queue);
+                                    if initial_suffix_read_domain(suffix_original, self.window_bytes) {
+                                        establish_initial_suffix_refinement(suffix_original, self.workspace@, self.window_bytes,
+                                            input@, end_of_input, consumed, None, suffix_start_queue, queue, read.status);
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -21150,6 +21630,10 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            fixed_phase_bad_cursor(old(self).workspace@, old(self).window_bytes, CompressedOuterPhase::DistanceParameters) ==> {
+                &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
+                &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+            },
             distance_phase_refines(old(self).workspace@, final(self).workspace@, old(self).window_bytes, input@, end_of_input, r.0, r.1),
             b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes) ==> {
                 &&& (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
@@ -21182,6 +21666,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _ => true,
             },
     {
+        proof { reveal(fixed_phase_bad_cursor); reveal(context_mode_pending); }
         proof { reveal(distance_value_applied); reveal(distance_action_frame); reveal(outer_phase_byte_frame); }
         let ghost original = self.workspace@;
         let mut consumed: usize = 0;
@@ -21266,6 +21751,14 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            fixed_phase_bad_cursor(old(self).workspace@, old(self).window_bytes, CompressedOuterPhase::ContextModes) ==> {
+                &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
+                &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+            },
+            context_mode_handoff_domain(old(self).workspace@, old(self).window_bytes) ==> {
+                &&& r == (0usize, None)
+                &&& context_mode_handoff_applied(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+            },
             context_mode_pending(old(self).workspace@, old(self).window_bytes)
                 && b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes) ==> {
                     &&& context_mode_phase_refines(old(self).workspace@, final(self).workspace@,
@@ -21336,8 +21829,11 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 _ => true,
             },
     {
+        proof { reveal(fixed_phase_bad_cursor); reveal(context_mode_pending); }
         proof {
             reveal(context_mode_count_invalid); reveal(context_mode_pending);
+            reveal(context_mode_handoff_domain); reveal(context_mode_handoff_applied);
+            reveal(context_mode_handoff_frame); reveal(context_map_start_frame); reveal(context_map_start_image);
             reveal(context_mode_value_applied); reveal(context_mode_action_frame);
             reveal(outer_phase_byte_frame);
         }
@@ -21880,6 +22376,23 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 B3B_OUTER_PHASE,
             ) == compressed_outer_phase_tag_spec(phase),
         ensures
+            phase == CompressedOuterPhase::InitialBlockLength
+                && initial_suffix_read_domain(old(self).workspace@, old(self).window_bytes) ==> {
+                &&& initial_suffix_phase_refines(old(self).workspace@, final(self).workspace@,
+                    old(self).window_bytes, input@, end_of_input, r.0, r.1)
+                &&& initial_suffix_action_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, r.1)
+                &&& (r.1.is_none() || r.1 == Some(CompressedHeaderStatus::NeedInput)
+                    || r.1 == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)))
+            },
+            fixed_phase_bad_cursor(old(self).workspace@, old(self).window_bytes, phase) ==> {
+                &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
+                &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+            },
+            phase == CompressedOuterPhase::ContextModes
+                && context_mode_handoff_domain(old(self).workspace@, old(self).window_bytes) ==> {
+                    &&& r == (0usize, None)
+                    &&& context_mode_handoff_applied(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+                },
             phase == CompressedOuterPhase::ContextModes
                 && context_mode_pending(old(self).workspace@, old(self).window_bytes)
                 && b3b_queue_encoding_valid(old(self).workspace@, old(self).window_bytes) ==> {
@@ -22004,9 +22517,11 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
                 }
                 CompressedOuterPhase::InitialBlockLength => {
                     let old_consumed = consumed;
+                    let remaining = &input[old_consumed..];
+                    proof { assert(old_consumed == 0); assert(remaining@ == input@); }
                     let (used, status) = self.advance_initial_block_length_phase(
                         phase,
-                        &input[old_consumed..],
+                        remaining,
                         end_of_input,
                     );
                     consumed = old_consumed + used;
@@ -24818,8 +25333,13 @@ fn block_count_planning_work(
     window_bytes: u32,
     input_len: usize,
 ) -> (r: Result<u64, CompressedHeaderError>)
-    ensures r.is_ok() ==> block_count_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+    ensures
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes) ==> {
+            &&& r.is_err() == fixed_phase_bad_cursor(workspace@, window_bytes, CompressedOuterPhase::BlockCount)
+            &&& (r.is_err() ==> r == Err(CompressedHeaderError::InternalState))
+        }, r.is_ok() ==> block_count_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
 {
+    reveal(fixed_phase_bad_cursor); reveal(context_mode_pending);
     reveal(block_count_planning_read_valid); reveal(var_uint8_planning_read_units);
     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
     if kind >= 3 {
@@ -24845,6 +25365,7 @@ fn block_count_planning_work(
     Ok(read.work)
 }
 
+#[verifier::spinoff_prover]
 fn plan_block_count_action(
     workspace: &[u8],
     window_bytes: u32,
@@ -24910,12 +25431,39 @@ fn plan_block_count_action(
             None
         }
     };
-    Ok(CompressedActionPlan {
+    let plan = CompressedActionPlan {
         planning_work: read_plan.work,
         execution_work,
         consumed: step.consumed,
         status,
-    })
+    };
+    proof {
+        assert(serialized_b3b_queue(workspace@, window_bytes, start_queue));
+        assert(serialized_var_uint8_phase(workspace@, window_bytes, start_phase));
+        assert(var_uint8_exact_step(start_queue, start_phase, input@, end_of_input,
+            step.consumed, queue, phase, step.status));
+        assert(plan.planning_work as nat == plan.consumed as nat + match step.status {
+            VarUint8Status::NeedInput | VarUint8Status::Truncated => 0nat,
+            _ => var_uint8_width(start_phase),
+        });
+        assert(plan.execution_work as nat == block_count_execution_units(plan.planning_work as nat, step.status));
+        assert(plan.status == block_count_status_for_var(step.status));
+        assert(exists|sq: BitQueue, eq: BitQueue, sp: VarUint8Phase, ep: VarUint8Phase, outcome: VarUint8Status| {
+            &&& serialized_b3b_queue(workspace@, window_bytes, sq)
+            &&& serialized_var_uint8_phase(workspace@, window_bytes, sp)
+            &&& eq.valid() && ep.valid()
+            &&& #[trigger] var_uint8_exact_step(sq, sp, input@, end_of_input, plan.consumed, eq, ep, outcome)
+            &&& plan.planning_work as nat == var_uint8_planning_read_units(sq, sp, input@.len())
+            &&& plan.planning_work as nat == plan.consumed as nat + match outcome {
+                VarUint8Status::NeedInput | VarUint8Status::Truncated => 0nat,
+                _ => var_uint8_width(sp),
+            }
+            &&& plan.planning_work <= 63
+            &&& plan.execution_work as nat == block_count_execution_units(plan.planning_work as nat, outcome)
+            &&& plan.status == block_count_status_for_var(outcome)
+        });
+    }
+    Ok(plan)
 }
 
 fn distance_base_execution_work(read_work: u64) -> (r: u64)
@@ -25026,8 +25574,13 @@ fn distance_planning_work(
     window_bytes: u32,
     input_len: usize,
 ) -> (r: Result<u64, CompressedHeaderError>)
-    ensures r.is_ok() ==> distance_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+    ensures
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes) ==> {
+            &&& r.is_err() == fixed_phase_bad_cursor(workspace@, window_bytes, CompressedOuterPhase::DistanceParameters)
+            &&& (r.is_err() ==> r == Err(CompressedHeaderError::InternalState))
+        }, r.is_ok() ==> distance_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
 {
+    reveal(fixed_phase_bad_cursor); reveal(context_mode_pending);
     reveal(distance_planning_read_valid); reveal(distance_read_units);
     let queue = load_b3b_queue(workspace, window_bytes)?;
     let read = plan_bit_read(queue, 6, input_len);
@@ -25232,19 +25785,34 @@ proof fn context_mode_plan_matches_action(before: Seq<u8>, after: Seq<u8>, windo
     bit_read_steps_agree(aq, pq, input, end, 2, used, plan.consumed, aeq, peq, ars, prs);
 }
 
+spec fn context_mode_handoff_plan_valid(before: Seq<u8>, window_bytes: u32, plan: CompressedActionPlan) -> bool {
+    &&& context_mode_handoff_domain(before, window_bytes)
+    &&& plan.planning_work == 0
+    &&& plan.execution_work == 18
+    &&& plan.consumed == 0
+    &&& plan.status.is_none()
+}
+
 fn context_mode_planning_work(
     workspace: &[u8],
     window_bytes: u32,
     input_len: usize,
 ) -> (r: Result<u64, CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes) ==> {
+            &&& r.is_err() == fixed_phase_bad_cursor(workspace@, window_bytes, CompressedOuterPhase::ContextModes)
+            &&& (r.is_err() ==> r == Err(CompressedHeaderError::InternalState))
+        },
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+            && context_mode_handoff_domain(workspace@, window_bytes) ==> r == Ok(0),
         context_mode_pending(workspace@, window_bytes) && b3b_queue_encoding_valid(workspace@, window_bytes) ==> r.is_ok(),
         r.is_ok() && context_mode_pending(workspace@, window_bytes) ==>
             context_mode_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
         b3b_workspace_shape(workspace@.len() as nat, window_bytes)
         && context_mode_count_invalid(workspace@, window_bytes) ==> r == Ok(0),
 {
-    reveal(context_mode_count_invalid); reveal(context_mode_pending);
+    reveal(fixed_phase_bad_cursor); reveal(context_mode_pending);
+    reveal(context_mode_count_invalid); reveal(context_mode_pending); reveal(context_mode_handoff_domain);
     reveal(context_mode_planning_read_valid); reveal(context_mode_read_units);
     let literal_count = state_u16(workspace, window_bytes, B3B_BLOCK_COUNTS)?;
     let initialized = state_u16(workspace, window_bytes, B3B_MODES_INITIALIZED)?;
@@ -25271,6 +25839,9 @@ fn plan_context_mode_action(
     end_of_input: bool,
 ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+            && context_mode_handoff_domain(workspace@, window_bytes) ==>
+                r.is_ok() && context_mode_handoff_plan_valid(workspace@, window_bytes, r.unwrap()),
         context_mode_pending(workspace@, window_bytes) && b3b_queue_encoding_valid(workspace@, window_bytes) ==> r.is_ok(),
         r.is_ok() && context_mode_pending(workspace@, window_bytes) ==>
             context_mode_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap()),
@@ -25279,6 +25850,7 @@ fn plan_context_mode_action(
         r.is_ok() && context_mode_bad_count_plan_valid(workspace@, window_bytes, r.unwrap()),
 {
     reveal(context_mode_count_invalid); reveal(context_mode_bad_count_plan_valid);
+    reveal(context_mode_handoff_domain); reveal(context_mode_handoff_plan_valid);
     reveal(context_mode_pending); reveal(context_mode_plan_valid);
     reveal(context_mode_planning_read_valid); reveal(context_mode_read_units);
     reveal(context_mode_execution_units); reveal(context_mode_read_status);
@@ -25381,6 +25953,145 @@ fn initial_suffix_value_execution_work(read_work: u64) -> (r: u64)
     initial_suffix_base_execution_work(read_work) + 2 + 4 + 1 + 1 + 1
 }
 
+spec fn m1_serialized_queue_snapshot(before: Seq<u8>, window_bytes: u32) -> BitQueue {
+    BitQueue {
+        pending: [
+            b3b_scalar_byte_at(before, window_bytes, B3B_QUEUE_OFFSET),
+            b3b_scalar_byte_at(before, window_bytes, (B3B_QUEUE_OFFSET + 1) as u16),
+            b3b_scalar_byte_at(before, window_bytes, (B3B_QUEUE_OFFSET + 2) as u16),
+            b3b_scalar_byte_at(before, window_bytes, (B3B_QUEUE_OFFSET + 3) as u16),
+            b3b_scalar_byte_at(before, window_bytes, (B3B_QUEUE_OFFSET + 4) as u16),
+            b3b_scalar_byte_at(before, window_bytes, (B3B_QUEUE_OFFSET + 5) as u16),
+            b3b_scalar_byte_at(before, window_bytes, (B3B_QUEUE_OFFSET + 6) as u16),
+            b3b_scalar_byte_at(before, window_bytes, (B3B_QUEUE_OFFSET + 7) as u16),
+        ],
+        len: b3b_scalar_byte_at(before, window_bytes, B3B_QUEUE_LEN) as usize,
+        offset: b3b_scalar_byte_at(before, window_bytes, B3B_QUEUE_OFFSET_BYTE) as usize,
+    }
+}
+
+proof fn m1_serialized_queue_snapshot_valid(before: Seq<u8>, window_bytes: u32)
+    requires b3b_queue_encoding_valid(before, window_bytes),
+    ensures m1_serialized_queue_snapshot(before, window_bytes).valid(),
+        serialized_b3b_queue(before, window_bytes, m1_serialized_queue_snapshot(before, window_bytes)),
+{
+    reveal(m1_serialized_queue_snapshot); reveal(b3b_queue_encoding_valid);
+    reveal(serialized_b3b_queue); reveal(BitQueue::valid);
+    reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
+    b3b_scalar_layout_is_exact();
+}
+
+spec fn initial_suffix_field_complete(before: Seq<u8>, window_bytes: u32, input_len: nat) -> bool {
+    let queue = m1_serialized_queue_snapshot(before, window_bytes);
+    let width = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat;
+    queue.bits().len() + 8 * input_bytes_taken(queue.bits().len(), width, input_len) >= width
+}
+
+spec fn initial_suffix_planning_units(before: Seq<u8>, window_bytes: u32, input_len: nat) -> nat {
+    let queue = m1_serialized_queue_snapshot(before, window_bytes);
+    let width = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat;
+    initial_suffix_read_units(queue, width, input_len) + 1
+        + if initial_suffix_field_complete(before, window_bytes, input_len) { 2nat } else { 0nat }
+}
+
+spec fn initial_suffix_execution_units(before: Seq<u8>, window_bytes: u32, input_len: nat, end: bool) -> nat {
+    let queue = m1_serialized_queue_snapshot(before, window_bytes);
+    let width = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat;
+    initial_suffix_read_units(queue, width, input_len) + 12
+        + if initial_suffix_field_complete(before, window_bytes, input_len) { 9nat }
+            else if end { 5nat } else { 0nat }
+}
+
+spec fn initial_suffix_read_units(queue: BitQueue, width: nat, input_len: nat) -> nat {
+    let taken = input_bytes_taken(queue.bits().len(), width, input_len);
+    taken + if queue.bits().len() + 8 * taken >= width { width } else { 0nat }
+}
+
+#[verifier::opaque]
+spec fn initial_suffix_plan_valid(before: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool, plan: CompressedActionPlan) -> bool {
+    let width = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat;
+    &&& initial_suffix_read_domain(before, window_bytes)
+    &&& plan.consumed <= input.len()
+    &&& exists|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        let work = initial_suffix_read_units(sq, width, input.len());
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& eq.valid()
+        &&& #[trigger] bit_read_exact_step(sq, input, end, width, plan.consumed, eq, read)
+        &&& work == plan.consumed as nat + match read { BitReadStatus::Value(_) => width, _ => 0nat }
+        &&& work <= 63
+        &&& plan.planning_work as nat == work + 1 + match read { BitReadStatus::Value(_) => 2nat, _ => 0nat }
+        &&& plan.execution_work as nat == work + 12 + match read { BitReadStatus::Value(_) => 9nat, BitReadStatus::Truncated => 5nat, _ => 0nat }
+        &&& plan.status == distance_read_status(read)
+    }
+}
+
+proof fn initial_suffix_plan_units_agree(before: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: CompressedActionPlan)
+    requires initial_suffix_plan_valid(before, window_bytes, input, end, plan),
+    ensures plan.planning_work as nat == initial_suffix_planning_units(before, window_bytes, input.len()),
+        plan.execution_work as nat == initial_suffix_execution_units(before, window_bytes, input.len(), end),
+        plan.planning_work <= 66, plan.execution_work <= 84,
+{
+    reveal(initial_suffix_plan_valid); reveal(initial_suffix_read_domain);
+    reveal(initial_suffix_planning_units); reveal(initial_suffix_execution_units);
+    reveal(initial_suffix_field_complete); reveal(initial_suffix_read_units);
+    let width = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat;
+    let (sq, eq, read) = choose|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        let work = initial_suffix_read_units(sq, width, input.len());
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& eq.valid()
+        &&& #[trigger] bit_read_exact_step(sq, input, end, width, plan.consumed, eq, read)
+        &&& work == plan.consumed as nat + match read { BitReadStatus::Value(_) => width, _ => 0nat }
+        &&& work <= 63
+        &&& plan.planning_work as nat == work + 1 + match read { BitReadStatus::Value(_) => 2nat, _ => 0nat }
+        &&& plan.execution_work as nat == work + 12 + match read { BitReadStatus::Value(_) => 9nat, BitReadStatus::Truncated => 5nat, _ => 0nat }
+        &&& plan.status == distance_read_status(read)
+    };
+    m1_serialized_queue_snapshot_valid(before, window_bytes);
+    serialized_bit_queues_agree(before, window_bytes, sq, m1_serialized_queue_snapshot(before, window_bytes));
+    bytes_bits_len(input.take(plan.consumed as int));
+    reveal(bit_read_exact_step);
+}
+
+spec fn m1_input_prefix_len(input_len: nat, input_credit: u64) -> nat {
+    if (input_credit as nat) < input_len { input_credit as nat } else { input_len }
+}
+
+proof fn initial_suffix_plan_matches_action(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    input: Seq<u8>, end: bool, plan: CompressedActionPlan, used: usize, status: Option<CompressedHeaderStatus>)
+    requires initial_suffix_plan_valid(before, window_bytes, input, end, plan),
+        initial_suffix_phase_refines(before, after, window_bytes, input, end, used, status),
+    ensures used == plan.consumed, status == plan.status,
+        initial_suffix_phase_refines(before, after, window_bytes, input, end, plan.consumed, plan.status),
+{
+    reveal(initial_suffix_plan_valid); reveal(initial_suffix_phase_refines); reveal(distance_read_status);
+    let width = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH) as nat;
+    let (pq, peq, prs) = choose|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        let work = initial_suffix_read_units(sq, width, input.len());
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& eq.valid()
+        &&& #[trigger] bit_read_exact_step(sq, input, end, width, plan.consumed, eq, read)
+        &&& work == plan.consumed as nat + match read { BitReadStatus::Value(_) => width, _ => 0nat }
+        &&& work <= 63
+        &&& plan.planning_work as nat == work + 1 + match read { BitReadStatus::Value(_) => 2nat, _ => 0nat }
+        &&& plan.execution_work as nat == work + 12 + match read { BitReadStatus::Value(_) => 9nat, BitReadStatus::Truncated => 5nat, _ => 0nat }
+        &&& plan.status == distance_read_status(read)
+    };
+    let (aq, aeq, ars) = choose|sq: BitQueue, eq: BitQueue, read: BitReadStatus| {
+        &&& serialized_b3b_queue(before, window_bytes, sq)
+        &&& serialized_b3b_queue(after, window_bytes, eq)
+        &&& #[trigger] bit_read_exact_step(sq, input, end, width, used, eq, read)
+        &&& match read {
+            BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+            BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+            BitReadStatus::Value(value) => status.is_none() && value <= u32::MAX
+                && initial_suffix_value_applied(before, after, window_bytes, value as u32),
+        }
+    };
+    serialized_bit_queues_agree(before, window_bytes, aq, pq);
+    bit_read_steps_agree(aq, pq, input, end, width, used, plan.consumed, aeq, peq, ars, prs);
+}
+
 fn initial_suffix_planning_work(
     workspace: &[u8],
     window_bytes: u32,
@@ -25405,7 +26116,14 @@ fn plan_initial_suffix_action(workspace: &[u8], window_bytes: u32,
     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
 ) -> (r: Result<CompressedActionPlan, CoreFailure>)
     requires old(budget).valid(),
-    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+    ensures
+        initial_suffix_read_domain(workspace@, window_bytes) ==>
+            r.is_ok() == (old(budget).work_remaining as nat >= initial_suffix_planning_units(workspace@, window_bytes, input@.len())),
+        initial_suffix_read_domain(workspace@, window_bytes) && old(budget).work_remaining >= 66 ==> r.is_ok(),
+        initial_suffix_read_domain(workspace@, window_bytes) && r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        initial_suffix_read_domain(workspace@, window_bytes) && r.is_ok() ==>
+            initial_suffix_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap()),
+        final(budget).valid(), final(budget).limits == old(budget).limits,
         final(budget).work_remaining <= old(budget).work_remaining,
         final(budget).input_remaining == old(budget).input_remaining,
         final(budget).output_remaining == old(budget).output_remaining,
@@ -25414,6 +26132,14 @@ fn plan_initial_suffix_action(workspace: &[u8], window_bytes: u32,
         r.is_ok() ==> r.unwrap().consumed <= input.len(),
         r.is_ok() ==> final(budget).work_remaining == old(budget).work_remaining - r.unwrap().planning_work,
 {
+    reveal(initial_suffix_read_domain); reveal(initial_suffix_plan_valid);
+    reveal(initial_suffix_planning_units); reveal(initial_suffix_field_complete);
+    proof {
+        if initial_suffix_read_domain(workspace@, window_bytes) {
+            m1_serialized_queue_snapshot_valid(workspace@, window_bytes);
+        }
+    }
+    reveal(initial_suffix_read_units); reveal(distance_read_status);
     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND).map_err(map_compressed_error)?;
     let subphase = state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_PHASE).map_err(map_compressed_error)?;
     let symbol = state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_SYMBOL).map_err(map_compressed_error)?;
@@ -25434,9 +26160,22 @@ fn plan_initial_suffix_action(workspace: &[u8], window_bytes: u32,
         Err(error) => return Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 4 + 1, consumed: 0,
             status: Some(CompressedHeaderStatus::Failed(error)) }),
     };
+    proof {
+        if initial_suffix_read_domain(workspace@, window_bytes) {
+            serialized_bit_queues_agree(workspace@, window_bytes, queue, m1_serialized_queue_snapshot(workspace@, window_bytes));
+        }
+    }
+    let ghost suffix_start_queue = queue;
     let read_plan = plan_bit_read(queue, width as usize, input.len());
     if !budget.charge_work(read_plan.work) { return Err(CoreFailure::ResourceLimit); }
     let read = queue.read_bits(width as usize, input, end_of_input);
+    proof {
+        bytes_bits_len(input@.take(read.consumed as int));
+        reveal(bit_read_exact_step);
+        assert(read_plan.complete == match read.status { BitReadStatus::Value(_) => true, _ => false });
+        assert(read_plan.work as nat == initial_suffix_read_units(suffix_start_queue, width as nat, input@.len()));
+        assert(bit_read_exact_step(suffix_start_queue, input@, end_of_input, width as nat, read.consumed, queue, read.status));
+    }
     if read.consumed != read_plan.consumed { return Err(core_state_failure()); }
     let mut planning_work = initial_suffix_planning_total(read_plan.work);
     let (execution_work, status) = match read.status {
@@ -25445,6 +26184,14 @@ fn plan_initial_suffix_action(workspace: &[u8], window_bytes: u32,
         BitReadStatus::Truncated => (initial_suffix_truncated_execution_work(read_plan.work),
             Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated))),
         BitReadStatus::Value(suffix) => {
+            proof {
+                lemma2_to64();
+                lemma_pow2_strictly_increases(width as nat, 32);
+                assert(suffix <= u32::MAX);
+                bounded_u64_fits_u32(suffix);
+                initial_suffix_shift_matches(width);
+                assert((suffix as u32) < (1u32 << width));
+            }
             // decode_block_length reads the offset and extra-width table cells.
             if !budget.charge_work(2) { return Err(CoreFailure::ResourceLimit); }
             planning_work += 2;
@@ -25458,7 +26205,32 @@ fn plan_initial_suffix_action(workspace: &[u8], window_bytes: u32,
             (work, status)
         },
     };
-    Ok(CompressedActionPlan { planning_work, execution_work, consumed: read.consumed, status })
+    let result = CompressedActionPlan { planning_work, execution_work, consumed: read.consumed, status };
+    proof {
+        if initial_suffix_read_domain(workspace@, window_bytes) {
+            assert(serialized_b3b_queue(workspace@, window_bytes, suffix_start_queue));
+            assert(queue.valid());
+            assert(bit_read_exact_step(suffix_start_queue, input@, end_of_input, width as nat, result.consumed, queue, read.status));
+            let work = initial_suffix_read_units(suffix_start_queue, width as nat, input@.len());
+            assert(work == result.consumed as nat + match read.status { BitReadStatus::Value(_) => width as nat, _ => 0nat });
+            assert(work <= 63);
+            assert(result.planning_work as nat == work + 1 + match read.status { BitReadStatus::Value(_) => 2nat, _ => 0nat });
+            assert(result.execution_work as nat == work + 12 + match read.status { BitReadStatus::Value(_) => 9nat, BitReadStatus::Truncated => 5nat, _ => 0nat });
+            assert(result.status == distance_read_status(read.status));
+            assert(exists|sq: BitQueue, eq: BitQueue, outcome: BitReadStatus| {
+                let work = initial_suffix_read_units(sq, width as nat, input@.len());
+                &&& serialized_b3b_queue(workspace@, window_bytes, sq)
+                &&& eq.valid()
+                &&& #[trigger] bit_read_exact_step(sq, input@, end_of_input, width as nat, result.consumed, eq, outcome)
+                &&& work == result.consumed as nat + match outcome { BitReadStatus::Value(_) => width as nat, _ => 0nat }
+                &&& work <= 63
+                &&& result.planning_work as nat == work + 1 + match outcome { BitReadStatus::Value(_) => 2nat, _ => 0nat }
+                &&& result.execution_work as nat == work + 12 + match outcome { BitReadStatus::Value(_) => 9nat, BitReadStatus::Truncated => 5nat, _ => 0nat }
+                &&& result.status == distance_read_status(outcome)
+            });
+        }
+    }
+    Ok(result)
 }
 
 
@@ -25656,6 +26428,10 @@ fn replay_installed_symbol_plan(
             *queue,
             *prefix,
         ));
+    }
+    proof {
+        assert(exact_work == iterations as u64 * (meta.symbols as u64 + 1)) by (nonlinear_arith)
+            requires exact_work == 0, iterations == 0;
     }
     while iterations < 15
         invariant budget.valid(), budget.limits == old(budget).limits,
@@ -27547,6 +28323,100 @@ spec fn canonical_plan_scan_result(lengths: Seq<u8>, symbols: nat, visits: nat,
     }
 }
 
+proof fn k1_weight_definitions_agree(value: u8)
+    ensures symbol_code_length_weight(value) == crate::brotli_prefix::code_weight(value),
+{
+    reveal(symbol_code_length_weight); reveal(crate::brotli_prefix::code_weight);
+}
+
+proof fn k1_prefix_sums_append(prefix: Seq<u8>, value: u8)
+    ensures crate::brotli_prefix::used_space(prefix + seq![value])
+            == crate::brotli_prefix::used_space(prefix) + crate::brotli_prefix::code_weight(value),
+        crate::brotli_prefix::nonzero_count(prefix + seq![value])
+            == crate::brotli_prefix::nonzero_count(prefix) + if value == 0 { 0nat } else { 1nat },
+    decreases prefix.len(),
+{
+    if prefix.len() > 0 {
+        k1_prefix_sums_append(prefix.skip(1), value);
+        assert((prefix + seq![value]).skip(1) =~= prefix.skip(1) + seq![value]);
+    } else { assert(prefix =~= Seq::<u8>::empty()); }
+    reveal_with_fuel(crate::brotli_prefix::used_space, 2);
+    reveal_with_fuel(crate::brotli_prefix::nonzero_count, 2);
+}
+
+proof fn k1_canonical_plan_sums_agree(lengths: Seq<u8>, limit: nat)
+    requires limit <= lengths.len(),
+    ensures canonical_plan_weight(lengths, limit)
+            == crate::brotli_prefix::used_space(lengths.take(limit as int)),
+        canonical_plan_nonzero(lengths, limit)
+            == crate::brotli_prefix::nonzero_count(lengths.take(limit as int)),
+    decreases limit,
+{
+    reveal(canonical_plan_weight); reveal(canonical_plan_nonzero);
+    if limit > 0 {
+        k1_canonical_plan_sums_agree(lengths, (limit - 1) as nat);
+        let previous = lengths.take(limit as int - 1);
+        let value = lengths[limit as int - 1];
+        assert(lengths.take(limit as int) =~= previous + seq![value]);
+        k1_weight_definitions_agree(value);
+        k1_prefix_sums_append(previous, value);
+    } else {
+        assert(lengths.take(0) =~= Seq::<u8>::empty());
+        reveal(crate::brotli_prefix::used_space); reveal(crate::brotli_prefix::nonzero_count);
+    }
+}
+
+proof fn k1_canonical_weight_prefix_le(lengths: Seq<u8>, left: nat, right: nat)
+    requires left <= right <= lengths.len(),
+    ensures canonical_plan_weight(lengths, left) <= canonical_plan_weight(lengths, right),
+    decreases right,
+{
+    if left < right {
+        k1_canonical_weight_prefix_le(lengths, left, (right - 1) as nat);
+        reveal(canonical_plan_weight);
+    }
+}
+
+proof fn k1_canonical_classification_agrees(lengths: Seq<u8>, symbols: nat, visits: nat, valid: bool)
+    requires 1 <= symbols <= 704, symbols <= lengths.len(),
+        canonical_plan_scan_result(lengths, symbols, visits, valid),
+    ensures valid == crate::brotli_prefix::valid_builder_lengths(lengths.take(symbols as int)),
+{
+    assert((1u32 << 15) == 32_768u32) by (bit_vector);
+    assert(crate::brotli_prefix::CODE_SPACE == 32_768u32);
+    k1_canonical_plan_sums_agree(lengths, symbols);
+    reveal(canonical_plan_scan_result); reveal(crate::brotli_prefix::valid_builder_lengths);
+    let selected = lengths.take(symbols as int);
+    assert(selected.len() == symbols);
+    if valid {
+        assert forall|i: int| 0 <= i < selected.len() implies #[trigger] selected[i] <= 15 by {
+            assert(selected[i] == lengths[i]);
+        }
+    } else if crate::brotli_prefix::valid_builder_lengths(selected) {
+        assert(canonical_plan_weight(lengths, symbols) == 32_768);
+        assert(canonical_plan_nonzero(lengths, symbols) >= 2);
+        if visits == symbols
+            && (forall|i: int| 0 <= i < symbols ==> lengths[i] <= 15)
+            && canonical_plan_weight(lengths, symbols) <= 32_768
+            && (canonical_plan_weight(lengths, symbols) != 32_768
+                || canonical_plan_nonzero(lengths, symbols) < 2) {
+            assert(false);
+        } else {
+            let index = (visits - 1) as nat;
+            assert(index < symbols);
+            if lengths[index as int] > 15 {
+                assert(selected[index as int] == lengths[index as int]);
+                assert(false);
+            } else {
+                reveal(canonical_plan_weight);
+                assert(canonical_plan_weight(lengths, index + 1) > 32_768);
+                k1_canonical_weight_prefix_le(lengths, index + 1, symbols);
+                assert(false);
+            }
+        }
+    }
+}
+
 fn plan_canonical_tree_install(
     lengths: &[u8; 704],
     budget: &mut crate::brotli::RequestBudget,
@@ -27569,6 +28439,7 @@ fn plan_canonical_tree_install(
             &&& r.unwrap().0 <= 704
             &&& r.unwrap().1 <= 300_000
             &&& canonical_plan_scan_result(lengths@, symbols as nat, r.unwrap().0 as nat, r.unwrap().2)
+            &&& r.unwrap().2 == crate::brotli_prefix::valid_builder_lengths(lengths@.take(symbols as int))
             &&& if r.unwrap().2 {
                 r.unwrap().1 as nat == 36 * symbols as nat
                     + 6 * canonical_plan_nonzero(lengths@, symbols as nat)
@@ -27611,6 +28482,7 @@ fn plan_canonical_tree_install(
         planning_work += 1;
         let length = lengths[symbol as usize];
         if length > 15 {
+            proof { k1_canonical_classification_agrees(lengths@, symbols as nat, planning_work as nat, false); }
             return Ok((planning_work, planning_work, false));
         }
         if length != 0 {
@@ -27628,7 +28500,8 @@ fn plan_canonical_tree_install(
                 assert(amount as nat == symbol_code_length_weight(length));
             }
             if amount > space {
-                return Ok((planning_work, planning_work, false));
+                proof { k1_canonical_classification_agrees(lengths@, symbols as nat, planning_work as nat, false); }
+            return Ok((planning_work, planning_work, false));
             }
             space -= amount;
             nonzero += 1;
@@ -27655,8 +28528,10 @@ fn plan_canonical_tree_install(
         }
     }
     if nonzero < 2 || space != 0 {
-        return Ok((planning_work, planning_work, false));
+        proof { k1_canonical_classification_agrees(lengths@, symbols as nat, planning_work as nat, false); }
+            return Ok((planning_work, planning_work, false));
     }
+    proof { k1_canonical_classification_agrees(lengths@, symbols as nat, planning_work as nat, true); }
     Ok((planning_work, canonical_tree_install_work(symbols, nonzero, index_sum), true))
 }
 
@@ -28521,6 +29396,10 @@ spec fn context_mode_result_matches(plan: CompressedActionPlan, limited: bool, r
     block_count_result_matches(plan, limited, result)
 }
 
+spec fn initial_suffix_result_matches(plan: CompressedActionPlan, limited: bool, result: Result<usize, CompressedStep>) -> bool {
+    block_count_result_matches(plan, limited, result)
+}
+
 fn execute_fixed_compressed_plan(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -28538,6 +29417,21 @@ fn execute_fixed_compressed_plan(
         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE)
             == compressed_outer_phase_tag_spec(phase),
     ensures
+        fixed_bad_cursor_plan_valid(old(workspace)@, window_bytes, phase, plan)
+            && old(budget).work_remaining >= plan.execution_work ==> {
+                &&& r == Err(CompressedStep { consumed: 0,
+                    status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
+                &&& terminal_error_frame(old(workspace)@, final(workspace)@, window_bytes)
+                &&& serialized_terminal_error(final(workspace)@, window_bytes, CompressedHeaderError::InternalState)
+                &&& final(budget).input_remaining == old(budget).input_remaining
+            },
+        phase == CompressedOuterPhase::ContextModes
+            && context_mode_handoff_plan_valid(old(workspace)@, window_bytes, plan)
+            && old(budget).work_remaining >= plan.execution_work ==> {
+                &&& r == Ok(0usize)
+                &&& context_mode_handoff_applied(old(workspace)@, final(workspace)@, window_bytes)
+                &&& final(budget).input_remaining == old(budget).input_remaining
+            },
         phase == CompressedOuterPhase::ContextModes
             && context_mode_bad_count_plan_valid(old(workspace)@, window_bytes, plan)
             && old(budget).work_remaining >= plan.execution_work ==> {
@@ -28555,6 +29449,17 @@ fn execute_fixed_compressed_plan(
                 &&& context_mode_phase_refines(old(workspace)@, final(workspace)@, window_bytes, input@,
                     end_of_input, plan.consumed, plan.status)
                 &&& context_mode_action_frame(old(workspace)@, final(workspace)@, window_bytes, plan.status)
+                &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
+                &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
+            },
+        phase == CompressedOuterPhase::InitialBlockLength
+            && initial_suffix_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan)
+            && old(budget).input_remaining >= plan.consumed as u64
+            && old(budget).work_remaining >= plan.execution_work ==> {
+                &&& initial_suffix_result_matches(plan, input_was_limited, r)
+                &&& initial_suffix_phase_refines(old(workspace)@, final(workspace)@, window_bytes, input@,
+                    end_of_input, plan.consumed, plan.status)
+                &&& initial_suffix_action_frame(old(workspace)@, final(workspace)@, window_bytes, plan.status)
                 &&& final(budget).input_remaining == old(budget).input_remaining - plan.consumed as u64
                 &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
             },
@@ -28607,6 +29512,8 @@ fn execute_fixed_compressed_plan(
             },
         },
 {
+    proof { reveal(fixed_bad_cursor_plan_valid); }
+    proof { reveal(initial_suffix_plan_valid); reveal(initial_suffix_result_matches); }
     proof {
         if phase == CompressedOuterPhase::BlockCount
             && block_count_plan_valid(workspace@, window_bytes, input@, end_of_input, plan)
@@ -28693,12 +29600,27 @@ fn execute_fixed_compressed_plan(
         }
     }
     proof {
+        if phase == CompressedOuterPhase::InitialBlockLength
+            && initial_suffix_plan_valid(before_planned_action, window_bytes, input@, end_of_input, plan) {
+            initial_suffix_plan_matches_action(before_planned_action, workspace@, window_bytes,
+                input@, end_of_input, plan, used, planned_status);
+            assert(planned_status.is_none() || planned_status == Some(CompressedHeaderStatus::NeedInput)
+                || planned_status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)));
+        }
+    }
+    proof {
         if phase == CompressedOuterPhase::ContextModes
             && context_mode_plan_valid(before_planned_action, window_bytes, input@, end_of_input, plan) {
             context_mode_plan_matches_action(before_planned_action, workspace@, window_bytes,
                 input@, end_of_input, plan, used, planned_status);
             assert(planned_status.is_none() || planned_status == Some(CompressedHeaderStatus::NeedInput)
                 || planned_status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)));
+        }
+    }
+    proof {
+        if phase == CompressedOuterPhase::ContextModes
+            && context_mode_handoff_plan_valid(before_planned_action, window_bytes, plan) {
+            reveal(context_mode_handoff_plan_valid);
         }
     }
     proof {
@@ -28710,7 +29632,9 @@ fn execute_fixed_compressed_plan(
         }
     }
     let statuses_disagree = match phase {
-        CompressedOuterPhase::BlockCount | CompressedOuterPhase::DistanceParameters => match (planned_status, plan.status) {
+        CompressedOuterPhase::BlockCount | CompressedOuterPhase::DistanceParameters | CompressedOuterPhase::InitialBlockLength => match (planned_status, plan.status) {
+            (Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)),
+                Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState))) => false,
             (None, None)
             | (Some(CompressedHeaderStatus::NeedInput), Some(CompressedHeaderStatus::NeedInput))
             | (Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
@@ -30662,6 +31586,77 @@ fn advance_planned_context_map_tail(
     Ok(0)
 }
 
+// This factors the exact normal-suffix owner postcondition without changing
+// its admitted domain, costs, outcome relation, or failure guarantees.
+#[verifier::opaque]
+spec fn initial_suffix_owner_effect(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    start_budget: crate::brotli::RequestBudget, end_budget: crate::brotli::RequestBudget,
+    input: Seq<u8>, end_of_input: bool, result: Result<usize, CompressedStep>, plan: CompressedActionPlan) -> bool {
+    &&& end_budget.input_remaining <= start_budget.input_remaining
+    &&& end_budget.output_remaining == start_budget.output_remaining
+    &&& end_budget.calls_remaining == start_budget.calls_remaining
+    &&& end_budget.initializations_remaining == start_budget.initializations_remaining
+    &&& {
+        let allowed = m1_input_prefix_len(input.len(), start_budget.input_remaining);
+        let end = end_of_input && allowed == input.len();
+        let planning = initial_suffix_planning_units(before, window_bytes, allowed);
+        let execution = initial_suffix_execution_units(before, window_bytes, allowed, end);
+        if start_budget.work_remaining as nat >= planning + execution {
+            &&& initial_suffix_plan_valid(before, window_bytes, input.take(allowed as int), end, plan)
+            &&& initial_suffix_result_matches(plan, allowed < input.len(), result)
+            &&& initial_suffix_phase_refines(before, after, window_bytes,
+                input.take(allowed as int), end, plan.consumed, plan.status)
+            &&& initial_suffix_action_frame(before, after, window_bytes, plan.status)
+            &&& end_budget.input_remaining == start_budget.input_remaining - plan.consumed as u64
+            &&& end_budget.work_remaining as nat + planning + execution == start_budget.work_remaining as nat
+        } else {
+            &&& result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+            &&& after == before
+            &&& end_budget.input_remaining == start_budget.input_remaining
+            &&& (start_budget.work_remaining as nat >= planning ==>
+                end_budget.work_remaining as nat + planning == start_budget.work_remaining as nat)
+        }
+    }
+}
+
+// Fold the component facts in a separate checked lemma; every requirement
+// below must be established at the owner call. The root binds the witness.
+proof fn establish_initial_suffix_owner_effect(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    start_budget: crate::brotli::RequestBudget, end_budget: crate::brotli::RequestBudget,
+    input: Seq<u8>, end_of_input: bool, result: Result<usize, CompressedStep>, plan: CompressedActionPlan)
+    requires
+        end_budget.input_remaining <= start_budget.input_remaining,
+        end_budget.output_remaining == start_budget.output_remaining,
+        end_budget.calls_remaining == start_budget.calls_remaining,
+        end_budget.initializations_remaining == start_budget.initializations_remaining,
+        {
+            let allowed = m1_input_prefix_len(input.len(), start_budget.input_remaining);
+            let end = end_of_input && allowed == input.len();
+            let planning = initial_suffix_planning_units(before, window_bytes, allowed);
+            let execution = initial_suffix_execution_units(before, window_bytes, allowed, end);
+            if start_budget.work_remaining as nat >= planning + execution {
+                &&& initial_suffix_plan_valid(before, window_bytes, input.take(allowed as int), end, plan)
+                &&& initial_suffix_result_matches(plan, allowed < input.len(), result)
+                &&& initial_suffix_phase_refines(before, after, window_bytes,
+                    input.take(allowed as int), end, plan.consumed, plan.status)
+                &&& initial_suffix_action_frame(before, after, window_bytes, plan.status)
+                &&& end_budget.input_remaining == start_budget.input_remaining - plan.consumed as u64
+                &&& end_budget.work_remaining as nat + planning + execution == start_budget.work_remaining as nat
+            } else {
+                &&& result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+                &&& after == before
+                &&& end_budget.input_remaining == start_budget.input_remaining
+                &&& (start_budget.work_remaining as nat >= planning ==>
+                    end_budget.work_remaining as nat + planning == start_budget.work_remaining as nat)
+            }
+        },
+    ensures initial_suffix_owner_effect(before, after, window_bytes, start_budget, end_budget,
+        input, end_of_input, result, plan),
+{
+    reveal(initial_suffix_owner_effect);
+}
+
+#[verifier::spinoff_prover]
 #[verifier::rlimit(1000)]
 fn advance_planned_compressed_action(
     workspace: &mut [u8],
@@ -30675,6 +31670,41 @@ fn advance_planned_compressed_action(
         b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
         compressed_decoder_state_ok(old(workspace)@, window_bytes),
     ensures
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 3
+            && initial_suffix_read_domain(old(workspace)@, window_bytes) ==>
+            exists|plan: CompressedActionPlan| #[trigger] initial_suffix_owner_effect(
+                old(workspace)@, final(workspace)@, window_bytes,
+                *old(budget), *final(budget), input@, end_of_input, r, plan),
+        fixed_outer_bad_cursor(old(workspace)@, window_bytes) ==> {
+            &&& final(budget).input_remaining == old(budget).input_remaining
+            &&& final(budget).output_remaining == old(budget).output_remaining
+            &&& final(budget).calls_remaining == old(budget).calls_remaining
+            &&& final(budget).initializations_remaining == old(budget).initializations_remaining
+            &&& if old(budget).work_remaining >= 5 {
+                &&& r == Err(CompressedStep { consumed: 0,
+                    status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
+                &&& final(budget).work_remaining == old(budget).work_remaining - 5
+                &&& terminal_error_frame(old(workspace)@, final(workspace)@, window_bytes)
+                &&& serialized_terminal_error(final(workspace)@, window_bytes, CompressedHeaderError::InternalState)
+            } else {
+                &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+                &&& final(workspace)@ == old(workspace)@
+                &&& *final(budget) == *old(budget)
+            }
+        },
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 5
+            && context_mode_handoff_domain(old(workspace)@, window_bytes) ==> {
+                &&& final(budget).input_remaining == old(budget).input_remaining
+                &&& if old(budget).work_remaining >= 18 {
+                    &&& r == Ok(0usize)
+                    &&& final(budget).work_remaining == old(budget).work_remaining - 18
+                    &&& context_mode_handoff_applied(old(workspace)@, final(workspace)@, window_bytes)
+                } else {
+                    &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+                    &&& *final(budget) == *old(budget)
+                    &&& final(workspace)@ == old(workspace)@
+                }
+            },
         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 5
             && context_mode_count_invalid(old(workspace)@, window_bytes) ==> {
                 &&& final(budget).input_remaining == old(budget).input_remaining
@@ -30709,7 +31739,11 @@ fn advance_planned_compressed_action(
             },
         },
 {
-    proof { reveal(context_mode_bad_count_plan_valid); }
+    proof {
+        reveal(context_mode_bad_count_plan_valid); reveal(context_mode_handoff_plan_valid);
+        reveal(fixed_outer_bad_cursor); reveal(fixed_bad_cursor_plan_valid);
+    }
+    proof { reveal(m1_input_prefix_len); }
     let initial_allowed = if budget.input_remaining > usize::MAX as u64 {
         input.len()
     } else {
@@ -30767,10 +31801,11 @@ fn advance_planned_compressed_action(
         ) {
             Ok(value) => value,
             Err(_) => {
-                return Err(CompressedStep {
-                    consumed: 0,
-                    status: CompressedStatus::Failed(core_state_failure()),
-                });
+                let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
+                return execute_fixed_compressed_plan(workspace, window_bytes, budget,
+                    CompressedOuterPhase::BlockCount, &input[..initial_allowed],
+                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan);
             }
         };
         if !budget.charge_work(planning_work) {
@@ -30877,12 +31912,35 @@ fn advance_planned_compressed_action(
                 CompressedOuterPhase::InitialBlockLength,
             ));
         }
+        let ghost suffix_owner_before = workspace@;
+        let ghost suffix_owner_work = budget.work_remaining;
+        proof {
+            assert(suffix_owner_before == old(workspace)@);
+            assert(suffix_owner_work == old(budget).work_remaining);
+        }
         let plan = match plan_initial_suffix_action(workspace, window_bytes, budget,
             &input[..initial_allowed], end_of_input && initial_allowed == input.len()) {
             Ok(value) => value,
-            Err(error) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+            Err(error) => {
+                proof {
+                    if initial_suffix_read_domain(suffix_owner_before, window_bytes) {
+                        establish_initial_suffix_owner_effect(suffix_owner_before, workspace@, window_bytes,
+                            *old(budget), *budget, input@, end_of_input,
+                            Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+                            CompressedActionPlan { planning_work: 0, execution_work: 0, consumed: 0, status: None });
+                    }
+                }
+                return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) });
+            },
         };
-        match execute_fixed_compressed_plan(
+        proof {
+            if initial_suffix_read_domain(workspace@, window_bytes) {
+                initial_suffix_plan_units_agree(workspace@, window_bytes, input@.take(initial_allowed as int),
+                    end_of_input && initial_allowed == input.len(), plan);
+            }
+        }
+        let ghost suffix_execution_credit = budget.work_remaining;
+        let result = execute_fixed_compressed_plan(
             workspace,
             window_bytes,
             budget,
@@ -30891,10 +31949,46 @@ fn advance_planned_compressed_action(
             end_of_input && initial_allowed == input.len(),
             initial_allowed < input.len(),
             plan,
-        ) {
-            Ok(used) => already_consumed = used,
-            Err(step) => return Err(step),
+        );
+        proof {
+            if initial_suffix_read_domain(suffix_owner_before, window_bytes) {
+                let allowed = m1_input_prefix_len(input@.len(), old(budget).input_remaining);
+                let end = end_of_input && allowed == input@.len();
+                let planning = initial_suffix_planning_units(suffix_owner_before, window_bytes, allowed);
+                let execution = initial_suffix_execution_units(suffix_owner_before, window_bytes, allowed, end);
+                assert(initial_allowed as nat == allowed);
+                assert(plan.planning_work as nat == planning);
+                assert(plan.execution_work as nat == execution);
+                assert(budget.output_remaining == old(budget).output_remaining);
+                assert(budget.calls_remaining == old(budget).calls_remaining);
+                assert(budget.initializations_remaining == old(budget).initializations_remaining);
+                assert(suffix_execution_credit as nat + planning == suffix_owner_work as nat);
+                if suffix_owner_work as nat >= planning + execution {
+                    assert(suffix_execution_credit >= plan.execution_work);
+                    assert(initial_suffix_result_matches(plan, allowed < input@.len(), result));
+                    assert(initial_suffix_plan_valid(suffix_owner_before, window_bytes, input@.take(allowed as int), end, plan));
+                    assert(initial_suffix_phase_refines(suffix_owner_before, workspace@, window_bytes,
+                        input@.take(allowed as int), end, plan.consumed, plan.status));
+                    assert(initial_suffix_action_frame(suffix_owner_before, workspace@, window_bytes, plan.status));
+                    assert(budget.input_remaining == old(budget).input_remaining - plan.consumed as u64);
+                    assert(budget.work_remaining as nat + planning + execution == suffix_owner_work as nat);
+                } else {
+                    assert(suffix_execution_credit < plan.execution_work);
+                    assert(result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }));
+                    assert(workspace@ == suffix_owner_before);
+                    assert(budget.input_remaining == old(budget).input_remaining);
+                    assert(budget.work_remaining as nat + planning == suffix_owner_work as nat);
+                }
+                assert(budget.input_remaining <= old(budget).input_remaining);
+            }
         }
+        proof {
+            if initial_suffix_read_domain(suffix_owner_before, window_bytes) {
+                establish_initial_suffix_owner_effect(suffix_owner_before, workspace@, window_bytes,
+                    *old(budget), *budget, input@, end_of_input, result, plan);
+            }
+        }
+        return result;
     } else if initial_outer == 4 {
         proof {
             reveal(compressed_outer_phase_tag_spec);
@@ -30913,10 +32007,11 @@ fn advance_planned_compressed_action(
         ) {
             Ok(value) => value,
             Err(_) => {
-                return Err(CompressedStep {
-                    consumed: 0,
-                    status: CompressedStatus::Failed(core_state_failure()),
-                });
+                let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
+                return execute_fixed_compressed_plan(workspace, window_bytes, budget,
+                    CompressedOuterPhase::DistanceParameters, &input[..initial_allowed],
+                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan);
             }
         };
         if !budget.charge_work(planning_work) {
@@ -30977,10 +32072,11 @@ fn advance_planned_compressed_action(
         ) {
             Ok(value) => value,
             Err(_) => {
-                return Err(CompressedStep {
-                    consumed: 0,
-                    status: CompressedStatus::Failed(core_state_failure()),
-                });
+                let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
+                return execute_fixed_compressed_plan(workspace, window_bytes, budget,
+                    CompressedOuterPhase::ContextModes, &input[..initial_allowed],
+                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan);
             }
         };
         if !budget.charge_work(planning_work) {
@@ -36567,6 +37663,369 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn m1_suffix_matches_w1_all_symbols_kinds_input_and_work_boundaries() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        let bytes = [0xffu8; 3];
+        let limits = |input, work| RequestLimits { max_input: input, max_output: 7, max_work: work,
+            max_calls: 9, max_initializations: 3, max_window_bits: 16 };
+        for kind in 0u8..3 {
+            for symbol in 0u8..26 {
+                let width = crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS[symbol as usize];
+                for cached in [None, Some(7usize), Some(1usize)] {
+                    let (mut original, window) = fresh_b3b_workspace();
+                    put_state_byte(&mut original, window, B3B_OUTER_PHASE, 3).unwrap();
+                    put_state_byte(&mut original, window, B3B_CURRENT_KIND, kind).unwrap();
+                    put_state_byte(&mut original, window, B3B_BLOCK_LENGTH_PHASE, 1).unwrap();
+                    put_state_byte(&mut original, window, B3B_BLOCK_LENGTH_SYMBOL, symbol).unwrap();
+                    put_state_byte(&mut original, window, B3B_BLOCK_LENGTH_SUFFIX_WIDTH, width).unwrap();
+                    let mut queue = BitQueue::new();
+                    if let Some(bits) = cached { queue.read_bits(bits, &[0xff], false); }
+                    store_b3b_queue(&mut original, window, &queue).unwrap();
+                    for quota in 0usize..=3 {
+                        for end in [false, true] {
+                            let effective_end = end && quota == bytes.len();
+                            let mut observed_queue = queue;
+                            let read = observed_queue.read_bits(width as usize, &bytes[..quota], effective_end);
+                            let read_work = read.consumed as u64 + if matches!(read.status, BitReadStatus::Value(_)) { width as u64 } else { 0 };
+                            let planning = read_work + 1 + if matches!(read.status, BitReadStatus::Value(_)) { 2 } else { 0 };
+                            let execution = read_work + 12 + match read.status { BitReadStatus::Value(_) => 9, BitReadStatus::Truncated => 5, _ => 0 };
+                            let total = planning + execution;
+                            let mut planning_budget = RequestBudget::new(limits(quota as u64, u64::MAX)).unwrap();
+                            let plan = plan_initial_suffix_action(&original, window, &mut planning_budget, &bytes[..quota], effective_end).unwrap();
+                            assert_eq!((plan.planning_work, plan.execution_work), (planning, execution));
+                            assert_eq!(u64::MAX - planning_budget.work_remaining, planning);
+                            let mut reference = original.clone();
+                            let expected = {
+                                let mut decoder = CompressedMetaBlockDecoder { workspace: &mut reference, window_bytes: window };
+                                decoder.advance_outer_phase_once(CompressedOuterPhase::InitialBlockLength, &bytes[..quota], effective_end)
+                            };
+                            assert_eq!((plan.consumed, plan.status), expected);
+                            for credit in [0, planning.saturating_sub(1), planning, total - 1, total] {
+                                let mut actual = original.clone();
+                                let mut budget = RequestBudget::new(limits(quota as u64, credit)).unwrap();
+                                let result = advance_planned_compressed_action(&mut actual, window, &mut budget, &bytes, end);
+                                assert_eq!(budget.output_remaining, 7);
+                                assert_eq!(budget.calls_remaining, 9);
+                                assert_eq!(budget.initializations_remaining, 3);
+                                if credit < total {
+                                    assert_eq!(result, Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }));
+                                    assert_eq!(actual.iter().zip(&original).position(|(a, b)| a != b), None);
+                                    assert_eq!(budget.input_remaining, quota as u64);
+                                    if credit >= planning { assert_eq!(budget.work_remaining, credit - planning); }
+                                } else {
+                                    let status = match expected.1 {
+                                        None => None,
+                                        Some(CompressedHeaderStatus::NeedInput) => Some(if quota < bytes.len() { CompressedStatus::Failed(CoreFailure::ResourceLimit) } else { CompressedStatus::NeedInput }),
+                                        Some(CompressedHeaderStatus::Failed(error)) => Some(CompressedStatus::Failed(map_compressed_error(error))),
+                                        _ => panic!("suffix cannot complete the whole header"),
+                                    };
+                                    let wanted = match status { None => Ok(expected.0), Some(status) => Err(CompressedStep { consumed: expected.0, status }) };
+                                    assert_eq!(result, wanted);
+                                    assert_eq!(actual.iter().zip(&reference).position(|(a, b)| a != b), None);
+                                    assert_eq!(budget.work_remaining, credit - total);
+                                    assert_eq!(budget.input_remaining, quota as u64 - expected.0 as u64);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_repeat_class_switch_survives_serialized_roundtrip() {
+        let mut lengths = [0u8; 18];
+        for symbol in [7usize, 8, 16, 17] { lengths[symbol] = 2; }
+        let code = ComplexCodeLengthAlphabet { skip: 0, lengths };
+        let mut logical = CodeDescriptionDecoder { queue: BitQueue::new(), alphabet_max: 256,
+            alphabet_limit: 256, phase: CodeDescriptionPhase::CompleteComplexAlphabet(code) };
+        logical.advance_field(&[], false);
+        // Four equal-length auxiliary codes: 8, repeat previous length, suffix
+        // zero (three repeats), then repeat zero. These eight bits are 0xc6.
+        let wire = [0xc6u8];
+        let mut used = 0usize;
+        for _ in 0..32 {
+            if matches!(logical.phase, CodeDescriptionPhase::ComplexRepeat { length: 0, .. }) { break; }
+            let step = logical.advance_field(&wire[used..], false);
+            used += step.consumed;
+            assert_ne!(step.status, CodeDescriptionStatus::NeedInput);
+            assert!(!matches!(step.status, CodeDescriptionStatus::Failed(_)));
+        }
+        assert_eq!(used, 1);
+        let expected_progress = match logical.phase {
+            CodeDescriptionPhase::ComplexRepeat { progress, length: 0, extra_bits: 3 } => progress,
+            other => panic!("repeat-zero transition not reached: {other:?}"),
+        };
+        assert_eq!((expected_progress.symbol, expected_progress.repeat, expected_progress.repeat_code_len), (4, 3, 8));
+        let (mut workspace, window) = fresh_b3b_workspace();
+        start_serialized_tree(&mut workspace, window, crate::brotli_prefix::TreeRegion::Literal, 0, 256, 256).unwrap();
+        put_state_u16(&mut workspace, window, B3B_BUILDER_INITIALIZED, 4).unwrap();
+        store_b3b_queue(&mut workspace, window, &logical.queue).unwrap();
+        store_code_description_decoder(&mut workspace, window, logical).unwrap();
+        let queue = load_b3b_queue(&workspace, window).unwrap();
+        let mut restored = load_code_description_decoder(&workspace, window, queue).unwrap();
+        let restored_previous = match restored.phase {
+            CodeDescriptionPhase::ComplexRepeat { progress, length: 0, extra_bits: 3 } => progress.repeat_code_len,
+            other => panic!("serialized repeat-zero transition changed: {other:?}"),
+        };
+        logical.advance_field(&[0], false);
+        restored.advance_field(&[0], false);
+        let span = |phase| match phase {
+            CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, .. } => (start, span_count, length),
+            other => panic!("repeat suffix did not yield a span: {other:?}"),
+        };
+        let expected_span = span(logical.phase);
+        let actual_span = span(restored.phase);
+        eprintln!("REPEAT_CLASS_SWITCH consumed={used} previous_before={} previous_after={restored_previous} expected_span={expected_span:?} actual_span={actual_span:?}", expected_progress.repeat_code_len);
+        assert_eq!(actual_span, expected_span, "serialized code description lost previous-repeat history");
+    }
+
+    #[test]
+    fn m1_repeat_codec_preserves_every_history_class_and_resumption() {
+        let mut lengths = [0u8; 18];
+        for symbol in [7usize, 8, 16, 17] { lengths[symbol] = 2; }
+        let code = ComplexCodeLengthAlphabet { skip: 0, lengths };
+        let (mut workspace, window) = fresh_b3b_workspace();
+        start_serialized_tree(&mut workspace, window, crate::brotli_prefix::TreeRegion::Literal, 0, 256, 256).unwrap();
+        put_state_u16(&mut workspace, window, B3B_BUILDER_INITIALIZED, 32).unwrap();
+        let mut configurations = 0;
+        for previous in 0u8..16 {
+            for current in 0u8..16 {
+                for repeat in [0u32, 3, 15, 32] {
+                    for cached in [false, true] {
+                        let mut queue = BitQueue::new();
+                        if cached { queue.read_bits(7, &[0xa5], false); }
+                        let progress = ComplexSymbolProgress { code, symbol: 32, prev_code_len: 8,
+                            repeat, repeat_code_len: previous, space: 32_768,
+                            prefix_width: 0, prefix_bits: 0, singleton: 18 };
+                        let original = CodeDescriptionDecoder { queue, alphabet_max: 256, alphabet_limit: 256,
+                            phase: CodeDescriptionPhase::ComplexRepeat { progress, length: current,
+                                extra_bits: if current == 0 { 3 } else { 2 } } };
+                        store_code_description_decoder(&mut workspace, window, original).unwrap();
+                        assert_eq!(state_byte(&workspace, window, B3B_REPEATED_LENGTH), Ok(previous));
+                        assert_eq!(state_byte(&workspace, window, B3B_PENDING_SPAN_LENGTH), Ok(current));
+                        let restored = load_code_description_decoder(&workspace, window, queue).unwrap();
+                        assert_eq!(restored, original);
+                        let mut pending = original;
+                        assert_eq!(pending.advance_field(&[], false).status, CodeDescriptionStatus::NeedInput);
+                        store_code_description_decoder(&mut workspace, window, pending).unwrap();
+                        let resumed = load_code_description_decoder(&workspace, window, pending.queue).unwrap();
+                        assert_eq!(resumed, pending);
+                        for suffix in [0u8, 0xff] {
+                            let mut expected = pending;
+                            let mut actual = resumed;
+                            assert_eq!(actual.advance_field(&[suffix], false), expected.advance_field(&[suffix], false));
+                            assert_eq!(actual, expected);
+                            // Tag seven keeps its original pending-span meaning;
+                            // terminal tags keep the same error encoding.
+                            store_code_description_decoder(&mut workspace, window, actual).unwrap();
+                            assert_eq!(load_code_description_decoder(&workspace, window, actual.queue).unwrap(), actual);
+                        }
+                        let mut expected = pending;
+                        let mut actual = resumed;
+                        assert_eq!(actual.advance_field(&[], true), expected.advance_field(&[], true));
+                        assert_eq!(actual, expected);
+                        configurations += 1;
+                    }
+                }
+            }
+        }
+        assert_eq!(configurations, 2048);
+        for invalid in [16u8, 255] {
+            // Restore a tag-six image before corrupting only its current length.
+            let queue = BitQueue::new();
+            let progress = ComplexSymbolProgress { code, symbol: 32, prev_code_len: 8,
+                repeat: 3, repeat_code_len: 8, space: 32_768,
+                prefix_width: 0, prefix_bits: 0, singleton: 18 };
+            let decoder = CodeDescriptionDecoder { queue, alphabet_max: 256, alphabet_limit: 256,
+                phase: CodeDescriptionPhase::ComplexRepeat { progress, length: 0, extra_bits: 3 } };
+            store_code_description_decoder(&mut workspace, window, decoder).unwrap();
+            put_state_byte(&mut workspace, window, B3B_PENDING_SPAN_LENGTH, invalid).unwrap();
+            assert_eq!(load_code_description_decoder(&workspace, window, queue), Err(CompressedHeaderError::InternalState));
+        }
+    }
+
+    #[test]
+    fn m1_completed_context_modes_match_w1_and_reserve_18_units() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        for count in [1u16, 2, 256] {
+            for invalid_queue in [false, true] {
+                let (mut original, window) = fresh_b3b_workspace();
+                put_state_byte(&mut original, window, B3B_OUTER_PHASE, 5).unwrap();
+                put_state_u16(&mut original, window, B3B_BLOCK_COUNTS, count).unwrap();
+                put_state_u16(&mut original, window, B3B_MODES_INITIALIZED, count).unwrap();
+                if invalid_queue {
+                    put_state_byte(&mut original, window, B3B_QUEUE_LEN, 255).unwrap();
+                }
+                for end in [false, true] {
+                    let plan = plan_context_mode_action(&original, window, &[0xff], end).unwrap();
+                    assert_eq!(context_mode_planning_work(&original, window, 1), Ok(0));
+                    assert_eq!(plan.planning_work, 0);
+                    assert_eq!(plan.execution_work, 18);
+                    assert_eq!(plan.consumed, 0);
+                    assert_eq!(plan.status, None);
+                    let mut reference = original.clone();
+                    let expected = {
+                        let mut decoder = CompressedMetaBlockDecoder {
+                            workspace: &mut reference,
+                            window_bytes: window,
+                        };
+                        decoder.advance_outer_phase_once(
+                            CompressedOuterPhase::ContextModes,
+                            &[0xff],
+                            end,
+                        )
+                    };
+                    assert_eq!(expected, (0, None));
+                    assert_eq!(state_byte(&reference, window, B3B_OUTER_PHASE), Ok(6));
+                    assert_eq!(state_u16(&reference, window, B3B_MAP_SIZE), Ok(count * 64));
+                    assert_eq!(state_byte(&reference, window, B3B_VAR_PHASE), Ok(0));
+                    assert_eq!(state_byte(&reference, window, B3B_VAR_WIDTH), Ok(0));
+                    for max_input in [0u64, 1] {
+                        for credit in [0u64, 17, 18] {
+                            let mut actual = original.clone();
+                            let mut budget = RequestBudget::new(RequestLimits {
+                                max_input,
+                                max_output: 7,
+                                max_work: credit,
+                                max_calls: 9,
+                                max_initializations: 3,
+                                max_window_bits: 16,
+                            })
+                            .unwrap();
+                            let result = advance_planned_compressed_action(
+                                &mut actual,
+                                window,
+                                &mut budget,
+                                &[0xff],
+                                end,
+                            );
+                            let wanted = if credit < 18 {
+                                Err(CompressedStep {
+                                    consumed: 0,
+                                    status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
+                                })
+                            } else {
+                                Ok(0)
+                            };
+                            assert_eq!(result, wanted);
+                            let image = if credit < 18 { &original } else { &reference };
+                            assert_eq!(
+                                actual
+                                    .iter()
+                                    .zip(image)
+                                    .position(|(left, right)| left != right),
+                                None
+                            );
+                            assert_eq!(budget.work_remaining, if credit < 18 { credit } else { 0 });
+                            assert_eq!(budget.input_remaining, max_input);
+                            assert_eq!(budget.output_remaining, 7);
+                            assert_eq!(budget.calls_remaining, 9);
+                            assert_eq!(budget.initializations_remaining, 3);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn m1_bad_fixed_phase_cursor_prepays_w1_terminal_image() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        let mut mismatches = 0usize;
+        for (phase, outer) in [
+            (CompressedOuterPhase::BlockCount, 0u8),
+            (CompressedOuterPhase::DistanceParameters, 4),
+            (CompressedOuterPhase::ContextModes, 5),
+        ] {
+            for defect in 0u8..5 {
+                if defect >= 3 && outer != 0 {
+                    continue;
+                }
+                let (mut original, window) = fresh_b3b_workspace();
+                put_state_byte(&mut original, window, B3B_OUTER_PHASE, outer).unwrap();
+                put_state_byte(&mut original, window, B3B_CURRENT_KIND, 0).unwrap();
+                put_state_u16(&mut original, window, B3B_BLOCK_COUNTS, 1).unwrap();
+                put_state_u16(&mut original, window, B3B_MODES_INITIALIZED, 0).unwrap();
+                match defect {
+                    0 => put_state_byte(&mut original, window, B3B_QUEUE_LEN, 9).unwrap(),
+                    1 => put_state_byte(&mut original, window, B3B_QUEUE_OFFSET_BYTE, 1).unwrap(),
+                    2 => put_state_byte(&mut original, window, B3B_QUEUE_OFFSET, 1).unwrap(),
+                    3 => put_state_byte(&mut original, window, B3B_VAR_PHASE, 3).unwrap(),
+                    _ => put_state_byte(&mut original, window, B3B_VAR_WIDTH, 8).unwrap(),
+                }
+                for end in [false, true] {
+                    let mut reference = original.clone();
+                    let expected = {
+                        let mut decoder = CompressedMetaBlockDecoder {
+                            workspace: &mut reference,
+                            window_bytes: window,
+                        };
+                        decoder.advance_outer_phase_once(phase, &[0xff], end)
+                    };
+                    assert_eq!(
+                        expected,
+                        (
+                            0,
+                            Some(CompressedHeaderStatus::Failed(
+                                CompressedHeaderError::InternalState
+                            ))
+                        )
+                    );
+                    for credit in [0u64, 4, 5] {
+                        let mut actual = original.clone();
+                        let mut budget = RequestBudget::new(RequestLimits {
+                            max_input: 1,
+                            max_output: 7,
+                            max_work: credit,
+                            max_calls: 9,
+                            max_initializations: 3,
+                            max_window_bits: 16,
+                        })
+                        .unwrap();
+                        let result = advance_planned_compressed_action(
+                            &mut actual,
+                            window,
+                            &mut budget,
+                            &[0xff],
+                            end,
+                        );
+                        let wanted = Err(CompressedStep {
+                            consumed: 0,
+                            status: CompressedStatus::Failed(if credit < 5 {
+                                CoreFailure::ResourceLimit
+                            } else {
+                                core_state_failure()
+                            }),
+                        });
+                        let image = if credit < 5 { &original } else { &reference };
+                        let different = actual
+                            .iter()
+                            .zip(image.iter())
+                            .position(|(left, right)| left != right);
+                        let work = if credit < 5 { credit } else { 0 };
+                        if result != wanted || different.is_some() || budget.work_remaining != work
+                        {
+                            eprintln!("BAD_CURSOR outer={outer} defect={defect} end={end} credit={credit} expected={wanted:?} actual={result:?} expected_outer={:?} actual_outer={:?} first_difference={different:?} work_left={} expected_work_left={work}",
+                                state_byte(image, window, B3B_OUTER_PHASE), state_byte(&actual, window, B3B_OUTER_PHASE), budget.work_remaining);
+                            mismatches += 1;
+                        }
+                        assert_eq!(budget.input_remaining, 1);
+                        assert_eq!(budget.output_remaining, 7);
+                        assert_eq!(budget.calls_remaining, 9);
+                        assert_eq!(budget.initializations_remaining, 3);
+                    }
+                }
+            }
+        }
+        assert_eq!(
+            mismatches, 0,
+            "M1 must reserve and execute W1's existing cursor failure"
+        );
     }
 
     #[test]

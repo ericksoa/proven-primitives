@@ -1,0 +1,82 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51669,13): 'if' cannot be used in patterns.
+WARNING: (59024,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26160:9
+      |
+26160 |         assert(exact_work == iterations as u64 * (meta.symbols as u64 + 1)) by (nonlinear_arith)
+      |         ^^^^^^
+
+WARNING: (51669,13): 'if' cannot be used in patterns.
+WARNING: (59024,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26210:9
+      |
+26210 |         assert(exact_work < 10_575) by (nonlinear_arith)
+      |         ^^^^^^
+
+WARNING: (51669,13): 'if' cannot be used in patterns.
+WARNING: (59024,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26479:13
+      |
+26479 |             assert(next_bits as nat == installed_prefix_value(
+      |             ^^^^^^
+
+WARNING: (51669,13): 'if' cannot be used in patterns.
+WARNING: (59024,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26592:13
+      |
+26592 |             assert(exact_work < 10_575) by (nonlinear_arith)
+      |             ^^^^^^
+
+WARNING: (51669,13): 'if' cannot be used in patterns.
+WARNING: (59024,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26531:9
+      |
+26531 |         while symbol < meta.symbols
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+WARNING: (51669,13): 'if' cannot be used in patterns.
+WARNING: (59024,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:27040:13
+      |
+27040 |             assert(exact_work
+      |             ^^^^^^
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:26163:5
+      |
+26163 |     while iterations < 15
+      |     ^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 8 seconds
+     --> src/brotli_input.rs:26163:5
+      |
+26163 |     while iterations < 15
+      |     ^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:26163:5
+      |
+26163 |     while iterations < 15
+      |     ^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:25974:1
+      |
+25974 | / fn replay_installed_symbol_plan(
+25975 | |     workspace: &[u8],
+25976 | |     window_bytes: u32,
+25977 | |     region: crate::brotli_prefix::TreeRegion,
+...     |
+25984 | |     end_of_input: bool,
+25985 | | ) -> (r: Result<InstalledSymbolStep, CoreFailure>)
+      | |_________________________________________________^
+
+verification results:: 8 verified, 0 errors (partial verification with `--verify-*`)

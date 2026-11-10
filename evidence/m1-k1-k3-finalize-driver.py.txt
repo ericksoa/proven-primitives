@@ -1,0 +1,48 @@
+from pathlib import Path
+import datetime,hashlib,json,os,re,subprocess
+root=Path.cwd()
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p):return {'path':str(p),'sha256':sha(p)}
+freeze=json.loads(Path('evidence/m1-k1-k3-attempt03-source-freeze.json').read_text());prior=json.loads(Path('evidence/m1-k1-k3-attempt02-source-freeze.json').read_text())
+proof_path='evidence/brotli-b3c-m1-k1-k3-attempt03-verification.json';proof=json.loads(Path(proof_path).read_text())
+assert freeze['exit_code']==0 and freeze['source_unchanged'] and proof['verification-results']['success'] and proof['verification-results']['errors']==0 and proof['verification-results']['is-verifying-entire-crate']
+assert freeze['source_sha256']==prior['source_sha256']
+assert all(sha(p)==h for p,h in dict(freeze['source_sha256'],**freeze['validation_source_sha256']).items())
+repair=json.loads(Path('evidence/m1-k1-k3-repair-controls-results.json').read_text())
+old=json.loads(Path('evidence/m1-k1-k3-regression-controls-results.json').read_text())
+legacy=[r for r in old if r['suite'] in ['the_prover_rejects_six_b3a_builder_storage_defects','the_prover_rejects_four_b3c_initial_suffix_metering_undercharges']]
+assert len(repair)==3 and len(legacy)==2
+before=Path('evidence/m1-k1-k3-before-repair-proof-rejection.rs.txt').read_text()
+after=Path('tests/proof_rejection.rs').read_text()
+assert hashlib.sha256(before.encode()).hexdigest()==prior['validation_source_sha256']['tests/proof_rejection.rs']
+def selected(text,name):
+ a=text.index('fn '+name+'(');return text[a:a+text[a:].index('\n}\n')+3]
+for name in [r['suite'] for r in legacy]+['check_brotli_prefix_function','check_brotli_input_function','transcript']:
+ assert selected(before,name)==selected(after,name), name
+
+mutants=[];suites=[]
+for rows,positive in [(repair,freeze),(legacy,prior)]:
+ for row in rows:
+  assert row['exit_code']==0 and row['source_unchanged'] and len(row['mutants'])==row['expected_mutants']
+  assert datetime.datetime.fromisoformat(row['started_utc'])>datetime.datetime.fromisoformat(positive['finished_utc'])
+  assert sha(row['log'])==row['sha256']
+  for m in row['mutants']:
+   text=Path(m['log']).read_text();lower=text.lower();assert sha(m['log'])==m['sha256']
+   assert re.search(r'verification results:: .*\b[1-9][0-9]* errors',text)
+   assert any(x in lower for x in ['postcondition not satisfied','precondition not satisfied','invariant not satisfied','assertion failed'])
+   assert not any(x in lower for x in ['resource limit','rlimit) exceeded','expected rlimit-count','panicked','internal compiler error','unexpected smt output'])
+   mutants.append(dict(m,preceding_positive='attempt03' if positive is freeze else 'attempt02'))
+  suites.append({k:v for k,v in row.items() if k!='mutants'})
+assert len(mutants)==len({m['name'] for m in mutants})==33
+control_path='evidence/brotli-b3c-m1-k1-k3-controls.json';Path(control_path).write_text(json.dumps({'suites':suites,'mutants':mutants,'resource_or_tool_failures_counted':0,'retained_failed_saved_table_suite':'evidence/m1-k1-k3-regression-controls-the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects.log','retained_transcripts_before_repair':'evidence/m1-k1-k3-before-repair-controls.tar.gz'},indent=2)+'\n')
+runtime='evidence/m1-k1-k3-attempt02-all-runtime-tests.log';text=Path(runtime).read_text();assert 'FAILED. 91 passed; 1 failed;' in text and 'REPEAT_CLASS_SWITCH consumed=1 previous_before=8 previous_after=0 expected_span=(4, 3, 0) actual_span=(4, 8, 0)' in text
+assert 'test result: ok. 9 passed;' in text and text.count('test result: ok. 1 passed;')==2
+baseline=json.loads(Path('evidence/brotli-b3c-m1-k2.json').read_text())
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools')
+head=subprocess.check_output(['git','rev-parse','HEAD'],env=env,text=True).strip();assert head=='d48e8feb44cd2fc47363809832de295d18270776'
+verus_dir=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+version=subprocess.check_output([str(verus_dir/'verus'),'--version'],env=env,text=True)
+assert '0.2026.10.18.7d82994' in version and '1.99.1' in version
+docs=['AGENTS.md','BROTLI_B3C_METERING_ADDENDUM.md','BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md','BROTLI_M1_BLOCK_LENGTH_PROOF_BOUNDARY_DECISION.md','BROTLI_M1_K1_REVIEW.md','BROTLI_M1_REPEAT_STATE_DECISION.md']
+receipt={'component':'Brotli M1 approved K1/K3 proof checkpoint; M1 incomplete','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':head,'claim':'Approved canonical installer success/error classification and exact planner equivalence, plus normal initial block-length suffix planning/W1 effects/frames and combined budget-owner guarantee, checked under original admitted inputs. Full M1, runtime regression repair and all supported-decoder release obligations remain open.','source_sha256':freeze['source_sha256'],'validation_source_sha256':freeze['validation_source_sha256'],'approval_and_document_sha256':{p:sha(p) for p in docs},'verifier':version,'verifier_binary':{n:sha(verus_dir/n) for n in ['verus','rust_verify','z3']},'verification_options':freeze['command'],'verification_elapsed_seconds':freeze['elapsed_seconds'],'verification_results':proof['verification-results'],'verification_evidence':ref(proof_path),'verification_log':ref('evidence/m1-k1-k3-attempt03-whole-crate.log'),'source_freeze':ref('evidence/m1-k1-k3-attempt03-source-freeze.json'),'negative_controls':{'evidence':ref(control_path),'suites_passed':5,'rejected_mutations':33,'order':'23 repaired/new mutations followed whole attempt03. The six builder and four suffix formula controls retain their actual preceding whole attempt02 positive on identical library bytes and identical selected test bodies. No failed harness run, resource failure or superseded proof check is counted.','library_identical_across_positives':True},'runtime_tests':{'evidence':ref(runtime),'passed':102,'failed':1,'all_passed':False,'library_passed':91,'library_failed':1,'primitives':9,'trust_scan':1,'upstream_comparison':1,'failure':'m1_repeat_class_switch_survives_serialized_roundtrip','scope':'Full runtime suite on identical final library. Final changes after this run affect only defect-test anchor/classification guards, whose compilation and executions are separately checked.'},'release_gate':'incomplete','not_established':['Correct serialized repeat history and complete tree replay; K4 approval required before codec changes','Exact source-operation ledger, including loader phase-validation scans in evidence/m1-loader-ledger-audit.json','Remaining malformed header/body outcome and frame relations, complete M1 controls and B3c closure','B3d/B4 and independent human specification review; no supported decoder or mathematical safety completion claim'],'trusted_components':baseline['trusted_components'],'execution_environment':baseline['execution_environment'],'held_decision':{'candidate':'K4','status':'awaiting explicit human approval; not implemented','proposal':ref('BROTLI_M1_REPEAT_STATE_DECISION.md')},'approved_decision':['K1 approved as written by direct human reply on 2026-11-09','K3 approved as written by the same direct human reply'],'earlier_failed_checks':{'whole_attempt01':ref('evidence/brotli-b3c-m1-k1-k3-verification.json'),'whole_attempt01_source':ref('evidence/m1-k1-k3-source-freeze.json'),'saved_table_harness_marker_failure':ref('evidence/m1-k1-k3-regression-controls-the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects.log'),'harness_before_repair':ref('evidence/m1-k1-k3-before-repair-proof-rejection.rs.txt'),'prior_transcripts_archive':ref('evidence/m1-k1-k3-before-repair-controls.tar.gz')},'previous_checkpoint':ref('evidence/brotli-b3c-m1-k2.json'),'evidence_completion':'Named K1/K3 checkpoint only. M1 is not complete, the runtime suite is not all green, and this work has not been committed or pushed.'}
+Path('evidence/brotli-b3c-m1-k1-k3.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps({'verified':proof['verification-results']['verified'],'errors':0,'negative_controls':33,'runtime_passed':102,'runtime_failed':1,'receipt':'evidence/brotli-b3c-m1-k1-k3.json'}))

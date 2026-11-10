@@ -1,0 +1,582 @@
+warning: unused variable: `window_bytes`
+   --> src/brotli.rs:958:13
+    |
+958 |         let window_bytes = self.window_bytes();
+    |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_window_bytes`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:1478:13
+     |
+1478 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `output`
+    --> src/brotli.rs:1438:9
+     |
+1438 |         output: &mut [u8],
+     |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:1709:13
+     |
+1709 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: unused variable: `output`
+    --> src/brotli.rs:1669:9
+     |
+1669 |         output: &mut [u8],
+     |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:2167:13
+     |
+2167 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:2168:13
+     |
+2168 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:2257:13
+     |
+2257 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: unused variable: `output`
+    --> src/brotli.rs:2217:9
+     |
+2217 |         output: &mut [u8],
+     |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:2999:13
+     |
+2999 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3232:13
+     |
+3232 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3233:13
+     |
+3233 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3292:13
+     |
+3292 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3293:13
+     |
+3293 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3350:13
+     |
+3350 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3351:13
+     |
+3351 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: unused variable: `old_position`
+    --> src/brotli_data.rs:1826:17
+     |
+1826 |             let old_position = position;
+     |                 ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_old_position`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:3976:13
+     |
+3976 |         let equal = simple_symbol_pair_metered(symbols, 0, 1, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:3980:13
+     |
+3980 |         let equal = simple_symbol_pair_metered(symbols, 0, 2, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:3982:13
+     |
+3982 |         let equal = simple_symbol_pair_metered(symbols, 1, 2, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:3986:13
+     |
+3986 |         let equal = simple_symbol_pair_metered(symbols, 0, 3, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:3988:13
+     |
+3988 |         let equal = simple_symbol_pair_metered(symbols, 1, 3, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:3990:13
+     |
+3990 |         let equal = simple_symbol_pair_metered(symbols, 2, 3, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `selected`
+    --> src/brotli_input.rs:4090:18
+     |
+4090 |             let (selected, reads) = decode_auxiliary_symbol_metered(&progress.code, bits, width, budget)?;
+     |                  ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_selected`
+
+warning: unused variable: `source_value`
+    --> src/brotli_input.rs:5336:9
+     |
+5336 |     let source_value = value;
+     |         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_source_value`
+
+warning: unused variable: `start_step`
+     --> src/brotli_input.rs:14593:17
+      |
+14593 |             let start_step = decoder.advance_field(&[], false);
+      |                 ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_step`
+
+warning: unused variable: `kind_tag`
+     --> src/brotli_input.rs:16755:5
+      |
+16755 |     kind_tag: u8,
+      |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_kind_tag`
+
+warning: unused variable: `kind_tag`
+     --> src/brotli_input.rs:17199:5
+      |
+17199 |     kind_tag: u8,
+      |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_kind_tag`
+
+warning: unused variable: `old_initialized`
+     --> src/brotli_input.rs:17647:37
+      |
+17647 | ...                   let old_initialized = initialized;
+      |                           ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_old_initialized`
+
+warning: unused variable: `kind_tag`
+     --> src/brotli_input.rs:17888:5
+      |
+17888 |     kind_tag: u8,
+      |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_kind_tag`
+
+warning: unused variable: `old_initialized`
+     --> src/brotli_input.rs:18174:37
+      |
+18174 | ...                   let old_initialized = initialized;
+      |                           ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_old_initialized`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:20980:9
+      |
+20980 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:21429:9
+      |
+21429 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:21614:9
+      |
+21614 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:21735:9
+      |
+21735 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:22131:9
+      |
+22131 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase_at`
+     --> src/brotli_input.rs:24903:9
+      |
+24903 |     let phase_at = window_bytes as usize + B3C_STATE_OFFSET as usize
+      |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_phase_at`
+
+warning: unused variable: `old_index`
+     --> src/brotli_input.rs:24954:13
+      |
+24954 |         let old_index = index;
+      |             ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_old_index`
+
+warning: unused variable: `stored`
+     --> src/brotli_input.rs:27366:9
+      |
+27366 |     let stored = store_terminal_error(workspace, window_bytes, error);
+      |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_stored`
+
+warning: variable does not need to be mutable
+     --> src/brotli_input.rs:27961:9
+      |
+27961 |     let mut queue = match load_b3b_queue(workspace, window_bytes) {
+      |         ----^^^^^
+      |         |
+      |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+     --> src/brotli_input.rs:27966:9
+      |
+27966 |     let mut prefix = match load_installed_prefix_state(workspace, window_bytes) {
+      |         ----^^^^^^
+      |         |
+      |         help: remove this `mut`
+
+warning: unused variable: `alphabet_max`
+     --> src/brotli_input.rs:28119:5
+      |
+28119 |     alphabet_max: u16,
+      |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_alphabet_max`
+
+warning: unused variable: `start_step`
+     --> src/brotli_input.rs:28830:18
+      |
+28830 |             let (start_step, start_planning, start_reads) = plan_code_description_field(
+      |                  ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_step`
+
+warning: unused variable: `planning_work`
+     --> src/brotli_input.rs:31055:55
+      |
+31055 |     input_was_limited: bool, plan: ContextSymbolPlan, planning_work: u64,
+      |                                                       ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_planning_work`
+
+warning: unused variable: `stored`
+     --> src/brotli_input.rs:31113:17
+      |
+31113 |             let stored = store_terminal_error(workspace, window_bytes, error);
+      |                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_stored`
+
+warning: unused variable: `context_kind`
+     --> src/brotli_input.rs:31250:13
+      |
+31250 |         let context_kind = if kind == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+      |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context_kind`
+
+warning: unused variable: `context_kind`
+     --> src/brotli_input.rs:31307:13
+      |
+31307 |         let context_kind = if kind == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+      |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context_kind`
+
+warning: value assigned to `execution_work` is never read
+     --> src/brotli_input.rs:31244:30
+      |
+31244 |       let mut execution_work = 0u64;
+      |                                ^^^^ this value is reassigned later and never used
+...
+31413 | /                 execution_work = if kind == 0 { 2 + serialized_map_start_work() + 1 + 1 }
+31414 | |                     else { 2 + tree_group_start_work() };
+      | |________________________________________________________- `execution_work` is overwritten here before the previous value is read
+      |
+      = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `already_consumed` is never read
+     --> src/brotli_input.rs:31753:32
+      |
+31753 |     let mut already_consumed = 0usize;
+      |                                ^^^^^^ this value is reassigned later and never used
+...
+32178 |             Ok(used) => already_consumed = used,
+      |                         ----------------------- `already_consumed` is overwritten here before the previous value is read
+
+warning: unused variable: `bits_base`
+     --> src/brotli_input.rs:32308:9
+      |
+32308 |     let bits_base = window_bytes as usize + B3C_DISTANCE_BITS_OFFSET as usize;
+      |         ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bits_base`
+
+warning: unused variable: `offsets_base`
+     --> src/brotli_input.rs:32309:9
+      |
+32309 |     let offsets_base = window_bytes as usize + B3C_DISTANCE_OFFSETS_OFFSET as usize;
+      |         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_offsets_base`
+
+warning: unused variable: `phase_at`
+     --> src/brotli_input.rs:32310:9
+      |
+32310 |     let phase_at = window_bytes as usize + B3C_STATE_OFFSET as usize
+      |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_phase_at`
+
+warning: unused variable: `phase_at`
+     --> src/brotli_input.rs:32570:9
+      |
+32570 |     let phase_at = window_bytes as usize + B3C_STATE_OFFSET as usize
+      |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_phase_at`
+
+warning: value assigned to `exact_work` is never read
+     --> src/brotli_input.rs:32959:5
+      |
+32959 |     exact_work = exact_work + TREE_METADATA_WORK;
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+33011 |     exact_work = work_before - budget.work_remaining;
+      |     ------------------------------------------------ `exact_work` is overwritten here before the previous value is read
+
+warning: value assigned to `exact_work` is never read
+     --> src/brotli_input.rs:33011:5
+      |
+33011 |     exact_work = work_before - budget.work_remaining;
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+33022 |     exact_work = work_before - budget.work_remaining;
+      |     ------------------------------------------------ `exact_work` is overwritten here before the previous value is read
+
+warning: value assigned to `exact_work` is never read
+     --> src/brotli_input.rs:33022:5
+      |
+33022 |     exact_work = work_before - budget.work_remaining;
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |
+      = help: maybe it is overwritten before being read?
+
+warning: unused variable: `num_htrees`
+    --> src/brotli_prefix.rs:4227:5
+     |
+4227 |     num_htrees: u16,
+     |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_num_htrees`
+
+   Compiling proven-primitives v0.1.0 (/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next)
+warning: `proven-primitives` (lib) generated 57 warnings (run `cargo fix --lib -p proven-primitives` to apply 52 suggestions)
+warning: variable does not need to be mutable
+     --> src/brotli_input.rs:36060:13
+      |
+36060 |         let mut actual = initial.clone();
+      |             ----^^^^^^
+      |             |
+      |             help: remove this `mut`
+
+warning: `proven-primitives` (lib test) generated 58 warnings (57 duplicates) (run `cargo fix --lib -p proven-primitives --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 5.98s
+     Running unittests src/lib.rs (target/release/deps/proven_primitives-0d653d16bea8a474)
+
+running 93 tests
+test brotli::tests::compressed_overlap_fixture_decodes_completely ... ok
+test brotli::tests::budget_and_initialization_are_exact_and_reset_does_not_refill ... ok
+test brotli::tests::final_truncation_is_sticky ... ok
+test brotli::tests::compressed_work_budget_boundary_and_one_short_are_terminal ... ok
+test brotli::tests::compressed_result_ignores_old_workspace_and_output_suffix ... ok
+test brotli::tests::need_output_does_not_mask_resource_exhaustion ... ok
+test brotli::tests::initialization_failures_have_exact_effects ... ok
+test brotli::tests::metadata_and_uncompressed_streams_cover_chunks_and_padding ... ok
+test brotli::tests::compression_dictionary_fixture_resource_boundaries ... ok
+test brotli_block::tests::b3b_adapter_preserves_switch_completion_suspension_and_failure ... ok
+test brotli_block::tests::all_three_integration_paths_preserve_status ... ok
+test brotli_block::tests::canonical_prefix_results_reach_the_real_switch_transition ... ok
+test brotli::tests::pinned_native_monkey_rejection_is_sticky ... ok
+test brotli_block::tests::invalid_single_type_switch_is_permanent_without_field_reads ... ok
+test brotli_block::tests::reset_is_the_only_terminal_recovery ... ok
+test brotli_block::tests::suspension_retains_type_and_wrong_sequence_fails ... ok
+test brotli::tests::reset_debits_only_initialization_and_work_and_is_atomic_on_failure ... ok
+test brotli_data::tests::arithmetic_transform_toggles_match_byte_xor ... ok
+test brotli_data::tests::committed_tables_match_pinned_reference_bytes ... ok
+test brotli_dictionary::tests::committed_dictionary_matches_pinned_reference_bytes ... ok
+test brotli_input::tests::all_first_bytes_match_rfc_window_header ... ok
+test brotli::tests::padding_mutations_are_permanent_at_every_split ... ok
+test brotli_input::tests::b3b_mtf_coverage_and_native_comparison_classification ... ok
+test brotli::tests::pinned_native_monkey_rejection_has_zero_output ... ok
+test brotli_input::tests::b3b_final_and_nonfinal_exhaustion_are_exact_and_sticky ... ok
+test brotli_input::tests::b3c_body_switch_permanent_failure_is_zero_consumption_and_repeatable ... ok
+test brotli::tests::every_small_fixture_prefix_is_truncated_and_sticky ... ok
+test brotli_input::tests::b3b_tree_group_order_count_and_completion_chunk_matrix ... ok
+test brotli_input::tests::b3b_context_map_runtime_matrix ... ok
+test brotli_input::tests::b3c_block_count_plan_reserves_exact_work_before_mutation ... ok
+test brotli_input::tests::b3c_context_mode_plan_reserves_exact_work_before_mutation ... ok
+test brotli::tests::small_compressed_fixtures_cover_whole_and_one_byte_input ... ok
+test brotli_input::tests::b3c_context_tree_count_handles_empty_eof_and_input_credit ... ok
+test brotli_input::tests::b3c_initial_suffix_plan_reserves_exact_work_before_mutation ... ok
+test brotli_input::tests::b3c_layout_and_initial_image_are_exact_and_old_storage_independent ... ok
+test brotli_input::tests::changing_widths_preserves_the_bit_stream ... ok
+test brotli_input::tests::b3b_rle_prefix_runtime_matrix_exact_fill_and_overflow ... ok
+test brotli_input::tests::bit_reader_widths_splits_and_old_storage ... ok
+test brotli_input::tests::b3c_distance_plan_reserves_exact_work_before_mutation ... ok
+test brotli_input::tests::complex_auxiliary_codes_reverse_nonpalindromic_stream_bits ... ok
+test brotli_input::tests::complex_code_length_alphabet_parses_static_prefixes ... ok
+test brotli_input::tests::complex_code_length_space_errors_are_permanent ... ok
+test brotli_input::tests::complex_repeat_overflow_truncation_and_failure_are_permanent ... ok
+test brotli_input::tests::complex_repeats_follow_rfc_chaining_in_whole_and_one_byte_chunks ... ok
+test brotli_input::tests::empty_chunks_terminal_states_and_reset ... ok
+test brotli_input::tests::compressed_header_completes_with_exact_streaming_handoff ... ok
+test brotli_input::tests::m1_auxiliary_completion_reserves_both_scans_before_advancing_local_state ... ok
+test brotli_input::tests::m1_auxiliary_lookup_prepays_each_cell_and_matches_small_canonical_codes ... ok
+test brotli_input::tests::b3c_context_repeat_resumes_partial_suffix_and_checks_boundary ... ok
+test brotli_input::tests::installed_symbol_reader_handles_single_canonical_and_suspension ... ok
+test brotli_input::tests::m1_complex_tree_drains_implicit_trailing_zeros_before_install ... ok
+test brotli_input::tests::m1_canonical_builder_errors_preserve_w1_status_and_images ... ok
+test brotli_input::tests::b3c_tree_plan_uses_replayed_lengths_across_every_input_split ... ok
+test brotli_input::tests::m1_context_mode_invalid_count_preserves_w1_terminal_image ... ok
+test brotli::tests::compressed_lz77_fixtures_cover_overlap_and_large_output ... ok
+test brotli_input::tests::m1_context_tree_actions_match_w1_at_every_split_and_quota_boundary ... ok
+test brotli_input::tests::m1_invalid_initial_subphase_prepays_w1_terminal_image ... ok
+test brotli_input::tests::m1_maximum_alphabet_accepts_valid_long_direct_zero_descriptions ... ok
+test brotli_input::tests::m1_completed_context_modes_match_w1_and_reserve_18_units ... ok
+test brotli_input::tests::m1_repeat_class_switch_survives_serialized_roundtrip ... ok
+test brotli_input::tests::m1_repeat_codec_preserves_every_history_class_and_resumption ... ok
+test brotli_input::tests::m1_saved_auxiliary_loads_charge_exactly_the_inspected_prefix ... ok
+test brotli_input::tests::m1_mtf_and_coverage_tail_match_w1_with_exact_and_short_work ... ok
+test brotli_input::tests::m1_tree_planning_preserves_w1_malformed_state_outcomes ... ok
+test brotli_input::tests::meta_block_errors_are_permanent_and_truthful ... ok
+test brotli::tests::pinned_native_quickfox_decodes_after_pending_span_drain ... ok
+test brotli_input::tests::meta_block_headers_cover_empty_normal_and_metadata_forms ... ok
+test brotli_input::tests::simple_code_description_errors_are_permanent ... ok
+test brotli_input::tests::simple_code_descriptions_cover_all_rfc_shapes_and_chunks ... ok
+test brotli_prefix::tests::b3_builder_accessors_use_exact_regions_and_track_initialization ... ok
+test brotli_prefix::tests::b3_builder_installs_sparse_canonical_records_and_frames_tree ... ok
+test brotli_prefix::tests::b3_builder_errors_preserve_workspace ... ok
+test brotli_prefix::tests::b3_tree_records_never_read_uninitialized_workspace ... ok
+test brotli_prefix::tests::b3_workspace_layout_is_exact_and_bounded ... ok
+test brotli_prefix::tests::b3_canonical_tree_records_accept_unused_zero_lengths ... ok
+test brotli_prefix::tests::block_length_ranges_match_rfc_table ... ok
+test brotli_prefix::tests::b3b_inverse_mtf_is_atomic_reusable_and_exactly_charged ... ok
+test brotli_prefix::tests::canonical_codes_match_small_independent_examples ... ok
+test brotli_prefix::tests::malformed_code_spaces_are_rejected ... ok
+test composition_demo::tests::empty_and_binary_compositions ... ok
+test brotli_prefix::tests::full_block_type_alphabet_is_bounded ... ok
+test composition_demo::tests::exact_prefix_handoff_and_state_transitions ... ok
+test composition_demo::tests::stage_errors_preserve_exact_effects ... ok
+test brotli_input::tests::m1_bad_fixed_phase_cursor_prepays_w1_terminal_image ... ok
+test brotli_input::tests::m1_context_symbols_match_w1_and_keep_unpaid_workspace_unchanged ... ok
+test brotli_input::tests::b3c_context_tree_count_plans_match_w1_and_reserve_before_writes ... ok
+test brotli_input::tests::m1_context_mode_plan_matches_w1_values_cursor_and_credit ... ok
+test brotli::tests::small_compressed_fixtures_cover_every_input_split ... ok
+test brotli_input::tests::m1_block_count_execution_matches_w1_and_reserves_before_writes ... ok
+test brotli_input::tests::m1_distance_plan_matches_w1_and_independent_parameter_values ... ok
+test brotli_input::tests::b3c_context_bits_plans_match_w1_and_reserve_before_writes ... ok
+test brotli_input::tests::m1_suffix_matches_w1_all_symbols_kinds_input_and_work_boundaries ... ok
+test brotli::tests::node_block_switch_witness_is_permanent_across_all_chunk_sizes ... ok
+
+test result: ok. 93 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.19s
+
+     Running tests/primitives.rs (target/release/deps/primitives-50900d79ef419de6)
+
+running 9 tests
+test base64_standard_vectors_and_canonical_rules ... ok
+test cve_2017_1000430_original_size_arithmetic_wraps_without_large_allocations ... ok
+test lz4_malformed_inputs_preserve_output_even_when_too_small ... ok
+test successful_lz4_output_is_independent_of_previous_destination_contents ... ok
+test cve_2026_32829_zero_offset_cannot_disclose_old_destination_bytes ... ok
+test lz4_literals_overlap_and_length_extensions ... ok
+test base64_all_bytes_and_generated_inputs ... ok
+test percent_vectors_binary_bytes_and_strict_errors ... ok
+test large_inputs_use_bounded_stack_and_preserve_tail ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/proof_rejection.rs (target/release/deps/proof_rejection-3aa537053cca6f16)
+
+running 46 tests
+test the_prover_rejects_b3a_auxiliary_code_without_bit_reversal ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_b3b_adapter_failure_as_retryable ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_b3b_installed_symbol_without_bit_reversal ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_b3c_exact_symbol_work_undercharge ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_b3c_serialized_symbol_write_undercharge ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_b3c_wrong_dictionary_source ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_eight_m1_context_mode_relation_and_frame_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_five_b3c_block_count_metering_undercharges ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_five_b3c_tree_formula_undercharges ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_five_k1_k3_success_and_preservation_defects ... ignored, requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_four_b3a_meta_header_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_four_b3b_block_count_and_category_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_four_b3b_inverse_mtf_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_four_b3c_context_mode_metering_undercharges ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_four_b3c_initial_suffix_metering_undercharges ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_four_m1_tree_action_bound_and_drain_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_nine_m1_source_refinement_and_debit_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_seventeen_b3c_context_bits_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_b3a_builder_storage_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_b3a_code_description_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_b3a_repeat_stream_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_b3b_cross_call_state_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_b3b_metadata_map_and_coverage_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_b3b_serialization_and_error_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_b3b_tree_group_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_k4_repeat_codec_defects ... ignored, requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_m1_bad_context_count_failure_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_m1_bad_fixed_cursor_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_m1_block_count_relation_and_debit_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_m1_context_mode_handoff_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_m1_distance_relation_and_frame_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_m1_nested_reset_transition_undercharges ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_thirteen_b3b_context_map_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_thirteen_b3c_context_tree_count_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_three_b3c_distance_metering_undercharges ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_three_k3_suffix_plan_relation_defects ... ignored, requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_twenty_eight_semantic_and_security_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_two_b3a_record_frame_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_two_b3b_distance_and_exhaustion_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_two_b3b_state_layout_and_bit_order_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test the_prover_rejects_two_k2_context_mode_success_guarantee_defects ... ignored, requires VERUS_ROOT pointing at the pinned Verus distribution
+test project_source_contains_no_proof_trust_bypasses ... ok
+
+test result: ok. 1 passed; 0 failed; 45 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/upstream_comparison.rs (target/release/deps/upstream_comparison-be29d1b1252b2c07)
+
+running 1 test
+test upstream_compatibility_and_historical_security_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+   Doc-tests proven_primitives
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

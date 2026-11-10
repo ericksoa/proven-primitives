@@ -1,0 +1,12 @@
+verification results:: 9 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-builder-canaries-85158/src/brotli_prefix.rs:5674:24
+     |
+5674 |                 assert(record.code as nat == canonical_code(lengths, symbol as int));
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

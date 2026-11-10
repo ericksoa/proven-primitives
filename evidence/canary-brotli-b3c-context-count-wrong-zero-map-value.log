@@ -2,28 +2,28 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17824:29
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-42081/src/brotli_input.rs:17863:29
       |
-17824 | ...                   while initialized < active_len
+17863 | ...                   while initialized < active_len
       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17607:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-42081/src/brotli_input.rs:17646:1
       |
-17607 | / fn advance_context_tree_count_phase(
-17608 | |     workspace: &mut [u8],
-17609 | |     window_bytes: u32,
-17610 | |     kind_tag: u8,
+17646 | / fn advance_context_tree_count_phase(
+17647 | |     workspace: &mut [u8],
+17648 | |     window_bytes: u32,
+17649 | |     kind_tag: u8,
 ...     |
-17614 | |     end_of_input: bool,
-17615 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+17653 | |     end_of_input: bool,
+17654 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
       | |______________________________________________^
 
 error: precondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17917:37
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-42081/src/brotli_input.rs:17956:37
       |
  8625 | /         after == before.update(
  8626 | |             crate::brotli_prefix::context_entry_at(window_bytes, kind, initialized) as int,
@@ -31,22 +31,22 @@ error: precondition not satisfied
  8628 | |         ),
       | |_________- failed precondition
 ...
-17917 | /                                     context_map_update_extends_valid_prefix(
-17918 | |                                         before_entry,
-17919 | |                                         workspace@,
-17920 | |                                         window_bytes,
+17956 | /                                     context_map_update_extends_valid_prefix(
+17957 | |                                         before_entry,
+17958 | |                                         workspace@,
+17959 | |                                         window_bytes,
 ...     |
-17924 | |                                         1,
-17925 | |                                     );
+17963 | |                                         1,
+17964 | |                                     );
       | |_____________________________________^
 
 note: recommendation not met
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-15775/src/brotli_input.rs:17870:48
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-42081/src/brotli_input.rs:17909:48
       |
-17870 |   ...                   == after_tree_count[
+17909 |   ...                   == after_tree_count[
       |  __________________________^
-17871 | | ...                       b3b_scalar_base(window_bytes) + i
-17872 | | ...                   ],
+17910 | | ...                       b3b_scalar_base(window_bytes) + i
+17911 | | ...                   ],
       | |_______________________^
       |
      --> seq.rs:980:12

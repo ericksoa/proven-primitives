@@ -1,0 +1,54 @@
+{
+  "mutants": [
+    {
+      "name": "brotli-k1-installer-rejects-valid-two-symbol-tree",
+      "log": "evidence/canary-brotli-k1-installer-rejects-valid-two-symbol-tree.log",
+      "sha256": "b729a547595b19085cbf5d2f06526c8be2bdfb409670e3819764ee82aa558645",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k1-invalid-length-changes-metadata",
+      "log": "evidence/canary-brotli-k1-invalid-length-changes-metadata.log",
+      "sha256": "abbe24468c58334c18879c7e82a802ad05fcadc6122d4d1a53a2ef4c0c507c74",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k1-invalid-length-changes-builder",
+      "log": "evidence/canary-brotli-k1-invalid-length-changes-builder.log",
+      "sha256": "7d01d2ce2110baf2bc0d987d49f127742a15b529831269bcdc4ec20be6271195",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-rejects-valid-symbol-and-suffix",
+      "log": "evidence/canary-brotli-k3-rejects-valid-symbol-and-suffix.log",
+      "sha256": "5c94b0b9d0c6b5478fab536e332d128db19045f0afc52b5e3e035c0c797c3366",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-decodes-wrong-block-length",
+      "log": "evidence/canary-brotli-k3-decodes-wrong-block-length.log",
+      "sha256": "e16563b91fbbb0b37835e18ae7e02cd71fbb985b30e5ed3ad789c530cec1a31b",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-suffix-plan-loses-consumption",
+      "log": "evidence/canary-brotli-k3-suffix-plan-loses-consumption.log",
+      "sha256": "3fb1173c538f8f8ecfbb7db1fb15b2da207272877f5b15dcac944dd369aac2c7",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-suffix-plan-loses-success",
+      "log": "evidence/canary-brotli-k3-suffix-plan-loses-success.log",
+      "sha256": "d2881c80123eb8086afe71fa4fd9fc84c63a936a1a2deb91626c2ca02aed2b2c",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-suffix-plan-undercharges-value-tables",
+      "log": "evidence/canary-brotli-k3-suffix-plan-undercharges-value-tables.log",
+      "sha256": "b828e4e1178efe7ed48bc0e2c5e5a4f7ed4e12b34503d9c0638158d8ea81137a",
+      "semantic_rejection": true
+    }
+  ],
+  "whole_positive": "evidence/brotli-b3c-m1-k1-k3-attempt02-verification.json",
+  "resource_or_tool_failures_counted": 0
+}

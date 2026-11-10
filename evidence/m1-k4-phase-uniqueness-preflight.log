@@ -1,0 +1,21 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51846,13): 'if' cannot be used in patterns.
+WARNING: (59201,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12627:7
+      |
+12627 |   proof fn k4_repeat_phase_values_are_unique(workspace: Seq<u8>, window_bytes: u32,
+      |  _______^
+12628 | |     left: CodeDescriptionPhase, right: CodeDescriptionPhase)
+      | |____________________________________________________________^
+
+error: assertion failed
+     --> src/brotli_input.rs:12639:20
+      |
+12639 |             assert(a.code.lengths@ =~= b.code.lengths@);
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

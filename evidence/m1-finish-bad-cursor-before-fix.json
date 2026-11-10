@@ -1,0 +1,11 @@
+{
+  "observed_utc": "2026-11-09T20:12:14.826761+00:00",
+  "kind": "runtime_comparison_failure_not_a_proof",
+  "source_sha256": "47c2b9c4c062f3c60a4e7ee426cd4b2bacc244de83bf5e604da0566c0e39a2ad",
+  "log": "evidence/m1-finish-bad-cursor-before-fix.log",
+  "log_sha256": "ac5abd4badac1aa3fe4efa12d76cd054006ca9869717a76f3673bb394f987f23",
+  "mismatches": 66,
+  "scope": "Invalid saved queues in block-count, distance, pending context-mode phases, plus invalid VAR_UINT8 encoding in block-count. W1 terminal image and five-unit reservation were skipped.",
+  "source_snapshot": "evidence/m1-finish-bad-cursor-before-fix-source.rs.gz",
+  "source_snapshot_sha256": "a8b938bde685403cccb0ae08af471c8c1b8e17de878fcb10e5b3660f9de4b775"
+}

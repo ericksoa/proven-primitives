@@ -1,0 +1,23 @@
+from pathlib import Path
+import hashlib,json,os,subprocess,time,datetime
+root=Path.cwd()
+freeze=json.loads(Path('evidence/m1-k1-k3-attempt02-source-freeze.json').read_text())
+verification=json.loads(Path('evidence/brotli-b3c-m1-k1-k3-attempt02-verification.json').read_text())
+assert freeze['exit_code']==0 and freeze['source_unchanged']
+assert verification['verification-results']['success'] and verification['verification-results']['errors']==0
+assert verification['verification-results']['is-verifying-entire-crate']
+identities=dict(freeze['source_sha256'],**freeze['validation_source_sha256'])
+def unchanged():
+ return all(hashlib.sha256(Path(n).read_bytes()).hexdigest()==h for n,h in identities.items())
+assert unchanged(), 'Whole positive must describe this exact source and harness'
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1',VERUS_ROOT='/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+rows=[]
+for name,expected in [('the_prover_rejects_five_k1_k3_success_and_preservation_defects',5),('the_prover_rejects_three_k3_suffix_plan_relation_defects',3)]:
+ cmd=['cargo','test','--locked','--release','--test','proof_rejection',name,'--','--ignored','--exact','--nocapture']
+ log=Path('evidence')/('m1-k1-k3-controls-'+name+'.log')
+ started=datetime.datetime.now(datetime.timezone.utc).isoformat();clock=time.monotonic()
+ with log.open('w') as out:r=subprocess.run(cmd,env=env,stdout=out,stderr=subprocess.STDOUT)
+ text=log.read_text();row={'suite':name,'expected_mutants':expected,'exit_code':r.returncode,'started_utc':started,'seconds':time.monotonic()-clock,'log':str(log),'sha256':hashlib.sha256(log.read_bytes()).hexdigest(),'rejected_lines':sum(line.startswith('REJECTED ') for line in text.splitlines()),'source_unchanged':unchanged()};rows.append(row)
+ Path('evidence/m1-k1-k3-controls-results.json').write_text(json.dumps(rows,indent=2)+'\n')
+ print(json.dumps(row),flush=True)
+ assert r.returncode==0 and row['rejected_lines']==expected and row['source_unchanged'], 'Retain actual failure; do not classify resource/tool errors as rejection'

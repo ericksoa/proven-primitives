@@ -565,3 +565,134 @@ The broad block-count limited-input mutant exhausted the checker before producin
 ### Final distance and K2 source validation
 
 The unchanged source passed **1,182 whole-crate checks with zero errors**. All **99 release tests** passed. Across **24 suites, 146 distinct deliberate defects** were rejected after their recorded unchanged-library whole-crate positives. Every rejection has a retained semantic checker failure without resource/compiler failure. Exact source, harness, approved K2 delta, tool, compiled-artifact and transcript identities are bound in `evidence/brotli-b3c-m1-k2.json`. K1 remains held. The named pending-read and distance/malformed-count guarantees do not complete M1 or the decoder release obligations.
+
+### Context-mode handoff and saved-cursor failures
+
+The K1 source review is recorded in `BROTLI_M1_K1_REVIEW.md`. It found no
+contradiction between K1's proposed classification and the existing installer,
+but it does not approve the boundary or prove the proposed guarantees. The
+separate K3 proposal records the success guarantee needed from the existing
+block-length helper for normal suffix agreement. Both exact human approval
+requests remain pending at this source checkpoint. The prefix module is
+unchanged from the preceding checked commit.
+
+Independent M1 work now binds the completed context-mode-list transition to
+the exact W1 map-start image, retained bytes, zero consumption and 18-unit
+reservation. The map-start helper exposes its existing fourteen writes and
+reset image; the handoff preserves all bytes outside those fields and the
+outer-phase byte. Both nested reset transitions retain their already-approved
+charges. The owner proves exact work debit on success and unchanged workspace
+and budget on a short reservation, including when the saved queue is invalid
+but this zero-input transition does not read it.
+
+A runtime comparison found another admitted-state discrepancy: malformed
+saved queues in block-count, distance and pending context-mode actions, and
+malformed VAR_UINT8 encoding in block-count, bypassed W1's terminal image and
+spent no work. All 66 exact/short-credit, EOF and error-image comparisons
+failed before the correction. The actual output, source snapshot and hashes
+are retained in `evidence/m1-finish-bad-cursor-before-fix*`.
+
+The existing read-only pre-scan now exposes its precise rejection domain. On
+those rejections the owner forecasts W1's existing four terminal writes and
+one transition, reserves five units and executes the original W1 action.
+Checked helper, dispatcher and execution contracts bind the error, zero
+consumption, terminal image, input preservation and exact work debit. With
+fewer than five units both workspace and budget stay unchanged and the result
+is ResourceLimit. The regression passes after this correction. These are
+internal admitted-state refinement defects, not demonstrated malformed-wire
+acceptance defects.
+
+All 101 release tests pass. Twelve new unchanged-contract controls cover the
+handoff reset image, quota, consumption and frame, plus cursor error
+classification, rejection forecasting, terminal execution and work debit.
+The complete run expands to 26 suites and 158 defects, gated on a fresh
+unchanged whole-crate positive. Full M1 remains incomplete: canonical/tree
+replay, normal suffix agreement, the complete source-operation ledger and
+remaining phase/failure relations and their controls still need closure.
+B3c/B3d/B4 and independent human review remain separate release obligations.
+
+### Approved K1/K3 proof continuation
+
+The human explicitly approved K1 and K3 as written on 2026-11-09, superseding
+the earlier holds noted at historical checkpoints above. K1 now opens exactly
+the named existing mathematical definitions and CODE_SPACE and proves the
+existing canonical installer's eligible-domain success/error classification.
+Input-private induction equates that classification with M1 planning. The
+original canonical-record correctness, frames, runtime guards, signature and
+admitted inputs remain intact.
+
+K3 strengthens only the existing block-length decoder's success guarantee.
+Normal suffix action, planning, execution and owner relations now bind the
+logical bit read, decoded length, consumption/status, next-state effects,
+outcome-specific frames, exact combined work/input debits and short-reservation
+identity. The mathematical owner relation carries a concrete plan witness;
+it does not add a runtime field or change W1's interface or result type.
+
+The final library passed **1,207 whole-crate checks with zero errors** and
+`--no-cheating`. The first whole attempt's actual 1,205/one-error result remains
+retained. An explicit ghost proof of the initial zero-iteration multiplication
+identity resolved that loop-entry obligation. Final source and harness are
+bound in `evidence/m1-k1-k3-attempt03-source-freeze.json`. All **33 deliberate defects across five affected suites** were rejected after
+their recorded whole-crate positives on identical library bytes. Eight are new
+K1/K3 controls and 25 cover the existing builder, table-read/canonical-planning
+and suffix-formula behavior. Exact transcripts and ordering are recorded in
+`evidence/brotli-b3c-m1-k1-k3-controls.json`. An older table-control marker stopped before
+its mutation because it omitted K1's newly checked proof statement; its failed
+output is retained and is not counted as a rejected defect.
+
+The full runtime suite is **102 passed, one failed**. The failing
+`m1_repeat_class_switch_survives_serialized_roundtrip` regression demonstrates
+that the W1 codec loses previous repeat-length history at a class switch,
+producing eight zeros instead of the expected three in an admitted decoder
+field sequence. It is not yet a full compressed-stream/native witness or a
+memory-safety violation. Candidate K4 in
+`BROTLI_M1_REPEAT_STATE_DECISION.md` proposes the exact private-byte correction
+and remains unapproved and unimplemented. F2's separate fixture policy stays
+unchanged.
+
+The source audit in `evidence/m1-loader-ledger-audit.json` also confirms extra
+phase-validation indexed reads after the 18 auxiliary loads. For example, a
+successful complex-prefix load reads 36 length cells; a complex-symbol load
+with a valid singleton reads 54. These are source-derived counts, not a checked
+complete work ledger. The executor reloads the serialized decoder each tree
+iteration, so the current candidate's 18-unit copy allowance does not cover
+those scans. Exact inspected-prefix/error accounting and full replay still
+need proof and correction within the approved policy.
+
+M1 remains incomplete. The remaining ledger, tree replay, malformed header/body
+relations and full control closure, B3c/B3d/B4 and independent human review are
+still open. This checkpoint has not been committed or pushed and does not
+promote a supported decoder or mathematical safety completion claim.
+
+### Approved K4 repeat-history correction
+
+The human subsequently approved K4 as written. This supersedes the outstanding
+K4 hold described at the historical K1/K3 checkpoint above. Byte 71 now retains
+previous repeat history; tag six uses existing byte 174 for current repeat
+length, rejecting values above 15 and deriving its existing suffix width.
+Tag seven, fixed workspace, write counts/formulas, W1 interfaces, 5,696-action
+caps, the 425-unit construction/reset charge and F2 expectations are unchanged.
+
+Checked private images cover copied lengths and complete repeat progress.
+Storage succeeds in the original valid workspace domain; correctly encoded
+valid repeat states reload successfully. Queue rebasing uses the existing
+serialized-queue relation, preserving logical bits and active bytes while
+ignoring unused local padding. A checked lemma transfers the reloaded field
+transition to the original state. The actual tree loop binds these guarantees
+through its ghost repeat-image invariant; no persistent runtime field is added.
+
+Final K4 evidence: **1,210 whole-crate checks, zero errors**, **104 passing
+runtime tests**, and **21 semantic defect rejections in three affected suites**.
+The original lost-history regression now produces three zeros as expected.
+The broader matrix covers 2,048 history/resumption configurations, tag seven
+and invalid current lengths. Existing F2 fixtures retain their approved results.
+See `evidence/brotli-b3c-m1-k4.json`. Failed, interrupted and superseded runs
+are retained and excluded from positive/rejection counts.
+
+M1 remains incomplete. Candidate K5 in
+`BROTLI_M1_LOADER_VALIDATION_METERING_DECISION.md` explicitly proposes the next
+read-unit/private-receipt change and is not implemented. The current loader
+validation scans still lack the complete metering/refinement closure. Complete
+tree/action/ledger and malformed-state controls, later B3c/B3d/B4 work and
+independent human review remain open; no supported decoder or complete
+mathematical safety claim is made.

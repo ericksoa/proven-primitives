@@ -2,33 +2,33 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:20365:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-35945/src/brotli_input.rs:20459:5
       |
-20365 | /     fn apply_block_count_value(
-20366 | |         &mut self,
-20367 | |         kind: u8,
-20368 | |         raw: u16,
-20369 | |         _queue: BitQueue,
-20370 | |         _var_phase: VarUint8Phase,
-20371 | |     ) -> (r: Result<(), CompressedHeaderError>)
+20459 | /     fn apply_block_count_value(
+20460 | |         &mut self,
+20461 | |         kind: u8,
+20462 | |         raw: u16,
+20463 | |         _queue: BitQueue,
+20464 | |         _var_phase: VarUint8Phase,
+20465 | |     ) -> (r: Result<(), CompressedHeaderError>)
       | |______________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-18490/src/brotli_input.rs:20395:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-35945/src/brotli_input.rs:20489:13
       |
-20395 |               block_count_value_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, kind, raw),
+20489 |               block_count_value_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes, kind, raw),
       |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
 ...
-20430 | /     {
-20431 | |         proof { reveal(block_count_value_frame); reveal(context_tree_start_frame); reveal(outer_phase_byte_frame); }
-20432 | |         let ghost original = self.workspace@;
-20433 | |         put_state_byte(self.workspace, self.window_bytes, 175, 255)?;
+20524 | /     {
+20525 | |         proof { reveal(block_count_value_frame); reveal(context_tree_start_frame); reveal(outer_phase_byte_frame); }
+20526 | |         let ghost original = self.workspace@;
+20527 | |         put_state_byte(self.workspace, self.window_bytes, 175, 255)?;
 ...     |
-20553 | |         Ok(())
-20554 | |     }
+20647 | |         Ok(())
+20648 | |     }
       | |_____- at the end of the function body
 
 error: aborting due to 1 previous error

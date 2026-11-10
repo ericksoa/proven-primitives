@@ -2,21 +2,21 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-distance-metering-canary-15245/src/brotli_input.rs:24935:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-distance-metering-canary-40805/src/brotli_input.rs:25064:1
       |
-24935 | fn distance_value_execution_work(read_work: u64) -> (r: u64)
+25064 | fn distance_value_execution_work(read_work: u64) -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-distance-metering-canary-15245/src/brotli_input.rs:24937:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-distance-metering-canary-40805/src/brotli_input.rs:25066:13
       |
-24937 |     ensures r == read_work + 10 + 1 + 1 + 2 + 2 + 1 + 1,
+25066 |     ensures r == read_work + 10 + 1 + 1 + 2 + 2 + 1 + 1,
       |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
-24938 | {
-24939 |     distance_base_execution_work(read_work) + 1 + 2 + 2 + 1
+25067 | {
+25068 |     distance_base_execution_work(read_work) + 1 + 2 + 2 + 1
       |     ------------------------------------------------------- at the end of the function body
 
 error: aborting due to 1 previous error

@@ -1,0 +1,16 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-88998/src/brotli_prefix.rs:58:9
+   |
+58 | /         symbol < 26 && suffix < (1u32 << BLOCK_LENGTH_EXTRA_BITS@[symbol as int])
+59 | |             ==> r.is_ok(),
+   | |_________________________^ failed this postcondition
+...
+78 |       if symbol == 0 && suffix == 0 { return Err(PrefixError::InvalidBlockLengthSuffix); }
+   |                                       ------------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

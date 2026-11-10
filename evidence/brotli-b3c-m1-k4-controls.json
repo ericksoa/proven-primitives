@@ -1,0 +1,169 @@
+{
+  "suites": [
+    {
+      "suite": "the_prover_rejects_six_k4_repeat_codec_defects",
+      "expected_mutants": 6,
+      "exit_code": 0,
+      "started_utc": "2026-11-10T01:53:33.408014+00:00",
+      "seconds": 101.97383512498345,
+      "log": "evidence/m1-k4-controls-the_prover_rejects_six_k4_repeat_codec_defects.log",
+      "sha256": "d82c7ebf44d9fdd0788e59e96eff190f45863228049d02aeb6739217a4a1a9d3",
+      "source_unchanged": true,
+      "mutants": [
+        {
+          "name": "brotli-k4-repeat-store-overwrites-history",
+          "log": "evidence/canary-brotli-k4-repeat-store-overwrites-history.log",
+          "sha256": "26fad6748451d0e13495affc1f5380c200327a9e1b09439161da5c8d4fc48a27",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-k4-repeat-load-current-from-history",
+          "log": "evidence/canary-brotli-k4-repeat-load-current-from-history.log",
+          "sha256": "68f6401002fb92a46bb7ed1e4e44864baa4ba2a43bfafc584e53443aa46d12ba",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-k4-progress-stores-previous-code-in-history",
+          "log": "evidence/canary-brotli-k4-progress-stores-previous-code-in-history.log",
+          "sha256": "a89ba2925aeb64c0692d5027822095f7d4bb9e1875cab65a953fa4408ea562ab",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-k4-repeat-load-history-from-current",
+          "log": "evidence/canary-brotli-k4-repeat-load-history-from-current.log",
+          "sha256": "68f6401002fb92a46bb7ed1e4e44864baa4ba2a43bfafc584e53443aa46d12ba",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-k4-repeat-width-uses-old-class",
+          "log": "evidence/canary-brotli-k4-repeat-width-uses-old-class.log",
+          "sha256": "54dbf373f5c62ad8868ee6537301e29f6dd99e94f566379d6a3f5a2244b94ec0",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-k4-repeat-rejects-valid-length-fifteen",
+          "log": "evidence/canary-brotli-k4-repeat-rejects-valid-length-fifteen.log",
+          "sha256": "b70c7bd1dc76bce9cbbbd6c42e639de7f66a54eb6d20838a643889e992283088",
+          "semantic_rejection": true
+        }
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_six_b3b_serialization_and_error_defects",
+      "expected_mutants": 6,
+      "exit_code": 0,
+      "started_utc": "2026-11-10T01:53:33.408308+00:00",
+      "seconds": 189.60674595899764,
+      "log": "evidence/m1-k4-controls-the_prover_rejects_six_b3b_serialization_and_error_defects.log",
+      "sha256": "1a8b48e7528536fa2cb3010e697b6a83a17b687d2e468f3d2481c5ac2320bffb",
+      "source_unchanged": true,
+      "mutants": [
+        {
+          "name": "brotli-context-repeat-uses-half-base",
+          "log": "evidence/canary-brotli-context-repeat-uses-half-base.log",
+          "sha256": "5c56c7df16d613211434bc1c3bfcbc057d2ad7813370cec6fb683d13a69cf3aa",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-b3b-state-address-shifts-scalar-block",
+          "log": "evidence/canary-brotli-b3b-state-address-shifts-scalar-block.log",
+          "sha256": "7f110b2c819b685348e62750a6d34862daf9fbc2e5c494ab647c417c3b215e01",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-b3b-u16-writes-low-byte-twice",
+          "log": "evidence/canary-brotli-b3b-u16-writes-low-byte-twice.log",
+          "sha256": "9fc50adf82fb1aa98594b2d57aff6038c20f139e78a0aa960cb317ae2ed5ae23",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-b3b-tag-accepts-first-invalid-value",
+          "log": "evidence/canary-brotli-b3b-tag-accepts-first-invalid-value.log",
+          "sha256": "0524d38fca3e067e9157c455d76f965f8ce36cc4c1e141180cee6f4d018a7079",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-terminal-store-marks-state-complete",
+          "log": "evidence/canary-brotli-terminal-store-marks-state-complete.log",
+          "sha256": "75b5faa38b30eb21b2a2f5edbaaa47f30fde88e2649ace13edfdeb45f98133fc",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-terminal-load-turns-truncation-unsupported",
+          "log": "evidence/canary-brotli-terminal-load-turns-truncation-unsupported.log",
+          "sha256": "981613a15ab63befa9257d1c7411ea2565857a1a204d608f5d22ae00f3c25d71",
+          "semantic_rejection": true
+        }
+      ]
+    },
+    {
+      "suite": "the_prover_rejects_nine_m1_source_refinement_and_debit_defects",
+      "expected_mutants": 9,
+      "exit_code": 0,
+      "started_utc": "2026-11-10T01:53:33.408435+00:00",
+      "seconds": 130.15408233299968,
+      "log": "evidence/m1-k4-controls-the_prover_rejects_nine_m1_source_refinement_and_debit_defects.log",
+      "sha256": "db84a521dc1438f8f7196f7503f0c0f26d189902321c23a736734a5ec44f4131",
+      "source_unchanged": true,
+      "mutants": [
+        {
+          "name": "brotli-m1-code-field-wrong-width",
+          "log": "evidence/canary-brotli-m1-code-field-wrong-width.log",
+          "sha256": "d5d84970c3766533763813bcc5522f8e275bede0f6bb6ef2245462e5f6157d4a",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-m1-auxiliary-wrong-symbol",
+          "log": "evidence/canary-brotli-m1-auxiliary-wrong-symbol.log",
+          "sha256": "483b0619af4715e16d9dd13b1cf0c2d0f2dfa72616fd9f70b39f17cfc7facbf4",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-m1-complex-start-wrong-previous-length",
+          "log": "evidence/canary-brotli-m1-complex-start-wrong-previous-length.log",
+          "sha256": "ea185f01918973ebd5da5c918ade082e09b4ff36bfc9781c13ba00807a1fa479",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-m1-var-integer-wrong-value",
+          "log": "evidence/canary-brotli-m1-var-integer-wrong-value.log",
+          "sha256": "34f5def883382f027d1b515c19962370b9990d2a79a872bbdfd2ca2aec9bbadb",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-m1-body-metadata-read-not-charged",
+          "log": "evidence/canary-brotli-m1-body-metadata-read-not-charged.log",
+          "sha256": "caa1e24d7b6726942dcb933f1ebdc5813b32e7ef61055c7a04cdf7d97d583e77",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-m1-body-execution-undercharge",
+          "log": "evidence/canary-brotli-m1-body-execution-undercharge.log",
+          "sha256": "caa1e24d7b6726942dcb933f1ebdc5813b32e7ef61055c7a04cdf7d97d583e77",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-m1-context-direct-wrong-value",
+          "log": "evidence/canary-brotli-m1-context-direct-wrong-value.log",
+          "sha256": "3e1e93db362dae604fd995a1c6410d2794f907622adf5e7427d30ae5311e60b5",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-m1-initial-symbol-execution-undercharge",
+          "log": "evidence/canary-brotli-m1-initial-symbol-execution-undercharge.log",
+          "sha256": "dc312264662052773afd3265c1923fd4a8558a8f454051d38baa64c1d3b50cd3",
+          "semantic_rejection": true
+        },
+        {
+          "name": "brotli-m1-context-symbol-execution-undercharge",
+          "log": "evidence/canary-brotli-m1-context-symbol-execution-undercharge.log",
+          "sha256": "31d033216f6df8ebe907937e09606e0b62a7e2fdb06dee512b848e779da3f802",
+          "semantic_rejection": true
+        }
+      ]
+    }
+  ],
+  "rejected_mutations": 21,
+  "resource_or_tool_failures_counted": 0,
+  "preceding_positive": "evidence/brotli-b3c-m1-k4-attempt03-verification.json"
+}

@@ -2,24 +2,24 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51874,13): 'if' cannot be used in patterns.
+WARNING: (59229,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-14568/src/brotli_input.rs:31793:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-4340/src/brotli_input.rs:32889:1
       |
-31793 | / fn advance_planned_body_symbol(
-31794 | |     workspace: &mut [u8],
-31795 | |     window_bytes: u32,
-31796 | |     budget: &mut crate::brotli::RequestBudget,
+32889 | / fn advance_planned_body_symbol(
+32890 | |     workspace: &mut [u8],
+32891 | |     window_bytes: u32,
+32892 | |     budget: &mut crate::brotli::RequestBudget,
 ...     |
-31801 | |     end_of_input: bool,
-31802 | | ) -> (r: BodySymbolStep)
+32897 | |     end_of_input: bool,
+32898 | | ) -> (r: BodySymbolStep)
       | |_______________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-14568/src/brotli_input.rs:32005:20
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-4340/src/brotli_input.rs:33101:20
       |
-32005 |             assert((work_before - budget.work_remaining) as nat == 2 * read_units + 17);
+33101 |             assert((work_before - budget.work_remaining) as nat == 2 * read_units + 17);
       |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
 
 error: aborting due to 1 previous error

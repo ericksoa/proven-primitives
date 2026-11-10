@@ -1,0 +1,59 @@
+from pathlib import Path
+import datetime,hashlib,json,os,re,subprocess
+root=Path.cwd();env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools')
+def digest(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p):return {'path':str(p),'sha256':digest(p)}
+def read(p):return json.loads(Path(p).read_text())
+def write(p,d):Path(p).write_text(json.dumps(d,indent=2)+'\n')
+base='d48e8feb44cd2fc47363809832de295d18270776'
+f=read('evidence/m1-handoff-cursor-source-freeze.json');v=read('evidence/brotli-b3c-m1-handoff-cursor-verification.json')['verification-results'];c=read('evidence/brotli-b3c-m1-handoff-cursor-controls.json')
+assert f['exit_code']==0 and f['source_unchanged']
+assert all(digest(p)==h for section in ['source_sha256','validation_source_sha256'] for p,h in f[section].items())
+assert v['success'] and v['is-verifying-entire-crate'] and v['errors']==0 and not v['encountered-error'] and not v['encountered-vir-error']
+assert c['source_unchanged'] and c['suites_failed']==0 and c['suites_passed']==26 and c['rejected_mutations']==158
+assert c['positive_control']['sha256']==digest('evidence/brotli-b3c-m1-handoff-cursor-verification.json')
+for row in c['suites']:assert row['exit_code']==0 and digest(row['log'])==row['log_sha256']
+cut=datetime.datetime.fromisoformat(f['started_utc']).timestamp();canaries=sorted(p for p in Path('evidence').glob('canary-brotli-*.log') if p.stat().st_mtime>=cut)
+assert len(canaries)==158,(len(canaries),'fresh canary count')
+for p in canaries:
+ s=p.read_text();assert any(x in s for x in ['postcondition not satisfied','precondition not satisfied','requires not satisfied','invariant not satisfied','assertion failed']),p
+ assert not re.search(r'resource limit.*exceeded|internal compiler error|thread .*panicked|timed out|error\[E\d+\]',s,re.I),p
+runtime=Path('evidence/m1-handoff-cursor-release-tests.log').read_text();assert 'test result: FAILED' not in runtime
+assert [int(n) for n in re.findall(r'test result: ok\. (\d+) passed;',runtime)]==[90,9,1,1,0]
+assert Path('evidence/m1-handoff-cursor-format-check.log').read_text()==''
+assert 'Finished `release` profile' in Path('evidence/m1-handoff-cursor-release-build.log').read_text()
+previous=read('evidence/brotli-b3c-m1-k2.json')
+# Neither held/proposed cross-module boundary was changed in this checkpoint.
+for p,h in f['source_sha256'].items():
+ if p!='src/brotli_input.rs':assert h==previous['source_sha256'][p],('unexpected source change',p)
+assert digest('BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md')==previous['approval_and_document_sha256']['BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md']
+assert digest(previous['verifier_binary']['path'])==previous['verifier_binary']['sha256']
+assert subprocess.check_output(['git','rev-parse','HEAD'],env=env,text=True).strip()==base
+subprocess.run(['git','diff','--check','--','.',':(exclude)evidence'],env=env,check=True)
+coverage=read('evidence/brotli-m1-handoff-cursor-coverage.json');coverage['generated_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();coverage['validation_state']='named_contracts_checked_M1_incomplete'
+for obligation in coverage['obligations']:obligation['state']='checked_named_contracts'
+coverage.pop('negative_controls_pending',None);coverage['positive_control']=ref('evidence/brotli-b3c-m1-handoff-cursor-verification.json');coverage['negative_controls']=ref('evidence/brotli-b3c-m1-handoff-cursor-controls.json');write('evidence/brotli-m1-handoff-cursor-coverage.json',coverage)
+heading='### Checked handoff and saved-cursor continuation'
+report=Path('BROTLI_B3C_METERING_ADDENDUM.md');assert heading not in report.read_text(),'Already finalized; verify existing identities before publishing.'
+with report.open('a') as out:out.write(f'\n{heading}\n\nThe unchanged source passed **{v["verified"]:,} whole-crate checks with zero errors**. All **101 release tests** passed, followed by **158 semantic defect rejections across 26 suites** after that whole-crate positive. The source, harness, actual failed cursor comparison and source snapshot, tool, compiled artifact and complete transcripts are bound in `evidence/brotli-m1-handoff-cursor.json`. K1 and K3 were unapproved at this source freeze and neither prefix-boundary proposal was implemented. M1 and the full decoder release gates remain incomplete.\n')
+artifacts=set(canaries)
+for pattern in ['m1-handoff-cursor-*','m1-finish-*','brotli-b3c-m1-handoff-cursor-*.json']:
+ artifacts.update(p for p in Path('evidence').glob(pattern) if p.is_file())
+for p in ['evidence/positive-brotli-m1-planner-cap-rank.log','evidence/positive-brotli-b3c-repeat-bound-obligation.log']:
+ assert re.search(r'verification results:: \d+ verified, 0 errors',Path(p).read_text());artifacts.add(Path(p))
+artifacts.add(Path('evidence/brotli-m1-handoff-cursor-coverage.json'))
+docs=list(previous['approval_and_document_sha256'])+['BROTLI_M1_K1_REVIEW.md','BROTLI_M1_BLOCK_LENGTH_PROOF_BOUNDARY_DECISION.md']
+r={'component':'Brotli M1 context-mode handoff and saved-cursor continuation','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':base,
+ 'claim':'Completed context-mode-list handoff and selected malformed saved-cursor rejection paths refine the existing W1 action, including exact terminal/reset images and frames, zero input consumption and prepaid eighteen/five-unit execution. Full M1, remaining source-operation ledger and later decoder obligations remain open.',
+ 'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],'approval_and_document_sha256':{p:digest(p) for p in docs},
+ 'verifier':previous['verifier'],'verifier_binary':previous['verifier_binary'],'verification_options':f['command'][2:],'per_function_verifier_effort':previous['per_function_verifier_effort'],
+ 'verification_elapsed_seconds':f['elapsed_seconds'],'verification_results':v,'verification_evidence':ref('evidence/brotli-b3c-m1-handoff-cursor-verification.json'),'verification_log':ref('evidence/m1-handoff-cursor-whole-crate.log'),'source_freeze':ref('evidence/m1-handoff-cursor-source-freeze.json'),
+ 'negative_controls':{'evidence':ref('evidence/brotli-b3c-m1-handoff-cursor-controls.json'),'suites_passed':26,'rejected_mutations':158,'order':'Every mutation started after this unchanged whole-crate positive; each counted raw transcript has a semantic proof failure without resource/compiler failure.'},
+ 'runtime_tests':{'evidence':ref('evidence/m1-handoff-cursor-release-tests.log'),'passed':101,'library':90,'primitives':9,'trust_scan':1,'upstream_comparison':1},
+ 'compiled_artifact':ref('target/release/libproven_primitives.rlib'),'release_build':ref('evidence/m1-handoff-cursor-release-build.log'),'format_check':ref('evidence/m1-handoff-cursor-format-check.log'),
+ 'coverage':ref('evidence/brotli-m1-handoff-cursor-coverage.json'),'artifact_sha256':{str(p):digest(p) for p in sorted(artifacts)},
+ 'previous_checkpoint':{'commit':base,'evidence':ref('evidence/brotli-b3c-m1-k2.json')},'release_gate':'incomplete',
+ 'not_established':coverage['remaining_m1_gaps']+coverage['later_required_phases'],'architectural_decisions_at_freeze':coverage['architectural_decisions_at_freeze'],
+ 'trusted_components':previous['trusted_components'],'execution_environment':previous['execution_environment'],'earlier_failed_checks':coverage['earlier_failed_checks']}
+write('evidence/brotli-m1-handoff-cursor.json',r)
+print(json.dumps({'verified':v['verified'],'errors':v['errors'],'tests':101,'defects':158,'M1':'incomplete','K1_K3':'unimplemented_pending_human_approval'}))

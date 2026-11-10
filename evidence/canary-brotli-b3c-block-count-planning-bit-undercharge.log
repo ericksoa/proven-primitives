@@ -2,26 +2,26 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-14704/src/brotli_input.rs:24580:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-40416/src/brotli_input.rs:24704:1
       |
-24580 | / fn plan_bit_read(
-24581 | |     queue: BitQueue,
-24582 | |     width: usize,
-24583 | |     input_len: usize,
-24584 | | ) -> (r: PlannedBitRead)
+24704 | / fn plan_bit_read(
+24705 | |     queue: BitQueue,
+24706 | |     width: usize,
+24707 | |     input_len: usize,
+24708 | | ) -> (r: PlannedBitRead)
       | |_______________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-14704/src/brotli_input.rs:24591:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-40416/src/brotli_input.rs:24715:9
       |
-24591 | /         r.work as nat == r.consumed as nat
-24592 | |             + if r.complete { width as nat } else { 0nat },
+24715 | /         r.work as nat == r.consumed as nat
+24716 | |             + if r.complete { width as nat } else { 0nat },
       | |__________________________________________________________^ failed this postcondition
 ...
-24613 |       PlannedBitRead { consumed, work, complete }
+24737 |       PlannedBitRead { consumed, work, complete }
       |       ------------------------------------------- at the end of the function body
 
 error: aborting due to 1 previous error

@@ -1,0 +1,28 @@
+from pathlib import Path
+import concurrent.futures,datetime,hashlib,json,os,re,subprocess,time
+freeze=json.loads(Path('evidence/m1-k1-k3-attempt03-source-freeze.json').read_text())
+proof=json.loads(Path('evidence/brotli-b3c-m1-k1-k3-attempt03-verification.json').read_text())
+assert freeze['exit_code']==0 and freeze['source_unchanged'] and proof['verification-results']['success'] and proof['verification-results']['is-verifying-entire-crate']
+identities=dict(freeze['source_sha256'],**freeze['validation_source_sha256'])
+def unchanged():return all(hashlib.sha256(Path(n).read_bytes()).hexdigest()==h for n,h in identities.items())
+assert unchanged()
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1',VERUS_ROOT='/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+source=Path('tests/proof_rejection.rs').read_text()
+cases=[('the_prover_rejects_five_k1_k3_success_and_preservation_defects',5),('the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects',15),('the_prover_rejects_three_k3_suffix_plan_relation_defects',3)]
+def run(case):
+ name,expected=case;start=source.index('fn '+name+'(');end=start+source[start:].index('\n}\n')+3;names=re.findall(r'"(brotli-[a-z0-9-]+)"',source[start:end]);assert len(names)==expected
+ log=Path('evidence')/('m1-k1-k3-repair-controls-'+name+'.log');clock=time.monotonic();started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ cmd=['cargo','test','--locked','--release','--test','proof_rejection',name,'--','--ignored','--exact','--nocapture']
+ with log.open('w') as out:result=subprocess.run(cmd,env=env,stdout=out,stderr=subprocess.STDOUT)
+ row={'suite':name,'expected_mutants':expected,'exit_code':result.returncode,'started_utc':started,'seconds':time.monotonic()-clock,'log':str(log),'sha256':hashlib.sha256(log.read_bytes()).hexdigest(),'source_unchanged':unchanged(),'mutants':[]}
+ if result.returncode==0:
+  for mutant in names:
+   p=Path('evidence')/('canary-'+mutant+'.log');text=p.read_text();lower=text.lower()
+   assert re.search(r'verification results:: .*\b[1-9][0-9]* errors',text), str(p)
+   assert any(x in lower for x in ['postcondition not satisfied','precondition not satisfied','invariant not satisfied','assertion failed']),str(p)
+   assert not any(x in lower for x in ['resource limit','rlimit) exceeded','expected rlimit-count','panicked','internal compiler error','unexpected smt output']),str(p)
+   row['mutants'].append({'name':mutant,'log':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'semantic_rejection':True})
+ print(json.dumps(row),flush=True);return row
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(run,cases))
+Path('evidence/m1-k1-k3-repair-controls-results.json').write_text(json.dumps(rows,indent=2)+'\n')
+assert all(r['exit_code']==0 and len(r['mutants'])==r['expected_mutants'] and r['source_unchanged'] for r in rows)

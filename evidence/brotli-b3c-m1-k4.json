@@ -1,0 +1,178 @@
+{
+  "component": "Brotli M1 approved K4 repeat-codec checkpoint; M1 incomplete",
+  "generated_utc": "2026-11-10T01:59:16.438295+00:00",
+  "base_commit": "d48e8feb44cd2fc47363809832de295d18270776",
+  "claim": "Exact approved repeat-state codec correction, full encoded repeat-state image/valid reload, queue preservation and reloaded-field agreement bound in the actual tree loop; original admitted inputs and root guarantees retained. Full M1 and decoder release obligations remain open.",
+  "source_sha256": {
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "f7f805873f806c74819fde0948853b39bd16fef32cb214c5f0b1ad7439d07f1d",
+    "src/brotli_prefix.rs": "b0b1ace05f345af70c1db2ddb364a77ee89db904c4cd9eb3bbd3643bc8b28a77",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a"
+  },
+  "validation_source_sha256": {
+    "tests/fixtures/brotli/corpus/10x10y": "41bd4c895e9fb36d74bc97db5092872a24267e3b0455ff6152b0d262faa00d49",
+    "tests/fixtures/brotli/corpus/10x10y.compressed": "d666afc0f6c35d8d7796175aa9a68f16ba59afedee946d4bce9167f6c86e0b84",
+    "tests/fixtures/brotli/corpus/64x": "be4d3ed1fc5f5cfa00735b28605a975f3293fa235d23abb1d9dea380fba0fb87",
+    "tests/fixtures/brotli/corpus/64x.compressed": "f0273c38c6a55c1d9ccb047da04bacdc4bb07acc44ff83871e6b3490dfc2c313",
+    "tests/fixtures/brotli/corpus/compression": "d18f849bb8c5ffef9e1b9b8719e3bcbba35f100655be40f035aeace790dec16b",
+    "tests/fixtures/brotli/corpus/compression.compressed": "a87bcbc0f45a2f793c075b26baec65ff9cd551e057c8cdef508231004ba4abf5",
+    "tests/fixtures/brotli/corpus/empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/fixtures/brotli/corpus/empty.compressed": "67586e98fad27da0b9968bc039a1ef34c939b9b8e523a8bef89d478608c5ecf6",
+    "tests/fixtures/brotli/corpus/monkey": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99",
+    "tests/fixtures/brotli/corpus/monkey.compressed": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9",
+    "tests/fixtures/brotli/corpus/quickfox_repeated": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82",
+    "tests/fixtures/brotli/corpus/quickfox_repeated.compressed": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a",
+    "tests/fixtures/brotli/corpus/x": "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015",
+    "tests/fixtures/brotli/corpus/x.compressed": "cd094a625b695542a1d37b3a11ea849d8db9584a2f9df4e60cf6158bb39bbf61",
+    "tests/fixtures/brotli/corpus/xyzzy": "7609128715518308672067aab169e24944ead24e3d732aab8a8f0b7013a65564",
+    "tests/fixtures/brotli/corpus/xyzzy.compressed": "c3f042a6be42887f842324d0e39dabd0d873e1676cd3dd2d7e2824242b318f14",
+    "tests/fixtures/brotli/corpus/zeros": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+    "tests/fixtures/brotli/corpus/zeros.compressed": "d1236d7fdab24209a747aa471f1bf33765b27adfd676355d4b4b310195dca49f",
+    "tests/fixtures/brotli/reference/command.bin": "fdbc5d5f207a43d34b26441e29b7024f4f3d00be66502d8a73233bcbe9f6c1b4",
+    "tests/fixtures/brotli/reference/context.bin": "0e4abc034ef46244934d117f15876cd477d0fb2ac94a023093338e72e37f7ad9",
+    "tests/fixtures/brotli/reference/dictionary-meta.bin": "1bce8bd7b829f177214697683c3216e836ada1e254bde7582a9111316d9fd0b9",
+    "tests/fixtures/brotli/reference/dictionary.bin": "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70",
+    "tests/fixtures/brotli/reference/transforms.bin": "7682bbd9a2901334c2b47d83aaca99e6d9fc65a2921a7c88180dde12ec3cd6b6",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "f667e8f89e271ef54c85e9fa2f3d9c93e3705cb7799e6104569f9506b17dd040",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39"
+  },
+  "approval_and_document_sha256": {
+    "AGENTS.md": "5dfc67a2d451585f17ba162953eb85048f6087bb71642baf5d43f38fbcf6eff5",
+    "BROTLI_B3B_W1_ADDENDUM.md": "6141a0d7d8999e97df3f7d1136a7e613cd916d418159ec423a37dcb9f1835810",
+    "BROTLI_M1_REPEAT_STATE_DECISION.md": "85b2ad853d20e6de50b255e2d82437cc4c1d29cbe1205505fc8464a1706a9a75",
+    "BROTLI_M1_LOADER_VALIDATION_METERING_DECISION.md": "106d8427945d98dd064f11d700c10aca21c711688cace018964df2434ee61020",
+    "BROTLI_B3C_METERING_ADDENDUM.md": "5652f7b0677df25c94a9cd5cca1abb8c3a0156467911066321c9195b4dcd686f"
+  },
+  "verifier": "Verus\n  Version: 0.2026.10.18.7d82994\n  Profile: release\n  Platform: macos_aarch64\n  Toolchain: 1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)\n\n",
+  "verifier_binary": {
+    "verus": "483703c79cf57530a9864de2e69326740ee69162dd98b853aedb8273c74a06f6",
+    "rust_verify": "261789c83d4f9949f2db4e6aa205987a22a5ed6f576b1f3663ca52b246a4bc7a",
+    "z3": "edae32f9e37ea4b5bb35310d72f0e352d0dc07626cac4e9e30bc1ea9a5bc8efb"
+  },
+  "verification_options": [
+    "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+    "src/lib.rs",
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "8",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "300",
+    "--trace",
+    "--time",
+    "--output-json"
+  ],
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 1210,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_elapsed_seconds": 309.22905991697917,
+  "verification_evidence": {
+    "path": "evidence/brotli-b3c-m1-k4-attempt03-verification.json",
+    "sha256": "a9b4616e33f16696ded30f167377225ed03be0e1238ba3e50671304c34e74476"
+  },
+  "verification_log": {
+    "path": "evidence/m1-k4-attempt03-whole-crate.log",
+    "sha256": "39f70a0739a4e6096fdc1753a765f8722f2fc6f5c04ef8a25dc0dc0cb165338a"
+  },
+  "source_freeze": {
+    "path": "evidence/m1-k4-attempt03-source-freeze.json",
+    "sha256": "b6d97279696403c09bf1102e8644c10f44847dd6ac88737d7286a75083b878f0"
+  },
+  "negative_controls": {
+    "evidence": {
+      "path": "evidence/brotli-b3c-m1-k4-controls.json",
+      "sha256": "b186df462041dc948fafe00c8748dfb630c68b4b7f20ad5d6cbf034adf8b84ea"
+    },
+    "suites_passed": 3,
+    "rejected_mutations": 21,
+    "order": "Every mutation followed whole03 positive on this exact unchanged library and harness; raw transcripts were strictly audited."
+  },
+  "runtime_tests": {
+    "evidence": {
+      "path": "evidence/m1-k4-final-all-runtime-tests.log",
+      "sha256": "6c5f925b04bc9ff0eef5050ab9108cdfa9e98b67fc1073863757ca2fe1423a28"
+    },
+    "passed": 104,
+    "failed": 0,
+    "library": 93,
+    "primitives": 9,
+    "trust_scan": 1,
+    "upstream_comparison": 1,
+    "repeat_matrix_configurations": 2048,
+    "F2_policy_changed": false
+  },
+  "release_gate": "incomplete",
+  "not_established": [
+    "Full source-operation ledger, loader validation/saved-symbol accounting and exact malformed-prefix reads",
+    "Complete tree/action and remaining header/body failure/frame/control closure",
+    "B3c/B3d/B4 and independent human specification review; no supported-decoder or mathematical safety completion claim"
+  ],
+  "trusted_components": [
+    "Approved mathematical specifications and their interpretation",
+    "Pinned Verus/Z3 and vstd",
+    "Rust 1.99.1, LLVM and Apple native build tools",
+    "Target machine and operating environment"
+  ],
+  "execution_environment": {
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+    "RUSTUP_TOOLCHAIN": "1.99.1",
+    "target": "aarch64-apple-darwin"
+  },
+  "approved_decision": "K4 approved exactly as written by direct human reply on 2026-11-09; no K5 changes authorized or implemented",
+  "held_decision": {
+    "candidate": "K5",
+    "status": "proposed, awaiting exact human approval",
+    "proposal": {
+      "path": "BROTLI_M1_LOADER_VALIDATION_METERING_DECISION.md",
+      "sha256": "106d8427945d98dd064f11d700c10aca21c711688cace018964df2434ee61020"
+    }
+  },
+  "earlier_failed_checks": {
+    "whole01": {
+      "path": "evidence/brotli-b3c-m1-k4-verification.json",
+      "sha256": "612c4157eba63367980ec60dd01a30d21f8376be428e6c765c17ff613e70933c"
+    },
+    "whole01_source": {
+      "path": "evidence/m1-k4-source-freeze.json",
+      "sha256": "2d7d917c9e498bf2783f20d7251eb05d09c04a272be52a6d62fb3853d9154065"
+    },
+    "whole02_interrupted": {
+      "path": "evidence/m1-k4-attempt02-source-freeze.json",
+      "sha256": "6acce5fedb1d4e3e36d16698320dd7af428a4d64f0c31607a7290fd148f823af"
+    },
+    "whole02_raw_output": {
+      "path": "evidence/m1-k4-attempt02-whole-crate.log",
+      "sha256": "afa71f3fb375dc6b8978e16ebd491effbd9bb0b9a94b1b94c0b1cbd0fc0db168"
+    },
+    "before_control_transcripts": {
+      "path": "evidence/m1-k4-before-controls.tar.gz",
+      "sha256": "b9262e3afe21d442f7e53958e99d3dc0e380b77f142d7223fb3465f2f945e1f1"
+    }
+  },
+  "previous_checkpoint": {
+    "path": "evidence/brotli-b3c-m1-k1-k3.json",
+    "sha256": "6cf1aad578e8bbf1c61c4f5ff9806fb29a1b98fae4592ba3d943160d8f443644"
+  },
+  "evidence_completion": "Named K4 checkpoint verified; full M1 remains incomplete. Commit and push requested by the human are delivery work, not release approval."
+}

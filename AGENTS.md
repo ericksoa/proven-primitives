@@ -112,18 +112,44 @@ rerunning verification. This covers only `advance_serialized_tree` and
 `plan_serialized_tree`; preserve the interfaces, RequestBudget policy,
 workspace, parser representations and 425-unit construction/reset charge.
 
-The human explicitly held Candidate K1 in
-`BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md` for review on 2026-11-04.
-K1 remains unapproved: do not expose its named prefix-code mathematical
-definitions or constant, or implement its proposed installer-contract change.
-This hold does not pause the approved F2 validation and publication.
+The human held Candidate K1 for review on 2026-11-04, then explicitly approved
+K1 exactly as written in `BROTLI_M1_CANONICAL_PROOF_BOUNDARY_DECISION.md` on
+2026-11-09 after the source review. Implement only its four named mathematical
+definition visibility changes, CODE_SPACE visibility and installer
+success/error contract. Preserve its signatures, executable algorithms,
+admitted inputs, budgets, workspace and all existing record/frame guarantees.
 
 The human explicitly approved Candidate K2 in
 `BROTLI_M1_CONTEXT_MODE_PROOF_BOUNDARY_DECISION.md` on 2026-11-09. Strengthen
 only `write_next_context_mode`'s success guarantee for the existing valid
 window/workspace and initialized index below 256, then prove normal context-mode
 agreement within the input-private boundary. Preserve its signature,
-requirements, executable body, budgets and workspace. K1 remains held.
+requirements, executable body, budgets and workspace. K1 was held at that
+checkpoint and was subsequently explicitly approved as recorded above.
+
+The assistant's source review in `BROTLI_M1_K1_REVIEW.md` is not the independent
+human specification review required for release. The human explicitly approved
+K3 as written in `BROTLI_M1_BLOCK_LENGTH_PROOF_BOUNDARY_DECISION.md` on
+2026-11-09: add only the existing block-length decoder's conditional success
+guarantee and its dependent M1 proofs. Preserve its signature, requirements,
+executable body, tables, errors, budgets, workspace and the 425-unit reset
+charge. Any other architectural decision still needs exact human approval.
+
+The human explicitly approved Candidate K4 as written in
+`BROTLI_M1_REPEAT_STATE_DECISION.md` on 2026-11-09. Preserve previous repeat
+length in byte 71 and, for tag-six ComplexRepeat only, store/load current repeat
+length in existing byte 174, with its existing invalid-state rejection and
+extra-bit derivation. Update only that codec, its proof relations and tag-dependent
+documentation. Keep tag-seven meanings, workspace size, write counts/work
+formulas, W1 interfaces, 5,696-action bounds and the 425-unit reset charge.
+Preserve the failed repeat-history evidence and separately approved F2 fixture
+policy. Any F2 expectation change requires a separate direct human decision.
+
+Candidate K5 in `BROTLI_M1_LOADER_VALIDATION_METERING_DECISION.md` remains
+proposed and unimplemented. Do not classify the four saved simple-symbol
+copies as new table reads, change the private pre-scan receipt, or change the
+loader quota terms under K5 without direct human approval. K4 remains approved;
+other already-approved M1 proof work may continue within its existing scope.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,

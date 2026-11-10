@@ -2,27 +2,27 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51669,13): 'if' cannot be used in patterns.
+WARNING: (59024,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-12411/src/brotli_input.rs:11904:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-89028/src/brotli_input.rs:11910:5
       |
-11904 |     while i < 17
+11910 |     while i < 17
       |     ^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-12411/src/brotli_input.rs:11884:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-89028/src/brotli_input.rs:11890:1
       |
-11884 | / fn read_aux_lengths(
-11885 | |     workspace: &[u8],
-11886 | |     window_bytes: u32,
-11887 | | ) -> (r: Result<[u8; 18], CompressedHeaderError>)
+11890 | / fn read_aux_lengths(
+11891 | |     workspace: &[u8],
+11892 | |     window_bytes: u32,
+11893 | | ) -> (r: Result<[u8; 18], CompressedHeaderError>)
       | |________________________________________________^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-12411/src/brotli_input.rs:11936:20
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-89028/src/brotli_input.rs:11942:20
       |
-11936 |             assert(lengths@[j] <= 5);
+11942 |             assert(lengths@[j] <= 5);
       |                    ^^^^^^^^^^^^^^^^ assertion failed
 
 error: aborting due to 1 previous error

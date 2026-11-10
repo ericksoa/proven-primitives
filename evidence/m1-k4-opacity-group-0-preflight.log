@@ -1,0 +1,30 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (51874,13): 'if' cannot be used in patterns.
+WARNING: (59229,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12633:7
+      |
+12633 |   proof fn k4_repeat_phase_values_are_unique(workspace: Seq<u8>, window_bytes: u32,
+      |  _______^
+12634 | |     left: CodeDescriptionPhase, right: CodeDescriptionPhase)
+      | |____________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12667:7
+      |
+12667 |   proof fn k4_repeat_image_rebases_queue(workspace: Seq<u8>, window_bytes: u32,
+      |  _______^
+12668 | |     original: CodeDescriptionDecoder, queue: BitQueue)
+      | |______________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12678:7
+      |
+12678 |   proof fn k4_repeat_reloaded_field_refines_original(workspace: Seq<u8>, window_bytes: u32,
+      |  _______^
+12679 | |     original: CodeDescriptionDecoder, loaded: CodeDescriptionDecoder,
+12680 | |     input: Seq<u8>, end: bool, after: CodeDescriptionDecoder, step: CodeDescriptionStep)
+      | |________________________________________________________________________________________^
+
+verification results:: 3 verified, 0 errors (partial verification with `--verify-*`)

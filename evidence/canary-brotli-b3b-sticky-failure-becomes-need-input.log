@@ -2,32 +2,32 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-12217/src/brotli_input.rs:20251:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-37866/src/brotli_input.rs:20345:5
       |
-20251 | /     fn repeat_terminal_failure(
-20252 | |         &mut self,
-20253 | |         error: CompressedHeaderError,
-20254 | |     ) -> (r: CompressedHeaderStep)
+20345 | /     fn repeat_terminal_failure(
+20346 | |         &mut self,
+20347 | |         error: CompressedHeaderError,
+20348 | |     ) -> (r: CompressedHeaderStep)
       | |_________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-12217/src/brotli_input.rs:20264:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-37866/src/brotli_input.rs:20358:13
       |
-20264 | /             r == (CompressedHeaderStep {
-20265 | |                 consumed: 0,
-20266 | |                 status: CompressedHeaderStatus::Failed(error),
-20267 | |             }),
+20358 | /             r == (CompressedHeaderStep {
+20359 | |                 consumed: 0,
+20360 | |                 status: CompressedHeaderStatus::Failed(error),
+20361 | |             }),
       | |______________^ failed this postcondition
 ...
-20273 | /     {
-20274 | |         CompressedHeaderStep {
-20275 | |             consumed: 0,
-20276 | |             status: CompressedHeaderStatus::NeedInput,
-20277 | |         }
-20278 | |     }
+20367 | /     {
+20368 | |         CompressedHeaderStep {
+20369 | |             consumed: 0,
+20370 | |             status: CompressedHeaderStatus::NeedInput,
+20371 | |         }
+20372 | |     }
       | |_____- at the end of the function body
 
 error: aborting due to 1 previous error

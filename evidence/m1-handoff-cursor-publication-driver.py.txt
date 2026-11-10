@@ -1,0 +1,53 @@
+from pathlib import Path
+import datetime,hashlib,io,json,os,subprocess,time
+root=Path.cwd();env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools');status=root/'target/m1-handoff-cursor-publication.json'
+def save(stage,**extra):status.write_text(json.dumps({'stage':stage,'updated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),**extra},indent=2)+'\n')
+def run(args):return subprocess.run(args,env=env,check=True)
+def output(args):return subprocess.check_output(args,env=env,text=True).strip()
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+base='d48e8feb44cd2fc47363809832de295d18270776';branch='codex/m1-saved-table-ledger';manifest=Path('evidence/brotli-m1-handoff-cursor.json')
+try:
+ save('waiting_for_whole_crate_positive_and_all_controls')
+ while not Path('evidence/brotli-b3c-m1-handoff-cursor-controls.json').exists():
+  p=Path('evidence/m1-handoff-cursor-source-freeze.json')
+  if p.exists():
+   f=json.loads(p.read_text());assert f['exit_code']==0 and f['source_unchanged'],'Whole source check did not pass'
+  p=Path('evidence/m1-handoff-cursor-control-runs.json')
+  if p.exists():assert all(r['exit_code']==0 for r in json.loads(p.read_text())),'A control suite failed; preserve its actual output'
+  time.sleep(10)
+ save('checking_final_evidence')
+ if not manifest.exists():run(['python3','evidence/m1-handoff-cursor-finalize-driver.py.txt'])
+ m=json.loads(manifest.read_text());hashes={}
+ for section in ['source_sha256','validation_source_sha256','approval_and_document_sha256','artifact_sha256']:
+  for p,h in m[section].items():assert sha(p)==h,(section,p);hashes[p]=h
+ assert output(['git','rev-parse','HEAD'])==base
+ assert output(['git','branch','--show-current'])==branch
+ assert output(['git','ls-remote','origin','refs/heads/'+branch]).split()[0]==base,'Remote branch changed'
+ allowed=set(m['artifact_sha256'])|set(m['approval_and_document_sha256'])|{'src/brotli_input.rs','tests/proof_rejection.rs',str(manifest)}
+ run(['git','add','-f','--',*sorted(allowed)])
+ run(['git','diff','--cached','--check','--','.',':(exclude)evidence'])
+ staged=set(output(['git','diff','--cached','--name-only']).splitlines());assert staged<=allowed and {'src/brotli_input.rs','tests/proof_rejection.rs'}<=staged
+ save('signing_validated_commit',staged_files=len(staged))
+ run(['/usr/bin/ssh-add','--apple-use-keychain','/Users/aerickson/.ssh/id_ed25519'])
+ run(['git','commit','--quiet','-S','-m','Prove M1 context-mode handoff and preserve saved-cursor failures'])
+ commit=output(['git','rev-parse','HEAD']);save('pushing_validated_commit',commit=commit)
+ run(['git','push','origin','HEAD:refs/heads/'+branch])
+ assert output(['git','ls-remote','origin','refs/heads/'+branch]).split()[0]==commit
+ verification=None
+ for attempt in range(10):
+  verification=json.loads(output(['gh','api','repos/ericksoa/proven-primitives/commits/'+commit,'--jq','.commit.verification | {verified,reason}']))
+  if verification['verified'] and verification['reason']=='valid':break
+  time.sleep(5)
+ assert verification['verified'] and verification['reason']=='valid',verification
+ hashes[str(manifest)]=sha(manifest)
+ request=''.join(commit+':'+p+'\n' for p in hashes).encode()
+ blobs=subprocess.run(['git','cat-file','--batch'],env=env,input=request,stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True);stream=io.BytesIO(blobs.stdout)
+ for p,h in hashes.items():
+  header=stream.readline().decode().split();assert len(header)==3 and header[1]=='blob',(p,header)
+  blob=stream.read(int(header[2]));assert stream.read(1)==b'\n';assert hashlib.sha256(blob).hexdigest()==h,('committed identity',p);assert sha(p)==h,('workspace identity',p)
+ assert sha(m['compiled_artifact']['path'])==m['compiled_artifact']['sha256']
+ assert not output(['git','status','--porcelain'])
+ save('published',commit=commit,signature=verification,worktree_clean=True,committed_hashes_verified=len(hashes),M1='incomplete',unapproved_at_source_freeze=['K1','K3'])
+ print(json.dumps({'commit':commit,'signature':verification,'worktree_clean':True,'verified':m['verification_results']['verified'],'tests':101,'defects':158,'M1':'incomplete'}),flush=True)
+except Exception as exc:
+ save('stopped_without_claiming_completion',error=str(exc));raise

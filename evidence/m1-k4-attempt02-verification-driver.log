@@ -1,0 +1,6 @@
+exit_code -15 source_unchanged True
+Traceback (most recent call last):
+  File "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/evidence/m1-k4-attempt02-verification-driver.py.txt", line 17, in <module>
+    assert p.returncode==0 and r['source_unchanged'], 'Whole-crate verification did not pass on unchanged source'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Whole-crate verification did not pass on unchanged source

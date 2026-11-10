@@ -2,27 +2,27 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51433,13): 'if' cannot be used in patterns.
-WARNING: (57873,5): 'if' cannot be used in patterns.
+WARNING: (51607,13): 'if' cannot be used in patterns.
+WARNING: (58340,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:29480:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-42115/src/brotli_input.rs:29657:1
       |
-29480 | / fn plan_context_bits_action(workspace: &[u8], window_bytes: u32,
-29481 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
-29482 | | ) -> (r: Result<ContextBitsPlan, CoreFailure>)
+29657 | / fn plan_context_bits_action(workspace: &[u8], window_bytes: u32,
+29658 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+29659 | | ) -> (r: Result<ContextBitsPlan, CoreFailure>)
       | |_____________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-16129/src/brotli_input.rs:29491:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-42115/src/brotli_input.rs:29668:9
       |
-29491 | /         r.is_ok() ==> {
-29492 | |             &&& context_bits_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap())
-29493 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().read_work
-29494 | |         },
+29668 | /         r.is_ok() ==> {
+29669 | |             &&& context_bits_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap())
+29670 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().read_work
+29671 | |         },
       | |_________^ failed this postcondition
 ...
-29550 | /     Ok(ContextBitsPlan { phase, start_queue, end_queue: queue, status: step.status,
-29551 | |         consumed: step.consumed, repeat, read_work: read.work, execution_work })
+29727 | /     Ok(ContextBitsPlan { phase, start_queue, end_queue: queue, status: step.status,
+29728 | |         consumed: step.consumed, repeat, read_work: read.work, execution_work })
       | |________________________________________________________________________________- at the end of the function body
 
 error: aborting due to 1 previous error

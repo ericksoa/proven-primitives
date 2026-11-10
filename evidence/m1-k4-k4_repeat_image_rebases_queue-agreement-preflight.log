@@ -1,0 +1,33 @@
+error[E0425]: cannot find value `B3B_QUEUE_BYTES` in this scope
+     --> src/brotli_input.rs:12693:58
+      |
+ 7589 | const B3B_QUEUE_LEN: u16 = 8;
+      | ----------------------------- similarly named constant `B3B_QUEUE_LEN` defined here
+...
+12693 |         assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_BYTES as int + i] == original.queue.pending@[i]);
+      |                                                          ^^^^^^^^^^^^^^^
+      |
+help: a constant with a similar name exists
+      |
+12693 -         assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_BYTES as int + i] == original.queue.pending@[i]);
+12693 +         assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_LEN as int + i] == original.queue.pending@[i]);
+      |
+
+error[E0425]: cannot find value `B3B_QUEUE_BYTES` in this scope
+     --> src/brotli_input.rs:12694:58
+      |
+ 7589 | const B3B_QUEUE_LEN: u16 = 8;
+      | ----------------------------- similarly named constant `B3B_QUEUE_LEN` defined here
+...
+12694 |         assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_BYTES as int + i] == loaded.queue.pending@[i]);
+      |                                                          ^^^^^^^^^^^^^^^
+      |
+help: a constant with a similar name exists
+      |
+12694 -         assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_BYTES as int + i] == loaded.queue.pending@[i]);
+12694 +         assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_LEN as int + i] == loaded.queue.pending@[i]);
+      |
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0425`.
