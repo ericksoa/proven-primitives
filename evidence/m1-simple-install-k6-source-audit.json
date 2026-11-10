@@ -1,0 +1,65 @@
+{
+  "kind": "source-derived accounting audit, not measured execution-counter evidence",
+  "generated_utc": "2026-11-10T18:02:43.290852+00:00",
+  "source_sha256": {
+    "src/brotli_prefix.rs": "b0b1ace05f345af70c1db2ddb364a77ee89db904c4cd9eb3bbd3643bc8b28a77",
+    "src/brotli_input.rs": "6684e039a8848f13216a84a8073c46bc795e590fe8911fc1c2c086d38f843754",
+    "BROTLI_M1_LOADER_VALIDATION_METERING_DECISION.md": "2b23d4d5323fa60bf47095a7e0b6004273ccde18d5914a4c17b3d9d893a51f21"
+  },
+  "functions": [
+    "brotli_prefix::install_simple_tree",
+    "brotli_prefix::simple_record_exec",
+    "brotli_input::simple_tree_install_work",
+    "brotli_input::plan_serialized_tree"
+  ],
+  "cases": [
+    {
+      "alphabet": 2,
+      "selector": 0,
+      "count": 1,
+      "validation_reads": 1,
+      "record_or_singleton_reads": 1,
+      "current_reservation": 5,
+      "proposed_reservation": 7
+    },
+    {
+      "alphabet": 2,
+      "selector": 1,
+      "count": 2,
+      "validation_reads": 4,
+      "record_or_singleton_reads": 3,
+      "current_reservation": 11,
+      "proposed_reservation": 18
+    },
+    {
+      "alphabet": 4,
+      "selector": 3,
+      "count": 4,
+      "validation_reads": 16,
+      "record_or_singleton_reads": 10,
+      "current_reservation": 17,
+      "proposed_reservation": 43
+    },
+    {
+      "alphabet": 704,
+      "selector": 4,
+      "count": 4,
+      "validation_reads": 16,
+      "record_or_singleton_reads": 2810,
+      "current_reservation": 2117,
+      "proposed_reservation": 4943
+    }
+  ],
+  "proposal": "BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md",
+  "approval": "pending",
+  "implemented": false,
+  "limits_preserved": [
+    "W1 interfaces and result",
+    "workspace",
+    "5696 action caps",
+    "798 initial planning proof bound",
+    "8192 per-iteration proof bound",
+    "425 construction/reset charge",
+    "F2 fixture policy"
+  ]
+}

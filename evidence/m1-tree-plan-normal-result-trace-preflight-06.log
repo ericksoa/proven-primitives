@@ -1,0 +1,8 @@
+error: expected `,`
+     --> src/brotli_input.rs:16021:62
+      |
+16021 |         tree as nat < crate::brotli_prefix::tree_region_count(region),
+      |                                                              ^^^^^^^^
+
+error: aborting due to 1 previous error
+

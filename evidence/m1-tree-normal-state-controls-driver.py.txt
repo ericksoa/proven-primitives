@@ -1,0 +1,50 @@
+from pathlib import Path
+import concurrent.futures,datetime,hashlib,json,os,re,shutil,subprocess,tempfile,time
+
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def now():return datetime.datetime.now(datetime.timezone.utc).isoformat()
+f=json.loads(Path('evidence/m1-tree-normal-state-attempt01-source-freeze.json').read_text())
+v=json.loads(Path('evidence/brotli-b3c-m1-tree-normal-state-attempt01-verification.json').read_text())
+assert f['exit_code']==0 and f['source_unchanged'] and v['verification-results']['success'] and v['verification-results']['is-verifying-entire-crate']
+identities=dict(f['source_sha256'],**f['validation_source_sha256'])
+def unchanged():return all(sha(n)==h for n,h in identities.items())
+assert unchanged()
+base=Path('src/brotli_input.rs').read_text();start=base.index('fn plan_serialized_tree(');finish=base.index('\n}\n',start)+3;selected=base[start:finish];body=selected.index('\n{\n');contract=selected[:body]
+
+def mutate(name):
+ x=selected
+ if name=='consumption-erased':
+  old='        consumed += step.consumed;';assert x.count(old)==1;x=x.replace(old,'        consumed += 0;',1)
+ elif name=='builder-prefix-first-cell-erased':
+  a=x.index('    while copied < copy_len');b=x.index('    let ghost initial_decoder',a);chunk=x[a:b];old='            Ok(value) => value,';assert chunk.count(old)==1
+  chunk=chunk.replace(old,'            Ok(value) => if copied == 0 { 0 } else { value },',1);x=x[:a]+chunk+x[b:]
+ elif name=='simple-complete-reported-need-input':
+  a=x.index('            CodeDescriptionPhase::CompleteSimple(code) => {');b=x.index('            CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } => {',a);chunk=x[a:b];old='status: SerializedTreeStatus::Complete,';assert chunk.count(old)==1
+  chunk=chunk.replace(old,'status: SerializedTreeStatus::NeedInput,',1);x=x[:a]+chunk+x[b:]
+ elif name=='need-input-reported-complete':
+  old='status: SerializedTreeStatus::NeedInput,';assert x.count(old)==1;x=x.replace(old,'status: SerializedTreeStatus::Complete,',1)
+ else:raise AssertionError(name)
+ assert x[:x.index('\n{\n')]==contract and x!=selected
+ return base[:start]+x+base[finish:]
+
+names=['consumption-erased','builder-prefix-first-cell-erased','simple-complete-reported-need-input','need-input-reported-complete']
+# Audit every unique transformation before invoking the checker on any mutant.
+for n in names:mutate(n)
+verus='/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus'
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1')
+evidence=Path('evidence').resolve();root=Path.cwd();driver={'path':str(Path(__file__)),'sha256':sha(__file__)}
+def run(name):
+ assert unchanged();began=now();clock=time.monotonic()
+ with tempfile.TemporaryDirectory(prefix='proven-primitives-m1-normal-tree-') as d:
+  folder=Path(d);shutil.copytree(root/'src',folder/'src');p=folder/'src/brotli_input.rs';p.write_text(mutate(name));mutant_sha=sha(p)
+  cmd=[verus,'src/lib.rs','--crate-type','lib','--verify-only-module','brotli_input','--verify-function','plan_serialized_tree','--no-cheating','--num-threads','1','--triggers-mode','silent','--rlimit','300','--multiple-errors','0']
+  log=evidence/('canary-brotli-m1-tree-normal-'+name+'.log')
+  with log.open('w') as out:result=subprocess.run(cmd,cwd=folder,env=env,stdout=out,stderr=subprocess.STDOUT)
+  text=log.read_text();lower=text.lower()
+  semantic=result.returncode!=0 and bool(re.search(r'verification results:: .*\b[1-9][0-9]* errors',text)) and any(s in lower for s in ['postcondition not satisfied','precondition not satisfied','invariant not satisfied','assertion failed']) and not any(s in lower for s in ['resource limit','rlimit) exceeded','expected rlimit-count','panicked','internal compiler error','unexpected smt output'])
+  row={'name':'brotli-m1-tree-normal-'+name,'function':'plan_serialized_tree','started_utc':began,'finished_utc':now(),'seconds':time.monotonic()-clock,'exit_code':result.returncode,'semantic_rejection':semantic,'original_root_contract_unchanged':True,'mutated_source_sha256':mutant_sha,'log':str(log.relative_to(root)),'sha256':sha(log),'source_unchanged':unchanged(),'command':cmd}
+  print(json.dumps(row),flush=True);return row
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(run,names))
+r={'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],'preceding_whole_positive':'evidence/m1-tree-normal-state-attempt01-source-freeze.json','driver':driver,'controls':rows,'semantic_rejections':sum(x['semantic_rejection'] for x in rows),'complete':all(x['semantic_rejection'] and x['source_unchanged'] for x in rows)}
+Path('evidence/m1-tree-normal-state-controls-results.json').write_text(json.dumps(r,indent=2)+'\n')
+assert r['complete'] and unchanged(), 'All controls must give semantic rejection; tooling/resource failures do not count'

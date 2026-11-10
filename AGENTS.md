@@ -163,6 +163,20 @@ tree loop's reload/field binding, with the original admitted requirements.
 This does not complete the plan/action tree trace, remaining source ledgers or
 M1. It grants no additional architectural authority.
 
+Candidate K6 in `BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md` is proposed,
+not approved or implemented. The source audit records installer symbol-table
+reads missing from the current simple-install reservation. Hold K6 formula,
+quota and related expectation changes until direct exact human approval.
+Independent M1 replay/state proofs may continue; this grants no architectural
+authority and does not complete M1.
+
+The normal M1 tree-planning trace checkpoint is recorded in
+`evidence/brotli-b3c-m1-tree-normal-state.json`. It binds Complete/NeedInput
+planner results and the initial builder image to checked replay traces. Its
+mathematical unit fold excludes installation. Failure-result traces, full
+executor refinement, remaining source ledgers and K6 remain open. No M1 or
+supported-decoder completion claim or additional architectural authority follows.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

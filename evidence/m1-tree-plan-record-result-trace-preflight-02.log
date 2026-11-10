@@ -1,0 +1,28 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (56911,13): 'if' cannot be used in patterns.
+WARNING: (64486,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:15983:7
+      |
+15983 |   proof fn m1_tree_record_finished_trace(workspace: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool,
+      |  _______^
+15984 | |     initial: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion, tree: u16,
+15985 | |     initialized: u16, values: Seq<u8>, actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), prefix_consumed: nat, result: SerializedTreeStep)
+      | |__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________^
+
+error: postcondition not satisfied
+     --> src/brotli_input.rs:15997:13
+      |
+15983 |   proof fn m1_tree_record_finished_trace(workspace: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool,
+      |  _______-
+15984 | |     initial: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion, tree: u16,
+15985 | |     initialized: u16, values: Seq<u8>, actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), prefix_consumed: nat, result: SerializedTreeStep)
+      | |__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________- at the end of the function body
+...
+15997 |       ensures m1_tree_result_has_trace(workspace, window_bytes, input, end, result),
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

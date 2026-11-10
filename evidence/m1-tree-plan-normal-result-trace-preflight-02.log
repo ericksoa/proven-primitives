@@ -1,0 +1,68 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (56911,13): 'if' cannot be used in patterns.
+WARNING: (64486,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30906:5
+      |
+30906 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31045:17
+      |
+31045 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30948:5
+      |
+30948 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30820:1
+      |
+30820 | / fn plan_serialized_tree(
+30821 | |     workspace: &[u8],
+30822 | |     window_bytes: u32,
+30823 | |     budget: &mut crate::brotli::RequestBudget,
+30824 | |     input: &[u8],
+30825 | |     end_of_input: bool,
+30826 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+note: recommendation not met
+     --> src/brotli_input.rs:30910:20
+      |
+30910 |                 == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+note: recommendation not met
+     --> src/brotli_input.rs:31049:69
+      |
+31049 | ...                   == if start <= i < at { length } else { before_values[i] },
+      |                                                               ^^^^^^^^^^^^^^^^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+error: precondition not satisfied
+     --> src/brotli_input.rs:31181:21
+      |
+15986 |       requires m1_code_decoder_image(workspace, window_bytes, initial.queue, initial),
+      |                ---------------------------------------------------------------------- failed precondition
+...
+31181 | /                     m1_tree_record_finished_trace(workspace@, window_bytes, input@, end_of_input,
+31182 | |                         initial_decoder, region, tree, initial_initialized, initial_values,
+31183 | |                         actions, action, before_consumed as nat, SerializedTreeStep { consumed, status: SerializedTreeStatus::NeedInput });
+      | |__________________________________________________________________________________________________________________________________________^
+
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

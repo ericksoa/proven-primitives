@@ -13306,6 +13306,28 @@ proof fn m1_description_values_are_unique(workspace: Seq<u8>, window_bytes: u32,
     }
 }
 
+proof fn m1_code_images_agree(workspace: Seq<u8>, window_bytes: u32,
+    left: CodeDescriptionDecoder, right: CodeDescriptionDecoder)
+    requires m1_code_decoder_image(workspace, window_bytes, left.queue, left),
+        m1_code_decoder_image(workspace, window_bytes, right.queue, right),
+        serialized_b3b_queue(workspace, window_bytes, left.queue),
+        serialized_b3b_queue(workspace, window_bytes, right.queue),
+    ensures m1_code_states_agree(left, right),
+{
+    reveal(m1_code_decoder_image);
+    m1_valid_phase_loader_choices(left); m1_valid_phase_loader_choices(right);
+    m1_description_values_are_unique(workspace, window_bytes, left.alphabet_limit, left.phase, right.phase);
+    serialized_bit_queues_agree(workspace, window_bytes, left.queue, right.queue);
+    reveal(serialized_b3b_queue); reveal(m1_code_states_agree);
+    assert forall|i: int| 0 <= i < left.queue.len implies #[trigger]
+        left.queue.pending@[i] == right.queue.pending@[i] by {
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == left.queue.pending@[i]);
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == right.queue.pending@[i]);
+    }
+    assert(left.queue.pending@.take(left.queue.len as int) =~= right.queue.pending@.take(right.queue.len as int));
+    reveal(CodeDescriptionDecoder::valid); reveal(BitQueue::bits);
+}
+
 proof fn m1_code_image_rebases_queue(workspace: Seq<u8>, window_bytes: u32,
     original: CodeDescriptionDecoder, queue: BitQueue)
     requires m1_code_decoder_image(workspace, window_bytes, original.queue, original), queue.valid(),
@@ -13679,6 +13701,9 @@ fn store_complex_code(
     code: ComplexCodeLengthAlphabet,
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED)
+                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED),
         forall|at: int| 0 <= at < old(workspace)@.len()
             && at != b3b_scalar_base(window_bytes) + B3B_AUX_SKIP as int
             && !(b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int <= at
@@ -13704,6 +13729,7 @@ fn store_complex_code(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(b3b_scalar_u16_at); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base); reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact(); }
     proof { reveal(code_descriptor_store_frame); reveal(k4_complex_code_values); }
     let ghost mut source_writes: nat = 0;
     match put_state_byte(workspace, window_bytes, B3B_AUX_SKIP, code.skip) {
@@ -13727,6 +13753,9 @@ fn store_complex_progress(
     progress: ComplexSymbolProgress,
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED)
+                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED),
         b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==> r.is_ok(),
         r.is_ok() ==> k4_complex_progress_values(final(workspace)@, window_bytes, progress),
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
@@ -13749,6 +13778,7 @@ fn store_complex_progress(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(b3b_scalar_u16_at); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base); reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact(); }
     proof { reveal(code_descriptor_store_frame); reveal(k4_complex_progress_values); reveal(k4_complex_code_values); }
     let ghost original = workspace@;
     proof {
@@ -13763,7 +13793,10 @@ fn store_complex_progress(
     proof { source_writes = source_writes + 19; }
     let mut i: usize = 0;
     while i < 5
-        invariant i <= 5, source_writes == 19 + i as nat,
+        invariant i <= 5,
+            b3b_workspace_shape(original.len(), window_bytes) ==>
+                b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED)
+                    == b3b_scalar_u16_at(original, window_bytes, B3B_BUILDER_INITIALIZED), source_writes == 19 + i as nat,
             k4_complex_code_values(workspace@, window_bytes, progress.code),
             i >= 1 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_PREVIOUS_LENGTH) == progress.prev_code_len,
             i >= 2 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_REPEATED_LENGTH) == progress.repeat_code_len,
@@ -13992,6 +14025,11 @@ fn store_simple_code_description_payload(
     phase: CodeDescriptionPhase,
 ) -> (r: Result<u8, CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes)
+            && m1_simple_description_tag(phase) != 255 ==> r.is_ok(),
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED)
+                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED),
         r.is_ok() && b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
             saved_aux_length_values(final(workspace)@, window_bytes)
                 == m1_payload_auxiliary_values(phase, saved_aux_length_values(old(workspace)@, window_bytes)),
@@ -14008,6 +14046,8 @@ fn store_simple_code_description_payload(
             #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
                 == code_phase_rank(phase, limit),
 {
+    proof { reveal(m1_simple_description_tag); reveal(m1_description_storage_tag); }
+    proof { reveal(b3b_scalar_u16_at); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base); reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact(); }
     let ghost mut source_writes: nat = 0;
     proof {
         reveal(saved_aux_length_values); reveal(m1_payload_auxiliary_values);
@@ -14064,6 +14104,12 @@ fn store_complex_code_description_payload(
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes)
+            && m1_simple_description_tag(phase) == 255
+            && m1_description_storage_tag(phase) != 255 ==> r.is_ok(),
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED)
+                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED),
         r.is_ok() && b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
             saved_aux_length_values(final(workspace)@, window_bytes)
                 == m1_payload_auxiliary_values(phase, saved_aux_length_values(old(workspace)@, window_bytes)),
@@ -14082,6 +14128,8 @@ fn store_complex_code_description_payload(
             #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
                 == code_phase_rank(phase, limit),
 {
+    proof { reveal(m1_simple_description_tag); reveal(m1_description_storage_tag); }
+    proof { reveal(b3b_scalar_u16_at); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base); reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact(); }
     let ghost mut source_writes: nat = 0;
     proof {
         reveal(saved_aux_length_values); reveal(m1_payload_auxiliary_values);
@@ -14196,6 +14244,11 @@ fn store_code_description_payload(
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes)
+            && m1_description_storage_tag(phase) != 255 ==> r.is_ok(),
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED)
+                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED),
         r.is_ok() && b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
             saved_aux_length_values(final(workspace)@, window_bytes)
                 == m1_payload_auxiliary_values(phase, saved_aux_length_values(old(workspace)@, window_bytes)),
@@ -14218,6 +14271,8 @@ fn store_code_description_payload(
             #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
                 == code_phase_rank(phase, limit),
 {
+    proof { reveal(m1_simple_description_tag); reveal(m1_description_storage_tag); }
+    proof { reveal(b3b_scalar_u16_at); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base); reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact(); }
     proof {
         reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
         reveal(m1_simple_description_tag);
@@ -14242,6 +14297,11 @@ fn store_code_description_decoder(
 ) -> (r: Result<(), CompressedHeaderError>)
     requires decoder.valid(),
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes)
+            && !matches!(decoder.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) ==> r.is_ok(),
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED)
+                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED),
         r.is_ok() && code_rank_aligned(decoder.phase)
             && m1_payload_store_context(old(workspace)@, window_bytes, decoder.phase)
             && saved_aux_copy_prefix(old(workspace)@, window_bytes, 18)
@@ -14296,6 +14356,8 @@ fn store_code_description_decoder(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(m1_simple_description_tag); reveal(m1_description_storage_tag); }
+    proof { reveal(b3b_scalar_u16_at); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base); reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact(); }
     proof {
         reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
         reveal(k4_repeat_decoder_image);
@@ -14458,6 +14520,7 @@ fn acknowledge_serialized_pending_span(
         old(decoder).valid(),
         matches!(old(decoder).phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
     ensures
+        *final(decoder) == m1_acknowledged_span_decoder(*old(decoder)),
         code_rank_aligned(old(decoder).phase) ==> {
             &&& code_rank_aligned(final(decoder).phase)
             &&& code_phase_rank(final(decoder).phase, final(decoder).alphabet_limit)
@@ -14479,6 +14542,7 @@ fn acknowledge_serialized_pending_span(
             _ => false,
         },
 {
+    proof { reveal(m1_acknowledged_span_decoder); }
     let ghost before = *decoder;
     let phase = decoder.phase;
     let after = match phase {
@@ -14552,6 +14616,7 @@ fn drain_serialized_pending_span(
         old(decoder).valid(),
         matches!(old(decoder).phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
     ensures
+        r.is_ok() ==> *final(decoder) == m1_acknowledged_span_decoder(*old(decoder)),
         r.is_err() ==> final(workspace)@ == old(workspace)@ && *final(decoder) == *old(decoder),
         r.is_ok() == match old(decoder).phase {
             CodeDescriptionPhase::ComplexPendingSpan { start, .. } =>
@@ -14623,6 +14688,7 @@ fn drain_serialized_pending_span(
             }
         },
 {
+    proof { reveal(m1_acknowledged_span_decoder); }
     proof { reveal(pending_span_drain_effect); }
     let ghost original = workspace@;
     proof { reveal(b3b_workspace_shape); }
@@ -14801,6 +14867,16 @@ fn drain_and_store_serialized_pending_span(
         old(decoder).valid(),
         matches!(old(decoder).phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
     ensures
+        r.is_ok() ==> m1_tree_builder_values(final(workspace)@, window_bytes, final(decoder).alphabet_limit,
+            b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) as u16)
+            == m1_tree_builder_span_values(m1_tree_builder_values(old(workspace)@, window_bytes, old(decoder).alphabet_limit,
+                b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) as u16), old(decoder).phase),
+        r.is_ok() ==> *final(decoder) == m1_acknowledged_span_decoder(*old(decoder)),
+        r.is_ok() ==> match old(decoder).phase {
+            CodeDescriptionPhase::ComplexPendingSpan { start, span_count, .. } =>
+                b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) == start as nat + span_count as nat,
+            _ => false,
+        },
         r.is_ok() && serialized_b3b_queue(old(workspace)@, window_bytes, old(decoder).queue) ==>
             serialized_b3b_queue(final(workspace)@, window_bytes, final(decoder).queue),
         final(decoder).queue == old(decoder).queue,
@@ -14856,6 +14932,7 @@ fn drain_and_store_serialized_pending_span(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(m1_acknowledged_span_decoder); }
     proof { reveal(pending_span_stored_effect); reveal(pending_span_drain_effect); }
     let ghost original_phase = decoder.phase;
     match drain_serialized_pending_span(workspace, window_bytes, decoder) {
@@ -14912,6 +14989,11 @@ fn drain_and_store_serialized_pending_span(
             assert forall|i: int| 0 <= i < B3B_QUEUE_OFFSET_BYTE + 1 implies #[trigger]
                 workspace@[b3b_scalar_base(window_bytes) + i] == old(workspace)@[b3b_scalar_base(window_bytes) + i] by {}
             serialized_b3b_queue_from_frame(old(workspace)@, workspace@, window_bytes, old(decoder).queue);
+        }
+    }
+    proof {
+        if result.is_ok() {
+            m1_tree_drained_builder_values(old(workspace)@, workspace@, window_bytes, *old(decoder));
         }
     }
     result
@@ -15471,6 +15553,518 @@ fn install_completed_simple_tree(
         reveal(code_store_frame);
     }
     Ok(meta)
+}
+
+#[verifier::opaque]
+spec fn m1_code_states_agree(left: CodeDescriptionDecoder, right: CodeDescriptionDecoder) -> bool {
+    &&& left.phase == right.phase
+    &&& left.alphabet_max == right.alphabet_max
+    &&& left.alphabet_limit == right.alphabet_limit
+    &&& left.queue.bits() == right.queue.bits()
+    &&& left.queue.len == right.queue.len
+    &&& left.queue.offset == right.queue.offset
+    &&& forall|i: int| 0 <= i < left.queue.len ==> #[trigger] left.queue.pending@[i] == right.queue.pending@[i]
+}
+
+proof fn m1_code_state_agreement_transitive(left: CodeDescriptionDecoder, middle: CodeDescriptionDecoder, right: CodeDescriptionDecoder)
+    requires m1_code_states_agree(left, middle), m1_code_states_agree(middle, right),
+    ensures m1_code_states_agree(left, right), m1_code_states_agree(middle, left),
+{
+    reveal(m1_code_states_agree);
+    assert forall|i: int| 0 <= i < left.queue.len implies #[trigger]
+        left.queue.pending@[i] == right.queue.pending@[i] by {}
+}
+
+proof fn m1_equivalent_code_fields_agree(before_left: CodeDescriptionDecoder,
+    before_right: CodeDescriptionDecoder, input: Seq<u8>, end: bool,
+    left: CodeDescriptionDecoder, ls: CodeDescriptionStep, right: CodeDescriptionDecoder, rs: CodeDescriptionStep)
+    requires before_left.valid(), before_right.valid(), m1_code_states_agree(before_left, before_right),
+        code_field_step_refines(before_left, input, end, left, ls),
+        code_field_step_refines(before_right, input, end, right, rs),
+    ensures m1_code_states_agree(left, right), ls == rs,
+{
+    reveal(m1_code_states_agree); reveal(code_field_step_refines);
+    if !code_phase_terminal(before_left.phase) {
+        let width = code_phase_width(before_left.phase, before_left.alphabet_max);
+        let available = before_left.queue.bits() + bytes_bits(input.take(ls.consumed as int));
+        if available.len() >= width {
+            code_transition_deterministic(before_left.phase, bits_value(available.take(width as int)),
+                before_left.alphabet_max, before_left.alphabet_limit, left.phase, ls.status, right.phase, rs.status);
+        }
+        reveal(bit_queue_read_image);
+    }
+}
+
+#[verifier::opaque]
+spec fn m1_acknowledged_span_decoder(before: CodeDescriptionDecoder) -> CodeDescriptionDecoder {
+    let phase = match before.phase {
+        CodeDescriptionPhase::ComplexPendingSpan { after, .. } => match after {
+            ComplexAfterSpan::Symbol(progress) => CodeDescriptionPhase::ComplexSymbol(progress),
+            ComplexAfterSpan::TrailingZeros { code, start } => CodeDescriptionPhase::ComplexPendingSpan {
+                start, span_count: (before.alphabet_limit - start) as u16, length: 0,
+                after: ComplexAfterSpan::Complete { code, symbols: before.alphabet_limit },
+            },
+            ComplexAfterSpan::Complete { code, symbols } => CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: symbols },
+        },
+        _ => before.phase,
+    };
+    CodeDescriptionDecoder { phase, ..before }
+}
+
+#[verifier::opaque]
+spec fn m1_tree_builder_values(workspace: Seq<u8>, window_bytes: u32,
+    limit: u16, initialized: u16) -> Seq<u8> {
+    Seq::new(704, |i: int| if initialized <= limit && i < initialized {
+        workspace[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i]
+    } else { 0u8 })
+}
+
+#[verifier::opaque]
+spec fn m1_tree_builder_span_values(previous: Seq<u8>, phase: CodeDescriptionPhase) -> Seq<u8> {
+    match phase {
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, .. } =>
+            Seq::new(704, |i: int| if start <= i < start as int + span_count as int { length } else { previous[i] }),
+        _ => previous,
+    }
+}
+
+proof fn m1_tree_builder_values_from_prefix(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    limit: u16, initialized: u16)
+    requires forall|i: int| initialized <= limit && 0 <= i < initialized ==>
+        #[trigger] before[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i]
+            == after[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+    ensures m1_tree_builder_values(before, window_bytes, limit, initialized)
+        == m1_tree_builder_values(after, window_bytes, limit, initialized),
+{
+    reveal(m1_tree_builder_values);
+    assert(m1_tree_builder_values(before, window_bytes, limit, initialized)
+        =~= m1_tree_builder_values(after, window_bytes, limit, initialized));
+}
+
+proof fn m1_tree_drained_builder_values(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+    decoder: CodeDescriptionDecoder)
+    requires b3b_workspace_shape(before.len(), window_bytes), before.len() == after.len(),
+        decoder.valid(), matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
+        pending_span_stored_effect(before, after, window_bytes, decoder.phase),
+        match decoder.phase {
+            CodeDescriptionPhase::ComplexPendingSpan { start, span_count, .. } => {
+                &&& b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED) == start
+                &&& b3b_scalar_u16_at(after, window_bytes, B3B_BUILDER_INITIALIZED) == start as nat + span_count as nat
+            },
+            _ => false,
+        },
+    ensures m1_tree_builder_values(after, window_bytes, decoder.alphabet_limit,
+            b3b_scalar_u16_at(after, window_bytes, B3B_BUILDER_INITIALIZED) as u16)
+        == m1_tree_builder_span_values(m1_tree_builder_values(before, window_bytes, decoder.alphabet_limit,
+            b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED) as u16), decoder.phase),
+{
+    reveal(m1_tree_builder_values); reveal(m1_tree_builder_span_values);
+    reveal(pending_span_stored_effect); reveal(CodeDescriptionDecoder::valid);
+    reveal(b3b_workspace_shape); reveal(b3b_scalar_base); b3b_scalar_layout_is_exact();
+    match decoder.phase {
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, .. } => {
+            let left = m1_tree_builder_values(after, window_bytes, decoder.alphabet_limit,
+                b3b_scalar_u16_at(after, window_bytes, B3B_BUILDER_INITIALIZED) as u16);
+            let right = m1_tree_builder_span_values(m1_tree_builder_values(before, window_bytes, decoder.alphabet_limit,
+                b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED) as u16), decoder.phase);
+            assert forall|i: int| 0 <= i < 704 implies #[trigger] left[i] == right[i] by {
+                if i < start {
+                    let at = window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i;
+                    assert(after[at] == before[at]);
+                }
+            }
+            assert(left =~= right);
+        },
+        _ => {},
+    }
+}
+
+#[verifier::opaque]
+spec fn m1_tree_field_action(before: CodeDescriptionDecoder, input: Seq<u8>, end: bool,
+    after: CodeDescriptionDecoder, step: CodeDescriptionStep) -> bool {
+    if matches!(before.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+        after == before && step == CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress }
+    } else { code_field_step_refines(before, input, end, after, step) }
+}
+
+#[verifier::opaque]
+spec fn m1_tree_aux_start(before: CodeDescriptionDecoder, after: CodeDescriptionDecoder) -> bool {
+    if matches!(before.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
+        code_field_step_refines(before, Seq::empty(), false, after,
+            CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress })
+    } else { after == before }
+}
+
+proof fn m1_tree_description_actions_agree(before_left: CodeDescriptionDecoder,
+    before_right: CodeDescriptionDecoder, input: Seq<u8>, end: bool,
+    field_left: CodeDescriptionDecoder, ls: CodeDescriptionStep, field_right: CodeDescriptionDecoder, rs: CodeDescriptionStep,
+    started_left: CodeDescriptionDecoder, started_right: CodeDescriptionDecoder)
+    requires before_left.valid(), before_right.valid(), field_left.valid(), field_right.valid(),
+        m1_code_states_agree(before_left, before_right),
+        m1_tree_field_action(before_left, input, end, field_left, ls),
+        m1_tree_field_action(before_right, input, end, field_right, rs),
+        m1_tree_aux_start(field_left, started_left), m1_tree_aux_start(field_right, started_right),
+    ensures ls == rs, m1_code_states_agree(field_left, field_right),
+        m1_code_states_agree(started_left, started_right),
+{
+    reveal(m1_tree_field_action); reveal(m1_tree_aux_start); reveal(m1_code_states_agree);
+    if !matches!(before_left.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+        m1_equivalent_code_fields_agree(before_left, before_right, input, end, field_left, ls, field_right, rs);
+    }
+    if matches!(field_left.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
+        m1_equivalent_code_fields_agree(field_left, field_right, Seq::empty(), false,
+            started_left, CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress },
+            started_right, CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress });
+    }
+}
+
+proof fn m1_tree_span_acknowledgements_agree(left: CodeDescriptionDecoder, right: CodeDescriptionDecoder)
+    requires m1_code_states_agree(left, right),
+    ensures m1_code_states_agree(m1_acknowledged_span_decoder(left), m1_acknowledged_span_decoder(right)),
+{
+    reveal(m1_code_states_agree); reveal(m1_acknowledged_span_decoder);
+}
+
+proof fn m1_canonical_scan_cannot_finish_before_another(lengths: Seq<u8>, symbols: nat,
+    first: nat, first_valid: bool, later: nat, later_valid: bool)
+    requires 1 <= symbols <= 704, symbols <= lengths.len(), first < later,
+        canonical_plan_scan_result(lengths, symbols, first, first_valid),
+        canonical_plan_scan_result(lengths, symbols, later, later_valid),
+    ensures false,
+{
+    reveal(canonical_plan_scan_result);
+    let prefix = if later_valid || (later == symbols
+        && (forall|i: int| 0 <= i < symbols ==> lengths[i] <= 15)
+        && canonical_plan_weight(lengths, symbols) <= 32_768
+        && (canonical_plan_weight(lengths, symbols) != 32_768
+            || canonical_plan_nonzero(lengths, symbols) < 2)) { symbols } else { (later - 1) as nat };
+    assert(first <= prefix <= symbols);
+    assert(canonical_plan_weight(lengths, prefix) <= 32_768);
+    assert(forall|i: int| 0 <= i < first ==> lengths[i] <= 15);
+    k1_canonical_weight_prefix_le(lengths, first, prefix);
+    assert(canonical_plan_weight(lengths, first) <= 32_768);
+    let index = (first - 1) as nat;
+    assert(lengths[index as int] <= 15);
+    reveal(canonical_plan_weight);
+    assert(canonical_plan_weight(lengths, first)
+        == canonical_plan_weight(lengths, index) + symbol_code_length_weight(lengths[index as int]));
+}
+
+proof fn m1_canonical_scan_results_are_unique(lengths: Seq<u8>, symbols: nat,
+    left: nat, lv: bool, right: nat, rv: bool)
+    requires 1 <= symbols <= 704, symbols <= lengths.len(),
+        canonical_plan_scan_result(lengths, symbols, left, lv),
+        canonical_plan_scan_result(lengths, symbols, right, rv),
+    ensures left == right, lv == rv,
+{
+    k1_canonical_classification_agrees(lengths, symbols, left, lv);
+    k1_canonical_classification_agrees(lengths, symbols, right, rv);
+    if left < right { m1_canonical_scan_cannot_finish_before_another(lengths, symbols, left, lv, right, rv); }
+    if right < left { m1_canonical_scan_cannot_finish_before_another(lengths, symbols, right, rv, left, lv); }
+}
+
+#[verifier::opaque]
+spec fn m1_tree_iteration_holds(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>, end: bool) -> bool {
+    &&& a.0.valid() && a.1.valid() && a.3.valid() && a.4.valid()
+    &&& code_rank_aligned(a.0.phase) && code_rank_aligned(a.1.phase)
+    &&& code_rank_aligned(a.3.phase) && code_rank_aligned(a.4.phase)
+    &&& a.7.len() == 704 && a.8.len() == 704
+    &&& m1_tree_field_action(a.0, input, end, a.1, a.2)
+    &&& m1_tree_aux_start(a.1, a.3)
+    &&& match a.3.phase {
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, .. } if a.5 == start => {
+            &&& a.4 == m1_acknowledged_span_decoder(a.3)
+            &&& a.6 as nat == start as nat + span_count as nat
+            &&& a.8 == m1_tree_builder_span_values(a.7, a.3.phase)
+        },
+        _ => a.4 == a.3 && a.6 == a.5 && a.8 == a.7,
+    }
+}
+
+#[verifier::opaque]
+spec fn m1_tree_iteration_status(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), region: crate::brotli_prefix::TreeRegion, tree: u16)
+    -> Option<SerializedTreeStatus> {
+    match a.3.phase {
+        CodeDescriptionPhase::ComplexPendingSpan { start, .. } =>
+            if a.5 != start { Some(SerializedTreeStatus::Failed(CompressedHeaderError::InternalState)) } else { None },
+        CodeDescriptionPhase::CompleteSimple(_) =>
+            if a.3.alphabet_limit as nat > crate::brotli_prefix::tree_region_symbols(region)
+                || tree as nat >= crate::brotli_prefix::tree_region_count(region) {
+                Some(SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidSymbol)))
+            } else { Some(SerializedTreeStatus::Complete) },
+        CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } =>
+            if a.5 != decoded_symbols || decoded_symbols != a.3.alphabet_limit {
+                Some(SerializedTreeStatus::Failed(CompressedHeaderError::InternalState))
+            } else if a.3.alphabet_limit as nat > crate::brotli_prefix::tree_region_symbols(region) {
+                Some(SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidSymbol)))
+            } else if tree as nat >= crate::brotli_prefix::tree_region_count(region) {
+                Some(SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidTree)))
+            } else if crate::brotli_prefix::valid_builder_lengths(a.7.take(decoded_symbols as int)) {
+                Some(SerializedTreeStatus::Complete)
+            } else { Some(SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidCodeLength))) },
+        CodeDescriptionPhase::Failed(error) => Some(SerializedTreeStatus::Failed(map_code_description_error_spec(error))),
+        _ => if a.2.status == CodeDescriptionStatus::NeedInput { Some(SerializedTreeStatus::NeedInput) } else { None },
+    }
+}
+
+spec fn map_code_description_error_spec(error: CodeDescriptionError) -> CompressedHeaderError {
+    match error {
+        CodeDescriptionError::MetaBlockNotCompressed => CompressedHeaderError::InternalState,
+        CodeDescriptionError::InvalidAlphabet => CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode),
+        CodeDescriptionError::DuplicateSimpleSymbol => CompressedHeaderError::InvalidFormat(CompressedFormatError::DuplicateSimpleSymbol),
+        CodeDescriptionError::CodeLengthSpace => CompressedHeaderError::InvalidFormat(CompressedFormatError::CodeLengthSpace),
+        CodeDescriptionError::Truncated => CompressedHeaderError::Truncated,
+    }
+}
+
+#[verifier::opaque]
+spec fn m1_tree_iteration_parsing_units(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>) -> nat {
+    22 + phase_validation_read_units(a.0.phase, a.0.alphabet_max, a.0.alphabet_limit)
+        + (if matches!(a.0.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) { 0nat }
+            else { code_field_total_read_units(a.0, input, a.2.consumed) }) + 10
+        + (if matches!(a.1.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
+            code_field_total_read_units(a.1, Seq::empty(), 0) + 1 } else { 0nat })
+        + match a.3.phase {
+            CodeDescriptionPhase::ComplexPendingSpan { start, span_count, .. } =>
+                if a.5 == start { span_count as nat + 2 + 4 + code_description_payload_writes_spec(a.4.phase) as nat + 2 } else { 0nat },
+            CodeDescriptionPhase::CompleteSimple(_) | CodeDescriptionPhase::CompleteComplex { .. }
+                | CodeDescriptionPhase::Failed(_) => 0nat,
+            _ => 4 + code_description_payload_writes_spec(a.3.phase) as nat + 1,
+        }
+}
+
+proof fn m1_tree_iterations_agree(left: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), right: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>, end: bool,
+    region: crate::brotli_prefix::TreeRegion, tree: u16)
+    requires m1_tree_iteration_holds(left, input, end), m1_tree_iteration_holds(right, input, end),
+        m1_code_states_agree(left.0, right.0), left.5 == right.5, left.7 == right.7,
+    ensures left.2 == right.2, m1_code_states_agree(left.4, right.4), left.6 == right.6, left.8 == right.8,
+        m1_tree_iteration_status(left, region, tree) == m1_tree_iteration_status(right, region, tree),
+        m1_tree_iteration_parsing_units(left, input) == m1_tree_iteration_parsing_units(right, input),
+{
+    reveal(m1_tree_iteration_holds);
+    m1_tree_description_actions_agree(left.0, right.0, input, end, left.1, left.2, right.1, right.2, left.3, right.3);
+    reveal(m1_code_states_agree);
+    if matches!(left.3.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+        m1_tree_span_acknowledgements_agree(left.3, right.3);
+    }
+    reveal(m1_tree_iteration_status); reveal(m1_tree_iteration_parsing_units);
+    reveal(code_field_total_read_units);
+}
+
+#[verifier::opaque]
+spec fn m1_tree_prefix(actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, input: Seq<u8>, end: bool,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    initial: CodeDescriptionDecoder, initial_initialized: u16, initial_values: Seq<u8>,
+    current: CodeDescriptionDecoder, initialized: u16, values: Seq<u8>, consumed: nat) -> bool
+    decreases actions.len(),
+{
+    if actions.len() == 0 {
+        m1_code_states_agree(initial, current) && initial_initialized == initialized && initial_values == values && consumed == 0
+    } else {
+        let a = actions[0];
+        &&& m1_code_states_agree(initial, a.0) && initial_initialized == a.5 && initial_values == a.7
+        &&& m1_tree_iteration_holds(a, input, end)
+        &&& m1_tree_iteration_status(a, region, tree).is_none()
+        &&& a.2.consumed <= consumed <= input.len()
+        &&& m1_tree_prefix(actions.skip(1), input.skip(a.2.consumed as int), end, region, tree,
+            a.4, a.6, a.8, current, initialized, values, (consumed - a.2.consumed as nat) as nat)
+    }
+}
+
+proof fn m1_tree_prefix_append(actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>, end: bool,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    initial: CodeDescriptionDecoder, initial_initialized: u16, initial_values: Seq<u8>,
+    current: CodeDescriptionDecoder, initialized: u16, values: Seq<u8>, consumed: nat)
+    requires m1_tree_prefix(actions, input, end, region, tree, initial, initial_initialized, initial_values,
+            current, initialized, values, consumed),
+        m1_code_states_agree(current, last.0), initialized == last.5, values == last.7,
+        m1_tree_iteration_holds(last, input.skip(consumed as int), end), m1_tree_iteration_status(last, region, tree).is_none(),
+    ensures m1_tree_prefix(actions.push(last), input, end, region, tree, initial, initial_initialized, initial_values,
+        last.4, last.6, last.8, consumed + last.2.consumed as nat),
+    decreases actions.len(),
+{
+    reveal_with_fuel(m1_tree_prefix, 2); reveal(m1_code_states_agree);
+    assert(consumed <= input.len());
+    assert(last.2.consumed <= input.len() - consumed) by {
+        reveal(m1_tree_iteration_holds); reveal(m1_tree_field_action); reveal(code_field_step_refines);
+    }
+    if actions.len() == 0 {
+        m1_code_state_agreement_transitive(initial, current, last.0);
+        assert(input.skip(0) =~= input);
+        assert(m1_code_states_agree(last.4, last.4));
+        assert(actions.push(last)[0] == last);
+        assert(actions.push(last).skip(1) =~= Seq::<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>::empty());
+    } else {
+        let first = actions[0];
+        assert(actions.push(last)[0] == first);
+        assert(input.skip(first.2.consumed as int).skip((consumed - first.2.consumed as nat) as int)
+            =~= input.skip(consumed as int));
+        m1_tree_prefix_append(actions.skip(1), last, input.skip(first.2.consumed as int), end, region, tree,
+            first.4, first.6, first.8, current, initialized, values, (consumed - first.2.consumed as nat) as nat);
+        assert(actions.push(last).skip(1) =~= actions.skip(1).push(last));
+        assert((consumed + last.2.consumed as nat - first.2.consumed as nat) as nat
+            == (consumed - first.2.consumed as nat) as nat + last.2.consumed as nat);
+    }
+}
+
+#[verifier::opaque]
+spec fn m1_finished_tree_trace(actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>, end: bool,
+    region: crate::brotli_prefix::TreeRegion, tree: u16,
+    initial: CodeDescriptionDecoder, initialized: u16, values: Seq<u8>, prefix_consumed: nat, result: SerializedTreeStep) -> bool {
+    &&& m1_tree_prefix(actions, input, end, region, tree, initial, initialized, values, last.0, last.5, last.7, prefix_consumed)
+    &&& m1_tree_iteration_holds(last, input.skip(prefix_consumed as int), end)
+    &&& m1_tree_iteration_status(last, region, tree) == Some(result.status)
+    &&& result.consumed as nat == prefix_consumed + last.2.consumed as nat
+}
+
+#[verifier::opaque]
+spec fn m1_tree_action_trace_parsing_units(actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, input: Seq<u8>) -> nat
+    decreases actions.len(),
+{
+    if actions.len() == 0 { 0nat } else {
+        m1_tree_iteration_parsing_units(actions[0], input)
+            + m1_tree_action_trace_parsing_units(actions.skip(1), input.skip(actions[0].2.consumed as int))
+    }
+}
+
+proof fn m1_finished_tree_traces_agree(left: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, ll: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), lp: nat, lr: SerializedTreeStep,
+    right: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, rl: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), rp: nat, rr: SerializedTreeStep,
+    input: Seq<u8>, end: bool, region: crate::brotli_prefix::TreeRegion, tree: u16,
+    initial_left: CodeDescriptionDecoder, initial_right: CodeDescriptionDecoder, initialized: u16, values: Seq<u8>)
+    requires m1_code_states_agree(initial_left, initial_right),
+        m1_finished_tree_trace(left, ll, input, end, region, tree, initial_left, initialized, values, lp, lr),
+        m1_finished_tree_trace(right, rl, input, end, region, tree, initial_right, initialized, values, rp, rr),
+    ensures lr == rr, m1_code_states_agree(ll.4, rl.4), ll.6 == rl.6, ll.8 == rl.8,
+        m1_tree_action_trace_parsing_units(left.push(ll), input)
+            == m1_tree_action_trace_parsing_units(right.push(rl), input),
+    decreases left.len() + right.len(),
+{
+    reveal(m1_finished_tree_trace); reveal_with_fuel(m1_tree_prefix, 1); reveal(m1_code_states_agree);
+    assert(input.skip(0) =~= input);
+    let lf = if left.len() == 0 { ll } else { left[0] };
+    let rf = if right.len() == 0 { rl } else { right[0] };
+    assert(m1_code_states_agree(initial_left, lf.0));
+    assert(m1_code_states_agree(initial_right, rf.0));
+    m1_code_state_agreement_transitive(initial_left, initial_right, rf.0);
+    m1_code_state_agreement_transitive(lf.0, initial_left, rf.0);
+    m1_tree_iterations_agree(lf, rf, input, end, region, tree);
+    if left.len() == 0 && right.len() == 0 {
+        assert(left.push(ll)[0] == ll && right.push(rl)[0] == rl);
+        assert(left.push(ll).skip(1) =~= Seq::<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>::empty());
+        assert(right.push(rl).skip(1) =~= Seq::<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>::empty());
+    } else if left.len() == 0 || right.len() == 0 {
+        assert(false);
+    } else {
+        assert(left.push(ll)[0] == lf && right.push(rl)[0] == rf);
+        assert(left.push(ll).skip(1) =~= left.skip(1).push(ll));
+        assert(right.push(rl).skip(1) =~= right.skip(1).push(rl));
+        let amount = lf.2.consumed as nat;
+        assert(amount <= lp && amount <= rp);
+        assert(input.skip(amount as int).skip((lp - amount) as int) =~= input.skip(lp as int));
+        assert(input.skip(amount as int).skip((rp - amount) as int) =~= input.skip(rp as int));
+        let next_left = SerializedTreeStep { consumed: (lr.consumed as nat - amount) as usize, status: lr.status };
+        let next_right = SerializedTreeStep { consumed: (rr.consumed as nat - amount) as usize, status: rr.status };
+        assert(m1_finished_tree_trace(left.skip(1), ll, input.skip(amount as int), end, region, tree,
+            lf.4, lf.6, lf.8, (lp - amount) as nat, next_left));
+        assert(m1_finished_tree_trace(right.skip(1), rl, input.skip(amount as int), end, region, tree,
+            rf.4, rf.6, rf.8, (rp - amount) as nat, next_right));
+        m1_finished_tree_traces_agree(left.skip(1), ll, (lp - amount) as nat, next_left,
+            right.skip(1), rl, (rp - amount) as nat, next_right,
+            input.skip(amount as int), end, region, tree, lf.4, rf.4, lf.6, lf.8);
+    }
+    reveal_with_fuel(m1_tree_action_trace_parsing_units, 2);
+}
+
+proof fn m1_tree_empty_prefix(initial: CodeDescriptionDecoder, initialized: u16, values: Seq<u8>,
+    input: Seq<u8>, end: bool, region: crate::brotli_prefix::TreeRegion, tree: u16)
+    ensures m1_tree_prefix(Seq::<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>::empty(), input, end, region, tree,
+        initial, initialized, values, initial, initialized, values, 0),
+{
+    reveal(m1_tree_prefix); reveal(m1_code_states_agree);
+}
+
+#[verifier::opaque]
+spec fn m1_tree_result_has_trace(workspace: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool,
+    result: SerializedTreeStep) -> bool {
+    exists|initial: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion, tree: u16,
+        actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), prefix_consumed: nat| {
+        &&& m1_code_decoder_image(workspace, window_bytes, initial.queue, initial)
+        &&& serialized_b3b_queue(workspace, window_bytes, initial.queue)
+        &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region)
+        &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_ACTIVE_TREE) == tree
+        &&& #[trigger] m1_finished_tree_trace(actions, last, input, end, region, tree, initial,
+            b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16,
+            m1_tree_builder_values(workspace, window_bytes, initial.alphabet_limit,
+                b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16), prefix_consumed, result)
+    }
+}
+
+proof fn m1_tree_record_finished_trace(workspace: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool,
+    initial: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion, tree: u16,
+    initialized: u16, values: Seq<u8>, actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), prefix_consumed: nat, result: SerializedTreeStep)
+    requires m1_code_decoder_image(workspace, window_bytes, initial.queue, initial),
+        serialized_b3b_queue(workspace, window_bytes, initial.queue),
+        b3b_scalar_byte_at(workspace, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region),
+        b3b_scalar_u16_at(workspace, window_bytes, B3B_ACTIVE_TREE) == tree,
+        initialized == b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED),
+        values == m1_tree_builder_values(workspace, window_bytes, initial.alphabet_limit, initialized),
+        m1_tree_prefix(actions, input, end, region, tree, initial, initialized, values,
+            last.0, last.5, last.7, prefix_consumed),
+        m1_tree_iteration_holds(last, input.skip(prefix_consumed as int), end),
+        m1_tree_iteration_status(last, region, tree) == Some(result.status),
+        result.consumed as nat == prefix_consumed + last.2.consumed as nat,
+    ensures m1_tree_result_has_trace(workspace, window_bytes, input, end, result),
+{
+    reveal(m1_finished_tree_trace); reveal(m1_tree_result_has_trace);
+    assert(b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16 == initialized);
+    let raw_initialized = b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
+    let raw_values = m1_tree_builder_values(workspace, window_bytes, initial.alphabet_limit, raw_initialized);
+    assert(raw_values == values);
+    assert(m1_finished_tree_trace(actions, last, input, end, region, tree, initial, raw_initialized, raw_values, prefix_consumed, result));
+}
+
+proof fn m1_tree_trace_unspanned_action(before: CodeDescriptionDecoder, field: CodeDescriptionDecoder,
+    step: CodeDescriptionStep, started: CodeDescriptionDecoder, initialized: u16, values: Seq<u8>, input: Seq<u8>, end: bool)
+    requires before.valid(), field.valid(), started.valid(), values.len() == 704,
+        code_rank_aligned(before.phase), code_rank_aligned(field.phase), code_rank_aligned(started.phase),
+        m1_tree_field_action(before, input, end, field, step), m1_tree_aux_start(field, started),
+        !matches!(started.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
+    ensures m1_tree_iteration_holds((before, field, step, started, started, initialized, initialized, values, values), input, end),
+{
+    reveal(m1_tree_iteration_holds);
+}
+
+proof fn m1_tree_trace_simple_status(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), region: crate::brotli_prefix::TreeRegion, tree: u16)
+    requires matches!(a.3.phase, CodeDescriptionPhase::CompleteSimple(_)),
+        a.3.alphabet_limit as nat <= crate::brotli_prefix::tree_region_symbols(region),
+        (tree as nat) < crate::brotli_prefix::tree_region_count(region),
+    ensures m1_tree_iteration_status(a, region, tree) == Some(SerializedTreeStatus::Complete),
+{
+    reveal(m1_tree_iteration_status);
+}
+
+proof fn m1_tree_trace_canonical_status(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), region: crate::brotli_prefix::TreeRegion, tree: u16)
+    requires match a.3.phase {
+            CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } => {
+                &&& a.5 == decoded_symbols && decoded_symbols == a.3.alphabet_limit
+                &&& crate::brotli_prefix::valid_builder_lengths(a.7.take(decoded_symbols as int))
+            },
+            _ => false,
+        },
+        a.3.alphabet_limit as nat <= crate::brotli_prefix::tree_region_symbols(region),
+        (tree as nat) < crate::brotli_prefix::tree_region_count(region),
+    ensures m1_tree_iteration_status(a, region, tree) == Some(SerializedTreeStatus::Complete),
+{
+    reveal(m1_tree_iteration_status);
+}
+
+proof fn m1_tree_trace_need_input_status(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), region: crate::brotli_prefix::TreeRegion, tree: u16)
+    requires !matches!(a.3.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }
+        | CodeDescriptionPhase::CompleteSimple(_) | CodeDescriptionPhase::CompleteComplex { .. } | CodeDescriptionPhase::Failed(_)),
+        a.2.status == CodeDescriptionStatus::NeedInput,
+    ensures m1_tree_iteration_status(a, region, tree) == Some(SerializedTreeStatus::NeedInput),
+{
+    reveal(m1_tree_iteration_status);
 }
 
 // Isolate the existing bounded tree-progress proof from accumulated solver context.
@@ -30290,6 +30884,8 @@ fn plan_code_description_field(decoder: &mut CodeDescriptionDecoder,
     Ok((step, before_work - budget.work_remaining, replay_work))
 }
 
+#[verifier::rlimit(600)]
+#[verifier::spinoff_prover]
 fn plan_serialized_tree(
     workspace: &[u8],
     window_bytes: u32,
@@ -30299,6 +30895,9 @@ fn plan_serialized_tree(
 ) -> (r: Result<SerializedTreePlan, CoreFailure>)
     requires old(budget).valid(),
     ensures
+        r.is_ok() && !matches!(r.unwrap().status, SerializedTreeStatus::Failed(_)) ==>
+            m1_tree_result_has_trace(workspace@, window_bytes, input@, end_of_input,
+                SerializedTreeStep { consumed: r.unwrap().consumed, status: r.unwrap().status }),
         final(budget).valid(),
         final(budget).limits == old(budget).limits,
         final(budget).input_remaining == old(budget).input_remaining,
@@ -30335,6 +30934,10 @@ fn plan_serialized_tree(
         crate::brotli_prefix::TreeRegion::BlockLength => (3u16, crate::brotli_prefix::BLOCK_LENGTH_SYMBOLS),
         crate::brotli_prefix::TreeRegion::TemporaryContext => (1u16, crate::brotli_prefix::TEMP_CONTEXT_SYMBOLS),
     };
+    proof {
+        assert(capacity as nat == crate::brotli_prefix::tree_region_symbols(region));
+        assert(tree_count as nat == crate::brotli_prefix::tree_region_count(region));
+    }
     let queue = match load_b3b_queue(workspace, window_bytes) {
         Ok(value) => value,
         Err(error) => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
@@ -30376,6 +30979,9 @@ fn plan_serialized_tree(
     while copied < copy_len
         invariant
             copied <= copy_len <= decoder.alphabet_limit <= 704,
+            forall|i: int| 0 <= i < copied ==> #[trigger] lengths@[i]
+                == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+            forall|i: int| copied <= i < 704 ==> #[trigger] lengths@[i] == 0,
             budget.work_remaining as int == old(budget).work_remaining as int
                 - initial_planning_work as int - copied as int,
             budget.valid(),
@@ -30398,6 +31004,22 @@ fn plan_serialized_tree(
         };
         copied += 1;
     }
+    let ghost initial_decoder = decoder;
+    let ghost initial_initialized = builder_initialized;
+    let ghost initial_values = lengths@;
+    proof {
+        assert(m1_code_decoder_image(workspace@, window_bytes, initial_decoder.queue, initial_decoder));
+        assert(serialized_b3b_queue(workspace@, window_bytes, initial_decoder.queue));
+        assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region));
+        assert(b3b_scalar_u16_at(workspace@, window_bytes, B3B_ACTIVE_TREE) == tree);
+    }
+    proof {
+        assert(initial_initialized as nat == b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED));
+        assert(initial_values =~= m1_tree_builder_values(workspace@, window_bytes,
+            initial_decoder.alphabet_limit, initial_initialized)) by { reveal(m1_tree_builder_values); }
+    }
+    let ghost mut actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)> = Seq::empty();
+    proof { m1_tree_empty_prefix(initial_decoder, initial_initialized, initial_values, input@, end_of_input, region, tree); }
     let mut consumed = 0usize;
     let mut planning_work = initial_planning_work + copy_len as u64;
     let mut execution_work = 0u64;
@@ -30405,6 +31027,19 @@ fn plan_serialized_tree(
     while iterations < 5_696
         invariant
             consumed <= input.len(),
+            actions.len() == iterations as nat,
+            capacity as nat == crate::brotli_prefix::tree_region_symbols(region),
+            tree_count as nat == crate::brotli_prefix::tree_region_count(region),
+            m1_code_decoder_image(workspace@, window_bytes, initial_decoder.queue, initial_decoder),
+            serialized_b3b_queue(workspace@, window_bytes, initial_decoder.queue),
+            b3b_scalar_byte_at(workspace@, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region),
+            b3b_scalar_u16_at(workspace@, window_bytes, B3B_ACTIVE_TREE) == tree,
+            initial_initialized as nat == b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED),
+            initial_values == m1_tree_builder_values(workspace@, window_bytes, initial_decoder.alphabet_limit, initial_initialized),
+            initial_values.len() == 704,
+            m1_tree_prefix(actions, input@, end_of_input, region, tree,
+                initial_decoder, initial_initialized, initial_values,
+                decoder, builder_initialized, lengths@, consumed as nat),
             iterations <= 5_696,
             planning_work <= 798 + iterations as u64 * 8192,
             execution_work <= iterations as u64 * 8192,
@@ -30425,6 +31060,9 @@ fn plan_serialized_tree(
         decreases 5_696 - iterations,
     {
         let ghost before_iteration = decoder;
+        let ghost before_initialized = builder_initialized;
+        let ghost before_values = lengths@;
+        let ghost before_consumed = consumed;
         let ghost before_reload_work = execution_work;
         let reload_reads = valid_code_loader_read_units(&decoder);
         execution_work = checked_planned_work_add(execution_work, reload_reads)?;
@@ -30439,6 +31077,12 @@ fn plan_serialized_tree(
         proof {
             assert(matches!(before_iteration.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) ==> decoder == before_iteration);
         }
+        let ghost field_after = decoder;
+        proof {
+            assert(m1_tree_field_action(before_iteration, input@.skip(consumed as int), end_of_input, field_after, step)) by {
+                reveal(m1_tree_field_action);
+            }
+        }
         planning_work = checked_planned_work_add(planning_work, field_planning)?;
         if matches!(decoder.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
             let ghost before_start = decoder;
@@ -30451,9 +31095,21 @@ fn plan_serialized_tree(
                 assert(code_phase_rank(decoder.phase, decoder.alphabet_limit)
                     < code_phase_rank(before_start.phase, before_start.alphabet_limit));
             }
+            proof {
+                assert(start_step.consumed == 0);
+                assert(start_step == CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress });
+                assert(m1_tree_aux_start(field_after, decoder)) by { reveal(m1_tree_aux_start); }
+            }
             planning_work = checked_planned_work_add(planning_work, start_planning)?;
             execution_work = checked_planned_work_add(execution_work, start_reads + 1)?;
         }
+        proof {
+            if !matches!(field_after.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
+                assert(decoder == field_after);
+                assert(m1_tree_aux_start(field_after, decoder)) by { reveal(m1_tree_aux_start); }
+            }
+        }
+        let ghost started = decoder;
         consumed += step.consumed;
         execution_work = checked_planned_work_add(
             execution_work,
@@ -30477,10 +31133,18 @@ fn plan_serialized_tree(
                 while at < start + span_count
                     invariant
                         start <= at <= start + span_count <= decoder.alphabet_limit <= 704,
+                        before_values.len() == 704,
+                        forall|i: int| 0 <= i < 704 ==> #[trigger] lengths@[i]
+                            == if start <= i < at { length } else { before_values[i] },
                     decreases start + span_count - at,
                 {
                     lengths[at as usize] = length;
                     at += 1;
+                }
+                proof {
+                    assert(lengths@ =~= m1_tree_builder_span_values(before_values, started.phase)) by {
+                        reveal(m1_tree_builder_span_values);
+                    }
                 }
                 builder_initialized = start + span_count;
                 let acknowledged = acknowledge_serialized_pending_span(&mut decoder);
@@ -30505,12 +31169,27 @@ fn plan_serialized_tree(
                     execution_work,
                     simple_tree_install_work(decoder.alphabet_limit, code.selector),
                 )?;
-                return Ok(SerializedTreePlan {
+                let normal_result = SerializedTreePlan {
                     planning_work,
                     execution_work,
                     consumed,
                     status: SerializedTreeStatus::Complete,
-                });
+                };
+                proof {
+                    let action = (before_iteration, field_after, step, started, decoder,
+                        before_initialized, builder_initialized, before_values, lengths@);
+                    assert(decoder == started);
+                    assert(builder_initialized == before_initialized);
+                    assert(lengths@ == before_values);
+                    m1_tree_trace_unspanned_action(before_iteration, field_after, step, started,
+                        before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
+                    m1_tree_trace_simple_status(action, region, tree);
+                    assert(m1_tree_iteration_status(action, region, tree) == Some(normal_result.status));
+                    m1_tree_record_finished_trace(workspace@, window_bytes, input@, end_of_input,
+                        initial_decoder, region, tree, initial_initialized, initial_values,
+                        actions, action, before_consumed as nat, SerializedTreeStep { consumed: normal_result.consumed, status: normal_result.status });
+                }
+                return Ok(normal_result);
             }
             CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } => {
                 if builder_initialized != decoded_symbols
@@ -30544,12 +31223,27 @@ fn plan_serialized_tree(
                         status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
                             crate::brotli_prefix::WorkspaceError::InvalidCodeLength)) });
                 }
-                return Ok(SerializedTreePlan {
+                let normal_result = SerializedTreePlan {
                     planning_work,
                     execution_work,
                     consumed,
                     status: SerializedTreeStatus::Complete,
-                });
+                };
+                proof {
+                    let action = (before_iteration, field_after, step, started, decoder,
+                        before_initialized, builder_initialized, before_values, lengths@);
+                    assert(decoder == started);
+                    assert(builder_initialized == before_initialized);
+                    assert(lengths@ == before_values);
+                    m1_tree_trace_unspanned_action(before_iteration, field_after, step, started,
+                        before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
+                    m1_tree_trace_canonical_status(action, region, tree);
+                    assert(m1_tree_iteration_status(action, region, tree) == Some(normal_result.status));
+                    m1_tree_record_finished_trace(workspace@, window_bytes, input@, end_of_input,
+                        initial_decoder, region, tree, initial_initialized, initial_values,
+                        actions, action, before_consumed as nat, SerializedTreeStep { consumed: normal_result.consumed, status: normal_result.status });
+                }
+                return Ok(normal_result);
             }
             CodeDescriptionPhase::Failed(error) => {
                 return Ok(SerializedTreePlan {
@@ -30565,12 +31259,27 @@ fn plan_serialized_tree(
                     code_description_store_writes(decoder.phase) + 1,
                 )?;
                 if matches!(step.status, CodeDescriptionStatus::NeedInput) {
-                    return Ok(SerializedTreePlan {
+                let normal_result = SerializedTreePlan {
                         planning_work,
                         execution_work,
                         consumed,
                         status: SerializedTreeStatus::NeedInput,
-                    });
+                    };
+                proof {
+                    let action = (before_iteration, field_after, step, started, decoder,
+                        before_initialized, builder_initialized, before_values, lengths@);
+                    assert(decoder == started);
+                    assert(builder_initialized == before_initialized);
+                    assert(lengths@ == before_values);
+                    m1_tree_trace_unspanned_action(before_iteration, field_after, step, started,
+                        before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
+                    m1_tree_trace_need_input_status(action, region, tree);
+                    assert(m1_tree_iteration_status(action, region, tree) == Some(normal_result.status));
+                    m1_tree_record_finished_trace(workspace@, window_bytes, input@, end_of_input,
+                        initial_decoder, region, tree, initial_initialized, initial_values,
+                        actions, action, before_consumed as nat, SerializedTreeStep { consumed: normal_result.consumed, status: normal_result.status });
+                }
+                    return Ok(normal_result);
                 }
             }
         }
@@ -30580,6 +31289,22 @@ fn plan_serialized_tree(
             assert(step.status != CodeDescriptionStatus::NeedInput);
             assert(code_phase_rank(decoder.phase, decoder.alphabet_limit)
                 < code_phase_rank(before_iteration.phase, before_iteration.alphabet_limit));
+        }
+        proof {
+            let action = (before_iteration, field_after, step, started, decoder,
+                before_initialized, builder_initialized, before_values, lengths@);
+            assert(m1_tree_iteration_holds(action, input@.skip(before_consumed as int), end_of_input)) by {
+                reveal(m1_tree_iteration_holds); reveal(m1_acknowledged_span_decoder);
+                reveal(pending_span_transition_holds);
+            }
+            assert(m1_tree_iteration_status(action, region, tree).is_none()) by {
+                reveal(m1_tree_iteration_status);
+            }
+            assert(m1_code_states_agree(before_iteration, before_iteration)) by { reveal(m1_code_states_agree); }
+            m1_tree_prefix_append(actions, action, input@, end_of_input, region, tree,
+                initial_decoder, initial_initialized, initial_values,
+                before_iteration, before_initialized, before_values, before_consumed as nat);
+            actions = actions.push(action);
         }
         iterations += 1;
     }

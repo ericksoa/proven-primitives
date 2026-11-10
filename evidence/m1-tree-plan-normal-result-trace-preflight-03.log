@@ -1,0 +1,43 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (56911,13): 'if' cannot be used in patterns.
+WARNING: (64486,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30910:5
+      |
+30910 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31062:17
+      |
+31062 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: while loop: Resource limit (rlimit) exceeded; consider rerunning with --profile for more details
+     --> src/brotli_input.rs:30958:5
+      |
+30958 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30958:5
+      |
+30958 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30824:1
+      |
+30824 | / fn plan_serialized_tree(
+30825 | |     workspace: &[u8],
+30826 | |     window_bytes: u32,
+30827 | |     budget: &mut crate::brotli::RequestBudget,
+30828 | |     input: &[u8],
+30829 | |     end_of_input: bool,
+30830 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

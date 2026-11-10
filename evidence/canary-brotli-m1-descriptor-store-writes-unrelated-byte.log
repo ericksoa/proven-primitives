@@ -2,25 +2,25 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51607,13): 'if' cannot be used in patterns.
-WARNING: (58340,5): 'if' cannot be used in patterns.
+WARNING: (57054,13): 'if' cannot be used in patterns.
+WARNING: (64629,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-36146/src/brotli_input.rs:13083:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-27297/src/brotli_input.rs:14293:1
       |
-13083 | / fn store_code_description_decoder(
-13084 | |     workspace: &mut [u8],
-13085 | |     window_bytes: u32,
-13086 | |     decoder: CodeDescriptionDecoder,
-13087 | | ) -> (r: Result<(), CompressedHeaderError>)
+14293 | / fn store_code_description_decoder(
+14294 | |     workspace: &mut [u8],
+14295 | |     window_bytes: u32,
+14296 | |     decoder: CodeDescriptionDecoder,
+14297 | | ) -> (r: Result<(), CompressedHeaderError>)
       | |__________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-36146/src/brotli_input.rs:13090:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-27297/src/brotli_input.rs:14323:9
       |
-13090 |         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+14323 |         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
       |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
 ...
-13157 |         Err(error) => return Err(error),
+14404 |         Err(error) => return Err(error),
       |                       ----------------- at this exit
 
 error: aborting due to 1 previous error

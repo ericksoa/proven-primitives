@@ -1,0 +1,33 @@
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30960:5
+      |
+30960 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31114:17
+      |
+31114 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31008:5
+      |
+31008 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30870:1
+      |
+30870 | / fn plan_serialized_tree(
+30871 | |     workspace: &[u8],
+30872 | |     window_bytes: u32,
+30873 | |     budget: &mut crate::brotli::RequestBudget,
+30874 | |     input: &[u8],
+30875 | |     end_of_input: bool,
+30876 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+verification results:: 4 verified, 0 errors (partial verification with `--verify-*`)

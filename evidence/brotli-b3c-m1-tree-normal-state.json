@@ -1,0 +1,171 @@
+{
+  "component": "Brotli M1 normal tree-planning trace checkpoint; M1 incomplete",
+  "generated_utc": "2026-11-10T19:09:22.408639+00:00",
+  "base_commit": "e1fcc7b7843f6097b95767a39e45ee8b230a5bdd",
+  "claim": "Complete and NeedInput results of the read-only tree planner have finite source-linked replay witnesses from the serialized decoder and exact builder image. Matching mathematical traces agree on outcome, final logical decoder/builder states and parser/storage-unit totals. The unit fold excludes tree installation. Error-result and executor trace closure remain open.",
+  "source_sha256": {
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "2b24d8b46db401b91a5845aa85d4565e302a5da51a766a0ec7eaff89aeaabde4",
+    "src/brotli_prefix.rs": "b0b1ace05f345af70c1db2ddb364a77ee89db904c4cd9eb3bbd3643bc8b28a77",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a"
+  },
+  "validation_source_sha256": {
+    "tests/fixtures/brotli/corpus/10x10y": "41bd4c895e9fb36d74bc97db5092872a24267e3b0455ff6152b0d262faa00d49",
+    "tests/fixtures/brotli/corpus/10x10y.compressed": "d666afc0f6c35d8d7796175aa9a68f16ba59afedee946d4bce9167f6c86e0b84",
+    "tests/fixtures/brotli/corpus/64x": "be4d3ed1fc5f5cfa00735b28605a975f3293fa235d23abb1d9dea380fba0fb87",
+    "tests/fixtures/brotli/corpus/64x.compressed": "f0273c38c6a55c1d9ccb047da04bacdc4bb07acc44ff83871e6b3490dfc2c313",
+    "tests/fixtures/brotli/corpus/compression": "d18f849bb8c5ffef9e1b9b8719e3bcbba35f100655be40f035aeace790dec16b",
+    "tests/fixtures/brotli/corpus/compression.compressed": "a87bcbc0f45a2f793c075b26baec65ff9cd551e057c8cdef508231004ba4abf5",
+    "tests/fixtures/brotli/corpus/empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/fixtures/brotli/corpus/empty.compressed": "67586e98fad27da0b9968bc039a1ef34c939b9b8e523a8bef89d478608c5ecf6",
+    "tests/fixtures/brotli/corpus/monkey": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99",
+    "tests/fixtures/brotli/corpus/monkey.compressed": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9",
+    "tests/fixtures/brotli/corpus/quickfox_repeated": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82",
+    "tests/fixtures/brotli/corpus/quickfox_repeated.compressed": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a",
+    "tests/fixtures/brotli/corpus/x": "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015",
+    "tests/fixtures/brotli/corpus/x.compressed": "cd094a625b695542a1d37b3a11ea849d8db9584a2f9df4e60cf6158bb39bbf61",
+    "tests/fixtures/brotli/corpus/xyzzy": "7609128715518308672067aab169e24944ead24e3d732aab8a8f0b7013a65564",
+    "tests/fixtures/brotli/corpus/xyzzy.compressed": "c3f042a6be42887f842324d0e39dabd0d873e1676cd3dd2d7e2824242b318f14",
+    "tests/fixtures/brotli/corpus/zeros": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+    "tests/fixtures/brotli/corpus/zeros.compressed": "d1236d7fdab24209a747aa471f1bf33765b27adfd676355d4b4b310195dca49f",
+    "tests/fixtures/brotli/reference/command.bin": "fdbc5d5f207a43d34b26441e29b7024f4f3d00be66502d8a73233bcbe9f6c1b4",
+    "tests/fixtures/brotli/reference/context.bin": "0e4abc034ef46244934d117f15876cd477d0fb2ac94a023093338e72e37f7ad9",
+    "tests/fixtures/brotli/reference/dictionary-meta.bin": "1bce8bd7b829f177214697683c3216e836ada1e254bde7582a9111316d9fd0b9",
+    "tests/fixtures/brotli/reference/dictionary.bin": "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70",
+    "tests/fixtures/brotli/reference/transforms.bin": "7682bbd9a2901334c2b47d83aaca99e6d9fc65a2921a7c88180dde12ec3cd6b6",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "4497f451cbd08c51409e8b3e4eeef78972258aab3d5faa799465d8500f2d67e6",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39"
+  },
+  "approval_and_document_sha256": {
+    "AGENTS.md": "03916d4ed19b591d8a4930629f743d761083b1b5b68ffdfd1abe8eac08be44a8",
+    "BROTLI_B3C_METERING_ADDENDUM.md": "c5d6d313433932f69e4933656abd1043fc433b5454fdf37cf07a8d9d79be38c2",
+    "BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md": "79da1ae206965242eea3664e265b69cc9e858fa52ae499856fae0b1a29a48616"
+  },
+  "verifier": "Verus\n  Version: 0.2026.10.18.7d82994\n  Profile: release\n  Platform: macos_aarch64\n  Toolchain: 1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)\n\n",
+  "verifier_binary": {
+    "verus": "483703c79cf57530a9864de2e69326740ee69162dd98b853aedb8273c74a06f6",
+    "rust_verify": "261789c83d4f9949f2db4e6aa205987a22a5ed6f576b1f3663ca52b246a4bc7a",
+    "z3": "edae32f9e37ea4b5bb35310d72f0e352d0dc07626cac4e9e30bc1ea9a5bc8efb"
+  },
+  "verification_options": [
+    "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+    "src/lib.rs",
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "8",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "300",
+    "--trace",
+    "--time",
+    "--output-json"
+  ],
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 1266,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_elapsed_seconds": 431.3834386249946,
+  "verification_evidence": {
+    "path": "evidence/brotli-b3c-m1-tree-normal-state-attempt02-verification.json",
+    "sha256": "fb712f9451523ed59ae705bcb6fa216184bd776332c4e9a6e56863dd3914dc2c"
+  },
+  "verification_log": {
+    "path": "evidence/m1-tree-normal-state-attempt02-whole-crate.log",
+    "sha256": "93d3e398d42f5406ed490a90598364f33e8d6503e3266b4720059f7d25196a44"
+  },
+  "source_freeze": {
+    "path": "evidence/m1-tree-normal-state-attempt02-source-freeze.json",
+    "sha256": "2d2c13aa1df2d635173859df0400578f1d2d9613dfd5d63944a7c86e86f31395"
+  },
+  "negative_controls": {
+    "evidence": {
+      "path": "evidence/brotli-b3c-m1-tree-normal-state-controls.json",
+      "sha256": "c9fd154b83d616e77a0f6b42f2275afc1089c388fcf851a31350df1a466a5736"
+    },
+    "new_defects": 4,
+    "legacy_defects": 6,
+    "semantic_rejections": 10
+  },
+  "runtime_tests": {
+    "evidence": {
+      "path": "evidence/m1-tree-normal-state-runtime-preflight-02.log",
+      "sha256": "6d1a96fd4883bb43d4c0f47b8010bb4d4859afe2b0612c437852cc9216e55e7d"
+    },
+    "passed": 106,
+    "failed": 0,
+    "library": 95,
+    "primitives": 9,
+    "trust_scan": 1,
+    "upstream_comparison": 1,
+    "F2_policy_changed": false
+  },
+  "architecture_changes": false,
+  "runtime_behavior_changes": false,
+  "original_requirements_and_guarantees_preserved": true,
+  "known_metering_issue": {
+    "decision": {
+      "path": "BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md",
+      "sha256": "79da1ae206965242eea3664e265b69cc9e858fa52ae499856fae0b1a29a48616"
+    },
+    "audit": {
+      "path": "evidence/m1-simple-install-k6-source-audit.json",
+      "sha256": "7688b01fb9ce206451ba894f18324dd1366e44bc33b271f26b30c36b3b44c1cd"
+    },
+    "human_approval": "pending",
+    "quota_correction_implemented": false,
+    "current_simple_install_function_identical_to_base": true
+  },
+  "release_gate": "incomplete",
+  "not_established": [
+    "Failure-result tree replay witnesses",
+    "Complete executor-to-planner tree refinement",
+    "Complete source-operation ledger and M1 control closure, including pending K6 simple-install read charges",
+    "B3c/B3d/B4 and independent human specification review; no supported-decoder or mathematical-safety completion claim"
+  ],
+  "earlier_failures": {
+    "before_result_binding_archive": {
+      "path": "evidence/m1-tree-normal-state-attempt01-before-recovery.tar.gz",
+      "sha256": "a3edabdb58966053688e98b96660c464a14f7fcda75686e2eb45dc2f2545377a"
+    },
+    "source_bound_status_control_results": {
+      "path": "evidence/m1-tree-normal-state-controls-results.json",
+      "sha256": "6adf74e9b0042ea7cb8e2a71b6179716843a02552832c7f76a022dea4798b2e5"
+    }
+  },
+  "previous_checkpoint": {
+    "path": "evidence/brotli-b3c-m1-full-codec.json",
+    "sha256": "1d2ab569c85e3220404dae810094532efa8f554cba1bdf4736ea0166bf45ddc9"
+  },
+  "trusted_components": [
+    "Approved mathematical specifications and their interpretation",
+    "Pinned Verus/Z3 and vstd",
+    "Rust 1.99.1, LLVM and Apple native build tools",
+    "Target machine and operating environment"
+  ],
+  "execution_environment": {
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+    "RUSTUP_TOOLCHAIN": "1.99.1",
+    "target": "aarch64-apple-darwin"
+  },
+  "evidence_completion": "Named normal-planner/state proof checkpoint verified. K6 awaits exact direct human approval; continue independent M1 proof work within already-approved scope."
+}

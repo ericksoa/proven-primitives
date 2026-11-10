@@ -764,3 +764,56 @@ checkpoint. Full plan/action tree replay, remaining failure/frame and source
 ledgers, complete M1 control closure, B3c/B3d/B4 and independent human review
 remain open. This is not a supported-decoder or mathematical-safety completion
 claim.
+
+
+### Open simple-install metering decision
+
+A subsequent source audit identified additional symbol-table operands in
+`install_simple_tree` and `simple_record_exec` that the current simple-install
+reservation omits. The worked two-symbol/two-symbol-alphabet case performs
+seven such reads in addition to the existing eleven reserved units. This is a
+source-derived accounting finding, not a measured execution-counter result or
+a completed M1 resource proof.
+
+Candidate K6 in `BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md` proposes the exact
+additional read terms, keeping the algorithms, interfaces, storage, existing
+write/reset formulas and other bounds unchanged. K6 is pending direct human
+approval and is not implemented. The source audit is recorded in
+`evidence/m1-simple-install-k6-source-audit.json`. Independent replay/state
+proofs continue. The preceding published codec checkpoint established its
+named storage/reload properties and did not establish the complete work ledger.
+
+
+### Normal tree-planning replay checkpoint
+
+The checked read-only tree planner now carries a replay prefix through its
+continuing iterations and binds each successful `Complete` or `NeedInput`
+result to a finite trace from the initial serialized decoder and exact builder
+snapshot. The proof covers copied builder cells, field reads, the transient
+auxiliary start and acknowledged spans. It binds the specification to the
+actual result value returned by the planner. Original requirements and all
+previous guarantees remain intact; executable algorithms, statuses, interfaces,
+workspace and work formulas are unchanged.
+
+The shared mathematical trace proof establishes equal outcomes, final logical
+decoder/builder states and total parser/storage units for traces with matching
+initial states. Installation is explicitly excluded from that unit fold and
+remains a separate obligation. The canonical scan proof also establishes unique
+validation outcomes and inspected-prefix lengths.
+
+Fresh final-source verification passed **1,266 whole-crate checks with zero
+errors**, `--no-cheating`. All **106 release runtime tests** pass. Four new
+normal-planner defects and six existing tree-plan/debit/frame defects were
+rejected semantically after that exact unchanged-source positive: **10**.
+The first status-swap controls exhausted checker resources and are retained,
+not counted. Binding the proof to the actual returned value preserved every
+contract and runtime behavior; a fresh whole positive preceded all ten final
+controls. Exact identities are in
+`evidence/brotli-b3c-m1-tree-normal-state.json`.
+
+This checkpoint does not establish failure-result traces, the complete
+executor-to-planner refinement, the complete source-operation ledger or M1.
+The executor-prefix prototype remains separate and unvalidated. K6 remains
+pending direct human approval and its quota correction is unimplemented.
+B3c/B3d/B4, independent human specification review and the supported-decoder
+release gate remain open.

@@ -1,0 +1,16 @@
+note: verifying module brotli_input (selected functions)
+
+error: Could not automatically infer triggers for this quantifier.  Use #[trigger] annotations to manually mark trigger terms instead.
+     --> src/brotli_input.rs:15970:5
+      |
+15970 | /     exists|initial: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion, tree: u16,
+15971 | |         actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescript...
+15972 | |         &&& m1_code_decoder_image(workspace, window_bytes, initial.queue, initial)
+15973 | |         &&& serialized_b3b_queue(workspace, window_bytes, initial.queue)
+...     |
+15979 | |                 b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16), prefix_consumed, result)
+15980 | |     }
+      | |_____^
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,51 @@
+from pathlib import Path
+import datetime,gzip,hashlib,json,os,re,subprocess
+
+def digest(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p):return {'path':str(p),'sha256':digest(p)}
+def read(p):return json.loads(Path(p).read_text())
+f=read('evidence/m1-tree-normal-state-attempt02-source-freeze.json');v=read('evidence/brotli-b3c-m1-tree-normal-state-attempt02-verification.json')
+assert f['exit_code']==0 and f['source_unchanged'] and v['verification-results']['success'] and v['verification-results']['is-verifying-entire-crate'] and v['verification-results']['errors']==0
+assert all(digest(n)==h for n,h in dict(f['source_sha256'],**f['validation_source_sha256']).items())
+new=read('evidence/m1-tree-normal-state-attempt02-controls-results.json');old=read('evidence/m1-tree-normal-state-attempt02-legacy-controls-results.json')
+assert new['complete'] and new['semantic_rejections']==4 and new['source_sha256']==f['source_sha256']
+rows=new['controls']+[dict(m,started_utc=r['started_utc'],source_unchanged=r['source_unchanged']) for r in old for m in r['mutants']]
+assert len(rows)==10 and len({x['name'] for x in rows})==10
+for r in old:assert r['exit_code']==0 and r['source_unchanged'] and len(r['mutants'])==r['expected_mutants']
+for row in rows:
+ assert row['semantic_rejection'] and row['source_unchanged'] and digest(row['log'])==row['sha256']
+ assert datetime.datetime.fromisoformat(row['started_utc'])>=datetime.datetime.fromisoformat(f['finished_utc'])
+ text=Path(row['log']).read_text();lower=text.lower()
+ assert re.search(r'verification results:: .*\b[1-9][0-9]* errors',text)
+ assert any(s in lower for s in ['postcondition not satisfied','precondition not satisfied','invariant not satisfied','assertion failed'])
+ assert not any(s in lower for s in ['resource limit','rlimit) exceeded','expected rlimit-count','panicked','internal compiler error','unexpected smt output'])
+counts=[(int(a),int(b)) for a,b in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed;',Path('evidence/m1-tree-normal-state-runtime-preflight-02.log').read_text())]
+assert sum(a for a,b in counts)==106 and sum(b for a,b in counts)==0
+previous=read('evidence/brotli-b3c-m1-full-codec.json');verus=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+tools={n:digest(verus/n) for n in ['verus','rust_verify','z3']};assert tools==previous['verifier_binary']
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1')
+base=subprocess.check_output(['git','rev-parse','HEAD'],env=env,text=True).strip()
+s=Path('src/brotli_input.rs').read_text();prior=subprocess.check_output(['git','show','HEAD:src/brotli_input.rs'],env=env,text=True)
+def function(t,name):
+ a=t.index('fn '+name+'(');return t[a:t.index('\n}\n',a)+3]
+assert function(s,'simple_tree_install_work')==function(prior,'simple_tree_install_work')
+assert f['source_sha256']['src/brotli_prefix.rs']==previous['source_sha256']['src/brotli_prefix.rs']
+Path('evidence/m1-tree-normal-state-final-source-brotli_input.rs.gz').write_bytes(gzip.compress(Path('src/brotli_input.rs').read_bytes(),mtime=0))
+controls={'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],'new_normal_controls':new,'legacy_affected_suites':old,'semantic_rejections':10,'preceding_whole_positive':ref('evidence/m1-tree-normal-state-attempt02-source-freeze.json'),'failed_first_attempt':ref('evidence/m1-tree-normal-state-attempt01-before-recovery.tar.gz'),'order':'All ten final mutations followed the recorded unchanged-source whole positive. Earlier resource failures are not semantic rejections.'}
+Path('evidence/brotli-b3c-m1-tree-normal-state-controls.json').write_text(json.dumps(controls,indent=2)+'\n')
+r={'component':'Brotli M1 normal tree-planning trace checkpoint; M1 incomplete','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':base,
+'claim':'Complete and NeedInput results of the read-only tree planner have finite source-linked replay witnesses from the serialized decoder and exact builder image. Matching mathematical traces agree on outcome, final logical decoder/builder states and parser/storage-unit totals. The unit fold excludes tree installation. Error-result and executor trace closure remain open.',
+'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],
+'approval_and_document_sha256':{n:digest(n) for n in ['AGENTS.md','BROTLI_B3C_METERING_ADDENDUM.md','BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md']},
+'verifier':previous['verifier'],'verifier_binary':tools,'verification_options':f['command'],'verification_results':v['verification-results'],'verification_elapsed_seconds':f['elapsed_seconds'],
+'verification_evidence':ref('evidence/brotli-b3c-m1-tree-normal-state-attempt02-verification.json'),'verification_log':ref('evidence/m1-tree-normal-state-attempt02-whole-crate.log'),'source_freeze':ref('evidence/m1-tree-normal-state-attempt02-source-freeze.json'),
+'negative_controls':{'evidence':ref('evidence/brotli-b3c-m1-tree-normal-state-controls.json'),'new_defects':4,'legacy_defects':6,'semantic_rejections':10},
+'runtime_tests':{'evidence':ref('evidence/m1-tree-normal-state-runtime-preflight-02.log'),'passed':106,'failed':0,'library':95,'primitives':9,'trust_scan':1,'upstream_comparison':1,'F2_policy_changed':False},
+'architecture_changes':False,'runtime_behavior_changes':False,'original_requirements_and_guarantees_preserved':True,
+'known_metering_issue':{'decision':ref('BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md'),'audit':ref('evidence/m1-simple-install-k6-source-audit.json'),'human_approval':'pending','quota_correction_implemented':False,'current_simple_install_function_identical_to_base':True},
+'release_gate':'incomplete','not_established':['Failure-result tree replay witnesses','Complete executor-to-planner tree refinement','Complete source-operation ledger and M1 control closure, including pending K6 simple-install read charges','B3c/B3d/B4 and independent human specification review; no supported-decoder or mathematical-safety completion claim'],
+'earlier_failures':{'before_result_binding_archive':ref('evidence/m1-tree-normal-state-attempt01-before-recovery.tar.gz'),'source_bound_status_control_results':ref('evidence/m1-tree-normal-state-controls-results.json')},
+'previous_checkpoint':ref('evidence/brotli-b3c-m1-full-codec.json'),'trusted_components':previous['trusted_components'],'execution_environment':previous['execution_environment'],
+'evidence_completion':'Named normal-planner/state proof checkpoint verified. K6 awaits exact direct human approval; continue independent M1 proof work within already-approved scope.'}
+Path('evidence/brotli-b3c-m1-tree-normal-state.json').write_text(json.dumps(r,indent=2)+'\n')
+print(json.dumps({'verified':v['verification-results']['verified'],'errors':0,'runtime_tests':106,'semantic_rejections':10,'M1_complete':False,'K6':'pending and unimplemented'}))

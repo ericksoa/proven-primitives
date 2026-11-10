@@ -1,0 +1,41 @@
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30911:5
+      |
+30911 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31063:17
+      |
+31063 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: while loop: Resource limit (rlimit) exceeded; consider rerunning with --profile for more details
+     --> src/brotli_input.rs:30959:5
+      |
+30959 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30959:5
+      |
+30959 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:30825:1
+      |
+30825 | / fn plan_serialized_tree(
+30826 | |     workspace: &[u8],
+30827 | |     window_bytes: u32,
+30828 | |     budget: &mut crate::brotli::RequestBudget,
+30829 | |     input: &[u8],
+30830 | |     end_of_input: bool,
+30831 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+
