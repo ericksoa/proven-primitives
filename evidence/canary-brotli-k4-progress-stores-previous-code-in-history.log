@@ -2,49 +2,49 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51874,13): 'if' cannot be used in patterns.
-WARNING: (59229,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4339/src/brotli_input.rs:13034:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4241/src/brotli_input.rs:13765:5
       |
-13034 |     while i < 5
+13765 |     while i < 5
       |     ^^^^^^^^^^^
 
 error: invariant not satisfied at end of loop body
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4339/src/brotli_input.rs:13038:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4241/src/brotli_input.rs:13769:13
       |
-13038 |             i >= 2 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_REPEATED_LENGTH) == progress.repeat_code_len,
+13769 |             i >= 2 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_REPEATED_LENGTH) == progress.repeat_code_len,
       |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check has been running for 2 seconds
       reporting errors as they are discovered (they may not be in source order)
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4339/src/brotli_input.rs:12995:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4241/src/brotli_input.rs:13724:1
       |
-12995 | / fn store_complex_progress(
-12996 | |     workspace: &mut [u8],
-12997 | |     window_bytes: u32,
-12998 | |     progress: ComplexSymbolProgress,
-12999 | | ) -> (r: Result<(), CompressedHeaderError>)
+13724 | / fn store_complex_progress(
+13725 | |     workspace: &mut [u8],
+13726 | |     window_bytes: u32,
+13727 | |     progress: ComplexSymbolProgress,
+13728 | | ) -> (r: Result<(), CompressedHeaderError>)
       | |__________________________________________^
 
-note: function body check finished in 12 seconds
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4339/src/brotli_input.rs:12995:1
+note: function body check finished in 16 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4241/src/brotli_input.rs:13724:1
       |
-12995 | / fn store_complex_progress(
-12996 | |     workspace: &mut [u8],
-12997 | |     window_bytes: u32,
-12998 | |     progress: ComplexSymbolProgress,
-12999 | | ) -> (r: Result<(), CompressedHeaderError>)
+13724 | / fn store_complex_progress(
+13725 | |     workspace: &mut [u8],
+13726 | |     window_bytes: u32,
+13727 | |     progress: ComplexSymbolProgress,
+13728 | | ) -> (r: Result<(), CompressedHeaderError>)
       | |__________________________________________^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4339/src/brotli_input.rs:12995:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k4-repeat-canary-4241/src/brotli_input.rs:13724:1
       |
-12995 | / fn store_complex_progress(
-12996 | |     workspace: &mut [u8],
-12997 | |     window_bytes: u32,
-12998 | |     progress: ComplexSymbolProgress,
-12999 | | ) -> (r: Result<(), CompressedHeaderError>)
+13724 | / fn store_complex_progress(
+13725 | |     workspace: &mut [u8],
+13726 | |     window_bytes: u32,
+13727 | |     progress: ComplexSymbolProgress,
+13728 | | ) -> (r: Result<(), CompressedHeaderError>)
       | |__________________________________________^
 
 error: aborting due to 1 previous error

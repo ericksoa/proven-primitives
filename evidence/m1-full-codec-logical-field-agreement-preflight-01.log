@@ -1,0 +1,14 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (54088,13): 'if' cannot be used in patterns.
+WARNING: (61810,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13320:7
+      |
+13320 |   proof fn m1_equivalent_code_fields_agree(before_left: CodeDescriptionDecoder,
+      |  _______^
+13321 | |     before_right: CodeDescriptionDecoder, input: Seq<u8>, end: bool,
+13322 | |     left: CodeDescriptionDecoder, ls: CodeDescriptionStep, right: CodeDescriptionDecoder, rs: CodeDescriptionStep)
+      | |__________________________________________________________________________________________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

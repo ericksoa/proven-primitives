@@ -156,6 +156,13 @@ workspace, 5,696-action caps and the 425-unit reset charge. K4 and the separate
 F2 fixture policy remain fixed. Other architectural decisions still require
 direct, exact human approval.
 
+The general M1 descriptor storage/reload proof checkpoint is recorded in
+`evidence/brotli-b3c-m1-full-codec.json`. It checks every stored phase's image,
+valid-image reload agreement, successful pending-span storage and the actual
+tree loop's reload/field binding, with the original admitted requirements.
+This does not complete the plan/action tree trace, remaining source ledgers or
+M1. It grants no additional architectural authority.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

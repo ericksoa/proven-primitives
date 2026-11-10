@@ -4,38 +4,38 @@ note: verifying module brotli_input, function lib::brotli_input::advance_seriali
 
 note: while loop has been running for 2 seconds
       reporting errors as they are discovered (they may not be in source order)
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-87132/src/brotli_input.rs:14973:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-9295/src/brotli_input.rs:15559:5
       |
-14973 |     while work < 2_000
+15559 |     while work < 2_000
       |     ^^^^^^^^^^^^^^^^^^
 
-note: while loop finished in 155 seconds
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-87132/src/brotli_input.rs:14973:5
+note: while loop finished in 184 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-9295/src/brotli_input.rs:15559:5
       |
-14973 |     while work < 2_000
+15559 |     while work < 2_000
       |     ^^^^^^^^^^^^^^^^^^
 
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-87132/src/brotli_input.rs:14973:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-9295/src/brotli_input.rs:15559:5
       |
-14973 |     while work < 2_000
+15559 |     while work < 2_000
       |     ^^^^^^^^^^^^^^^^^^
 
 error: assertion failed
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-87132/src/brotli_input.rs:15331:20
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-9295/src/brotli_input.rs:15959:20
       |
-15331 |     proof { assert(false); }
+15959 |     proof { assert(false); }
       |                    ^^^^^ assertion failed
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-87132/src/brotli_input.rs:14893:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-9295/src/brotli_input.rs:15479:1
       |
-14893 | / fn advance_serialized_tree(
-14894 | |     workspace: &mut [u8],
-14895 | |     window_bytes: u32,
-14896 | |     input: &[u8],
-14897 | |     end_of_input: bool,
-14898 | | ) -> (r: SerializedTreeStep)
+15479 | / fn advance_serialized_tree(
+15480 | |     workspace: &mut [u8],
+15481 | |     window_bytes: u32,
+15482 | |     input: &[u8],
+15483 | |     end_of_input: bool,
+15484 | | ) -> (r: SerializedTreeStep)
       | |___________________________^
 
 error: aborting due to 1 previous error

@@ -2,16 +2,16 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (53085,13): 'if' cannot be used in patterns.
-WARNING: (60949,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:1927:5
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:1927:5
      |
 1927 |     while i < limit
      |     ^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:1905:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:1905:1
      |
 1905 | / fn auxiliary_count_metered(lengths: &[u8; 18], length: u8, limit: usize,
 1906 | |     budget: &mut crate::brotli::RequestBudget,
@@ -19,7 +19,7 @@ note: function body check: not all errors may have been reported; rerun with a h
      | |________________________________________^
 
 error: invariant not satisfied at end of loop body
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:1935:13
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:1935:13
      |
 1935 |             i as u64 <= old(budget).work_remaining,
      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

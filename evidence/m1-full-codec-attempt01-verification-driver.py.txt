@@ -1,0 +1,19 @@
+from pathlib import Path
+import hashlib,json,datetime,subprocess,os,time
+files=sorted(Path('src').glob('*.rs'))+[Path(x) for x in ['Cargo.toml','Cargo.lock','rust-toolchain.toml']]
+r={'validation_source_sha256':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('tests').rglob('*')) if p.is_file()},'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source_sha256':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in files}}
+Path('evidence/m1-full-codec-attempt01-source-start.json').write_text(json.dumps(r,indent=2)+'\n')
+cmd=['/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus','src/lib.rs','--crate-type','lib','--no-cheating','--num-threads','8','--triggers-mode','silent','--rlimit','300','--trace','--time','--output-json']
+start=time.monotonic()
+with Path('evidence/m1-full-codec-attempt01-whole-crate.log').open('w') as out:
+ p=subprocess.run(cmd,env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1'),stdout=out,stderr=subprocess.STDOUT)
+r.update(exit_code=p.returncode,elapsed_seconds=time.monotonic()-start,finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),source_unchanged=all(hashlib.sha256(Path(n).read_bytes()).hexdigest()==h for n,h in r['source_sha256'].items()),command=cmd)
+Path('evidence/m1-full-codec-attempt01-source-freeze.json').write_text(json.dumps(r,indent=2)+'\n')
+s=Path('evidence/m1-full-codec-attempt01-whole-crate.log').read_text();at=s.find('{\n  "func-details"')
+if at!=-1:
+ d=json.loads(s[at:]);Path('evidence/brotli-b3c-m1-full-codec-attempt01-verification.json').write_text(json.dumps(d,indent=2)+'\n');print(d['verification-results'])
+print('exit_code',p.returncode,'source_unchanged',r['source_unchanged'])
+
+assert p.returncode==0 and r['source_unchanged'], 'Whole-crate verification did not pass on unchanged source'
+assert d['verification-results']['success'] and d['verification-results']['errors']==0 and d['verification-results']['is-verifying-entire-crate']
+assert all(hashlib.sha256(Path(n).read_bytes()).hexdigest()==h for n,h in r['validation_source_sha256'].items()), 'Validation source changed'

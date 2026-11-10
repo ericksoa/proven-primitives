@@ -1,0 +1,73 @@
+from pathlib import Path
+import datetime,gzip,hashlib,json,re,subprocess,os
+
+def digest(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p):return {'path':str(p),'sha256':digest(p)}
+def read(p):return json.loads(Path(p).read_text())
+def function(s,name):
+ a=s.index('fn '+name+'(');return s[a:s.index('\n}\n',a)+3]
+f1=read('evidence/m1-full-codec-attempt01-source-freeze.json');f2=read('evidence/m1-full-codec-attempt02-source-freeze.json')
+v=read('evidence/brotli-b3c-m1-full-codec-attempt02-verification.json')
+assert f1['exit_code']==f2['exit_code']==0 and f1['source_unchanged'] and f2['source_unchanged']
+assert f1['source_sha256']==f2['source_sha256']
+assert v['verification-results']['success'] and v['verification-results']['errors']==0 and v['verification-results']['is-verifying-entire-crate']
+assert all(digest(n)==h for n,h in dict(f2['source_sha256'],**f2['validation_source_sha256']).items())
+old=gzip.decompress(Path('evidence/m1-full-codec-attempt01-proof_rejection.rs.gz').read_bytes()).decode()
+new=Path('tests/proof_rejection.rs').read_text()
+old_case='''            "brotli-m1-parser-skips-pending-span-drain",
+            "advance_serialized_tree",
+            "if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {",
+            "if false {",'''
+new_case='''            "brotli-m1-parser-skips-pending-span-drain",
+            "advance_serialized_tree",
+            "let step = if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {",
+            "let step = if false {",'''
+assert old.count(old_case)==1 and old.replace(old_case,new_case,1)==new
+assert hashlib.sha256(old.encode()).hexdigest()==f1['validation_source_sha256']['tests/proof_rejection.rs']
+for name in ['check_brotli_input_function','check_brotli_block_function','transcript']:
+ assert function(old,name)==function(new,name)
+rows=[];roots=[]
+for attempt,freeze in [('01',f1),('02',f2)]:
+ for row in read('evidence/m1-full-codec-attempt'+attempt+'-controls-results.json'):
+  if row['exit_code']!=0:
+   assert attempt=='01' and row['suite']=='the_prover_rejects_four_m1_tree_action_bound_and_drain_defects';continue
+  assert row['source_unchanged'] and len(row['mutants'])==row['expected_mutants']
+  assert datetime.datetime.fromisoformat(row['started_utc'])>=datetime.datetime.fromisoformat(freeze['finished_utc'])
+  if attempt=='01':assert function(old,row['suite'])==function(new,row['suite'])
+  for m in row['mutants']:
+   assert m['semantic_rejection'] and digest(m['log'])==m['sha256']
+   text=Path(m['log']).read_text();lower=text.lower()
+   assert re.search(r'verification results:: .*\b[1-9][0-9]* errors',text)
+   assert any(x in lower for x in ['postcondition not satisfied','precondition not satisfied','invariant not satisfied','assertion failed'])
+   assert not any(x in lower for x in ['resource limit','rlimit) exceeded','expected rlimit-count','panicked','internal compiler error','unexpected smt output'])
+  row=dict(row,preceding_whole_positive=ref('evidence/m1-full-codec-attempt'+attempt+'-source-freeze.json'))
+  rows.append(row)
+assert len(rows)==7 and sum(len(r['mutants']) for r in rows)==66
+assert len({m['name'] for r in rows for m in r['mutants']})==66
+controls={'component':'M1 descriptor storage/reload and affected controls','source_sha256':f2['source_sha256'],'final_harness_sha256':digest('tests/proof_rejection.rs'),'suites':rows,'suites_passed':7,'semantic_rejections':66,'legacy_harness_repair':'Only the original parser conditional selector was narrowed; all 62 reused suite bodies and shared checker helpers are byte-identical. Each rejection retains its actual preceding unchanged-library whole positive. Failed four-control suite and its first partial results are not counted.'}
+Path('evidence/brotli-b3c-m1-full-codec-controls.json').write_text(json.dumps(controls,indent=2)+'\n')
+rt=Path('evidence/m1-full-codec-release-tests-final-harness.log').read_text()
+counts=[(int(a),int(b)) for a,b in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed;',rt)]
+assert sum(a for a,b in counts)==106 and sum(b for a,b in counts)==0 and 'test result: FAILED' not in rt
+previous=read('evidence/brotli-b3c-m1-k5.json')
+verus=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+tools={n:digest(verus/n) for n in ['verus','rust_verify','z3']};assert tools==previous['verifier_binary']
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1')
+version=subprocess.check_output([str(verus/'verus'),'--version'],env=env,text=True)
+base=subprocess.check_output(['git','rev-parse','HEAD'],env=env,text=True).strip()
+r={'component':'Brotli M1 general descriptor codec proof checkpoint; M1 incomplete','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':base,
+'claim':'Every successful serialized descriptor load has the checked general image; every valid encoded image reloads to the expected phase, alphabet and active queue state. Encoder payload images and auxiliary preservation, successful pending-span drain/store images and actual tree-loop reload/field agreement are checked. Source storage counters bind the existing write formulas. The full plan/action tree trace and end-to-end source-operation ledger remain open.',
+'source_sha256':f2['source_sha256'],'validation_source_sha256':f2['validation_source_sha256'],
+'approval_and_document_sha256':{n:digest(n) for n in ['AGENTS.md','BROTLI_B3C_METERING_ADDENDUM.md','BROTLI_M1_REPEAT_STATE_DECISION.md','BROTLI_M1_LOADER_VALIDATION_METERING_DECISION.md']},
+'verifier':version,'verifier_binary':tools,'verification_options':f2['command'],'verification_results':v['verification-results'],'verification_elapsed_seconds':f2['elapsed_seconds'],
+'verification_evidence':ref('evidence/brotli-b3c-m1-full-codec-attempt02-verification.json'),'verification_log':ref('evidence/m1-full-codec-attempt02-whole-crate.log'),'source_freeze':ref('evidence/m1-full-codec-attempt02-source-freeze.json'),
+'negative_controls':{'evidence':ref('evidence/brotli-b3c-m1-full-codec-controls.json'),'suites_passed':7,'rejected_mutations':66,'order':'Every counted mutation follows its recorded unchanged-library whole positive. No resource/compiler/harness failure is counted.'},
+'runtime_tests':{'evidence':ref('evidence/m1-full-codec-release-tests-final-harness.log'),'passed':106,'failed':0,'library':95,'primitives':9,'trust_scan':1,'upstream_comparison':1,'F2_policy_changed':False},
+'architecture_changes':False,'runtime_behavior_changes':False,'release_gate':'incomplete','not_established':['Complete serialized-tree plan/action trace across all outcomes','Remaining header/body failure/frame/source-operation ledgers and complete M1 control closure','B3c/B3d/B4 and independent human specification review; no supported-decoder or mathematical safety completion claim'],
+'queue_domain':'Complete phase and alphabet equality plus active queued bytes, length, offset and logical bits. Unused in-memory queue bytes are not serialized. Nonterminal field refinement transports across reload; terminal fields preserve logical state and consume zero input.',
+'new_guarantee_domain':'The general decoder image includes the original loader guards and valid auxiliary cells. Encoder-image guarantees are conditional on valid aligned state, existing alphabet metadata and retained-history/builder context. Original executable requirements and all existing root guarantees are preserved.',
+'earlier_failures':{'tree_resource_limit':ref('evidence/m1-full-codec-tree-binding-preflight-01.log'),'control_selector_failure':ref('evidence/m1-full-codec-attempt01-controls-the_prover_rejects_four_m1_tree_action_bound_and_drain_defects.log'),'prior_harness':ref('evidence/m1-full-codec-attempt01-proof_rejection.rs.gz')},
+'previous_checkpoint':ref('evidence/brotli-b3c-m1-k5.json'),'trusted_components':previous['trusted_components'],'execution_environment':previous['execution_environment'],
+'evidence_completion':'Named codec proof checkpoint verified; continue the already-authorized remaining M1 work.'}
+Path('evidence/brotli-b3c-m1-full-codec.json').write_text(json.dumps(r,indent=2)+'\n')
+print(json.dumps({'whole_checks':v['verification-results']['verified'],'errors':0,'runtime_tests':106,'defects':66,'m1_complete':False}))

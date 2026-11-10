@@ -2,34 +2,34 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51874,13): 'if' cannot be used in patterns.
-WARNING: (59229,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-4340/src/brotli_input.rs:31087:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-5248/src/brotli_input.rs:32668:1
       |
-31087 | / fn execute_planned_context_symbol(workspace: &mut [u8], window_bytes: u32,
-31088 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end: bool,
-31089 | |     input_was_limited: bool, plan: ContextSymbolPlan, planning_work: u64,
-31090 | | ) -> (r: Result<usize, CompressedStep>)
+32668 | / fn execute_planned_context_symbol(workspace: &mut [u8], window_bytes: u32,
+32669 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end: bool,
+32670 | |     input_was_limited: bool, plan: ContextSymbolPlan, planning_work: u64,
+32671 | | ) -> (r: Result<usize, CompressedStep>)
       | |______________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-4340/src/brotli_input.rs:31104:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-5248/src/brotli_input.rs:32685:9
       |
-31104 | /         old(budget).work_remaining < plan.execution_work ==> {
-31105 | |             &&& final(workspace)@ == old(workspace)@
-31106 | |             &&& *final(budget) == *old(budget)
-31107 | |             &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
-31108 | |         },
+32685 | /         old(budget).work_remaining < plan.execution_work ==> {
+32686 | |             &&& final(workspace)@ == old(workspace)@
+32687 | |             &&& *final(budget) == *old(budget)
+32688 | |             &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+32689 | |         },
       | |_________^ failed this postcondition
 ...
-31145 | /     match status {
-31146 | |         Some(ContextAdvanceStatus::Failed(error)) => {
-31147 | |             let stored = store_terminal_error(workspace, window_bytes, error);
-31148 | |             proof {
+32726 | /     match status {
+32727 | |         Some(ContextAdvanceStatus::Failed(error)) => {
+32728 | |             let stored = store_terminal_error(workspace, window_bytes, error);
+32729 | |             proof {
 ...     |
-31162 | |         _ => Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) }),
-31163 | |     }
+32743 | |         _ => Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) }),
+32744 | |     }
       | |_____- at the end of the function body
 
 error: aborting due to 1 previous error

@@ -1,0 +1,22 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13900:7
+      |
+13900 |   proof fn m1_loaded_pending_history(workspace: Seq<u8>, window_bytes: u32,
+      |  _______^
+13901 | |     decoder: CodeDescriptionDecoder)
+      | |____________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13911:7
+      |
+13911 |   proof fn m1_field_pending_history(workspace: Seq<u8>, window_bytes: u32,
+      |  _______^
+13912 | |     before: CodeDescriptionDecoder, input: Seq<u8>, end: bool,
+13913 | |     after: CodeDescriptionDecoder, step: CodeDescriptionStep)
+      | |_____________________________________________________________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)

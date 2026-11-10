@@ -1,0 +1,13 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
+error: assertion failed
+     --> src/brotli_input.rs:14786:20
+      |
+14786 |             assert(m1_payload_store_context(after_span, window_bytes, decoder.phase));
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

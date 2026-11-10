@@ -1,0 +1,24 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-4240/src/brotli_input.rs:14238:1
+      |
+14238 | / fn store_code_description_decoder(
+14239 | |     workspace: &mut [u8],
+14240 | |     window_bytes: u32,
+14241 | |     decoder: CodeDescriptionDecoder,
+14242 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-4240/src/brotli_input.rs:14369:20
+      |
+14369 |             assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_CODE_PHASE) == tag);
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

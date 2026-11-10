@@ -2,28 +2,28 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (53085,13): 'if' cannot be used in patterns.
-WARNING: (60949,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:12299:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:12307:5
       |
-12299 |     while i < 18
+12307 |     while i < 18
       |     ^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:12277:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:12285:1
       |
-12277 | / fn read_aux_lengths(
-12278 | |     workspace: &[u8],
-12279 | |     window_bytes: u32,
-12280 | | ) -> (r: Result<[u8; 18], CompressedHeaderError>)
+12285 | / fn read_aux_lengths(
+12286 | |     workspace: &[u8],
+12287 | |     window_bytes: u32,
+12288 | | ) -> (r: Result<[u8; 18], CompressedHeaderError>)
       | |________________________________________________^
 
 error: invariant not satisfied at end of loop body
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:12302:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:12310:13
       |
-12302 | /             b3b_workspace_shape(workspace@.len(), window_bytes) ==>
-12303 | |                 total_reads == i as nat + table_u8_scan_reads(values, 5, i as nat),
+12310 | /             b3b_workspace_shape(workspace@.len(), window_bytes) ==>
+12311 | |                 total_reads == i as nat + table_u8_scan_reads(values, 5, i as nat),
       | |__________________________________________________________________________________^
 
 error: aborting due to 1 previous error

@@ -2,23 +2,23 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51874,13): 'if' cannot be used in patterns.
-WARNING: (59229,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-4340/src/brotli_input.rs:5112:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-5248/src/brotli_input.rs:5475:1
      |
-5112 | / fn advance_var_uint8(
-5113 | |     queue: &mut BitQueue,
-5114 | |     phase: &mut VarUint8Phase,
-5115 | |     input: &[u8],
-5116 | |     end_of_input: bool,
-5117 | | ) -> (r: VarUint8Step)
+5475 | / fn advance_var_uint8(
+5476 | |     queue: &mut BitQueue,
+5477 | |     phase: &mut VarUint8Phase,
+5478 | |     input: &[u8],
+5479 | |     end_of_input: bool,
+5480 | | ) -> (r: VarUint8Step)
      | |_____________________^
 
 error: assertion failed
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-4340/src/brotli_input.rs:5202:12
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-5248/src/brotli_input.rs:5565:12
      |
-5202 |     assert(var_uint8_transition(started, field as nat, *phase, status));
+5565 |     assert(var_uint8_transition(started, field as nat, *phase, status));
      |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
 
 error: aborting due to 1 previous error

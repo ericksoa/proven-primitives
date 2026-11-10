@@ -2,10 +2,10 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (53085,13): 'if' cannot be used in patterns.
-WARNING: (60949,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:4281:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:4281:1
      |
 4281 | / fn simple_symbol_pair_metered(symbols: &[u16; 4], left: usize, right: usize,
 4282 | |     budget: &mut crate::brotli::RequestBudget,
@@ -13,7 +13,7 @@ note: function body check: not all errors may have been reported; rerun with a h
      | |__________________________________^
 
 error: postcondition not satisfied
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:4291:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:4291:9
      |
 4291 |         r.is_ok() == (old(budget).work_remaining >= 2),
      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition

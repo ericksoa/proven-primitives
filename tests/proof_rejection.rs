@@ -3721,8 +3721,8 @@ fn the_prover_rejects_four_m1_tree_action_bound_and_drain_defects() {
         (
             "brotli-m1-parser-skips-pending-span-drain",
             "advance_serialized_tree",
-            "if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {",
-            "if false {",
+            "let step = if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {",
+            "let step = if false {",
         ),
         (
             "brotli-m1-planner-skips-pending-span-drain",
@@ -4598,8 +4598,8 @@ fn the_prover_rejects_six_k4_repeat_codec_defects() {
         (
             "brotli-k4-repeat-store-overwrites-history",
             "store_complex_code_description_payload",
-            "CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {\n            store_complex_progress(workspace, window_bytes, progress)?;\n            put_state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH, length)?;",
-            "CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {\n            store_complex_progress(workspace, window_bytes, progress)?;\n            put_state_byte(workspace, window_bytes, B3B_REPEATED_LENGTH, length)?;",
+            "CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {\n            store_complex_progress(workspace, window_bytes, progress)?;\n            proof { source_writes = source_writes + 34; }\n            put_state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH, length)?;",
+            "CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {\n            store_complex_progress(workspace, window_bytes, progress)?;\n            proof { source_writes = source_writes + 34; }\n            put_state_byte(workspace, window_bytes, B3B_REPEATED_LENGTH, length)?;",
         ),
         (
             "brotli-k4-repeat-load-current-from-history",
@@ -4690,6 +4690,123 @@ fn the_prover_rejects_fourteen_k5_loader_accounting_defects() {
         ("brotli-k5-each-reload-restores-old-eighteen", "plan_serialized_tree", "checked_planned_work_add(execution_work, reload_reads)", "checked_planned_work_add(execution_work, 18)"),
         ("brotli-k5-invalid-last-auxiliary-misclassified-valid", "plan_saved_aux_load", "return Ok((i as u64 + 1, false));", "return Ok((i as u64 + 1, true));"),
         ("brotli-k5-invalid-alphabet-misclassified-valid", "plan_saved_aux_load", "return Ok((0, false));", "return Ok((0, true));"),
+    ] {
+        let start = original.find(&format!("fn {function}(")).unwrap();
+        let end = start + original[start..].find("\n}\n").unwrap() + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").unwrap();
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        let lower = log.to_ascii_lowercase();
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(lower.contains("postcondition not satisfied") || lower.contains("precondition not satisfied")
+            || lower.contains("invariant not satisfied") || lower.contains("assertion failed"),
+            "expected a semantic proof rejection: {log}");
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count"), "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate source defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_twelve_m1_general_codec_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-general-codec-canary-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        (
+            "brotli-m1-codec-simple-index-erased",
+            "store_simple_code_description_payload",
+            "put_state_byte(workspace, window_bytes, B3B_CODE_INDEX, index)?;",
+            "put_state_byte(workspace, window_bytes, B3B_CODE_INDEX, 0)?;",
+        ),
+        (
+            "brotli-m1-codec-shape-selector-lost",
+            "store_simple_code_description_payload",
+            "put_state_byte(workspace, window_bytes, B3B_SIMPLE_SELECTOR, 3)?;",
+            "put_state_byte(workspace, window_bytes, B3B_SIMPLE_SELECTOR, 2)?;",
+        ),
+        (
+            "brotli-m1-codec-symbol-array-alias",
+            "write_simple_symbols",
+            "            symbols[i],",
+            "            symbols[0],",
+        ),
+        (
+            "brotli-m1-codec-aux-array-erased",
+            "write_aux_lengths",
+            "            lengths[i],",
+            "            0,",
+        ),
+        (
+            "brotli-m1-codec-prefix-phase-alias",
+            "store_complex_code_description_payload",
+            "CodeDescriptionPhase::ComplexPrefix3(_) => 2,",
+            "CodeDescriptionPhase::ComplexPrefix3(_) => 3,",
+        ),
+        (
+            "brotli-m1-codec-prefix-nonzero-erased",
+            "store_complex_code_description_payload",
+            "put_state_byte(workspace, window_bytes, B3B_AUX_NONZERO, progress.nonzero)?;",
+            "put_state_byte(workspace, window_bytes, B3B_AUX_NONZERO, 0)?;",
+        ),
+        (
+            "brotli-m1-codec-aux-skip-erased",
+            "store_complex_code",
+            "put_state_byte(workspace, window_bytes, B3B_AUX_SKIP, code.skip)",
+            "put_state_byte(workspace, window_bytes, B3B_AUX_SKIP, 0)",
+        ),
+        (
+            "brotli-m1-codec-chained-history-erased",
+            "store_complex_progress",
+            "put_state_u32(workspace, window_bytes, B3B_CHAINED_REPEAT, progress.repeat)",
+            "put_state_u32(workspace, window_bytes, B3B_CHAINED_REPEAT, 0)",
+        ),
+        (
+            "brotli-m1-codec-parent-tag-erased",
+            "store_code_description_decoder",
+            "put_state_byte(workspace, window_bytes, B3B_CODE_PHASE, tag)",
+            "put_state_byte(workspace, window_bytes, B3B_CODE_PHASE, 0)",
+        ),
+        (
+            "brotli-m1-codec-failed-error-tag-alias",
+            "code_description_error_tag",
+            "CodeDescriptionError::InvalidAlphabet => 2,",
+            "CodeDescriptionError::InvalidAlphabet => 3,",
+        ),
+        (
+            "brotli-m1-codec-simple-write-undercharge",
+            "store_simple_code_description_payload",
+            "put_state_byte(workspace, window_bytes, B3B_CODE_INDEX, index)?;\n            proof { source_writes = source_writes + 1; }",
+            "put_state_byte(workspace, window_bytes, B3B_CODE_INDEX, index)?;\n            proof { source_writes = source_writes + 0; }",
+        ),
+        (
+            "brotli-m1-codec-complex-write-undercharge",
+            "store_complex_code_description_payload",
+            "CodeDescriptionPhase::ComplexSymbol(progress) => {\n            store_complex_progress(workspace, window_bytes, progress)?;\n            proof { source_writes = source_writes + 34; }",
+            "CodeDescriptionPhase::ComplexSymbol(progress) => {\n            store_complex_progress(workspace, window_bytes, progress)?;\n            proof { source_writes = source_writes + 33; }",
+        ),
     ] {
         let start = original.find(&format!("fn {function}(")).unwrap();
         let end = start + original[start..].find("\n}\n").unwrap() + 3;

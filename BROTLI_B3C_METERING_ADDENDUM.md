@@ -720,3 +720,47 @@ This completes K5's accounting change, not M1. Complete serialized-state/tree
 replay and the remaining header/body, frame, source-ledger and control closure
 still require work. Later decoder phases and independent human review remain
 separate; no release gate or supported-format claim is promoted.
+
+
+### General descriptor storage and reload agreement
+
+The M1 continuation now checks the general serialized decoder image for every
+stored description phase. Successful loads establish the image, and every
+valid encoded image reloads to the expected phase, alphabet and active queued
+state. The image retains the original loader guards, auxiliary-cell bounds,
+rank alignment and alphabet metadata. Store guarantees are conditional on the
+existing retained-history and builder context where those fields are needed;
+no original executable requirement or root guarantee was narrowed.
+
+The encoder proofs bind simple symbols, auxiliary progress, symbol/repeat
+history, pending spans, completed descriptions and error tags. They preserve
+the auxiliary snapshot across unrelated scalar writes. Successful span drains
+produce the next stored image. The actual bounded tree loop now carries and
+checks storage/reload agreement for all successfully stored phases, extending
+the earlier repeat-only proof. Nonterminal field refinement transports across
+reload; terminal states retain the same phase, alphabet and logical queue and
+consume no input. Unused in-memory queue bytes are outside serialization.
+
+Source counters check the existing symbol-array and auxiliary-array writes,
+complex-code/progress helpers, each payload branch and the enclosing four
+writes. Runtime behavior, W1 interfaces, budgets, workspace, 5,696-action caps,
+the 425-unit reset charge and F2 fixture policy are unchanged.
+
+Fresh verification passed **1,246 whole-crate checks, zero errors**, with
+`--no-cheating`, followed by **66 distinct semantic defect rejections across
+seven affected suites**. All **106 release runtime tests** pass. Twelve new
+controls cover saved-field corruption and storage undercounts. The first
+expanded tree preflight exhausted the verifier; explicit proof handoffs then
+passed. One legacy control stopped at a text-selector audit because a new
+proof condition repeated its phrase. Its output and old harness are retained;
+only that selector was narrowed, a fresh whole-crate positive passed, and all
+four controls in that suite were rerun successfully. The other 62 controls
+retain their actual preceding positive on identical library bytes and identical
+suite/checker bodies. No resource or harness failure is counted as a rejection.
+
+Exact source, harness, tool and transcript identities are recorded in
+`evidence/brotli-b3c-m1-full-codec.json`. This closes the named codec proof
+checkpoint. Full plan/action tree replay, remaining failure/frame and source
+ledgers, complete M1 control closure, B3c/B3d/B4 and independent human review
+remain open. This is not a supported-decoder or mathematical-safety completion
+claim.

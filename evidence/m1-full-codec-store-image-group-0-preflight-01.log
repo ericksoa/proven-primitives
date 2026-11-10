@@ -1,0 +1,34 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53950,13): 'if' cannot be used in patterns.
+WARNING: (61672,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13926:1
+      |
+13926 | / fn store_complex_code_description_payload(
+13927 | |     workspace: &mut [u8],
+13928 | |     window_bytes: u32,
+13929 | |     phase: CodeDescriptionPhase,
+13930 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+error: postcondition not satisfied
+     --> src/brotli_input.rs:13933:9
+      |
+13933 | /         r.is_ok() && b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+13934 | |             saved_aux_length_values(final(workspace)@, window_bytes)
+13935 | |                 == m1_payload_auxiliary_values(phase, saved_aux_length_values(old(workspace)@, window_bytes)),
+      | |_____________________________________________________________________________________________________________^ failed this postcondition
+...
+13950 | / {
+13951 | |     proof {
+13952 | |         reveal(saved_aux_length_values); reveal(m1_payload_auxiliary_values);
+13953 | |         reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
+...     |
+14023 | |     Ok(tag)
+14024 | | }
+      | |_- at the end of the function body
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

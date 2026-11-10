@@ -1,0 +1,205 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:25241:1
+      |
+25241 | / fn store_meta_phase(
+25242 | |     workspace: &mut [u8],
+25243 | |     window_bytes: u32,
+25244 | |     phase: MetaBlockPhase,
+25245 | | ) -> (r: Result<(), CoreFailure>)
+      | |________________________________^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:11273:5
+      |
+11273 |     while i < 8
+      |     ^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:11189:1
+      |
+11189 | / fn store_b3b_queue(
+11190 | |     workspace: &mut [u8],
+11191 | |     window_bytes: u32,
+11192 | |     queue: &BitQueue,
+11193 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12759:1
+      |
+12759 | / fn store_installed_prefix_state(
+12760 | |     workspace: &mut [u8],
+12761 | |     window_bytes: u32,
+12762 | |     prefix: InstalledPrefixState,
+12763 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:34947:5
+      |
+34947 |     while i < 3
+      |     ^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:34981:5
+      |
+34981 |     while i < 6
+      |     ^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:34926:1
+      |
+34926 | / fn store_body_switch_state(
+34927 | |     workspace: &mut [u8],
+34928 | |     window_bytes: u32,
+34929 | |     state: crate::brotli_block::B3bSwitchState,
+34930 | | ) -> (r: Result<(), CoreFailure>)
+      | |________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:11754:1
+      |
+11754 | / fn store_terminal_error(
+11755 | |     workspace: &mut [u8],
+11756 | |     window_bytes: u32,
+11757 | |     error: CompressedHeaderError,
+11758 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:11524:1
+      |
+11524 | / fn store_var_uint8_phase(
+11525 | |     workspace: &mut [u8],
+11526 | |     window_bytes: u32,
+11527 | |     phase: VarUint8Phase,
+11528 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13989:1
+      |
+13989 | / fn store_simple_code_description_payload(
+13990 | |     workspace: &mut [u8],
+13991 | |     window_bytes: u32,
+13992 | |     phase: CodeDescriptionPhase,
+13993 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13676:1
+      |
+13676 | / fn store_complex_code(
+13677 | |     workspace: &mut [u8],
+13678 | |     window_bytes: u32,
+13679 | |     code: ComplexCodeLengthAlphabet,
+13680 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13765:5
+      |
+13765 |     while i < 5
+      |     ^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:13724:1
+      |
+13724 | / fn store_complex_progress(
+13725 | |     workspace: &mut [u8],
+13726 | |     window_bytes: u32,
+13727 | |     progress: ComplexSymbolProgress,
+13728 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:14060:1
+      |
+14060 | / fn store_complex_code_description_payload(
+14061 | |     workspace: &mut [u8],
+14062 | |     window_bytes: u32,
+14063 | |     phase: CodeDescriptionPhase,
+14064 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:14192:1
+      |
+14192 | / fn store_code_description_payload(
+14193 | |     workspace: &mut [u8],
+14194 | |     window_bytes: u32,
+14195 | |     phase: CodeDescriptionPhase,
+14196 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:14238:1
+      |
+14238 | / fn store_code_description_decoder(
+14239 | |     workspace: &mut [u8],
+14240 | |     window_bytes: u32,
+14241 | |     decoder: CodeDescriptionDecoder,
+14242 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:16074:1
+      |
+16074 | / fn store_context_map_progress(
+16075 | |     workspace: &mut [u8],
+16076 | |     window_bytes: u32,
+16077 | |     progress: u16,
+16078 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:16161:1
+      |
+16161 | / fn store_context_phase(
+16162 | |     workspace: &mut [u8],
+16163 | |     window_bytes: u32,
+16164 | |     next_phase: u8,
+16165 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:17484:1
+      |
+17484 | / fn store_context_zero_symbol(
+17485 | |     workspace: &mut [u8],
+17486 | |     window_bytes: u32,
+17487 | |     kind: crate::brotli_prefix::ContextMapKind,
+...     |
+17490 | |     num_trees: u16,
+17491 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:17573:1
+      |
+17573 | / fn store_context_pending_run_symbol(
+17574 | |     workspace: &mut [u8],
+17575 | |     window_bytes: u32,
+17576 | |     symbol: u16,
+...     |
+17579 | |     _initialized: u16,
+17580 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:17632:1
+      |
+17632 | / fn store_context_direct_symbol(
+17633 | |     workspace: &mut [u8],
+17634 | |     window_bytes: u32,
+17635 | |     kind: crate::brotli_prefix::ContextMapKind,
+...     |
+17640 | |     symbol: u16,
+17641 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+verification results:: 21 verified, 0 errors (partial verification with `--verify-*`)

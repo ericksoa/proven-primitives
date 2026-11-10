@@ -2,33 +2,33 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51874,13): 'if' cannot be used in patterns.
-WARNING: (59229,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-4341/src/brotli_input.rs:7916:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-4210/src/brotli_input.rs:8279:1
      |
-7916 | / fn b3b_state_address(
-7917 | |     workspace_len: usize,
-7918 | |     window_bytes: u32,
-7919 | |     relative: u16,
-7920 | |     width: u8,
-7921 | | ) -> (r: Result<usize, crate::brotli_prefix::WorkspaceError>)
+8279 | / fn b3b_state_address(
+8280 | |     workspace_len: usize,
+8281 | |     window_bytes: u32,
+8282 | |     relative: u16,
+8283 | |     width: u8,
+8284 | | ) -> (r: Result<usize, crate::brotli_prefix::WorkspaceError>)
      | |____________________________________________________________^
 
 error: postcondition not satisfied
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-4341/src/brotli_input.rs:7923:13
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-4210/src/brotli_input.rs:8286:13
      |
-7923 |       ensures r.is_ok() ==> {
+8286 |       ensures r.is_ok() ==> {
      |  _____________^
-7924 | |         &&& b3b_workspace_shape(workspace_len as nat, window_bytes)
-7925 | |         &&& relative as nat + width as nat <= B3B_SCALAR_BYTES
-7926 | |         &&& r.unwrap() as nat
-7927 | |             == window_bytes as nat + B3B_SCALAR_OFFSET as nat + relative as nat
-7928 | |         &&& r.unwrap() as nat + width as nat <= workspace_len
-7929 | |     },
+8287 | |         &&& b3b_workspace_shape(workspace_len as nat, window_bytes)
+8288 | |         &&& relative as nat + width as nat <= B3B_SCALAR_BYTES
+8289 | |         &&& r.unwrap() as nat
+8290 | |             == window_bytes as nat + B3B_SCALAR_OFFSET as nat + relative as nat
+8291 | |         &&& r.unwrap() as nat + width as nat <= workspace_len
+8292 | |     },
      | |_____^ failed this postcondition
 ...
-7961 |       Ok(at)
+8324 |       Ok(at)
      |       ------ at the end of the function body
 
 error: aborting due to 1 previous error

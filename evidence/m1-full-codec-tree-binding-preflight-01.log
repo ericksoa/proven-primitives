@@ -1,0 +1,11 @@
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+error: while loop: Resource limit (rlimit) exceeded; consider rerunning with --profile for more details
+     --> src/brotli_input.rs:15405:5
+      |
+15405 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

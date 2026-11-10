@@ -2,27 +2,27 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51874,13): 'if' cannot be used in patterns.
-WARNING: (59229,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-4340/src/brotli_input.rs:16517:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-5248/src/brotli_input.rs:17632:1
       |
-16517 | / fn store_context_direct_symbol(
-16518 | |     workspace: &mut [u8],
-16519 | |     window_bytes: u32,
-16520 | |     kind: crate::brotli_prefix::ContextMapKind,
+17632 | / fn store_context_direct_symbol(
+17633 | |     workspace: &mut [u8],
+17634 | |     window_bytes: u32,
+17635 | |     kind: crate::brotli_prefix::ContextMapKind,
 ...     |
-16525 | |     symbol: u16,
-16526 | | ) -> (r: Result<(), CompressedHeaderError>)
+17640 | |     symbol: u16,
+17641 | | ) -> (r: Result<(), CompressedHeaderError>)
       | |__________________________________________^
 
 error: precondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-4340/src/brotli_input.rs:16562:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-5248/src/brotli_input.rs:17677:13
       |
- 4969 |     requires value < 256,
+ 5332 |     requires value < 256,
       |              ----------- failed precondition
 ...
-16562 |     proof { bounded_u16_fits_u8(value); }
+17677 |     proof { bounded_u16_fits_u8(value); }
       |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: aborting due to 1 previous error

@@ -1,0 +1,21 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53950,13): 'if' cannot be used in patterns.
+WARNING: (61672,5): 'if' cannot be used in patterns.
+error: postcondition not satisfied
+     --> src/brotli_input.rs:14101:9
+      |
+14101 | /         r.is_ok() && code_rank_aligned(decoder.phase)
+14102 | |             && m1_payload_store_context(old(workspace)@, window_bytes, decoder.phase)
+14103 | |             && saved_aux_copy_prefix(old(workspace)@, window_bytes, 18)
+14104 | |             && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_MAX) == decoder.alphabet_max
+14105 | |             && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == decoder.alphabet_limit ==>
+14106 | |                 m1_code_decoder_image(final(workspace)@, window_bytes, decoder.queue, decoder),
+      | |______________________________________________________________________________________________^ failed this postcondition
+...
+14234 |       result
+      |       ------ at the end of the function body
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

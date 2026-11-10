@@ -3,58 +3,58 @@ verification results:: 4 verified, 1 errors (partial verification with `--verify
 note: verifying module brotli_input (selected functions)
 
 note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:28978:17
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:29606:17
       |
-28978 |                 assert(amount == if length == 1 { 16_384u32 }
+29606 |                 assert(amount == if length == 1 { 16_384u32 }
       |                 ^^^^^^
 
-WARNING: (53085,13): 'if' cannot be used in patterns.
-WARNING: (60949,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:29002:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:29630:13
       |
-29002 |             assert(2 * index_sum as int <= (symbol as int + 1) * symbol as int)
+29630 |             assert(2 * index_sum as int <= (symbol as int + 1) * symbol as int)
       |             ^^^^^^
 
-WARNING: (53085,13): 'if' cannot be used in patterns.
-WARNING: (60949,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:29011:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:29639:13
       |
-29011 |             assert(index_sum <= 247_456) by (nonlinear_arith)
+29639 |             assert(index_sum <= 247_456) by (nonlinear_arith)
       |             ^^^^^^
 
-WARNING: (53085,13): 'if' cannot be used in patterns.
-WARNING: (60949,5): 'if' cannot be used in patterns.
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
 note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:28945:5
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:29573:5
       |
-28945 |     while symbol < symbols
+29573 |     while symbol < symbols
       |     ^^^^^^^^^^^^^^^^^^^^^^
 
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:28907:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:29535:1
       |
-28907 | / fn plan_canonical_tree_install(
-28908 | |     lengths: &[u8; 704],
-28909 | |     budget: &mut crate::brotli::RequestBudget,
-28910 | |     symbols: u16,
-28911 | | ) -> (r: Result<(u64, u64, bool), CoreFailure>)
+29535 | / fn plan_canonical_tree_install(
+29536 | |     lengths: &[u8; 704],
+29537 | |     budget: &mut crate::brotli::RequestBudget,
+29538 | |     symbols: u16,
+29539 | | ) -> (r: Result<(u64, u64, bool), CoreFailure>)
       | |______________________________________________^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:28925:9
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-6222/src/brotli_input.rs:29553:9
       |
-28925 | /         r.is_ok() ==> {
-28926 | |             &&& r.unwrap().0 <= 704
-28927 | |             &&& r.unwrap().1 <= 300_000
-28928 | |             &&& canonical_plan_scan_result(lengths@, symbols as nat, r.unwrap().0 as nat, r.unwrap().2)
+29553 | /         r.is_ok() ==> {
+29554 | |             &&& r.unwrap().0 <= 704
+29555 | |             &&& r.unwrap().1 <= 300_000
+29556 | |             &&& canonical_plan_scan_result(lengths@, symbols as nat, r.unwrap().0 as nat, r.unwrap().2)
 ...     |
-28934 | |             } else { r.unwrap().1 == r.unwrap().0 }
-28935 | |         },
+29562 | |             } else { r.unwrap().1 == r.unwrap().0 }
+29563 | |         },
       | |_________^ failed this postcondition
 ...
-28973 |               return Ok((planning_work, planning_work, true));
+29601 |               return Ok((planning_work, planning_work, true));
       |               ----------------------------------------------- at this exit
 
 error: aborting due to 1 previous error

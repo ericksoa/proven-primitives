@@ -1,0 +1,26 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53950,13): 'if' cannot be used in patterns.
+WARNING: (61672,5): 'if' cannot be used in patterns.
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:13936:1
+      |
+13936 | / fn store_complex_code_description_payload(
+13937 | |     workspace: &mut [u8],
+13938 | |     window_bytes: u32,
+13939 | |     phase: CodeDescriptionPhase,
+13940 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+note: function body check finished in 10 seconds
+     --> src/brotli_input.rs:13936:1
+      |
+13936 | / fn store_complex_code_description_payload(
+13937 | |     workspace: &mut [u8],
+13938 | |     window_bytes: u32,
+13939 | |     phase: CodeDescriptionPhase,
+13940 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

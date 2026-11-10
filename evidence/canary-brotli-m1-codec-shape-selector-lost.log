@@ -1,0 +1,33 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-4240/src/brotli_input.rs:13989:1
+      |
+13989 | / fn store_simple_code_description_payload(
+13990 | |     workspace: &mut [u8],
+13991 | |     window_bytes: u32,
+13992 | |     phase: CodeDescriptionPhase,
+13993 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-4240/src/brotli_input.rs:14005:9
+      |
+14005 |           r.is_ok() ==> m1_simple_description_values(final(workspace)@, window_bytes, phase),
+      |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+14010 | / {
+14011 | |     let ghost mut source_writes: nat = 0;
+14012 | |     proof {
+14013 | |         reveal(saved_aux_length_values); reveal(m1_payload_auxiliary_values);
+...     |
+14057 | |     Ok(tag)
+14058 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

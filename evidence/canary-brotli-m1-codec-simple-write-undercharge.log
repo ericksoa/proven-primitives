@@ -1,0 +1,24 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-4240/src/brotli_input.rs:13989:1
+      |
+13989 | / fn store_simple_code_description_payload(
+13990 | |     workspace: &mut [u8],
+13991 | |     window_bytes: u32,
+13992 | |     phase: CodeDescriptionPhase,
+13993 | | ) -> (r: Result<u8, CompressedHeaderError>)
+      | |__________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-4240/src/brotli_input.rs:14056:20
+      |
+14056 |     proof { assert(source_writes == code_description_payload_writes_spec(phase)); }
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

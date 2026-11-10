@@ -11915,8 +11915,9 @@ fn decode_tree_region(tag: u8) -> (r: Option<crate::brotli_prefix::TreeRegion>)
 }
 
 fn code_description_error_tag(error: CodeDescriptionError) -> (r: u8)
-    ensures 1 <= r <= 5,
+    ensures 1 <= r <= 5, r == m1_code_error_tag(error),
 {
+    reveal(m1_code_error_tag);
     match error {
         CodeDescriptionError::MetaBlockNotCompressed => 1,
         CodeDescriptionError::InvalidAlphabet => 2,
@@ -11927,7 +11928,11 @@ fn code_description_error_tag(error: CodeDescriptionError) -> (r: u8)
 }
 
 fn decode_code_description_error(tag: u8) -> (r: Option<CodeDescriptionError>)
+    ensures r.is_some() == (1 <= tag <= 5),
+        r.is_some() ==> m1_code_error_tag(r.unwrap()) == tag,
+        forall|error: CodeDescriptionError| #[trigger] m1_code_error_tag(error) == tag ==> r == Some(error),
 {
+    reveal(m1_code_error_tag);
     match tag {
         1 => Some(CodeDescriptionError::MetaBlockNotCompressed),
         2 => Some(CodeDescriptionError::InvalidAlphabet),
@@ -12227,9 +12232,10 @@ fn write_simple_symbols(
         reveal(code_store_frame);
         assert(code_store_frame(original, workspace@, window_bytes));
     }
+    let ghost mut source_writes: nat = 0;
     let mut i: usize = 0;
     while i < 4
-        invariant i <= 4,
+        invariant i <= 4, source_writes == 2 * i as nat,
             i > 0 ==> b3b_workspace_shape(workspace@.len(), window_bytes),
             forall|j: int| 0 <= j < i ==> #[trigger] symbols@[j] as nat
                 == b3b_scalar_u16_at(workspace@, window_bytes, (B3B_SIMPLE_SYMBOLS as int + 2 * j) as u16),
@@ -12269,8 +12275,10 @@ fn write_simple_symbols(
             Ok(()) => {}
             Err(error) => return Err(CompressedHeaderError::Workspace(error)),
         }
+        proof { source_writes = source_writes + 2; }
         i = i + 1;
     }
+    proof { assert(source_writes == 8); }
     Ok(())
 }
 
@@ -12378,9 +12386,10 @@ fn write_aux_lengths(
         reveal(code_store_frame);
         assert(code_store_frame(original, workspace@, window_bytes));
     }
+    let ghost mut source_writes: nat = 0;
     let mut i: usize = 0;
     while i < 18
-        invariant i <= 18,
+        invariant i <= 18, source_writes == 1 * i as nat,
             i > 0 ==> b3b_workspace_shape(workspace@.len(), window_bytes),
             forall|j: int| 0 <= j < i ==> #[trigger]
                 workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j] == lengths@[j],
@@ -12421,8 +12430,10 @@ fn write_aux_lengths(
             b3b_scalar_layout_is_exact();
             assert(workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i as int] == lengths@[i as int]);
         }
+        proof { source_writes = source_writes + 1; }
         i = i + 1;
     }
+    proof { assert(source_writes == 18); }
     Ok(())
 }
 
@@ -13098,6 +13109,249 @@ proof fn k4_repeat_reloaded_field_refines_original(workspace: Seq<u8>, window_by
     reveal(code_field_step_refines); reveal(bit_queue_read_image);
 }
 
+spec fn m1_code_error_tag(error: CodeDescriptionError) -> u8 {
+    match error {
+        CodeDescriptionError::MetaBlockNotCompressed => 1,
+        CodeDescriptionError::InvalidAlphabet => 2,
+        CodeDescriptionError::DuplicateSimpleSymbol => 3,
+        CodeDescriptionError::CodeLengthSpace => 4,
+        CodeDescriptionError::Truncated => 5,
+    }
+}
+
+spec fn m1_description_storage_tag(phase: CodeDescriptionPhase) -> u8 {
+    match phase {
+        CodeDescriptionPhase::Selector => 0,
+        CodeDescriptionPhase::SimpleSize => 1,
+        CodeDescriptionPhase::SimpleSymbols { .. } => 2,
+        CodeDescriptionPhase::SimpleShape { .. } => 3,
+        CodeDescriptionPhase::ComplexPrefix2(_) | CodeDescriptionPhase::ComplexPrefix3(_)
+        | CodeDescriptionPhase::ComplexPrefix4(_) => 4,
+        CodeDescriptionPhase::ComplexSymbol(_) => 5,
+        CodeDescriptionPhase::ComplexRepeat { .. } => 6,
+        CodeDescriptionPhase::ComplexPendingSpan { .. } => 7,
+        CodeDescriptionPhase::CompleteSimple(_) => 8,
+        CodeDescriptionPhase::CompleteComplex { .. } => 9,
+        CodeDescriptionPhase::Failed(_) => 10,
+        CodeDescriptionPhase::CompleteComplexAlphabet(_) => 255,
+    }
+}
+
+#[verifier::opaque]
+spec fn m1_description_payload_values(workspace: Seq<u8>, window_bytes: u32,
+    phase: CodeDescriptionPhase) -> bool {
+    match phase {
+        CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize
+        | CodeDescriptionPhase::SimpleSymbols { .. } | CodeDescriptionPhase::SimpleShape { .. }
+        | CodeDescriptionPhase::CompleteSimple(_) => m1_simple_description_values(workspace, window_bytes, phase),
+        CodeDescriptionPhase::ComplexPrefix2(p) | CodeDescriptionPhase::ComplexPrefix3(p)
+        | CodeDescriptionPhase::ComplexPrefix4(p) => {
+            &&& k4_complex_code_values(workspace, window_bytes,
+                ComplexCodeLengthAlphabet { skip: p.skip, lengths: p.lengths })
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_INDEX) == p.index
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SPACE) == p.space
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_NONZERO) == p.nonzero
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_AUX_PHASE) == match phase {
+                CodeDescriptionPhase::ComplexPrefix2(_) => 1u8,
+                CodeDescriptionPhase::ComplexPrefix3(_) => 2u8,
+                _ => 3u8,
+            }
+        },
+        CodeDescriptionPhase::ComplexSymbol(p) => k4_complex_progress_values(workspace, window_bytes, p),
+        CodeDescriptionPhase::ComplexRepeat { .. } => k4_repeat_values(workspace, window_bytes, phase),
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, after } => {
+            &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) == start
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH) == length
+            &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL) == start as nat + span_count as nat
+            &&& match after {
+                ComplexAfterSpan::Symbol(p) => k4_complex_progress_values(workspace, window_bytes, p),
+                ComplexAfterSpan::TrailingZeros { code, .. } | ComplexAfterSpan::Complete { code, .. } => {
+                    &&& k4_complex_code_values(workspace, window_bytes, code)
+                    &&& b3b_scalar_u32_at(workspace, window_bytes, B3B_FINAL_SPACE) == 0
+                    &&& loader_shared_complex_guards(workspace, window_bytes)
+                },
+            }
+        },
+        CodeDescriptionPhase::CompleteComplex { code, decoded_symbols } => {
+            &&& k4_complex_code_values(workspace, window_bytes, code)
+            &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL) == decoded_symbols
+            &&& b3b_scalar_u32_at(workspace, window_bytes, B3B_FINAL_SPACE) == 0
+            &&& loader_shared_complex_guards(workspace, window_bytes)
+        },
+        CodeDescriptionPhase::Failed(error) =>
+            b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_ERROR) == m1_code_error_tag(error),
+        CodeDescriptionPhase::CompleteComplexAlphabet(_) => false,
+    }
+}
+
+#[verifier::opaque]
+spec fn m1_code_decoder_image(workspace: Seq<u8>, window_bytes: u32,
+    queue: BitQueue, expected: CodeDescriptionDecoder) -> bool {
+    &&& b3b_workspace_shape(workspace.len(), window_bytes)
+    &&& expected.valid()
+    &&& code_rank_aligned(expected.phase)
+    &&& expected.queue == queue
+    &&& saved_aux_load_valid(workspace, window_bytes)
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_MAX) == expected.alphabet_max
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT) == expected.alphabet_limit
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_PHASE) == m1_description_storage_tag(expected.phase)
+    &&& m1_description_payload_values(workspace, window_bytes, expected.phase)
+}
+proof fn m1_complex_code_values_are_unique(workspace: Seq<u8>, window_bytes: u32,
+    left: ComplexCodeLengthAlphabet, right: ComplexCodeLengthAlphabet)
+    requires k4_complex_code_values(workspace, window_bytes, left), k4_complex_code_values(workspace, window_bytes, right),
+    ensures left == right,
+{
+    reveal(k4_complex_code_values);
+    assert forall|i: int| 0 <= i < 18 implies #[trigger] left.lengths@[i] == right.lengths@[i] by {
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] == left.lengths@[i]);
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] == right.lengths@[i]);
+    }
+    assert(left.lengths@ =~= right.lengths@); assert(left.lengths == right.lengths);
+}
+
+proof fn m1_complex_progress_values_are_unique(workspace: Seq<u8>, window_bytes: u32,
+    left: ComplexSymbolProgress, right: ComplexSymbolProgress)
+    requires k4_complex_progress_values(workspace, window_bytes, left), k4_complex_progress_values(workspace, window_bytes, right),
+    ensures left == right,
+{
+    reveal(k4_complex_progress_values);
+    m1_complex_code_values_are_unique(workspace, window_bytes, left.code, right.code);
+}
+
+proof fn m1_simple_symbol_values_are_unique(workspace: Seq<u8>, window_bytes: u32,
+    left: [u16; 4], right: [u16; 4])
+    requires m1_simple_symbol_values(workspace, window_bytes, left), m1_simple_symbol_values(workspace, window_bytes, right),
+    ensures left == right,
+{
+    reveal(m1_simple_symbol_values);
+    assert forall|i: int| 0 <= i < 4 implies #[trigger] left@[i] == right@[i] by {
+        assert(left@[i] as nat == b3b_scalar_u16_at(workspace, window_bytes, (B3B_SIMPLE_SYMBOLS as int + 2 * i) as u16));
+        assert(right@[i] as nat == b3b_scalar_u16_at(workspace, window_bytes, (B3B_SIMPLE_SYMBOLS as int + 2 * i) as u16));
+    }
+    assert(left@ =~= right@);
+}
+
+spec fn m1_phase_loader_choices(phase: CodeDescriptionPhase, limit: u16) -> bool {
+    match phase {
+        CodeDescriptionPhase::ComplexRepeat { .. } => k4_repeat_width_agrees(phase),
+        CodeDescriptionPhase::ComplexPendingSpan { after, .. } => match after {
+            ComplexAfterSpan::Symbol(p) => p.space > 0,
+            ComplexAfterSpan::TrailingZeros { start, .. } => start < limit,
+            ComplexAfterSpan::Complete { symbols, .. } => symbols == limit,
+        },
+        _ => true,
+    }
+}
+
+proof fn m1_valid_phase_loader_choices(decoder: CodeDescriptionDecoder)
+    requires decoder.valid(),
+    ensures m1_phase_loader_choices(decoder.phase, decoder.alphabet_limit),
+{
+    reveal(CodeDescriptionDecoder::valid); reveal(ComplexAfterSpan::valid);
+    reveal(ComplexSymbolProgress::valid); reveal(m1_phase_loader_choices); reveal(k4_repeat_width_agrees);
+}
+
+proof fn m1_description_values_are_unique(workspace: Seq<u8>, window_bytes: u32, limit: u16,
+    left: CodeDescriptionPhase, right: CodeDescriptionPhase)
+    requires m1_description_payload_values(workspace, window_bytes, left),
+        m1_description_payload_values(workspace, window_bytes, right),
+        m1_description_storage_tag(left) == m1_description_storage_tag(right),
+        code_rank_aligned(left), code_rank_aligned(right),
+        m1_phase_loader_choices(left, limit), m1_phase_loader_choices(right, limit),
+    ensures left == right,
+{
+    reveal(m1_description_payload_values); reveal(m1_description_storage_tag);
+    reveal(m1_simple_description_values); reveal(k4_complex_progress_values);
+    reveal(m1_phase_loader_choices); reveal(code_rank_aligned); reveal(m1_code_error_tag);
+    match (left, right) {
+        (CodeDescriptionPhase::Selector, CodeDescriptionPhase::Selector)
+        | (CodeDescriptionPhase::SimpleSize, CodeDescriptionPhase::SimpleSize) => {},
+        (CodeDescriptionPhase::SimpleSymbols { symbols: a, .. }, CodeDescriptionPhase::SimpleSymbols { symbols: b, .. })
+        | (CodeDescriptionPhase::SimpleShape { symbols: a }, CodeDescriptionPhase::SimpleShape { symbols: b }) => {
+            m1_simple_symbol_values_are_unique(workspace, window_bytes, a, b);
+        },
+        (CodeDescriptionPhase::CompleteSimple(a), CodeDescriptionPhase::CompleteSimple(b)) => {
+            m1_simple_symbol_values_are_unique(workspace, window_bytes, a.symbols, b.symbols);
+        },
+        (CodeDescriptionPhase::ComplexPrefix2(a) | CodeDescriptionPhase::ComplexPrefix3(a) | CodeDescriptionPhase::ComplexPrefix4(a),
+         CodeDescriptionPhase::ComplexPrefix2(b) | CodeDescriptionPhase::ComplexPrefix3(b) | CodeDescriptionPhase::ComplexPrefix4(b)) => {
+            m1_complex_code_values_are_unique(workspace, window_bytes,
+                ComplexCodeLengthAlphabet { skip: a.skip, lengths: a.lengths },
+                ComplexCodeLengthAlphabet { skip: b.skip, lengths: b.lengths });
+        },
+        (CodeDescriptionPhase::ComplexSymbol(a), CodeDescriptionPhase::ComplexSymbol(b)) => {
+            m1_complex_progress_values_are_unique(workspace, window_bytes, a, b);
+        },
+        (CodeDescriptionPhase::ComplexRepeat { .. }, CodeDescriptionPhase::ComplexRepeat { .. }) => {
+            k4_repeat_phase_values_are_unique(workspace, window_bytes, left, right);
+        },
+        (CodeDescriptionPhase::ComplexPendingSpan { after: a, .. }, CodeDescriptionPhase::ComplexPendingSpan { after: b, .. }) => {
+            match (a, b) {
+                (ComplexAfterSpan::Symbol(a), ComplexAfterSpan::Symbol(b)) => {
+                    m1_complex_progress_values_are_unique(workspace, window_bytes, a, b);
+                },
+                (ComplexAfterSpan::TrailingZeros { code: a, .. }, ComplexAfterSpan::TrailingZeros { code: b, .. })
+                | (ComplexAfterSpan::Complete { code: a, .. }, ComplexAfterSpan::Complete { code: b, .. }) => {
+                    m1_complex_code_values_are_unique(workspace, window_bytes, a, b);
+                },
+                _ => { assert(false); },
+            }
+        },
+        (CodeDescriptionPhase::CompleteComplex { code: a, .. }, CodeDescriptionPhase::CompleteComplex { code: b, .. }) => {
+            m1_complex_code_values_are_unique(workspace, window_bytes, a, b);
+        },
+        (CodeDescriptionPhase::Failed(_), CodeDescriptionPhase::Failed(_)) => {},
+        _ => { assert(false); },
+    }
+}
+
+proof fn m1_code_image_rebases_queue(workspace: Seq<u8>, window_bytes: u32,
+    original: CodeDescriptionDecoder, queue: BitQueue)
+    requires m1_code_decoder_image(workspace, window_bytes, original.queue, original), queue.valid(),
+    ensures m1_code_decoder_image(workspace, window_bytes, queue, CodeDescriptionDecoder {
+        queue, alphabet_max: original.alphabet_max, alphabet_limit: original.alphabet_limit,
+        phase: original.phase,
+    }),
+{
+    reveal(m1_code_decoder_image); reveal(CodeDescriptionDecoder::valid);
+}
+
+proof fn m1_code_reloaded_field_refines_original(workspace: Seq<u8>, window_bytes: u32,
+    original: CodeDescriptionDecoder, loaded: CodeDescriptionDecoder,
+    input: Seq<u8>, end: bool, after: CodeDescriptionDecoder, step: CodeDescriptionStep)
+    requires m1_code_decoder_image(workspace, window_bytes, original.queue, original),
+        m1_code_decoder_image(workspace, window_bytes, loaded.queue, loaded),
+        serialized_b3b_queue(workspace, window_bytes, original.queue),
+        serialized_b3b_queue(workspace, window_bytes, loaded.queue),
+        code_field_step_refines(loaded, input, end, after, step),
+    ensures original.phase == loaded.phase,
+        original.alphabet_max == loaded.alphabet_max, original.alphabet_limit == loaded.alphabet_limit,
+        original.queue.bits() == loaded.queue.bits(),
+        !code_phase_terminal(original.phase) ==> code_field_step_refines(original, input, end, after, step),
+        code_phase_terminal(original.phase) ==> {
+            &&& after.phase == original.phase
+            &&& after.queue.bits() == original.queue.bits()
+            &&& step.consumed == 0
+        },
+{
+    reveal(m1_code_decoder_image);
+    reveal(CodeDescriptionDecoder::valid);
+    m1_valid_phase_loader_choices(original); m1_valid_phase_loader_choices(loaded);
+    m1_description_values_are_unique(workspace, window_bytes, original.alphabet_limit,
+        original.phase, loaded.phase);
+    serialized_bit_queues_agree(workspace, window_bytes, original.queue, loaded.queue);
+    reveal(serialized_b3b_queue);
+    assert forall|i: int| 0 <= i < original.queue.len implies
+        #[trigger] original.queue.pending@[i] == loaded.queue.pending@[i] by {
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == original.queue.pending@[i]);
+        assert(workspace[b3b_scalar_base(window_bytes) + B3B_QUEUE_OFFSET as int + i] == loaded.queue.pending@[i]);
+    }
+    assert(original.queue.pending@.take(original.queue.len as int)
+        =~= loaded.queue.pending@.take(loaded.queue.len as int));
+    reveal(code_field_step_refines); reveal(bit_queue_read_image);
+}
+
 fn load_code_description_decoder(
     workspace: &[u8],
     window_bytes: u32,
@@ -13105,6 +13359,9 @@ fn load_code_description_decoder(
 ) -> (r: Result<CodeDescriptionDecoder, CompressedHeaderError>)
     requires queue.valid(),
     ensures
+        forall|expected: CodeDescriptionDecoder| #[trigger]
+            m1_code_decoder_image(workspace@, window_bytes, queue, expected) ==> r == Ok(expected),
+        r.is_ok() ==> m1_code_decoder_image(workspace@, window_bytes, queue, r.unwrap()),
         r.is_ok() ==> loader_table_read_units(workspace@, window_bytes)
             == 22 + phase_validation_read_units(r.unwrap().phase, r.unwrap().alphabet_max, r.unwrap().alphabet_limit),
         b3b_workspace_shape(workspace@.len(), window_bytes)
@@ -13133,6 +13390,11 @@ fn load_code_description_decoder(
         reveal(k4_repeat_values); reveal(k4_complex_progress_values);
         reveal(k4_complex_code_values); reveal(k4_repeat_width_agrees);
         reveal(k4_repeat_decoder_image); reveal(CodeDescriptionDecoder::valid);
+    }
+    proof {
+        reveal(m1_code_decoder_image); reveal(m1_description_payload_values); reveal(m1_description_storage_tag);
+        reveal(m1_simple_description_values); reveal(m1_simple_symbol_values);
+        reveal(loader_shared_complex_guards); reveal(code_rank_aligned); reveal(m1_code_error_tag);
     }
     let ghost mut source_reads: nat = 0;
     proof {
@@ -13380,6 +13642,19 @@ fn load_code_description_decoder(
             }
         }
     }
+    proof {
+        reveal(m1_phase_loader_choices);
+        assert(m1_description_storage_tag(phase) == tag);
+        assert(m1_description_payload_values(workspace@, window_bytes, phase));
+        assert(code_rank_aligned(phase));
+        assert(m1_phase_loader_choices(phase, alphabet_limit));
+        assert forall|expected: CodeDescriptionDecoder|
+            #[trigger] m1_code_decoder_image(workspace@, window_bytes, queue, expected)
+            implies expected == CodeDescriptionDecoder { queue, alphabet_max, alphabet_limit, phase } by {
+            m1_valid_phase_loader_choices(expected);
+            m1_description_values_are_unique(workspace@, window_bytes, alphabet_limit, phase, expected.phase);
+        }
+    }
     let phase_valid = code_description_phase_valid_exec(&phase, alphabet_max, alphabet_limit);
     proof {
         assert(source_reads == 22);
@@ -13404,6 +13679,11 @@ fn store_complex_code(
     code: ComplexCodeLengthAlphabet,
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        forall|at: int| 0 <= at < old(workspace)@.len()
+            && at != b3b_scalar_base(window_bytes) + B3B_AUX_SKIP as int
+            && !(b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int <= at
+                < b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + 18)
+            ==> #[trigger] final(workspace)@[at] == old(workspace)@[at],
         b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==> r.is_ok(),
         r.is_ok() ==> k4_complex_code_values(final(workspace)@, window_bytes, code),
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
@@ -13425,11 +13705,20 @@ fn store_complex_code(
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
     proof { reveal(code_descriptor_store_frame); reveal(k4_complex_code_values); }
+    let ghost mut source_writes: nat = 0;
     match put_state_byte(workspace, window_bytes, B3B_AUX_SKIP, code.skip) {
         Ok(()) => {}
         Err(error) => return Err(error),
     }
-    write_aux_lengths(workspace, window_bytes, code.lengths)
+    proof { source_writes = source_writes + 1; }
+    let result = write_aux_lengths(workspace, window_bytes, code.lengths);
+    proof {
+        if result.is_ok() {
+            source_writes = source_writes + 18;
+            assert(source_writes == 19);
+        }
+    }
+    result
 }
 
 fn store_complex_progress(
@@ -13466,13 +13755,15 @@ fn store_complex_progress(
         assert(original == old(workspace)@);
         reveal(code_store_frame);
     }
+    let ghost mut source_writes: nat = 0;
     match store_complex_code(workspace, window_bytes, progress.code) {
         Ok(()) => {}
         Err(error) => return Err(error),
     }
+    proof { source_writes = source_writes + 19; }
     let mut i: usize = 0;
     while i < 5
-        invariant i <= 5,
+        invariant i <= 5, source_writes == 19 + i as nat,
             k4_complex_code_values(workspace@, window_bytes, progress.code),
             i >= 1 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_PREVIOUS_LENGTH) == progress.prev_code_len,
             i >= 2 ==> b3b_scalar_byte_at(workspace@, window_bytes, B3B_REPEATED_LENGTH) == progress.repeat_code_len,
@@ -13520,20 +13811,27 @@ fn store_complex_progress(
             Ok(()) => {}
             Err(error) => return Err(error),
         }
+        proof { source_writes = source_writes + 1; }
         i = i + 1;
     }
     match put_state_u16(workspace, window_bytes, B3B_FINAL_SYMBOL, progress.symbol) {
         Ok(()) => {}
         Err(error) => return Err(error),
     }
-    proof { assert(code_store_frame(original, workspace@, window_bytes)); }
+    proof { source_writes = source_writes + 2; assert(code_store_frame(original, workspace@, window_bytes)); }
     match put_state_u32(workspace, window_bytes, B3B_CHAINED_REPEAT, progress.repeat) {
         Ok(()) => {}
         Err(error) => return Err(error),
     }
-    proof { assert(code_store_frame(original, workspace@, window_bytes)); }
+    proof { source_writes = source_writes + 4; assert(code_store_frame(original, workspace@, window_bytes)); }
     let result = put_state_u32(workspace, window_bytes, B3B_FINAL_SPACE, progress.space);
     proof { assert(code_store_frame(original, workspace@, window_bytes)); }
+    proof {
+        if result.is_ok() {
+            source_writes = source_writes + 4;
+            assert(source_writes == 34);
+        }
+    }
     result
 }
 
@@ -13582,12 +13880,127 @@ spec fn m1_simple_description_values(workspace: Seq<u8>, window_bytes: u32,
     }
 }
 
+spec fn m1_retained_progress_supports_end(workspace: Seq<u8>, window_bytes: u32, end: nat) -> bool {
+    &&& 1 <= b3b_scalar_byte_at(workspace, window_bytes, B3B_PREVIOUS_LENGTH) <= 15
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_REPEATED_LENGTH) <= 15
+    &&& b3b_scalar_u32_at(workspace, window_bytes, B3B_CHAINED_REPEAT) <= end
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_FINAL_PREFIX_WIDTH) < 5
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SINGLETON) <= 18
+}
+
+spec fn m1_payload_store_context(workspace: Seq<u8>, window_bytes: u32, phase: CodeDescriptionPhase) -> bool {
+    match phase {
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, after, .. } => {
+            &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) == start
+            &&& match after {
+                ComplexAfterSpan::Symbol(_) => true,
+                ComplexAfterSpan::TrailingZeros { code, .. } | ComplexAfterSpan::Complete { code, .. } => {
+                    &&& (code.skip == 0 || code.skip == 2 || code.skip == 3)
+                    &&& start as nat + span_count as nat <= b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT)
+                    &&& m1_retained_progress_supports_end(workspace, window_bytes, start as nat + span_count as nat)
+                },
+            }
+        },
+        CodeDescriptionPhase::CompleteComplex { code, decoded_symbols } => {
+            &&& (code.skip == 0 || code.skip == 2 || code.skip == 3)
+            &&& decoded_symbols as nat <= b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT)
+            &&& m1_retained_progress_supports_end(workspace, window_bytes, decoded_symbols as nat)
+        },
+        _ => true,
+    }
+}
+
+spec fn m1_pending_history_supports(workspace: Seq<u8>, window_bytes: u32,
+    phase: CodeDescriptionPhase) -> bool {
+    match phase {
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, after, .. } => match after {
+            ComplexAfterSpan::Symbol(_) => true,
+            _ => m1_retained_progress_supports_end(workspace, window_bytes, start as nat + span_count as nat),
+        },
+        _ => false,
+    }
+}
+
+proof fn m1_loaded_pending_history(workspace: Seq<u8>, window_bytes: u32,
+    decoder: CodeDescriptionDecoder)
+    requires m1_code_decoder_image(workspace, window_bytes, decoder.queue, decoder),
+        matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
+    ensures m1_pending_history_supports(workspace, window_bytes, decoder.phase),
+{
+    reveal(m1_code_decoder_image); reveal(m1_description_payload_values);
+    reveal(m1_pending_history_supports); reveal(m1_retained_progress_supports_end);
+    reveal(loader_shared_complex_guards);
+}
+
+proof fn m1_field_pending_history(workspace: Seq<u8>, window_bytes: u32,
+    before: CodeDescriptionDecoder, input: Seq<u8>, end: bool,
+    after: CodeDescriptionDecoder, step: CodeDescriptionStep)
+    requires m1_code_decoder_image(workspace, window_bytes, before.queue, before),
+        after.valid(), code_field_step_refines(before, input, end, after, step),
+    ensures matches!(after.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) ==>
+        m1_pending_history_supports(workspace, window_bytes, after.phase),
+{
+    reveal(m1_code_decoder_image); reveal(m1_description_payload_values);
+    reveal(k4_complex_progress_values); reveal(k4_repeat_values);
+    reveal(m1_pending_history_supports); reveal(m1_retained_progress_supports_end);
+    reveal(loader_shared_complex_guards); reveal(code_rank_aligned);
+    reveal(CodeDescriptionDecoder::valid); reveal(ComplexSymbolProgress::valid);
+    reveal(code_field_step_refines); reveal(code_transition_holds);
+    reveal(code_phase_terminal); reveal(pending_span_transition_holds);
+    reveal(complex_symbol_transition_holds); reveal(direct_symbol_transition_holds);
+    reveal(repeated_symbol_transition_holds); reveal(complex_after_span_holds);
+}
+
+spec fn m1_payload_auxiliary_values(phase: CodeDescriptionPhase, previous: Seq<u8>) -> Seq<u8> {
+    match phase {
+        CodeDescriptionPhase::ComplexPrefix2(p) | CodeDescriptionPhase::ComplexPrefix3(p)
+        | CodeDescriptionPhase::ComplexPrefix4(p) => p.lengths@,
+        CodeDescriptionPhase::ComplexSymbol(p) | CodeDescriptionPhase::ComplexRepeat { progress: p, .. } => p.code.lengths@,
+        CodeDescriptionPhase::ComplexPendingSpan { after, .. } => match after {
+            ComplexAfterSpan::Symbol(p) => p.code.lengths@,
+            ComplexAfterSpan::TrailingZeros { code, .. } | ComplexAfterSpan::Complete { code, .. } => code.lengths@,
+        },
+        CodeDescriptionPhase::CompleteComplex { code, .. } => code.lengths@,
+        _ => previous,
+    }
+}
+
+proof fn m1_saved_auxiliary_raw_at(workspace: Seq<u8>, window_bytes: u32, i: int)
+    requires 0 <= i < 18,
+    ensures saved_aux_length_values(workspace, window_bytes)[i]
+        == workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i],
+{
+    b3b_scalar_layout_is_exact();
+    reveal(saved_aux_length_values); reveal(b3b_scalar_byte_at);
+    assert((B3B_AUX_LENGTHS as int + i) as u16 as int == B3B_AUX_LENGTHS as int + i);
+}
+
+proof fn m1_valid_payload_auxiliary_bounds(decoder: CodeDescriptionDecoder, previous: Seq<u8>)
+    requires decoder.valid(), previous.len() == 18,
+        forall|i: int| 0 <= i < 18 ==> previous[i] <= 5,
+    ensures m1_payload_auxiliary_values(decoder.phase, previous).len() == 18,
+        forall|i: int| 0 <= i < 18 ==> #[trigger] m1_payload_auxiliary_values(decoder.phase, previous)[i] <= 5,
+{
+    reveal(m1_payload_auxiliary_values); reveal(CodeDescriptionDecoder::valid);
+    reveal(ComplexProgress::valid); reveal(ComplexSymbolProgress::valid);
+    reveal(ComplexAfterSpan::valid); reveal(ComplexCodeLengthAlphabet::valid);
+}
+
 fn store_simple_code_description_payload(
     workspace: &mut [u8],
     window_bytes: u32,
     phase: CodeDescriptionPhase,
 ) -> (r: Result<u8, CompressedHeaderError>)
     ensures
+        r.is_ok() && b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            saved_aux_length_values(final(workspace)@, window_bytes)
+                == m1_payload_auxiliary_values(phase, saved_aux_length_values(old(workspace)@, window_bytes)),
+        forall|at: int| 0 <= at < old(workspace)@.len()
+            && !(b3b_scalar_base(window_bytes) + B3B_SIMPLE_SELECTOR as int <= at
+                < b3b_scalar_base(window_bytes) + B3B_CODE_WIDTH as int + 1)
+            && !(b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int <= at
+                < b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int + 8)
+            ==> #[trigger] final(workspace)@[at] == old(workspace)@[at],
         r.is_ok() ==> r.unwrap() == m1_simple_description_tag(phase),
         r.is_ok() ==> m1_simple_description_values(final(workspace)@, window_bytes, phase),
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes), code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
@@ -13595,7 +14008,10 @@ fn store_simple_code_description_payload(
             #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
                 == code_phase_rank(phase, limit),
 {
+    let ghost mut source_writes: nat = 0;
     proof {
+        reveal(saved_aux_length_values); reveal(m1_payload_auxiliary_values);
+        reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
         reveal(code_descriptor_store_frame); reveal(m1_simple_description_tag);
         reveal(m1_simple_description_values); reveal(m1_simple_symbol_values);
     }
@@ -13606,26 +14022,38 @@ fn store_simple_code_description_payload(
             selector, count, index, width, symbols,
         } => {
             put_state_byte(workspace, window_bytes, B3B_SIMPLE_SELECTOR, selector)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_SIMPLE_COUNT, count)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_CODE_INDEX, index)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_CODE_WIDTH, width)?;
+            proof { source_writes = source_writes + 1; }
             write_simple_symbols(workspace, window_bytes, symbols)?;
+            proof { source_writes = source_writes + 8; }
             2
         }
         CodeDescriptionPhase::SimpleShape { symbols } => {
             put_state_byte(workspace, window_bytes, B3B_SIMPLE_SELECTOR, 3)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_SIMPLE_COUNT, 4)?;
+            proof { source_writes = source_writes + 1; }
             write_simple_symbols(workspace, window_bytes, symbols)?;
+            proof { source_writes = source_writes + 8; }
             3
         }
         CodeDescriptionPhase::CompleteSimple(code) => {
             put_state_byte(workspace, window_bytes, B3B_SIMPLE_SELECTOR, code.selector)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_SIMPLE_COUNT, code.count)?;
+            proof { source_writes = source_writes + 1; }
             write_simple_symbols(workspace, window_bytes, code.symbols)?;
+            proof { source_writes = source_writes + 8; }
             8
         }
         _ => return Err(CompressedHeaderError::InternalState),
     };
+    proof { assert(source_writes == code_description_payload_writes_spec(phase)); }
     Ok(tag)
 }
 
@@ -13636,6 +14064,13 @@ fn store_complex_code_description_payload(
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
     ensures
+        r.is_ok() && b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            saved_aux_length_values(final(workspace)@, window_bytes)
+                == m1_payload_auxiliary_values(phase, saved_aux_length_values(old(workspace)@, window_bytes)),
+        r.is_ok() && code_rank_aligned(phase) && m1_payload_store_context(old(workspace)@, window_bytes, phase) ==> {
+            &&& r.unwrap() == m1_description_storage_tag(phase)
+            &&& m1_description_payload_values(final(workspace)@, window_bytes, phase)
+        },
         b3b_workspace_shape(old(workspace)@.len(), window_bytes)
             && matches!(phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> r.is_ok(),
         r.is_ok() && matches!(phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> {
@@ -13647,8 +14082,14 @@ fn store_complex_code_description_payload(
             #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
                 == code_phase_rank(phase, limit),
 {
+    let ghost mut source_writes: nat = 0;
     proof {
+        reveal(saved_aux_length_values); reveal(m1_payload_auxiliary_values);
+        reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
         reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
+        reveal(m1_description_payload_values); reveal(m1_description_storage_tag);
+        reveal(m1_payload_store_context); reveal(m1_retained_progress_supports_end);
+        reveal(loader_shared_complex_guards); reveal(code_rank_aligned); reveal(m1_code_error_tag);
         reveal(k4_complex_progress_values); reveal(k4_complex_code_values);
     }
     let tag = match phase {
@@ -13661,20 +14102,29 @@ fn store_complex_code_description_payload(
                 _ => 3,
             };
             put_state_byte(workspace, window_bytes, B3B_CODE_AUX_PHASE, aux_tag)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_AUX_SKIP, progress.skip)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_AUX_INDEX, progress.index)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_AUX_SPACE, progress.space)?;
+            proof { source_writes = source_writes + 1; }
             put_state_byte(workspace, window_bytes, B3B_AUX_NONZERO, progress.nonzero)?;
+            proof { source_writes = source_writes + 1; }
             write_aux_lengths(workspace, window_bytes, progress.lengths)?;
+            proof { source_writes = source_writes + 18; }
             4
         }
         CodeDescriptionPhase::ComplexSymbol(progress) => {
             store_complex_progress(workspace, window_bytes, progress)?;
+            proof { source_writes = source_writes + 34; }
             5
         }
         CodeDescriptionPhase::ComplexRepeat { progress, length, .. } => {
             store_complex_progress(workspace, window_bytes, progress)?;
+            proof { source_writes = source_writes + 34; }
             put_state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH, length)?;
+            proof { source_writes = source_writes + 1; }
             6
         }
         CodeDescriptionPhase::ComplexPendingSpan {
@@ -13684,23 +14134,31 @@ fn store_complex_code_description_payload(
             match after {
                 ComplexAfterSpan::Symbol(progress) => {
                     store_complex_progress(workspace, window_bytes, progress)?;
+                    proof { source_writes = source_writes + 34; }
                 }
                 ComplexAfterSpan::TrailingZeros { code, .. }
                 | ComplexAfterSpan::Complete { code, .. } => {
                     store_complex_code(workspace, window_bytes, code)?;
+                    proof { source_writes = source_writes + 19; }
                     put_state_u16(workspace, window_bytes, B3B_FINAL_SYMBOL, end)?;
+                    proof { source_writes = source_writes + 2; }
                     put_state_u32(workspace, window_bytes, B3B_FINAL_SPACE, 0)?;
+                    proof { source_writes = source_writes + 4; }
                 }
             }
             put_state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH, length)?;
+            proof { source_writes = source_writes + 1; }
             7
         }
         CodeDescriptionPhase::CompleteComplexAlphabet(_) =>
             return Err(CompressedHeaderError::InternalState),
         CodeDescriptionPhase::CompleteComplex { code, decoded_symbols } => {
             store_complex_code(workspace, window_bytes, code)?;
+            proof { source_writes = source_writes + 19; }
             put_state_u16(workspace, window_bytes, B3B_FINAL_SYMBOL, decoded_symbols)?;
+            proof { source_writes = source_writes + 2; }
             put_state_u32(workspace, window_bytes, B3B_FINAL_SPACE, 0)?;
+            proof { source_writes = source_writes + 4; }
             9
         }
         CodeDescriptionPhase::Failed(error) => {
@@ -13710,10 +14168,24 @@ fn store_complex_code_description_payload(
                 B3B_CODE_ERROR,
                 code_description_error_tag(error),
             )?;
+            proof { source_writes = source_writes + 1; }
             10
         }
         _ => return Err(CompressedHeaderError::InternalState),
     };
+    proof {
+        if b3b_workspace_shape(old(workspace)@.len(), window_bytes) {
+            let expected = m1_payload_auxiliary_values(phase, saved_aux_length_values(old(workspace)@, window_bytes));
+            assert(expected.len() == 18);
+            assert forall|i: int| 0 <= i < 18 implies #[trigger]
+                saved_aux_length_values(workspace@, window_bytes)[i] == expected[i] by {
+                m1_saved_auxiliary_raw_at(workspace@, window_bytes, i);
+                m1_saved_auxiliary_raw_at(old(workspace)@, window_bytes, i);
+            }
+            assert(saved_aux_length_values(workspace@, window_bytes) =~= expected);
+        }
+    }
+    proof { assert(source_writes == code_description_payload_writes_spec(phase)); }
     Ok(tag)
 }
 
@@ -13724,6 +14196,13 @@ fn store_code_description_payload(
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
     ensures
+        r.is_ok() && b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==>
+            saved_aux_length_values(final(workspace)@, window_bytes)
+                == m1_payload_auxiliary_values(phase, saved_aux_length_values(old(workspace)@, window_bytes)),
+        r.is_ok() && code_rank_aligned(phase) && m1_payload_store_context(old(workspace)@, window_bytes, phase) ==> {
+            &&& r.unwrap() == m1_description_storage_tag(phase)
+            &&& m1_description_payload_values(final(workspace)@, window_bytes, phase)
+        },
         r.is_ok() && m1_simple_description_tag(phase) != 255 ==> {
             &&& r.unwrap() == m1_simple_description_tag(phase)
             &&& m1_simple_description_values(final(workspace)@, window_bytes, phase)
@@ -13742,6 +14221,7 @@ fn store_code_description_payload(
     proof {
         reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
         reveal(m1_simple_description_tag);
+        reveal(m1_description_storage_tag); reveal(m1_description_payload_values);
         reveal(k4_complex_progress_values); reveal(k4_complex_code_values);
     }
     match phase {
@@ -13762,6 +14242,12 @@ fn store_code_description_decoder(
 ) -> (r: Result<(), CompressedHeaderError>)
     requires decoder.valid(),
     ensures
+        r.is_ok() && code_rank_aligned(decoder.phase)
+            && m1_payload_store_context(old(workspace)@, window_bytes, decoder.phase)
+            && saved_aux_copy_prefix(old(workspace)@, window_bytes, 18)
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_MAX) == decoder.alphabet_max
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == decoder.alphabet_limit ==>
+                m1_code_decoder_image(final(workspace)@, window_bytes, decoder.queue, decoder),
         serialized_b3b_queue(old(workspace)@, window_bytes, decoder.queue) ==>
             serialized_b3b_queue(final(workspace)@, window_bytes, decoder.queue),
         r.is_ok() && matches!(decoder.phase, CodeDescriptionPhase::ComplexRepeat { .. })
@@ -13813,20 +14299,28 @@ fn store_code_description_decoder(
     proof {
         reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
         reveal(k4_repeat_decoder_image);
+        reveal(m1_code_decoder_image); reveal(m1_description_storage_tag); reveal(m1_description_payload_values);
+        reveal(m1_payload_store_context); reveal(m1_retained_progress_supports_end);
+        reveal(saved_aux_load_valid); reveal(saved_aux_load_eligible); reveal(saved_aux_copy_prefix);
+        reveal(saved_aux_length_values); reveal(m1_payload_auxiliary_values);
         reveal(k4_complex_progress_values); reveal(k4_complex_code_values);
     }
+    let ghost mut source_writes: nat = 0;
     match put_state_byte(workspace, window_bytes, B3B_CODE_AUX_PHASE, 0) {
         Ok(()) => {}
         Err(error) => return Err(error),
     }
+    proof { source_writes = source_writes + 1; }
     match put_state_byte(workspace, window_bytes, B3B_CODE_ERROR, 0) {
         Ok(()) => {}
         Err(error) => return Err(error),
     }
+    proof { source_writes = source_writes + 1; }
     match put_state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH, 0) {
         Ok(()) => {}
         Err(error) => return Err(error),
     }
+    proof { source_writes = source_writes + 1; }
     proof {
         reveal(CodeDescriptionDecoder::valid);
         reveal(code_phase_store_safe);
@@ -13847,6 +14341,22 @@ fn store_code_description_decoder(
         Ok(value) => value,
         Err(error) => return Err(error),
     };
+    proof {
+        if code_rank_aligned(decoder.phase)
+            && m1_payload_store_context(old(workspace)@, window_bytes, decoder.phase)
+            && saved_aux_copy_prefix(old(workspace)@, window_bytes, 18)
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_MAX) == decoder.alphabet_max
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == decoder.alphabet_limit {
+            assert forall|i: int| 0 <= i < 18 implies #[trigger]
+                saved_aux_length_values(old(workspace)@, window_bytes)[i] <= 5 by {
+                m1_saved_auxiliary_raw_at(old(workspace)@, window_bytes, i);
+                reveal(b3b_workspace_shape); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
+                b3b_scalar_layout_is_exact();
+            }
+            m1_valid_payload_auxiliary_bounds(decoder, saved_aux_length_values(old(workspace)@, window_bytes));
+        }
+    }
+    proof { source_writes = source_writes + code_description_payload_writes_spec(decoder.phase) as nat; }
     let ghost before_tag = workspace@;
     let result = put_state_byte(workspace, window_bytes, B3B_CODE_PHASE, tag);
     proof {
@@ -13868,6 +14378,37 @@ fn store_code_description_decoder(
             assert forall|i: int| 0 <= i < B3B_QUEUE_OFFSET_BYTE + 1 implies #[trigger]
                 workspace@[b3b_scalar_base(window_bytes) + i] == old(workspace)@[b3b_scalar_base(window_bytes) + i] by {}
             serialized_b3b_queue_from_frame(old(workspace)@, workspace@, window_bytes, decoder.queue);
+        }
+        if result.is_ok() && code_rank_aligned(decoder.phase)
+            && m1_payload_store_context(old(workspace)@, window_bytes, decoder.phase)
+            && saved_aux_copy_prefix(old(workspace)@, window_bytes, 18)
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_MAX) == decoder.alphabet_max
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == decoder.alphabet_limit {
+            assert(b3b_workspace_shape(workspace@.len(), window_bytes));
+            assert(m1_description_payload_values(before_tag, window_bytes, decoder.phase));
+            reveal(m1_simple_description_values); reveal(m1_simple_symbol_values);
+            reveal(loader_shared_complex_guards);
+            assert(m1_description_payload_values(workspace@, window_bytes, decoder.phase));
+            let expected = m1_payload_auxiliary_values(decoder.phase, saved_aux_length_values(old(workspace)@, window_bytes));
+            assert(saved_aux_length_values(before_tag, window_bytes) == expected);
+            assert forall|i: int| 0 <= i < 18 implies #[trigger]
+                saved_aux_length_values(workspace@, window_bytes)[i] <= 5 by {
+                m1_saved_auxiliary_raw_at(before_tag, window_bytes, i);
+                m1_saved_auxiliary_raw_at(workspace@, window_bytes, i);
+            }
+            assert(saved_aux_copy_prefix(workspace@, window_bytes, 18)) by {
+                assert forall|i: int| 0 <= i < 18 implies #[trigger]
+                    workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] <= 5 by {
+                    m1_saved_auxiliary_raw_at(workspace@, window_bytes, i);
+                }
+            }
+            assert(m1_code_decoder_image(workspace@, window_bytes, decoder.queue, decoder));
+        }
+    }
+    proof {
+        if result.is_ok() {
+            source_writes = source_writes + 1;
+            assert(source_writes == 4 + code_description_payload_writes_spec(decoder.phase) as nat);
         }
     }
     result
@@ -14260,6 +14801,15 @@ fn drain_and_store_serialized_pending_span(
         old(decoder).valid(),
         matches!(old(decoder).phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
     ensures
+        r.is_ok() && serialized_b3b_queue(old(workspace)@, window_bytes, old(decoder).queue) ==>
+            serialized_b3b_queue(final(workspace)@, window_bytes, final(decoder).queue),
+        final(decoder).queue == old(decoder).queue,
+        r.is_ok() && code_rank_aligned(old(decoder).phase)
+            && m1_pending_history_supports(old(workspace)@, window_bytes, old(decoder).phase)
+            && saved_aux_copy_prefix(old(workspace)@, window_bytes, 18)
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_MAX) == old(decoder).alphabet_max
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == old(decoder).alphabet_limit ==>
+                m1_code_decoder_image(final(workspace)@, window_bytes, final(decoder).queue, *final(decoder)),
         r.is_ok() ==> pending_span_stored_effect(
             old(workspace)@, final(workspace)@, window_bytes, old(decoder).phase,
         ),
@@ -14313,6 +14863,33 @@ fn drain_and_store_serialized_pending_span(
         Err(error) => return Err(error),
     }
     let ghost after_span = workspace@;
+    proof {
+        reveal(m1_pending_history_supports); reveal(m1_payload_store_context);
+        reveal(m1_retained_progress_supports_end); reveal(pending_span_transition_holds);
+        reveal(code_rank_aligned); reveal(CodeDescriptionDecoder::valid); reveal(ComplexAfterSpan::valid);
+        reveal(ComplexCodeLengthAlphabet::valid);
+        reveal(saved_aux_copy_prefix);
+        reveal(b3b_workspace_shape); reveal(b3b_scalar_base);
+        reveal(b3b_scalar_byte_at); reveal(b3b_scalar_u16_at); reveal(b3b_scalar_u32_at);
+        b3b_scalar_layout_is_exact();
+        if code_rank_aligned(old(decoder).phase)
+            && m1_pending_history_supports(old(workspace)@, window_bytes, old(decoder).phase)
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == old(decoder).alphabet_limit {
+            match old(decoder).phase {
+                CodeDescriptionPhase::ComplexPendingSpan { start, span_count, after, .. } => {
+                    assert(b3b_scalar_u16_at(after_span, window_bytes, B3B_BUILDER_INITIALIZED) == start as nat + span_count as nat);
+                    if !matches!(after, ComplexAfterSpan::Symbol(_)) {
+                        assert(m1_retained_progress_supports_end(after_span, window_bytes, start as nat + span_count as nat));
+                    }
+                },
+                _ => {},
+            }
+            assert(m1_payload_store_context(after_span, window_bytes, decoder.phase));
+        }
+        if saved_aux_copy_prefix(old(workspace)@, window_bytes, 18) {
+            assert(saved_aux_copy_prefix(after_span, window_bytes, 18));
+        }
+    }
     let result = store_code_description_decoder(workspace, window_bytes, *decoder);
     proof {
         reveal(code_descriptor_store_frame); reveal(b3b_scalar_base);
@@ -14326,6 +14903,15 @@ fn drain_and_store_serialized_pending_span(
                 assert(after_span[at] == length);
                 assert(workspace@[at] == after_span[at]);
             }
+        }
+    }
+    proof {
+        if result.is_ok() && serialized_b3b_queue(old(workspace)@, window_bytes, old(decoder).queue) {
+            reveal(b3b_workspace_shape); reveal(b3b_scalar_base);
+            b3b_scalar_layout_is_exact();
+            assert forall|i: int| 0 <= i < B3B_QUEUE_OFFSET_BYTE + 1 implies #[trigger]
+                workspace@[b3b_scalar_base(window_bytes) + i] == old(workspace)@[b3b_scalar_base(window_bytes) + i] by {}
+            serialized_b3b_queue_from_frame(old(workspace)@, workspace@, window_bytes, old(decoder).queue);
         }
     }
     result
@@ -14969,15 +15555,14 @@ fn advance_serialized_tree(
     let ghost loop_limit = b3b_scalar_u16_at(original, window_bytes, B3B_ALPHABET_LIMIT) as u16;
     let mut consumed: usize = 0;
     let mut work: u16 = 0;
-    let ghost mut previous_repeat: Option<CodeDescriptionDecoder> = None;
+    let ghost mut previous_decoder: Option<CodeDescriptionDecoder> = None;
     while work < 5_696
         invariant consumed <= input.len(), work <= 5_696,
-            previous_repeat.is_some() ==> {
-                &&& previous_repeat.unwrap().valid()
-                &&& matches!(previous_repeat.unwrap().phase, CodeDescriptionPhase::ComplexRepeat { .. })
-                &&& k4_repeat_decoder_image(workspace@, window_bytes,
-                    previous_repeat.unwrap().queue, previous_repeat.unwrap())
-                &&& serialized_b3b_queue(workspace@, window_bytes, previous_repeat.unwrap().queue)
+            previous_decoder.is_some() ==> {
+                &&& previous_decoder.unwrap().valid()
+                &&& m1_code_decoder_image(workspace@, window_bytes,
+                    previous_decoder.unwrap().queue, previous_decoder.unwrap())
+                &&& serialized_b3b_queue(workspace@, window_bytes, previous_decoder.unwrap().queue)
             },
             loop_limit == b3b_scalar_u16_at(original, window_bytes, B3B_ALPHABET_LIMIT) as u16,
             work > 0 ==> work as nat + serialized_code_rank(workspace@, window_bytes, loop_limit) <= 5_695,
@@ -15027,8 +15612,8 @@ fn advance_serialized_tree(
         };
         let loaded = load_code_description_decoder(workspace, window_bytes, queue);
         proof {
-            if let Some(previous) = previous_repeat {
-                k4_repeat_image_rebases_queue(workspace@, window_bytes, previous, queue);
+            if let Some(previous) = previous_decoder {
+                m1_code_image_rebases_queue(workspace@, window_bytes, previous, queue);
                 assert(loaded == Ok(CodeDescriptionDecoder { queue,
                     alphabet_max: previous.alphabet_max, alphabet_limit: previous.alphabet_limit,
                     phase: previous.phase }));
@@ -15038,8 +15623,8 @@ fn advance_serialized_tree(
             Ok(value) => value,
             Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
         };
-        let ghost reloaded_repeat = previous_repeat;
-        proof { previous_repeat = None; }
+        let ghost reloaded_decoder = previous_decoder;
+        proof { previous_decoder = None; }
         proof {
             assert(decoder.alphabet_limit as nat == b3b_scalar_u16_at(
                 workspace@,
@@ -15065,9 +15650,19 @@ fn advance_serialized_tree(
             assert(matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) ==> decoder == before_field);
         }
         proof {
-            if let Some(previous) = reloaded_repeat {
-                k4_repeat_reloaded_field_refines_original(workspace@, window_bytes, previous,
-                    before_field, input@.skip(consumed as int), end_of_input, decoder, step);
+            if matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+                m1_loaded_pending_history(workspace@, window_bytes, before_field);
+            } else {
+                m1_field_pending_history(workspace@, window_bytes, before_field,
+                    input@.skip(consumed as int), end_of_input, decoder, step);
+            }
+        }
+        proof {
+            if !matches!(before_field.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+                if let Some(previous) = reloaded_decoder {
+                    m1_code_reloaded_field_refines_original(workspace@, window_bytes, previous,
+                        before_field, input@.skip(consumed as int), end_of_input, decoder, step);
+                }
             }
         }
         proof {
@@ -15087,16 +15682,31 @@ fn advance_serialized_tree(
             proof {
                 assert(start_step.status != CodeDescriptionStatus::NeedInput);
                 code_field_rank_decreases(before_start, Seq::empty(), false, decoder, start_step);
+                assert(matches!(decoder.phase, CodeDescriptionPhase::ComplexSymbol(_))) by {
+                    reveal(code_field_step_refines); reveal(code_transition_holds);
+                    reveal(code_phase_terminal); reveal(code_phase_width);
+                }
             }
         }
         consumed = consumed + step.consumed;
+        let ghost before_queue_store = workspace@;
         match store_b3b_queue(workspace, window_bytes, &decoder.queue) {
             Ok(()) => {}
             Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
         }
 
+        proof {
+            if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+                assert(m1_pending_history_supports(workspace@, window_bytes, decoder.phase)) by {
+                    reveal(m1_pending_history_supports); reveal(m1_retained_progress_supports_end);
+                    reveal(b3b_scalar_byte_at); reveal(b3b_scalar_u32_at); reveal(b3b_scalar_base);
+                    reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact();
+                }
+            }
+        }
         match decoder.phase {
             CodeDescriptionPhase::ComplexPendingSpan { .. } => {
+                proof { reveal(saved_aux_copy_prefix); }
                 match drain_and_store_serialized_pending_span(
                     workspace,
                     window_bytes,
@@ -15104,6 +15714,11 @@ fn advance_serialized_tree(
                 ) {
                     Ok(()) => {}
                     Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
+                }
+                proof {
+                    assert(m1_code_decoder_image(workspace@, window_bytes, decoder.queue, decoder));
+                    assert(serialized_b3b_queue(workspace@, window_bytes, decoder.queue));
+                    previous_decoder = Some(decoder);
                 }
             }
             CodeDescriptionPhase::CompleteSimple(code) => {
@@ -15303,16 +15918,29 @@ fn advance_serialized_tree(
                 status: SerializedTreeStatus::Failed(map_code_description_error(error)),
             },
             _ => {
+                proof {
+                    assert(m1_payload_store_context(workspace@, window_bytes, decoder.phase)) by {
+                        reveal(m1_payload_store_context);
+                    }
+                    assert(saved_aux_copy_prefix(workspace@, window_bytes, 18)) by {
+                        reveal(saved_aux_copy_prefix); reveal(b3b_workspace_shape); reveal(b3b_scalar_base);
+                        b3b_scalar_layout_is_exact();
+                        assert forall|i: int| 0 <= i < 18 implies #[trigger]
+                            workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] <= 5 by {
+                            let at = b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i;
+                            assert(before_queue_store[at] <= 5);
+                            assert(workspace@[at] == before_queue_store[at]);
+                        }
+                    }
+                }
                 match store_code_description_decoder(workspace, window_bytes, decoder) {
                     Ok(()) => {}
                     Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
                 }
                 proof {
-                    if matches!(decoder.phase, CodeDescriptionPhase::ComplexRepeat { .. }) {
-                        assert(k4_repeat_decoder_image(workspace@, window_bytes, decoder.queue, decoder));
-                        assert(serialized_b3b_queue(workspace@, window_bytes, decoder.queue));
-                        previous_repeat = Some(decoder);
-                    }
+                    assert(m1_code_decoder_image(workspace@, window_bytes, decoder.queue, decoder));
+                    assert(serialized_b3b_queue(workspace@, window_bytes, decoder.queue));
+                    previous_decoder = Some(decoder);
                 }
                 if matches!(step.status, CodeDescriptionStatus::NeedInput) {
                     return SerializedTreeStep { consumed, status: SerializedTreeStatus::NeedInput };

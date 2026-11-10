@@ -1,0 +1,19 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53950,13): 'if' cannot be used in patterns.
+WARNING: (61672,5): 'if' cannot be used in patterns.
+error: postcondition not satisfied
+     --> src/brotli_input.rs:13325:9
+      |
+13314 |   proof fn m1_code_reloaded_field_refines_original(workspace: Seq<u8>, window_bytes: u32,
+      |  _______-
+13315 | |     original: CodeDescriptionDecoder, loaded: CodeDescriptionDecoder,
+13316 | |     input: Seq<u8>, end: bool, after: CodeDescriptionDecoder, step: CodeDescriptionStep)
+      | |________________________________________________________________________________________- at the end of the function body
+...
+13325 |           code_field_step_refines(original, input, end, after, step),
+      |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

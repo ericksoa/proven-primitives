@@ -1,0 +1,21 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53988,13): 'if' cannot be used in patterns.
+WARNING: (61710,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12237:5
+      |
+12237 |     while i < 4
+      |     ^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:12199:1
+      |
+12199 | / fn write_simple_symbols(
+12200 | |     workspace: &mut [u8],
+12201 | |     window_bytes: u32,
+12202 | |     symbols: [u16; 4],
+12203 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)
