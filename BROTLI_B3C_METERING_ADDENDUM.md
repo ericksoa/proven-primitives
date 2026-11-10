@@ -696,3 +696,27 @@ validation scans still lack the complete metering/refinement closure. Complete
 tree/action/ledger and malformed-state controls, later B3c/B3d/B4 work and
 independent human review remain open; no supported decoder or complete
 mathematical safety claim is made.
+
+### Approved K5 loader table accounting
+
+The human approved K5 as written on 2026-11-10, superseding the historical K5
+hold above. Four saved simple-symbol words and every reached validation table
+operand are now counted in planning and W1 reload forecasts. The new private
+pre-scan flag distinguishes a valid full scan from an invalid final cell.
+Early exits retain their exact prefixes; singleton validation still precedes
+its later prefix-width check. Each forecast read is charged as performed, and
+the original loader is invoked only after its complete read count is prepaid.
+Existing mutation/reset formulas, W1 interfaces, ownership, workspace, runtime
+caps and the 425-unit reset charge remain unchanged.
+
+The source scan models are bound by checked loop/call counters, loader-exit
+assertions and a successful-load phase-count guarantee. Initial and per-reload
+adapter assertions bind the new receipts to those source-level logical units.
+Final evidence: **1,235 whole-crate checks, zero errors**, **106 passing runtime
+tests**, and **33 semantic defect rejections across three affected suites**.
+See `evidence/brotli-b3c-m1-k5.json`. Failed and superseded checks are retained.
+
+This completes K5's accounting change, not M1. Complete serialized-state/tree
+replay and the remaining header/body, frame, source-ledger and control closure
+still require work. Later decoder phases and independent human review remain
+separate; no release gate or supported-format claim is promoted.

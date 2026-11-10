@@ -1,0 +1,14 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53085,13): 'if' cannot be used in patterns.
+WARNING: (60949,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3412:1
+     |
+3412 | / fn simple_code_valid_exec(
+3413 | |     code: &SimpleCodeDescription,
+3414 | |     alphabet_limit: u16,
+3415 | | ) -> (r: bool)
+     | |_____________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

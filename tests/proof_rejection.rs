@@ -3652,7 +3652,7 @@ fn the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects() {
         ("brotli-m1-saved-aux-load-not-charged", "plan_saved_aux_load",
             "budget.charge_work(1)", "budget.charge_work(0)"),
         ("brotli-m1-saved-aux-wrong-partial-count", "plan_saved_aux_load",
-            "return Ok(i as u64 + 1);", "return Ok(18);"),
+            "return Ok((i as u64 + 1, false));", "return Ok((18, false));"),
         ("brotli-m1-saved-aux-skips-last-copy", "read_aux_lengths",
             "while i < 18", "while i < 17"),
         ("brotli-m1-saved-aux-accepts-invalid-length", "read_aux_lengths",
@@ -4631,6 +4631,65 @@ fn the_prover_rejects_six_k4_repeat_codec_defects() {
             "if repeat_length > 15 {",
             "if repeat_length >= 15 {",
         ),
+    ] {
+        let start = original.find(&format!("fn {function}(")).unwrap();
+        let end = start + original[start..].find("\n}\n").unwrap() + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").unwrap();
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        let lower = log.to_ascii_lowercase();
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(lower.contains("postcondition not satisfied") || lower.contains("precondition not satisfied")
+            || lower.contains("invariant not satisfied") || lower.contains("assertion failed"),
+            "expected a semantic proof rejection: {log}");
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count"), "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate source defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_fourteen_k5_loader_accounting_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-k5-loader-canary-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-k5-loader-omits-four-simple-copies", "plan_saved_loader_read_units", "let base = 4 + aux_reads;", "let base = aux_reads;"),
+        ("brotli-k5-prefix-validation-scan-undercharge", "plan_saved_loader_read_units", "return Ok(base + if 1 <= auxiliary_phase && auxiliary_phase <= 3 { 18u64 } else { 0u64 });", "return Ok(base + if 1 <= auxiliary_phase && auxiliary_phase <= 3 { 17u64 } else { 0u64 });"),
+        ("brotli-k5-singleton-guard-reordered-before-scan", "plan_saved_loader_read_units", "|| prefix_bits >= (1u8 << prefix_width) || singleton >= 18 {", "|| prefix_bits >= (1u8 << prefix_width) || prefix_width != 0 || singleton >= 18 {"),
+        ("brotli-k5-selected-singleton-read-unpaid", "plan_saved_singleton_validation_reads", "if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }\n    let selected", "if !budget.charge_work(0) { return Err(CoreFailure::ResourceLimit); }\n    let selected"),
+        ("brotli-k5-singleton-skips-last-validation-cell", "plan_saved_singleton_validation_reads", "while i < 18", "while i < 17"),
+        ("brotli-k5-simple-right-comparison-operand-unpaid", "plan_saved_simple_validation_reads", "if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }\n            let right", "if !budget.charge_work(0) { return Err(CoreFailure::ResourceLimit); }\n            let right"),
+        ("brotli-k5-simple-omits-right-operand-receipt", "plan_saved_simple_validation_reads", "let right = state_u16(workspace, window_bytes, B3B_SIMPLE_SYMBOLS + 2 * j as u16)\n                .map_err(map_compressed_error)?;\n            inspected += 1;", "let right = state_u16(workspace, window_bytes, B3B_SIMPLE_SYMBOLS + 2 * j as u16)\n                .map_err(map_compressed_error)?;\n            inspected += 0;"),
+        ("brotli-k5-selector-reload-keeps-old-eighteen", "valid_code_loader_read_units", "_ => 22,", "_ => 18,"),
+        ("brotli-k5-prefix-reload-omits-validation-cell", "valid_code_loader_read_units", "valid_complex_code_scan_is_18(ComplexCodeLengthAlphabet { skip: progress.skip, lengths: progress.lengths }); }\n            40", "valid_complex_code_scan_is_18(ComplexCodeLengthAlphabet { skip: progress.skip, lengths: progress.lengths }); }\n            39"),
+        ("brotli-k5-singleton-reload-omits-selected-cell", "valid_code_loader_read_units", "CodeDescriptionPhase::ComplexSymbol(progress)\n        | CodeDescriptionPhase::ComplexRepeat { progress, .. } => {\n            proof { valid_complex_symbol_validation_count(progress, decoder.alphabet_limit); }\n            40 + if progress.singleton < 18 { 18u64 } else { 0u64 }", "CodeDescriptionPhase::ComplexSymbol(progress)\n        | CodeDescriptionPhase::ComplexRepeat { progress, .. } => {\n            proof { valid_complex_symbol_validation_count(progress, decoder.alphabet_limit); }\n            40 + if progress.singleton < 18 { 17u64 } else { 0u64 }"),
+        ("brotli-k5-initial-loader-replay-unpaid", "plan_serialized_tree", "budget.charge_work(loader_reads)", "budget.charge_work(0)"),
+        ("brotli-k5-each-reload-restores-old-eighteen", "plan_serialized_tree", "checked_planned_work_add(execution_work, reload_reads)", "checked_planned_work_add(execution_work, 18)"),
+        ("brotli-k5-invalid-last-auxiliary-misclassified-valid", "plan_saved_aux_load", "return Ok((i as u64 + 1, false));", "return Ok((i as u64 + 1, true));"),
+        ("brotli-k5-invalid-alphabet-misclassified-valid", "plan_saved_aux_load", "return Ok((0, false));", "return Ok((0, true));"),
     ] {
         let start = original.find(&format!("fn {function}(")).unwrap();
         let end = start + original[start..].find("\n}\n").unwrap() + 3;

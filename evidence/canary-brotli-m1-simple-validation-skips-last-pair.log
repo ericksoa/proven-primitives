@@ -2,37 +2,37 @@ verification results:: 1 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51669,13): 'if' cannot be used in patterns.
-WARNING: (59024,5): 'if' cannot be used in patterns.
+WARNING: (53085,13): 'if' cannot be used in patterns.
+WARNING: (60949,5): 'if' cannot be used in patterns.
 note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-89028/src/brotli_input.rs:3971:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:4334:9
      |
-3971 |         assert(work == count as u64 * (count as u64 - 1)) by (nonlinear_arith)
+4334 |         assert(work == count as u64 * (count as u64 - 1)) by (nonlinear_arith)
      |         ^^^^^^
 
-WARNING: (51669,13): 'if' cannot be used in patterns.
-WARNING: (59024,5): 'if' cannot be used in patterns.
+WARNING: (53085,13): 'if' cannot be used in patterns.
+WARNING: (60949,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-89028/src/brotli_input.rs:3943:1
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:4306:1
      |
-3943 | / fn simple_distinct_validation_metered(symbols: &[u16; 4], count: u8,
-3944 | |     budget: &mut crate::brotli::RequestBudget,
-3945 | | ) -> (r: Result<u64, CoreFailure>)
+4306 | / fn simple_distinct_validation_metered(symbols: &[u16; 4], count: u8,
+4307 | |     budget: &mut crate::brotli::RequestBudget,
+4308 | | ) -> (r: Result<u64, CoreFailure>)
      | |_________________________________^
 
 error: postcondition not satisfied
-    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-89028/src/brotli_input.rs:3955:9
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-87133/src/brotli_input.rs:4318:9
      |
-3955 |           r.is_ok() == (old(budget).work_remaining >= count as u64 * (count as u64 - 1)),
+4318 |           r.is_ok() == (old(budget).work_remaining >= count as u64 * (count as u64 - 1)),
      |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
 ...
-3961 | / {
-3962 | |     let work = match count { 1 => 0u64, 2 => 2u64, 3 => 6u64, _ => 12u64 };
-3963 | |     proof {
-3964 | |         match count {
+4324 | / {
+4325 | |     let work = match count { 1 => 0u64, 2 => 2u64, 3 => 6u64, _ => 12u64 };
+4326 | |     proof {
+4327 | |         match count {
 ...    |
-3993 | |     Ok(work)
-3994 | | }
+4356 | |     Ok(work)
+4357 | | }
      | |_- at the end of the function body
 
 error: aborting due to 1 previous error

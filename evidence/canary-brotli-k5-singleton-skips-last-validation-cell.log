@@ -1,0 +1,40 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53085,13): 'if' cannot be used in patterns.
+WARNING: (60949,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-87134/src/brotli_input.rs:29245:5
+      |
+29245 |     while i < 17
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-87134/src/brotli_input.rs:29216:1
+      |
+29216 | / fn plan_saved_singleton_validation_reads(workspace: &[u8], window_bytes: u32,
+29217 | |     budget: &mut crate::brotli::RequestBudget, singleton: u8,
+29218 | | ) -> (r: Result<u64, CoreFailure>)
+      | |_________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-87134/src/brotli_input.rs:29229:9
+      |
+29229 | /         r.is_ok() ==> {
+29230 | |             &&& r.unwrap() <= 18
+29231 | |             &&& r.unwrap() as nat == singleton_value_reads(saved_aux_length_values(workspace@, window_bytes), singleton)
+29232 | |             &&& final(budget).work_remaining as int == old(budget).work_remaining as int - r.unwrap() as int
+29233 | |         },
+      | |_________^ failed this postcondition
+29234 | / {
+29235 | |     proof { reveal(saved_aux_length_values); reveal(singleton_value_reads); }
+29236 | |     let ghost values = saved_aux_length_values(workspace@, window_bytes);
+29237 | |     let ghost total = singleton_value_reads(values, singleton);
+...     |
+29272 | |     Ok(inspected)
+29273 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

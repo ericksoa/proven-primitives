@@ -1,6 +1,7 @@
 # M1 loader table-read accounting: Candidate K5
 
-Status: proposed for exact direct human approval; not implemented.
+Status: **approved as written by direct human reply on 2026-11-10**.
+Implementation and verification are authorized within the exact scope below.
 
 K4 was approved and corrects repeat history without changing work formulas.
 The remaining M1 loader ledger needs a separate quota decision. The current
@@ -103,3 +104,40 @@ reads, early exits and per-reload charges. Preserve failed outputs; resource,
 compiler and harness failures do not count as semantic defect rejections.
 K5 does not itself complete tree replay, the rest of M1, B3c/B3d/B4 or the
 independent human release review.
+
+## Implemented and checked K5 checkpoint
+
+The exact approved unit policy is implemented in read-only planning and every
+planned W1 reload. The private pre-scan receipt now contains its unchanged
+inspected auxiliary-prefix count and the precise all-auxiliary-valid flag,
+including an invalid eighteenth cell. Validation forecasts preserve original
+guard order, singleton skipped-index behavior and both distinctness operands.
+They charge their own actual reads and prepay the existing W1 loader's count.
+Ordinary individual scalar bookkeeping and all existing mutation formulas stay
+fixed. Only the initial proof bound changes to 798; runtime caps stay 5,696.
+
+Source-level loop/call counters and closed read-path models are checked in the
+existing validators and at every loader exit. Successful loads bind their
+source count to the validated logical phase. The valid-state scalar forecast
+uses that phase count for every replay iteration. Checked adapter assertions
+bind initial prepayment and each reload term to those models. These are logical
+source-level work units, not machine-instruction or wall-clock measurements.
+
+The unchanged final source passed **1,235 whole-crate checks with zero errors**
+and `--no-cheating`. All **106 runtime tests** pass. The new matrix exercises
+45 normal/malformed loader states across exact and short credits, and a
+hand-counted three-step tree confirms all three reload charges (58 planning,
+132 execution). F2 expectations stay unchanged. All **33 defects in three
+affected suites** were semantically rejected after that exact whole-crate
+positive: fourteen new K5 controls, fifteen saved-table controls and four
+runtime-cap/span-drain controls. Raw logs and exact hashes are bound in
+`evidence/brotli-b3c-m1-k5.json` and its control manifest.
+
+Earlier proof failures and old quota-expectation failures are retained and are
+not counted as rejections. Updating the approved quota expectations preserves
+the prior semantic, exact-credit and one-short assertions.
+
+K5's named change is complete; **M1 remains incomplete**. Full serialized-state
+and tree/action replay, remaining header/body outcomes/frames/source ledgers,
+complete control closure and B3c/B3d/B4/independent human release review remain
+open. No supported-decoder or complete mathematical-safety claim is made.

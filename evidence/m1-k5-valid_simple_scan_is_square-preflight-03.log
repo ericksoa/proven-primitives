@@ -1,0 +1,35 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53085,13): 'if' cannot be used in patterns.
+WARNING: (60949,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3116:9
+     |
+3116 |         assert(reads == count * count) by (nonlinear_arith) requires reads == 0, count == 0;
+     |         ^^^^^^
+
+WARNING: (53085,13): 'if' cannot be used in patterns.
+WARNING: (60949,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3120:9
+     |
+3120 |         assert(reads == count * count) by (nonlinear_arith)
+     |         ^^^^^^
+
+WARNING: (53085,13): 'if' cannot be used in patterns.
+WARNING: (60949,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3101:7
+     |
+3101 | proof fn valid_simple_scan_is_square(symbols: Seq<u16>, count: nat, limit: u16)
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: requires not satisfied
+    --> src/brotli_input.rs:3116:70
+     |
+3116 |         assert(reads == count * count) by (nonlinear_arith) requires reads == 0, count == 0;
+     |                                                                      ^^^^^^^^^^
+
+verification results:: 2 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

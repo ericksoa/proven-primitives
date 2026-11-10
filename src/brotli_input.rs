@@ -2919,13 +2919,288 @@ fn alphabet_bit_width(alphabet_max: u16) -> (r: u8)
     else { 10 }
 }
 
+// Source-level table-read models. Runtime helpers below bind their actual
+// loop positions to these counts; scalar bookkeeping is outside this unit.
+#[verifier::opaque]
+spec fn table_u8_scan_reads(values: Seq<u8>, maximum: u8, at: nat) -> nat
+    decreases (values.len() - at) as nat,
+{
+    if at >= values.len() { 0 }
+    else { 1 + if values[at as int] > maximum { 0nat }
+        else { table_u8_scan_reads(values, maximum, at + 1) } }
+}
+
+#[verifier::opaque]
+spec fn simple_range_scan_reads(values: Seq<u16>, count: nat, limit: u16, at: nat) -> nat
+    decreases (count - at) as nat,
+{
+    if count > values.len() || at >= count { 0 }
+    else { 1 + if values[at as int] >= limit { 0nat }
+        else { simple_range_scan_reads(values, count, limit, at + 1) } }
+}
+
+#[verifier::opaque]
+spec fn simple_distinct_scan_reads(values: Seq<u16>, count: nat, left: nat, right: nat) -> nat
+    decreases (count - left) as nat, (count - right) as nat,
+{
+    if count > values.len() || left >= count { 0 }
+    else if right >= count { simple_distinct_scan_reads(values, count, left + 1, left + 2) }
+    else { 2 + if values[left as int] == values[right as int] { 0nat }
+        else { simple_distinct_scan_reads(values, count, left, right + 1) } }
+}
+
+#[verifier::opaque]
+spec fn singleton_other_scan_reads(values: Seq<u8>, singleton: nat, at: nat) -> nat
+    decreases (values.len() - at) as nat,
+{
+    if at >= values.len() { 0 }
+    else if at == singleton { singleton_other_scan_reads(values, singleton, at + 1) }
+    else { 1 + if values[at as int] != 0 { 0nat }
+        else { singleton_other_scan_reads(values, singleton, at + 1) } }
+}
+
+spec fn singleton_validation_reads(code: ComplexCodeLengthAlphabet, singleton: u8) -> nat {
+    if singleton >= 18 { 0 }
+    else { 1 + if code.lengths@[singleton as int] == 0 { 0nat }
+        else { singleton_other_scan_reads(code.lengths@, singleton as nat, 0) } }
+}
+
+spec fn complex_code_validation_reads(code: ComplexCodeLengthAlphabet) -> nat {
+    if code.skip == 0 || code.skip == 2 || code.skip == 3 {
+        table_u8_scan_reads(code.lengths@, 5, 0)
+    } else { 0 }
+}
+
+proof fn table_u8_scan_read_bounds(values: Seq<u8>, maximum: u8, at: nat)
+    requires at <= values.len(),
+    ensures table_u8_scan_reads(values, maximum, at) <= values.len() - at,
+        (forall|i: int| at <= i < values.len() ==> values[i] <= maximum) ==>
+            table_u8_scan_reads(values, maximum, at) == values.len() - at,
+    decreases values.len() - at,
+{
+    reveal(table_u8_scan_reads);
+    if at < values.len() && values[at as int] <= maximum {
+        table_u8_scan_read_bounds(values, maximum, at + 1);
+    }
+}
+
+proof fn simple_range_scan_read_bounds(values: Seq<u16>, count: nat, limit: u16, at: nat)
+    requires at <= count <= values.len(),
+    ensures simple_range_scan_reads(values, count, limit, at) <= count - at,
+        (forall|i: int| at <= i < count ==> values[i] < limit) ==>
+            simple_range_scan_reads(values, count, limit, at) == count - at,
+    decreases count - at,
+{
+    reveal(simple_range_scan_reads);
+    if at < count && values[at as int] < limit {
+        simple_range_scan_read_bounds(values, count, limit, at + 1);
+    }
+}
+
+proof fn simple_distinct_small_read_bounds(values: Seq<u16>, count: nat)
+    requires count <= 4, count <= values.len(),
+    ensures simple_distinct_scan_reads(values, count, 0, 1) <= count * ((count - 1) as nat),
+        active_symbols_distinct(values, count) ==>
+            simple_distinct_scan_reads(values, count, 0, 1) == count * ((count - 1) as nat),
+{
+    reveal_with_fuel(simple_distinct_scan_reads, 12); reveal(active_symbols_distinct);
+    if count == 0 {} else if count == 1 {} else if count == 2 {} else if count == 3 {} else {}
+}
+
+proof fn singleton_other_read_bounds(values: Seq<u8>, singleton: nat, at: nat)
+    requires singleton < values.len(), at <= values.len(),
+    ensures singleton_other_scan_reads(values, singleton, at) as int
+            <= values.len() as int - at as int - if singleton >= at { 1int } else { 0int },
+        (forall|i: int| at <= i < values.len() && i != singleton ==> values[i] == 0) ==>
+            singleton_other_scan_reads(values, singleton, at) as int
+                == values.len() as int - at as int - if singleton >= at { 1int } else { 0int },
+    decreases values.len() - at,
+{
+    reveal(singleton_other_scan_reads);
+    if at < values.len() && (at == singleton || values[at as int] == 0) {
+        singleton_other_read_bounds(values, singleton, at + 1);
+    }
+}
+
+spec fn complex_symbol_scalar_validation(progress: ComplexSymbolProgress, limit: u16) -> bool {
+    &&& 1 <= limit <= 704
+    &&& progress.symbol < limit
+    &&& 1 <= progress.prev_code_len <= 15
+    &&& progress.repeat <= progress.symbol
+    &&& (progress.repeat == 0 || progress.repeat >= 3)
+    &&& progress.repeat_code_len <= 15
+    &&& 1 <= progress.space <= 32_768
+    &&& progress.prefix_width < 5
+    &&& progress.singleton <= 18
+    &&& progress.prefix_bits < (1u8 << progress.prefix_width)
+}
+
+#[verifier::opaque]
+spec fn complex_symbol_validation_reads(progress: ComplexSymbolProgress, limit: u16) -> nat {
+    complex_code_validation_reads(progress.code)
+        + if progress.code.valid() && complex_symbol_scalar_validation(progress, limit)
+            && progress.singleton < 18 { singleton_validation_reads(progress.code, progress.singleton) }
+            else { 0nat }
+}
+
+spec fn simple_code_validation_reads(code: SimpleCodeDescription, limit: u16) -> nat {
+    if limit == 0 || limit > 704 || code.selector > 4
+        || code.count as nat != simple_count(code.selector) { 0 }
+    else { simple_validation_reads(code.symbols@, code.count as nat, limit) }
+}
+
+#[verifier::opaque]
+spec fn phase_validation_read_units(phase: CodeDescriptionPhase, maximum: u16, limit: u16) -> nat {
+    if limit == 0 || limit > maximum || maximum > 704 { 0 }
+    else { match phase {
+        CodeDescriptionPhase::SimpleSymbols { selector, count, index, width, symbols } => {
+            if selector <= 3 && count as nat == simple_count(selector) && index < count
+                && width as nat == alphabet_bit_width_spec(maximum) {
+                simple_validation_reads(symbols@, index as nat, limit)
+            } else { 0 }
+        },
+        CodeDescriptionPhase::SimpleShape { symbols } => simple_validation_reads(symbols@, 4, limit),
+        CodeDescriptionPhase::ComplexPrefix2(progress)
+        | CodeDescriptionPhase::ComplexPrefix3(progress)
+        | CodeDescriptionPhase::ComplexPrefix4(progress) =>
+            complex_code_validation_reads(ComplexCodeLengthAlphabet { skip: progress.skip, lengths: progress.lengths }),
+        CodeDescriptionPhase::ComplexSymbol(progress)
+        | CodeDescriptionPhase::ComplexRepeat { progress, .. } => complex_symbol_validation_reads(progress, limit),
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, after } => {
+            if span_count == 0 || length > 15 || start as nat + span_count as nat > limit { 0 }
+            else { match after {
+                ComplexAfterSpan::Symbol(progress) => complex_symbol_validation_reads(progress, limit),
+                ComplexAfterSpan::TrailingZeros { code, .. }
+                | ComplexAfterSpan::Complete { code, .. } => complex_code_validation_reads(code),
+            } }
+        },
+        CodeDescriptionPhase::CompleteSimple(code) => simple_code_validation_reads(code, limit),
+        CodeDescriptionPhase::CompleteComplexAlphabet(code)
+        | CodeDescriptionPhase::CompleteComplex { code, .. } => complex_code_validation_reads(code),
+        _ => 0,
+    } }
+}
+
+proof fn valid_complex_code_scan_is_18(code: ComplexCodeLengthAlphabet)
+    requires code.valid(),
+    ensures complex_code_validation_reads(code) == 18,
+{
+    reveal(ComplexCodeLengthAlphabet::valid); reveal(complex_code_validation_reads);
+    table_u8_scan_read_bounds(code.lengths@, 5, 0);
+}
+
+proof fn valid_singleton_scan_is_18(code: ComplexCodeLengthAlphabet, singleton: u8)
+    requires singleton < 18, code.lengths@[singleton as int] != 0,
+        forall|i: int| 0 <= i < 18 && i != singleton ==> code.lengths@[i] == 0,
+    ensures singleton_validation_reads(code, singleton) == 18,
+{
+    reveal(singleton_validation_reads);
+    singleton_other_read_bounds(code.lengths@, singleton as nat, 0);
+}
+
+proof fn valid_simple_scan_is_square(symbols: Seq<u16>, count: nat, limit: u16)
+    requires count <= 4, count <= symbols.len(),
+        forall|i: int| 0 <= i < count ==> symbols[i] < limit,
+        active_symbols_distinct(symbols, count),
+    ensures simple_validation_reads(symbols, count, limit) == count * count,
+{
+    reveal(simple_validation_reads);
+    simple_range_scan_read_bounds(symbols, count, limit, 0);
+    simple_distinct_small_read_bounds(symbols, count);
+    assert(simple_range_scan_reads(symbols, count, limit, 0) == count);
+    assert(simple_distinct_scan_reads(symbols, count, 0, 1) == count * ((count - 1) as nat));
+    assert(simple_validation_reads(symbols, count, limit)
+        == simple_range_scan_reads(symbols, count, limit, 0) + simple_distinct_scan_reads(symbols, count, 0, 1));
+    let reads = simple_validation_reads(symbols, count, limit);
+    let previous = (count - 1) as nat;
+    assert(reads == count + count * previous);
+    if count == 0 {
+        assert(reads == count * count) by (nonlinear_arith)
+            requires reads == count + count * previous, count == 0;
+    } else {
+        assert(previous as int == count as int - 1);
+        assert(reads == count * count) by (nonlinear_arith)
+            requires reads == count + count * previous, previous as int == count as int - 1;
+    }
+}
+
+proof fn valid_complex_symbol_validation_count(progress: ComplexSymbolProgress, limit: u16)
+    requires progress.valid(limit),
+    ensures complex_symbol_validation_reads(progress, limit) == 18 + if progress.singleton < 18 { 18nat } else { 0nat },
+{
+    reveal(ComplexSymbolProgress::valid); reveal(complex_symbol_scalar_validation);
+    reveal(complex_symbol_validation_reads);
+    valid_complex_code_scan_is_18(progress.code);
+    if progress.singleton < 18 { valid_singleton_scan_is_18(progress.code, progress.singleton); }
+}
+
+fn valid_code_loader_read_units(decoder: &CodeDescriptionDecoder) -> (r: u64)
+    requires decoder.valid(),
+    ensures r as nat == 22 + phase_validation_read_units(decoder.phase, decoder.alphabet_max, decoder.alphabet_limit),
+        r <= 58,
+{
+    proof {
+        reveal(CodeDescriptionDecoder::valid); reveal(phase_validation_read_units);
+        reveal(SimpleCodeDescription::valid); reveal(ComplexProgress::valid);
+        reveal(ComplexAfterSpan::valid); reveal(simple_code_validation_reads); reveal(simple_count);
+    }
+    match decoder.phase {
+        CodeDescriptionPhase::SimpleSymbols { index, symbols, .. } => {
+            proof { valid_simple_scan_is_square(symbols@, index as nat, decoder.alphabet_limit); }
+            22 + index as u64 * index as u64
+        },
+        CodeDescriptionPhase::SimpleShape { symbols } => {
+            proof { valid_simple_scan_is_square(symbols@, 4, decoder.alphabet_limit); }
+            38
+        },
+        CodeDescriptionPhase::ComplexPrefix2(progress)
+        | CodeDescriptionPhase::ComplexPrefix3(progress)
+        | CodeDescriptionPhase::ComplexPrefix4(progress) => {
+            proof { valid_complex_code_scan_is_18(ComplexCodeLengthAlphabet { skip: progress.skip, lengths: progress.lengths }); }
+            40
+        },
+        CodeDescriptionPhase::ComplexSymbol(progress)
+        | CodeDescriptionPhase::ComplexRepeat { progress, .. } => {
+            proof { valid_complex_symbol_validation_count(progress, decoder.alphabet_limit); }
+            40 + if progress.singleton < 18 { 18u64 } else { 0u64 }
+        },
+        CodeDescriptionPhase::ComplexPendingSpan { after, .. } => match after {
+            ComplexAfterSpan::Symbol(progress) => {
+                proof { valid_complex_symbol_validation_count(progress, decoder.alphabet_limit); }
+                40 + if progress.singleton < 18 { 18u64 } else { 0u64 }
+            },
+            ComplexAfterSpan::TrailingZeros { code, .. } | ComplexAfterSpan::Complete { code, .. } => {
+                proof { valid_complex_code_scan_is_18(code); }
+                40
+            },
+        },
+        CodeDescriptionPhase::CompleteSimple(code) => {
+            proof {
+                assert(code.count <= 4);
+                assert(code.count as u64 * code.count as u64 <= 16) by (nonlinear_arith) requires code.count <= 4;
+                valid_simple_scan_is_square(code.symbols@, code.count as nat, decoder.alphabet_limit);
+            }
+            22 + code.count as u64 * code.count as u64
+        },
+        CodeDescriptionPhase::CompleteComplexAlphabet(code)
+        | CodeDescriptionPhase::CompleteComplex { code, .. } => {
+            proof { valid_complex_code_scan_is_18(code); }
+            40
+        },
+        _ => 22,
+    }
+}
+
 fn simple_symbols_distinct(symbols: &[u16; 4], count: u8) -> (r: bool)
     requires 1 <= count <= 4,
     ensures r == active_symbols_distinct(symbols@, count as nat),
 {
+    let ghost total_reads = simple_distinct_scan_reads(symbols@, count as nat, 0, 1);
+    let ghost mut inspected: nat = 0;
     let mut i: usize = 0;
     while i < count as usize
         invariant i <= count <= 4,
+            total_reads == inspected + simple_distinct_scan_reads(symbols@, count as nat, i as nat, i as nat + 1),
             forall|a: int, b: int| 0 <= a < i && 0 <= b < count && a != b
                 ==> symbols@[a] != symbols@[b],
         decreases count as usize - i,
@@ -2933,18 +3208,23 @@ fn simple_symbols_distinct(symbols: &[u16; 4], count: u8) -> (r: bool)
         let mut j = i + 1;
         while j < count as usize
             invariant i < count <= 4, i + 1 <= j <= count,
+                total_reads == inspected + simple_distinct_scan_reads(symbols@, count as nat, i as nat, j as nat),
                 forall|a: int, b: int| 0 <= a < i && 0 <= b < count && a != b
                     ==> symbols@[a] != symbols@[b],
                 forall|b: int| i < b < j ==> symbols@[i as int] != symbols@[b],
             decreases count as usize - j,
         {
+            proof { reveal_with_fuel(simple_distinct_scan_reads, 2); inspected = inspected + 2; }
             if symbols[i] == symbols[j] {
+                proof { assert(inspected == total_reads); }
                 return false;
             }
             j = j + 1;
         }
+        proof { reveal_with_fuel(simple_distinct_scan_reads, 2); }
         i = i + 1;
     }
+    proof { reveal(simple_distinct_scan_reads); assert(inspected == total_reads); }
     true
 }
 
@@ -2956,17 +3236,22 @@ fn active_symbols_in_range(
     requires count <= 4,
     ensures r == forall|i: int| 0 <= i < count ==> symbols@[i] < alphabet_limit,
 {
+    let ghost total_reads = simple_range_scan_reads(symbols@, count as nat, alphabet_limit, 0);
     let mut i: usize = 0;
     while i < count as usize
         invariant i <= count <= 4,
+            total_reads == i as nat + simple_range_scan_reads(symbols@, count as nat, alphabet_limit, i as nat),
             forall|j: int| 0 <= j < i ==> symbols@[j] < alphabet_limit,
         decreases count as usize - i,
     {
+        proof { reveal_with_fuel(simple_range_scan_reads, 2); }
         if symbols[i] >= alphabet_limit {
+            proof { assert(total_reads == i as nat + 1); }
             return false;
         }
         i = i + 1;
     }
+    proof { reveal(simple_range_scan_reads); assert(total_reads == count); }
     true
 }
 
@@ -2984,20 +3269,28 @@ fn active_symbols_distinct_exec(symbols: &[u16; 4], count: u8) -> (r: bool)
 fn complex_code_valid_exec(code: &ComplexCodeLengthAlphabet) -> (r: bool)
     ensures r == code.valid(),
 {
+    proof { reveal(complex_code_validation_reads); }
+    let ghost total_reads = complex_code_validation_reads(*code);
     if !(code.skip == 0 || code.skip == 2 || code.skip == 3) {
+        proof { assert(total_reads == 0); }
         return false;
     }
     let mut i: usize = 0;
     while i < 18
         invariant i <= 18,
+            code.skip == 0 || code.skip == 2 || code.skip == 3,
+            total_reads == i as nat + table_u8_scan_reads(code.lengths@, 5, i as nat),
             forall|j: int| 0 <= j < i ==> code.lengths@[j] <= 5,
         decreases 18 - i,
     {
+        proof { reveal_with_fuel(table_u8_scan_reads, 2); }
         if code.lengths[i] > 5 {
+            proof { assert(total_reads == i as nat + 1); }
             return false;
         }
         i = i + 1;
     }
+    proof { reveal(table_u8_scan_reads); assert(total_reads == 18); }
     true
 }
 
@@ -3026,22 +3319,34 @@ fn singleton_code_valid_exec(
             ==> code.lengths@[i] == 0
     },
 {
+    proof { reveal(singleton_validation_reads); }
+    let ghost total_reads = singleton_validation_reads(*code, singleton);
+    let ghost mut inspected: nat = 1;
     if code.lengths[singleton as usize] == 0 {
+        proof { assert(total_reads == inspected); }
         return false;
     }
     let mut i: usize = 0;
     while i < 18
         invariant i <= 18,
+            total_reads == inspected + singleton_other_scan_reads(code.lengths@, singleton as nat, i as nat),
+            inspected as int == 1 + i as int - if (singleton as usize) < i { 1int } else { 0int },
             code.lengths@[singleton as int] != 0,
             forall|j: int| 0 <= j < i && j != singleton
                 ==> code.lengths@[j] == 0,
         decreases 18 - i,
     {
+        proof {
+            reveal_with_fuel(singleton_other_scan_reads, 2);
+            if i != singleton as usize { inspected = inspected + 1; }
+        }
         if i != singleton as usize && code.lengths[i] != 0 {
+            proof { assert(total_reads == inspected); }
             return false;
         }
         i = i + 1;
     }
+    proof { reveal(singleton_other_scan_reads); assert(total_reads == inspected); assert(inspected == 18); }
     true
 }
 
@@ -3051,7 +3356,10 @@ fn complex_symbol_progress_valid_exec(
 ) -> (r: bool)
     ensures r == progress.valid(alphabet_limit),
 {
-    if !complex_code_valid_exec(&progress.code)
+    proof { reveal(complex_symbol_validation_reads); reveal(complex_symbol_scalar_validation); }
+    let code_ok = complex_code_valid_exec(&progress.code);
+    let ghost mut observed_reads = complex_code_validation_reads(progress.code);
+    if !code_ok
         || alphabet_limit == 0
         || alphabet_limit > 704
         || progress.symbol >= alphabet_limit
@@ -3065,19 +3373,25 @@ fn complex_symbol_progress_valid_exec(
         || progress.prefix_width >= 5
         || progress.singleton > 18
     {
+        proof { assert(observed_reads == complex_symbol_validation_reads(*progress, alphabet_limit)); }
         return false;
     }
     if progress.prefix_bits >= (1u8 << progress.prefix_width) {
+        proof { assert(observed_reads == complex_symbol_validation_reads(*progress, alphabet_limit)); }
         return false;
     }
     if progress.singleton < 18 {
-        if !singleton_code_valid_exec(&progress.code, progress.singleton)
+        let singleton_ok = singleton_code_valid_exec(&progress.code, progress.singleton);
+        proof { observed_reads = observed_reads + singleton_validation_reads(progress.code, progress.singleton); }
+        if !singleton_ok
             || progress.prefix_width != 0
             || progress.prefix_bits != 0
         {
+            proof { assert(observed_reads == complex_symbol_validation_reads(*progress, alphabet_limit)); }
             return false;
         }
     }
+    proof { assert(observed_reads == complex_symbol_validation_reads(*progress, alphabet_limit)); }
     true
 }
 
@@ -3103,13 +3417,28 @@ fn simple_code_valid_exec(
 ) -> (r: bool)
     ensures r == code.valid(alphabet_limit),
 {
+    proof { reveal(simple_code_validation_reads); reveal(simple_validation_reads); reveal(simple_count); }
     if alphabet_limit == 0 || alphabet_limit > 704 || code.selector > 4 {
+        proof { assert(simple_code_validation_reads(*code, alphabet_limit) == 0); }
         return false;
     }
     let expected = if code.selector <= 2 { code.selector + 1 } else { 4 };
-    code.count == expected
-        && active_symbols_in_range(&code.symbols, code.count, alphabet_limit)
-        && active_symbols_distinct_exec(&code.symbols, code.count)
+    if code.count != expected {
+        proof { assert(simple_code_validation_reads(*code, alphabet_limit) == 0); }
+        return false;
+    }
+    let range_ok = active_symbols_in_range(&code.symbols, code.count, alphabet_limit);
+    let ghost mut observed_reads = simple_range_scan_reads(code.symbols@, code.count as nat, alphabet_limit, 0);
+    if !range_ok {
+        proof { assert(observed_reads == simple_code_validation_reads(*code, alphabet_limit)); }
+        return false;
+    }
+    let distinct_ok = active_symbols_distinct_exec(&code.symbols, code.count);
+    proof {
+        observed_reads = observed_reads + simple_distinct_scan_reads(code.symbols@, code.count as nat, 0, 1);
+        assert(observed_reads == simple_code_validation_reads(*code, alphabet_limit));
+    }
+    distinct_ok
 }
 
 fn code_description_phase_valid_exec(
@@ -3164,50 +3493,84 @@ fn code_description_phase_valid_exec(
         }
     },
 {
+    proof {
+        reveal(phase_validation_read_units); reveal(simple_validation_reads);
+        reveal(simple_code_validation_reads); reveal(simple_count);
+    }
+    let ghost mut observed_reads: nat = 0;
     if alphabet_limit == 0 || alphabet_limit > alphabet_max || alphabet_max > 704 {
+        proof { assert(phase_validation_read_units(*phase, alphabet_max, alphabet_limit) == 0); }
         return false;
     }
-    match phase {
-        CodeDescriptionPhase::SimpleSymbols {
-            selector, count, index, width, symbols,
-        } => {
+    let result = match phase {
+        CodeDescriptionPhase::SimpleSymbols { selector, count, index, width, symbols } => {
             let expected = if *selector <= 2 { *selector + 1 } else { 4 };
-            *selector <= 3
-                && *count == expected
-                && *index < *count
-                && *width == alphabet_bit_width(alphabet_max)
-                && active_symbols_in_range(symbols, *index, alphabet_limit)
-                && active_symbols_distinct_exec(symbols, *index)
-        }
-        CodeDescriptionPhase::SimpleShape { symbols } =>
-            active_symbols_in_range(symbols, 4, alphabet_limit)
-                && active_symbols_distinct_exec(symbols, 4),
+            if !(*selector <= 3 && *count == expected && *index < *count
+                && *width == alphabet_bit_width(alphabet_max)) { false }
+            else {
+                let range_ok = active_symbols_in_range(symbols, *index, alphabet_limit);
+                proof { observed_reads = simple_range_scan_reads(symbols@, *index as nat, alphabet_limit, 0); }
+                if range_ok {
+                    let distinct_ok = active_symbols_distinct_exec(symbols, *index);
+                    proof { observed_reads = observed_reads + simple_distinct_scan_reads(symbols@, *index as nat, 0, 1); }
+                    distinct_ok
+                } else { false }
+            }
+        },
+        CodeDescriptionPhase::SimpleShape { symbols } => {
+            let range_ok = active_symbols_in_range(symbols, 4, alphabet_limit);
+            proof { observed_reads = simple_range_scan_reads(symbols@, 4, alphabet_limit, 0); }
+            if range_ok {
+                let distinct_ok = active_symbols_distinct_exec(symbols, 4);
+                proof { observed_reads = observed_reads + simple_distinct_scan_reads(symbols@, 4, 0, 1); }
+                distinct_ok
+            } else { false }
+        },
         CodeDescriptionPhase::ComplexPrefix2(progress)
         | CodeDescriptionPhase::ComplexPrefix3(progress)
-        | CodeDescriptionPhase::ComplexPrefix4(progress) =>
-            complex_progress_valid_exec(progress),
-        CodeDescriptionPhase::ComplexSymbol(progress) =>
-            complex_symbol_progress_valid_exec(progress, alphabet_limit),
-        CodeDescriptionPhase::ComplexRepeat { progress, length, extra_bits } =>
+        | CodeDescriptionPhase::ComplexPrefix4(progress) => {
+            proof { observed_reads = complex_code_validation_reads(ComplexCodeLengthAlphabet { skip: progress.skip, lengths: progress.lengths }); }
+            complex_progress_valid_exec(progress)
+        },
+        CodeDescriptionPhase::ComplexSymbol(progress) => {
+            proof { observed_reads = complex_symbol_validation_reads(*progress, alphabet_limit); }
+            complex_symbol_progress_valid_exec(progress, alphabet_limit)
+        },
+        CodeDescriptionPhase::ComplexRepeat { progress, length, extra_bits } => {
+            proof { observed_reads = complex_symbol_validation_reads(*progress, alphabet_limit); }
             complex_symbol_progress_valid_exec(progress, alphabet_limit)
                 && (*length == 0 || *length <= 15)
-                && ((*length == 0 && *extra_bits == 3)
-                    || (*length != 0 && *extra_bits == 2)),
-        CodeDescriptionPhase::ComplexPendingSpan {
-            start, span_count, length, after,
-        } => {
-            *span_count > 0
-                && *length <= 15
-                && *start as u32 + *span_count as u32 <= alphabet_limit as u32
-                && complex_after_span_valid_exec(after, alphabet_limit)
-        }
-        CodeDescriptionPhase::CompleteSimple(code) =>
-            simple_code_valid_exec(code, alphabet_limit),
-        CodeDescriptionPhase::CompleteComplexAlphabet(code) => complex_code_valid_exec(code),
-        CodeDescriptionPhase::CompleteComplex { code, decoded_symbols } =>
-            complex_code_valid_exec(code) && *decoded_symbols == alphabet_limit,
+                && ((*length == 0 && *extra_bits == 3) || (*length != 0 && *extra_bits == 2))
+        },
+        CodeDescriptionPhase::ComplexPendingSpan { start, span_count, length, after } => {
+            if !(*span_count > 0 && *length <= 15
+                && *start as u32 + *span_count as u32 <= alphabet_limit as u32) { false }
+            else {
+                proof {
+                    observed_reads = match *after {
+                        ComplexAfterSpan::Symbol(progress) => complex_symbol_validation_reads(progress, alphabet_limit),
+                        ComplexAfterSpan::TrailingZeros { code, .. } | ComplexAfterSpan::Complete { code, .. } => complex_code_validation_reads(code),
+                    };
+                }
+                complex_after_span_valid_exec(after, alphabet_limit)
+            }
+        },
+        CodeDescriptionPhase::CompleteSimple(code) => {
+            proof { observed_reads = simple_code_validation_reads(*code, alphabet_limit); }
+            simple_code_valid_exec(code, alphabet_limit)
+        },
+        CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+            proof { observed_reads = complex_code_validation_reads(*code); }
+            complex_code_valid_exec(code)
+        },
+        CodeDescriptionPhase::CompleteComplex { code, decoded_symbols } => {
+            proof { observed_reads = complex_code_validation_reads(*code); }
+            complex_code_valid_exec(code) && *decoded_symbols == alphabet_limit
+        },
         _ => true,
-    }
+    };
+    proof { assert(observed_reads == phase_validation_read_units(*phase, alphabet_max, alphabet_limit)); }
+    result
 }
 
 fn process_complex_code_length(
@@ -11747,16 +12110,28 @@ fn initialize_code_description_state(
     result
 }
 
+#[verifier::opaque]
+spec fn m1_simple_symbol_values(workspace: Seq<u8>, window_bytes: u32, symbols: [u16; 4]) -> bool {
+    &&& b3b_workspace_shape(workspace.len(), window_bytes)
+    &&& forall|i: int| 0 <= i < 4 ==> #[trigger] symbols@[i] as nat
+        == b3b_scalar_u16_at(workspace, window_bytes, (B3B_SIMPLE_SYMBOLS as int + 2 * i) as u16)
+}
+
 fn read_simple_symbols(
     workspace: &[u8],
     window_bytes: u32,
 ) -> (r: Result<[u16; 4], CompressedHeaderError>)
     ensures b3b_workspace_shape(workspace@.len(), window_bytes) ==> r.is_ok(),
+        r.is_ok() ==> m1_simple_symbol_values(workspace@, window_bytes, r.unwrap()),
 {
+    proof { reveal(m1_simple_symbol_values); }
     let mut symbols = [0u16; 4];
     let mut i: usize = 0;
     while i < 4
         invariant i <= 4,
+            i > 0 ==> b3b_workspace_shape(workspace@.len(), window_bytes),
+            forall|j: int| 0 <= j < i ==> #[trigger] symbols@[j] as nat
+                == b3b_scalar_u16_at(workspace@, window_bytes, (B3B_SIMPLE_SYMBOLS as int + 2 * j) as u16),
         decreases 4 - i,
     {
         symbols[i] = match read_b3b_state_u16(
@@ -11769,6 +12144,7 @@ fn read_simple_symbols(
         };
         i = i + 1;
     }
+    proof { assert(i == 4); }
     Ok(symbols)
 }
 
@@ -11821,6 +12197,8 @@ fn write_simple_symbols(
     symbols: [u16; 4],
 ) -> (r: Result<(), CompressedHeaderError>)
     ensures
+        b3b_workspace_shape(old(workspace)@.len(), window_bytes) ==> r.is_ok(),
+        r.is_ok() ==> m1_simple_symbol_values(final(workspace)@, window_bytes, symbols),
         forall|at: int| 0 <= at < old(workspace)@.len()
             && !(b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int <= at
                 < b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int + 8) ==>
@@ -11842,6 +12220,7 @@ fn write_simple_symbols(
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
             ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
 {
+    proof { reveal(m1_simple_symbol_values); }
     let ghost original = workspace@;
     proof {
         assert(original == old(workspace)@);
@@ -11851,6 +12230,9 @@ fn write_simple_symbols(
     let mut i: usize = 0;
     while i < 4
         invariant i <= 4,
+            i > 0 ==> b3b_workspace_shape(workspace@.len(), window_bytes),
+            forall|j: int| 0 <= j < i ==> #[trigger] symbols@[j] as nat
+                == b3b_scalar_u16_at(workspace@, window_bytes, (B3B_SIMPLE_SYMBOLS as int + 2 * j) as u16),
             original == old(workspace)@,
             forall|at: int| 0 <= at < original.len()
                 && !(b3b_scalar_base(window_bytes) + B3B_SIMPLE_SYMBOLS as int <= at
@@ -11874,6 +12256,10 @@ fn write_simple_symbols(
             code_store_frame(original, workspace@, window_bytes),
         decreases 4 - i,
     {
+        proof {
+            reveal(m1_simple_symbol_values); reveal(b3b_scalar_u16_at);
+            reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base); b3b_scalar_layout_is_exact();
+        }
         match write_b3b_state_u16(
             workspace,
             window_bytes,
@@ -11905,17 +12291,23 @@ fn read_aux_lengths(
             &&& r.is_err() ==> r == Err(CompressedHeaderError::InternalState)
         },
 {
-    proof { b3b_scalar_layout_is_exact(); }
+    proof { b3b_scalar_layout_is_exact(); reveal(saved_aux_length_values); }
+    let ghost values = saved_aux_length_values(workspace@, window_bytes);
+    let ghost total_reads = table_u8_scan_reads(values, 5, 0);
     let mut lengths = [0u8; 18];
     let mut i: usize = 0;
     while i < 18
         invariant i <= 18,
+            values == saved_aux_length_values(workspace@, window_bytes), values.len() == 18,
+            b3b_workspace_shape(workspace@.len(), window_bytes) ==>
+                total_reads == i as nat + table_u8_scan_reads(values, 5, i as nat),
             forall|j: int| 0 <= j < i ==> #[trigger] lengths@[j]
                 == workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j],
             forall|j: int| 0 <= j < i ==> lengths@[j] <= 5,
             i > 0 ==> b3b_workspace_shape(workspace@.len() as nat, window_bytes),
         decreases 18 - i,
     {
+        proof { reveal(saved_aux_length_values); reveal_with_fuel(table_u8_scan_reads, 2); }
         let value = match read_b3b_state_byte(
             workspace,
             window_bytes,
@@ -11930,6 +12322,8 @@ fn read_aux_lengths(
         lengths[i] = value;
         if value > 5 {
             proof {
+                assert(value == values[i as int]);
+                assert(total_reads == i as nat + 1);
                 assert(!(forall|j: int| 0 <= j < 18 ==> #[trigger]
                     workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j] <= 5));
             }
@@ -11943,6 +12337,7 @@ fn read_aux_lengths(
             assert(lengths@[j] <= 5);
         }
     }
+    proof { reveal(table_u8_scan_reads); assert(total_reads == 18); }
     Ok(lengths)
 }
 
@@ -12710,6 +13105,8 @@ fn load_code_description_decoder(
 ) -> (r: Result<CodeDescriptionDecoder, CompressedHeaderError>)
     requires queue.valid(),
     ensures
+        r.is_ok() ==> loader_table_read_units(workspace@, window_bytes)
+            == 22 + phase_validation_read_units(r.unwrap().phase, r.unwrap().alphabet_max, r.unwrap().alphabet_limit),
         b3b_workspace_shape(workspace@.len(), window_bytes)
             && b3b_scalar_byte_at(workspace@, window_bytes, B3B_CODE_PHASE) == 6
             && b3b_scalar_byte_at(workspace@, window_bytes, B3B_PENDING_SPAN_LENGTH) > 15 ==>
@@ -12737,63 +13134,96 @@ fn load_code_description_decoder(
         reveal(k4_complex_code_values); reveal(k4_repeat_width_agrees);
         reveal(k4_repeat_decoder_image); reveal(CodeDescriptionDecoder::valid);
     }
+    let ghost mut source_reads: nat = 0;
+    proof {
+        reveal(loader_table_read_units); reveal(loader_forecast_table_reads);
+        reveal(loader_enters_complex_validation); reveal(loader_reaches_singleton_validation);
+        reveal(loader_shared_complex_guards); reveal(loader_simple_validation_count);
+        reveal(saved_aux_copy_read_units); reveal(saved_aux_load_valid); reveal(saved_aux_load_eligible);
+        reveal(simple_validation_reads); reveal(simple_count);
+        reveal(simple_range_scan_reads); reveal(simple_distinct_scan_reads);
+        reveal(phase_validation_read_units); reveal(simple_code_validation_reads);
+        reveal(complex_symbol_validation_reads); reveal(complex_symbol_scalar_validation);
+        reveal(complex_code_validation_reads); reveal(singleton_validation_reads); reveal(singleton_value_reads);
+        reveal(m1_simple_symbol_values); reveal(saved_simple_symbol_values); reveal(saved_aux_length_values);
+        reveal(ComplexCodeLengthAlphabet::valid);
+    }
     let alphabet_max = match state_u16(workspace, window_bytes, B3B_ALPHABET_MAX) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let alphabet_limit = match state_u16(workspace, window_bytes, B3B_ALPHABET_LIMIT) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     if alphabet_max == 0 || alphabet_max > 704
         || alphabet_limit == 0 || alphabet_limit > alphabet_max {
-        return Err(CompressedHeaderError::InternalState);
+        return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
     }
     let tag = match state_byte(workspace, window_bytes, B3B_CODE_PHASE) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let selector = match state_byte(workspace, window_bytes, B3B_SIMPLE_SELECTOR) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let count = match state_byte(workspace, window_bytes, B3B_SIMPLE_COUNT) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let index = match state_byte(workspace, window_bytes, B3B_CODE_INDEX) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let width = match state_byte(workspace, window_bytes, B3B_CODE_WIDTH) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let symbols = match read_simple_symbols(workspace, window_bytes) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
+    proof { source_reads = source_reads + 4; }
     let skip = match state_byte(workspace, window_bytes, B3B_AUX_SKIP) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let aux_index = match state_byte(workspace, window_bytes, B3B_AUX_INDEX) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let aux_space = match state_byte(workspace, window_bytes, B3B_AUX_SPACE) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
     let aux_nonzero = match state_byte(workspace, window_bytes, B3B_AUX_NONZERO) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
-    let lengths = match read_aux_lengths(workspace, window_bytes) {
+    let aux_result = read_aux_lengths(workspace, window_bytes);
+    proof {
+        assert(saved_aux_load_eligible(workspace@, window_bytes));
+        saved_aux_scan_matches_receipt(workspace@, window_bytes, 0);
+        source_reads = source_reads + saved_aux_copy_read_units(workspace@, window_bytes);
+    }
+    let lengths = match aux_result {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
     };
+    proof {
+        assert(saved_aux_load_valid(workspace@, window_bytes));
+        assert(saved_aux_copy_read_units(workspace@, window_bytes) == 18);
+        assert(symbols@ =~= saved_simple_symbol_values(workspace@, window_bytes));
+        assert(lengths@ =~= saved_aux_length_values(workspace@, window_bytes));
+    }
     let code = ComplexCodeLengthAlphabet { skip, lengths };
+    proof {
+        if skip == 0 || skip == 2 || skip == 3 {
+            assert(code.valid());
+            valid_complex_code_scan_is_18(code);
+        }
+    }
     let phase = match tag {
         0 => CodeDescriptionPhase::Selector,
         1 => CodeDescriptionPhase::SimpleSize,
@@ -12804,72 +13234,72 @@ fn load_code_description_decoder(
             if !(skip == 0 || skip == 2 || skip == 3)
                 || aux_index < skip || aux_index >= 18 || aux_space > 32
                 || aux_nonzero > aux_index - skip {
-                return Err(CompressedHeaderError::InternalState);
+                return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
             }
             let progress = ComplexProgress {
                 skip, index: aux_index, lengths, space: aux_space, nonzero: aux_nonzero,
             };
             let aux_tag = match state_byte(workspace, window_bytes, B3B_CODE_AUX_PHASE) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             match aux_tag {
                 1 => CodeDescriptionPhase::ComplexPrefix2(progress),
                 2 => CodeDescriptionPhase::ComplexPrefix3(progress),
                 3 => CodeDescriptionPhase::ComplexPrefix4(progress),
-                _ => return Err(CompressedHeaderError::InternalState),
+                _ => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) },
             }
         }
         5 | 6 | 7 | 9 => {
             if !(skip == 0 || skip == 2 || skip == 3) {
-                return Err(CompressedHeaderError::InternalState);
+                return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
             }
             let symbol = match state_u16(workspace, window_bytes, B3B_FINAL_SYMBOL) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             let previous = match state_byte(workspace, window_bytes, B3B_PREVIOUS_LENGTH) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             let repeated = match state_byte(workspace, window_bytes, B3B_REPEATED_LENGTH) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             let repeat = match state_u32(workspace, window_bytes, B3B_CHAINED_REPEAT) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             let final_space = match state_u32(workspace, window_bytes, B3B_FINAL_SPACE) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             let prefix_bits = match state_byte(workspace, window_bytes, B3B_FINAL_PREFIX_BITS) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             let prefix_width = match state_byte(workspace, window_bytes, B3B_FINAL_PREFIX_WIDTH) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             let singleton = match state_byte(workspace, window_bytes, B3B_AUX_SINGLETON) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             if symbol > alphabet_limit || previous == 0 || previous > 15
                 || repeated > 15 || repeat > symbol as u32 || final_space > 32_768
                 || prefix_width >= 5 || singleton > 18 {
-                return Err(CompressedHeaderError::InternalState);
+                return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
             }
             if tag == 9 {
                 if symbol != alphabet_limit || final_space != 0 {
-                    return Err(CompressedHeaderError::InternalState);
+                    return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
                 }
                 CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: symbol }
             } else {
                 if symbol >= alphabet_limit || final_space == 0 {
                     if tag != 7 {
-                        return Err(CompressedHeaderError::InternalState);
+                        return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
                     }
                 }
                 let progress = ComplexSymbolProgress {
@@ -12883,10 +13313,10 @@ fn load_code_description_decoder(
                     let repeat_length = match state_byte(
                         workspace, window_bytes, B3B_PENDING_SPAN_LENGTH) {
                         Ok(value) => value,
-                        Err(error) => return Err(error),
+                        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
                     };
                     if repeat_length > 15 {
-                        return Err(CompressedHeaderError::InternalState);
+                        return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
                     }
                     let extra_bits = if repeat_length == 0 { 3 } else { 2 };
                     CodeDescriptionPhase::ComplexRepeat {
@@ -12896,15 +13326,15 @@ fn load_code_description_decoder(
                     let initialized = match state_u16(
                         workspace, window_bytes, B3B_BUILDER_INITIALIZED) {
                         Ok(value) => value,
-                        Err(error) => return Err(error),
+                        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
                     };
                     let pending_length = match state_byte(
                         workspace, window_bytes, B3B_PENDING_SPAN_LENGTH) {
                         Ok(value) => value,
-                        Err(error) => return Err(error),
+                        Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
                     };
                     if initialized >= symbol || pending_length > 15 {
-                        return Err(CompressedHeaderError::InternalState);
+                        return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
                     }
                     let after = if final_space == 0 {
                         if symbol < alphabet_limit {
@@ -12932,14 +13362,14 @@ fn load_code_description_decoder(
         10 => {
             let error_tag = match state_byte(workspace, window_bytes, B3B_CODE_ERROR) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(error) },
             };
             match decode_code_description_error(error_tag) {
                 Some(error) => CodeDescriptionPhase::Failed(error),
-                None => return Err(CompressedHeaderError::InternalState),
+                None => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) },
             }
         }
-        _ => return Err(CompressedHeaderError::InternalState),
+        _ => return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) },
     };
     proof {
         if tag == 6 {
@@ -12950,11 +13380,21 @@ fn load_code_description_decoder(
             }
         }
     }
-    if !code_description_phase_valid_exec(&phase, alphabet_max, alphabet_limit) {
-        return Err(CompressedHeaderError::InternalState);
+    let phase_valid = code_description_phase_valid_exec(&phase, alphabet_max, alphabet_limit);
+    proof {
+        assert(source_reads == 22);
+        assert(phase_validation_read_units(phase, alphabet_max, alphabet_limit)
+            == (if loader_enters_complex_validation(workspace@, window_bytes) { 18nat } else { 0nat })
+                + loader_forecast_table_reads(workspace@, window_bytes));
+        source_reads = source_reads + phase_validation_read_units(phase, alphabet_max, alphabet_limit);
+        assert(source_reads == loader_table_read_units(workspace@, window_bytes));
+    }
+    if !phase_valid {
+        return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };
     }
     let decoder = CodeDescriptionDecoder { queue, alphabet_max, alphabet_limit, phase };
     assert(decoder.valid());
+    proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); }
     Ok(decoder)
 }
 
@@ -13105,18 +13545,60 @@ spec fn code_phase_store_safe(phase: CodeDescriptionPhase) -> bool {
     }
 }
 
+spec fn m1_simple_description_tag(phase: CodeDescriptionPhase) -> u8 {
+    match phase {
+        CodeDescriptionPhase::Selector => 0,
+        CodeDescriptionPhase::SimpleSize => 1,
+        CodeDescriptionPhase::SimpleSymbols { .. } => 2,
+        CodeDescriptionPhase::SimpleShape { .. } => 3,
+        CodeDescriptionPhase::CompleteSimple(_) => 8,
+        _ => 255,
+    }
+}
+
+#[verifier::opaque]
+spec fn m1_simple_description_values(workspace: Seq<u8>, window_bytes: u32,
+    phase: CodeDescriptionPhase) -> bool {
+    match phase {
+        CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize => true,
+        CodeDescriptionPhase::SimpleSymbols { selector, count, index, width, symbols } => {
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_SELECTOR) == selector
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_COUNT) == count
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_INDEX) == index
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_WIDTH) == width
+            &&& m1_simple_symbol_values(workspace, window_bytes, symbols)
+        },
+        CodeDescriptionPhase::SimpleShape { symbols } => {
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_SELECTOR) == 3
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_COUNT) == 4
+            &&& m1_simple_symbol_values(workspace, window_bytes, symbols)
+        },
+        CodeDescriptionPhase::CompleteSimple(code) => {
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_SELECTOR) == code.selector
+            &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_COUNT) == code.count
+            &&& m1_simple_symbol_values(workspace, window_bytes, code.symbols)
+        },
+        _ => false,
+    }
+}
+
 fn store_simple_code_description_payload(
     workspace: &mut [u8],
     window_bytes: u32,
     phase: CodeDescriptionPhase,
 ) -> (r: Result<u8, CompressedHeaderError>)
     ensures
+        r.is_ok() ==> r.unwrap() == m1_simple_description_tag(phase),
+        r.is_ok() ==> m1_simple_description_values(final(workspace)@, window_bytes, phase),
         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes), code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
         r.is_ok() && code_rank_aligned(phase) ==> forall|limit: u16|
             #[trigger] code_payload_rank(final(workspace)@, window_bytes, r.unwrap(), limit)
                 == code_phase_rank(phase, limit),
 {
-    proof { reveal(code_descriptor_store_frame); }
+    proof {
+        reveal(code_descriptor_store_frame); reveal(m1_simple_description_tag);
+        reveal(m1_simple_description_values); reveal(m1_simple_symbol_values);
+    }
     let tag = match phase {
         CodeDescriptionPhase::Selector => 0,
         CodeDescriptionPhase::SimpleSize => 1,
@@ -13242,6 +13724,10 @@ fn store_code_description_payload(
 ) -> (r: Result<u8, CompressedHeaderError>)
     requires code_phase_store_safe(phase),
     ensures
+        r.is_ok() && m1_simple_description_tag(phase) != 255 ==> {
+            &&& r.unwrap() == m1_simple_description_tag(phase)
+            &&& m1_simple_description_values(final(workspace)@, window_bytes, phase)
+        },
         b3b_workspace_shape(old(workspace)@.len(), window_bytes)
             && matches!(phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> r.is_ok(),
         r.is_ok() && matches!(phase, CodeDescriptionPhase::ComplexRepeat { .. }) ==> {
@@ -13255,6 +13741,7 @@ fn store_code_description_payload(
 {
     proof {
         reveal(code_descriptor_store_frame); reveal(k4_repeat_values);
+        reveal(m1_simple_description_tag);
         reveal(k4_complex_progress_values); reveal(k4_complex_code_values);
     }
     match phase {
@@ -28540,6 +29027,139 @@ spec fn saved_aux_copy_prefix(workspace: Seq<u8>, window_bytes: u32, limit: nat)
         #[trigger] workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] <= 5
 }
 
+spec fn saved_aux_load_eligible(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let maximum = b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_MAX);
+    let limit = b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT);
+    1 <= limit <= maximum <= 704
+}
+
+spec fn saved_aux_load_valid(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    saved_aux_load_eligible(workspace, window_bytes) && saved_aux_copy_prefix(workspace, window_bytes, 18)
+}
+
+#[verifier::opaque]
+spec fn saved_simple_symbol_values(workspace: Seq<u8>, window_bytes: u32) -> Seq<u16> {
+    Seq::new(4, |i: int| b3b_scalar_u16_at(workspace, window_bytes,
+        (B3B_SIMPLE_SYMBOLS as int + 2 * i) as u16) as u16)
+}
+
+#[verifier::opaque]
+spec fn saved_aux_length_values(workspace: Seq<u8>, window_bytes: u32) -> Seq<u8> {
+    Seq::new(18, |i: int| b3b_scalar_byte_at(workspace, window_bytes,
+        (B3B_AUX_LENGTHS as int + i) as u16))
+}
+
+spec fn simple_validation_reads(values: Seq<u16>, count: nat, limit: u16) -> nat {
+    simple_range_scan_reads(values, count, limit, 0)
+        + if forall|i: int| 0 <= i < count ==> values[i] < limit {
+            simple_distinct_scan_reads(values, count, 0, 1)
+        } else { 0nat }
+}
+
+spec fn singleton_value_reads(values: Seq<u8>, singleton: u8) -> nat {
+    if singleton as nat >= values.len() { 0 }
+    else { 1 + if values[singleton as int] == 0 { 0nat }
+        else { singleton_other_scan_reads(values, singleton as nat, 0) } }
+}
+
+spec fn loader_shared_complex_guards(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let skip = b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SKIP);
+    let symbol = b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL);
+    let previous = b3b_scalar_byte_at(workspace, window_bytes, B3B_PREVIOUS_LENGTH);
+    &&& (skip == 0 || skip == 2 || skip == 3)
+    &&& symbol <= b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT)
+    &&& 1 <= previous <= 15
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_REPEATED_LENGTH) <= 15
+    &&& b3b_scalar_u32_at(workspace, window_bytes, B3B_CHAINED_REPEAT) <= symbol
+    &&& b3b_scalar_u32_at(workspace, window_bytes, B3B_FINAL_SPACE) <= 32_768
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_FINAL_PREFIX_WIDTH) < 5
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SINGLETON) <= 18
+}
+
+spec fn loader_enters_complex_validation(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let tag = b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_PHASE);
+    let symbol = b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL);
+    let limit = b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT);
+    let space = b3b_scalar_u32_at(workspace, window_bytes, B3B_FINAL_SPACE);
+    let length = b3b_scalar_byte_at(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH);
+    &&& saved_aux_load_valid(workspace, window_bytes)
+    &&& if tag == 4 {
+        let skip = b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SKIP);
+        let index = b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_INDEX);
+        &&& (skip == 0 || skip == 2 || skip == 3)
+        &&& skip <= index < 18
+        &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SPACE) <= 32
+        &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_NONZERO) as int <= index as int - skip as int
+        &&& 1 <= b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_AUX_PHASE) <= 3
+    } else {
+        &&& loader_shared_complex_guards(workspace, window_bytes)
+        &&& match tag {
+            5 => symbol < limit && space > 0,
+            6 => symbol < limit && space > 0 && length <= 15,
+            7 => b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) < symbol && length <= 15,
+            9 => symbol == limit && space == 0,
+            _ => false,
+        }
+    }
+}
+
+spec fn loader_reaches_singleton_validation(workspace: Seq<u8>, window_bytes: u32) -> bool {
+    let tag = b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_PHASE);
+    let repeat = b3b_scalar_u32_at(workspace, window_bytes, B3B_CHAINED_REPEAT);
+    let width = b3b_scalar_byte_at(workspace, window_bytes, B3B_FINAL_PREFIX_WIDTH);
+    &&& loader_enters_complex_validation(workspace, window_bytes)
+    &&& (tag == 5 || tag == 6 || (tag == 7
+        && b3b_scalar_u32_at(workspace, window_bytes, B3B_FINAL_SPACE) > 0))
+    &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_FINAL_SYMBOL)
+        < b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT)
+    &&& (repeat == 0 || repeat >= 3)
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_FINAL_PREFIX_BITS) < (1u8 << width)
+    &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SINGLETON) < 18
+}
+
+spec fn loader_simple_validation_count(workspace: Seq<u8>, window_bytes: u32) -> nat {
+    let tag = b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_PHASE);
+    let selector = b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_SELECTOR);
+    let count = b3b_scalar_byte_at(workspace, window_bytes, B3B_SIMPLE_COUNT);
+    if !saved_aux_load_valid(workspace, window_bytes) { 0 }
+    else if tag == 2 {
+        let index = b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_INDEX);
+        let width = b3b_scalar_byte_at(workspace, window_bytes, B3B_CODE_WIDTH);
+        if selector <= 3 && 1 <= count <= 4 && index < count && width <= 10
+            && count as nat == simple_count(selector)
+            && width as nat == alphabet_bit_width_spec(
+                b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_MAX) as u16) {
+            index as nat
+        } else { 0 }
+    } else if tag == 3 && selector == 3 && count == 4 { 4 }
+    else if tag == 8 && selector <= 4 && count as nat == simple_count(selector) { count as nat }
+    else { 0 }
+}
+
+#[verifier::opaque]
+spec fn loader_forecast_table_reads(workspace: Seq<u8>, window_bytes: u32) -> nat {
+    if !saved_aux_load_valid(workspace, window_bytes) { 0 }
+    else if loader_reaches_singleton_validation(workspace, window_bytes) {
+        singleton_value_reads(saved_aux_length_values(workspace, window_bytes),
+            b3b_scalar_byte_at(workspace, window_bytes, B3B_AUX_SINGLETON))
+    } else {
+        simple_validation_reads(saved_simple_symbol_values(workspace, window_bytes),
+            loader_simple_validation_count(workspace, window_bytes),
+            b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT) as u16)
+    }
+}
+
+#[verifier::opaque]
+spec fn loader_table_read_units(workspace: Seq<u8>, window_bytes: u32) -> nat {
+    if !b3b_workspace_shape(workspace.len(), window_bytes)
+        || !saved_aux_load_eligible(workspace, window_bytes) { 0 }
+    else {
+        4 + saved_aux_copy_read_units(workspace, window_bytes)
+            + if loader_enters_complex_validation(workspace, window_bytes) { 18nat } else { 0nat }
+            + loader_forecast_table_reads(workspace, window_bytes)
+    }
+}
+
 spec fn saved_aux_copy_read_units(workspace: Seq<u8>, window_bytes: u32) -> nat {
     let maximum = b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_MAX);
     let limit = b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT);
@@ -28565,9 +29185,328 @@ proof fn saved_aux_bad_indices_agree(workspace: Seq<u8>, window_bytes: u32,
     if left < right {} else if right < left {}
 }
 
+proof fn saved_aux_scan_matches_receipt(workspace: Seq<u8>, window_bytes: u32, at: nat)
+    requires b3b_workspace_shape(workspace.len(), window_bytes),
+        saved_aux_load_eligible(workspace, window_bytes), at <= 18,
+        saved_aux_copy_prefix(workspace, window_bytes, at),
+    ensures saved_aux_copy_read_units(workspace, window_bytes)
+        == at + table_u8_scan_reads(saved_aux_length_values(workspace, window_bytes), 5, at),
+    decreases 18 - at,
+{
+    reveal(saved_aux_length_values); reveal(saved_aux_copy_prefix); reveal(saved_aux_load_eligible);
+    reveal(table_u8_scan_reads); reveal(saved_aux_copy_read_units);
+    reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base); b3b_scalar_layout_is_exact();
+    if at < 18 {
+        let value = workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + at as int];
+        if value <= 5 {
+            assert(saved_aux_copy_prefix(workspace, window_bytes, at + 1));
+            saved_aux_scan_matches_receipt(workspace, window_bytes, at + 1);
+        } else {
+            assert(exists|bad: usize| bad as nat == at && bad < 18
+                && #[trigger] saved_aux_copy_prefix(workspace, window_bytes, bad as nat)
+                && workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + bad as int] > 5);
+            let bad = choose|bad: usize| bad < 18
+                && #[trigger] saved_aux_copy_prefix(workspace, window_bytes, bad as nat)
+                && workspace[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + bad as int] > 5;
+            saved_aux_bad_indices_agree(workspace, window_bytes, at as int, bad as int);
+        }
+    }
+}
+
+fn plan_saved_singleton_validation_reads(workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, singleton: u8,
+) -> (r: Result<u64, CoreFailure>)
+    requires old(budget).valid(), b3b_workspace_shape(workspace@.len(), window_bytes), singleton < 18,
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        old(budget).work_remaining >= 18 ==> r.is_ok(),
+        r.is_ok() ==> {
+            &&& r.unwrap() <= 18
+            &&& r.unwrap() as nat == singleton_value_reads(saved_aux_length_values(workspace@, window_bytes), singleton)
+            &&& final(budget).work_remaining as int == old(budget).work_remaining as int - r.unwrap() as int
+        },
+{
+    proof { reveal(saved_aux_length_values); reveal(singleton_value_reads); }
+    let ghost values = saved_aux_length_values(workspace@, window_bytes);
+    let ghost total = singleton_value_reads(values, singleton);
+    proof { singleton_other_read_bounds(values, singleton as nat, 0); assert(total <= 18); }
+    if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+    let selected = state_byte(workspace, window_bytes, B3B_AUX_LENGTHS + singleton as u16)
+        .map_err(map_compressed_error)?;
+    let mut inspected = 1u64;
+    if selected == 0 { return Ok(inspected); }
+    let mut i = 0u8;
+    while i < 18
+        invariant i <= 18, singleton < 18,
+            b3b_workspace_shape(workspace@.len(), window_bytes),
+            values == saved_aux_length_values(workspace@, window_bytes), values.len() == 18,
+            selected == values[singleton as int], selected != 0,
+            total == singleton_value_reads(values, singleton), total <= 18,
+            total == inspected as nat + singleton_other_scan_reads(values, singleton as nat, i as nat),
+            inspected as int == 1 + i as int - if singleton < i { 1int } else { 0int },
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.work_remaining as int == old(budget).work_remaining as int - inspected as int,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+        decreases 18 - i,
+    {
+        proof { reveal(saved_aux_length_values); reveal_with_fuel(singleton_other_scan_reads, 2); }
+        if i != singleton {
+            if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+            let value = state_byte(workspace, window_bytes, B3B_AUX_LENGTHS + i as u16)
+                .map_err(map_compressed_error)?;
+            inspected += 1;
+            if value != 0 { return Ok(inspected); }
+        }
+        i += 1;
+    }
+    proof { reveal(singleton_other_scan_reads); }
+    Ok(inspected)
+}
+
+fn plan_saved_simple_validation_reads(workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, count: u8, alphabet_limit: u16,
+) -> (r: Result<u64, CoreFailure>)
+    requires old(budget).valid(), b3b_workspace_shape(workspace@.len(), window_bytes), count <= 4,
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        old(budget).work_remaining >= 16 ==> r.is_ok(),
+        r.is_ok() ==> {
+            &&& r.unwrap() <= 16
+            &&& r.unwrap() as nat == simple_validation_reads(saved_simple_symbol_values(workspace@, window_bytes), count as nat, alphabet_limit)
+            &&& final(budget).work_remaining as int == old(budget).work_remaining as int - r.unwrap() as int
+        },
+{
+    proof { reveal(saved_simple_symbol_values); reveal(simple_validation_reads); }
+    let ghost values = saved_simple_symbol_values(workspace@, window_bytes);
+    let ghost range_total = simple_range_scan_reads(values, count as nat, alphabet_limit, 0);
+    let ghost distinct_total = simple_distinct_scan_reads(values, count as nat, 0, 1);
+    proof {
+        simple_range_scan_read_bounds(values, count as nat, alphabet_limit, 0);
+        simple_distinct_small_read_bounds(values, count as nat);
+        assert(range_total <= count);
+        assert(range_total + distinct_total <= 16) by (nonlinear_arith)
+            requires range_total <= count, distinct_total <= count as nat * ((count as nat - 1) as nat), count <= 4;
+    }
+    let mut inspected = 0u64;
+    let mut i = 0u8;
+    while i < count
+        invariant i <= count <= 4,
+            b3b_workspace_shape(workspace@.len(), window_bytes),
+            values == saved_simple_symbol_values(workspace@, window_bytes), values.len() == 4,
+            range_total == simple_range_scan_reads(values, count as nat, alphabet_limit, 0),
+            range_total == inspected as nat + simple_range_scan_reads(values, count as nat, alphabet_limit, i as nat),
+            range_total <= count, inspected == i,
+            forall|j: int| 0 <= j < i ==> values[j] < alphabet_limit,
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.work_remaining as int == old(budget).work_remaining as int - inspected as int,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+        decreases count - i,
+    {
+        proof { reveal(saved_simple_symbol_values); reveal_with_fuel(simple_range_scan_reads, 2); }
+        if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+        let value = state_u16(workspace, window_bytes, B3B_SIMPLE_SYMBOLS + 2 * i as u16)
+            .map_err(map_compressed_error)?;
+        inspected += 1;
+        if value >= alphabet_limit { return Ok(inspected); }
+        i += 1;
+    }
+    proof { reveal(simple_range_scan_reads); }
+    i = 0;
+    while i < count
+        invariant i <= count <= 4,
+            b3b_workspace_shape(workspace@.len(), window_bytes),
+            values == saved_simple_symbol_values(workspace@, window_bytes), values.len() == 4,
+            forall|j: int| 0 <= j < count ==> values[j] < alphabet_limit,
+            range_total == count,
+            range_total == simple_range_scan_reads(values, count as nat, alphabet_limit, 0),
+            distinct_total == simple_distinct_scan_reads(values, count as nat, 0, 1),
+            distinct_total <= count as nat * ((count as nat - 1) as nat),
+            range_total as int + distinct_total as int <= 16,
+            inspected as nat + simple_distinct_scan_reads(values, count as nat, i as nat, i as nat + 1)
+                == range_total + distinct_total,
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.work_remaining as int == old(budget).work_remaining as int - inspected as int,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+        decreases count - i,
+    {
+        let mut j = i + 1;
+        while j < count
+            invariant i < count <= 4, i + 1 <= j <= count,
+                b3b_workspace_shape(workspace@.len(), window_bytes),
+                values == saved_simple_symbol_values(workspace@, window_bytes), values.len() == 4,
+                forall|k: int| 0 <= k < count ==> values[k] < alphabet_limit,
+                range_total == count,
+                range_total == simple_range_scan_reads(values, count as nat, alphabet_limit, 0),
+                distinct_total == simple_distinct_scan_reads(values, count as nat, 0, 1),
+                distinct_total == simple_distinct_scan_reads(values, count as nat, 0, 1),
+                range_total as int + distinct_total as int <= 16,
+                inspected as nat + simple_distinct_scan_reads(values, count as nat, i as nat, j as nat)
+                    == range_total + distinct_total,
+                budget.valid(), budget.limits == old(budget).limits,
+                budget.work_remaining as int == old(budget).work_remaining as int - inspected as int,
+                budget.input_remaining == old(budget).input_remaining,
+                budget.output_remaining == old(budget).output_remaining,
+                budget.calls_remaining == old(budget).calls_remaining,
+                budget.initializations_remaining == old(budget).initializations_remaining,
+            decreases count - j,
+        {
+            proof { reveal(saved_simple_symbol_values); reveal_with_fuel(simple_distinct_scan_reads, 2); }
+            if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+            let left = state_u16(workspace, window_bytes, B3B_SIMPLE_SYMBOLS + 2 * i as u16)
+                .map_err(map_compressed_error)?;
+            inspected += 1;
+            if !budget.charge_work(1) { return Err(CoreFailure::ResourceLimit); }
+            let right = state_u16(workspace, window_bytes, B3B_SIMPLE_SYMBOLS + 2 * j as u16)
+                .map_err(map_compressed_error)?;
+            inspected += 1;
+            if left == right {
+                proof {
+                    reveal(simple_validation_reads);
+                    assert(left == values[i as int]); assert(right == values[j as int]);
+                    assert(inspected as nat == range_total + distinct_total);
+                    assert(inspected as nat == simple_validation_reads(values, count as nat, alphabet_limit));
+                }
+                return Ok(inspected);
+            }
+            j += 1;
+        }
+        proof { reveal_with_fuel(simple_distinct_scan_reads, 2); }
+        i += 1;
+    }
+    proof { reveal(simple_distinct_scan_reads); }
+    Ok(inspected)
+}
+
+fn plan_saved_loader_read_units(workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, aux_reads: u64, aux_valid: bool,
+) -> (r: Result<u64, CoreFailure>)
+    requires old(budget).valid(), b3b_workspace_shape(workspace@.len(), window_bytes),
+        aux_reads as nat == saved_aux_copy_read_units(workspace@, window_bytes),
+        aux_valid == saved_aux_load_valid(workspace@, window_bytes),
+    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        final(budget).work_remaining <= old(budget).work_remaining,
+        r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
+        r.is_err() ==> final(budget).work_remaining == 0,
+        old(budget).work_remaining >= 18 ==> r.is_ok(),
+        r.is_ok() ==> {
+            &&& r.unwrap() as nat == loader_table_read_units(workspace@, window_bytes)
+            &&& r.unwrap() <= 58
+            &&& old(budget).work_remaining as int - final(budget).work_remaining as int <= 18
+            &&& final(budget).work_remaining as nat + loader_forecast_table_reads(workspace@, window_bytes)
+                == old(budget).work_remaining as nat
+        },
+{
+    proof {
+        reveal(loader_table_read_units); reveal(loader_forecast_table_reads);
+        reveal(loader_enters_complex_validation); reveal(loader_reaches_singleton_validation);
+        reveal(loader_shared_complex_guards); reveal(loader_simple_validation_count);
+        reveal(saved_aux_copy_read_units); reveal(saved_aux_load_valid); reveal(saved_aux_load_eligible);
+        reveal(simple_validation_reads); reveal(simple_count);
+        reveal(simple_range_scan_reads); reveal(simple_distinct_scan_reads);
+    }
+    if aux_reads == 0 { return Ok(0); }
+    let base = 4 + aux_reads;
+    if !aux_valid { return Ok(base); }
+    let maximum = state_u16(workspace, window_bytes, B3B_ALPHABET_MAX).map_err(map_compressed_error)?;
+    let limit = state_u16(workspace, window_bytes, B3B_ALPHABET_LIMIT).map_err(map_compressed_error)?;
+    let tag = state_byte(workspace, window_bytes, B3B_CODE_PHASE).map_err(map_compressed_error)?;
+    let selector = state_byte(workspace, window_bytes, B3B_SIMPLE_SELECTOR).map_err(map_compressed_error)?;
+    let count = state_byte(workspace, window_bytes, B3B_SIMPLE_COUNT).map_err(map_compressed_error)?;
+    if tag == 2 {
+        let index = state_byte(workspace, window_bytes, B3B_CODE_INDEX).map_err(map_compressed_error)?;
+        let width = state_byte(workspace, window_bytes, B3B_CODE_WIDTH).map_err(map_compressed_error)?;
+        if selector > 3 || count == 0 || count > 4 || index >= count || width > 10 { return Ok(base); }
+        let expected = if selector <= 2 { selector + 1 } else { 4 };
+        if count != expected || width != alphabet_bit_width(maximum) { return Ok(base); }
+        let reads = plan_saved_simple_validation_reads(workspace, window_bytes, budget, index, limit)?;
+        return Ok(base + reads);
+    }
+    if tag == 3 {
+        if selector != 3 || count != 4 { return Ok(base); }
+        let reads = plan_saved_simple_validation_reads(workspace, window_bytes, budget, 4, limit)?;
+        return Ok(base + reads);
+    }
+    if tag == 8 {
+        if selector > 4 { return Ok(base); }
+        let expected = if selector <= 2 { selector + 1 } else { 4 };
+        if count != expected { return Ok(base); }
+        let reads = plan_saved_simple_validation_reads(workspace, window_bytes, budget, count, limit)?;
+        return Ok(base + reads);
+    }
+    let skip = state_byte(workspace, window_bytes, B3B_AUX_SKIP).map_err(map_compressed_error)?;
+    if tag == 4 {
+        let index = state_byte(workspace, window_bytes, B3B_AUX_INDEX).map_err(map_compressed_error)?;
+        let space = state_byte(workspace, window_bytes, B3B_AUX_SPACE).map_err(map_compressed_error)?;
+        let nonzero = state_byte(workspace, window_bytes, B3B_AUX_NONZERO).map_err(map_compressed_error)?;
+        if !(skip == 0 || skip == 2 || skip == 3) || index < skip || index >= 18
+            || space > 32 || nonzero > index - skip { return Ok(base); }
+        let auxiliary_phase = state_byte(workspace, window_bytes, B3B_CODE_AUX_PHASE).map_err(map_compressed_error)?;
+        return Ok(base + if 1 <= auxiliary_phase && auxiliary_phase <= 3 { 18u64 } else { 0u64 });
+    }
+    if !(tag == 5 || tag == 6 || tag == 7 || tag == 9) { return Ok(base); }
+    if !(skip == 0 || skip == 2 || skip == 3) { return Ok(base); }
+    let symbol = state_u16(workspace, window_bytes, B3B_FINAL_SYMBOL).map_err(map_compressed_error)?;
+    let previous = state_byte(workspace, window_bytes, B3B_PREVIOUS_LENGTH).map_err(map_compressed_error)?;
+    let repeated = state_byte(workspace, window_bytes, B3B_REPEATED_LENGTH).map_err(map_compressed_error)?;
+    let repeat = state_u32(workspace, window_bytes, B3B_CHAINED_REPEAT).map_err(map_compressed_error)?;
+    let space = state_u32(workspace, window_bytes, B3B_FINAL_SPACE).map_err(map_compressed_error)?;
+    let prefix_bits = state_byte(workspace, window_bytes, B3B_FINAL_PREFIX_BITS).map_err(map_compressed_error)?;
+    let prefix_width = state_byte(workspace, window_bytes, B3B_FINAL_PREFIX_WIDTH).map_err(map_compressed_error)?;
+    let singleton = state_byte(workspace, window_bytes, B3B_AUX_SINGLETON).map_err(map_compressed_error)?;
+    if symbol > limit || previous == 0 || previous > 15 || repeated > 15
+        || repeat > symbol as u32 || space > 32_768 || prefix_width >= 5 || singleton > 18 {
+        return Ok(base);
+    }
+    if tag == 9 { return Ok(base + if symbol == limit && space == 0 { 18u64 } else { 0u64 }); }
+    if tag == 7 {
+        let initialized = state_u16(workspace, window_bytes, B3B_BUILDER_INITIALIZED).map_err(map_compressed_error)?;
+        let length = state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH).map_err(map_compressed_error)?;
+        if initialized >= symbol || length > 15 { return Ok(base); }
+        if space == 0 { return Ok(base + 18); }
+    } else {
+        if symbol >= limit || space == 0 { return Ok(base); }
+        if tag == 6 {
+            let length = state_byte(workspace, window_bytes, B3B_PENDING_SPAN_LENGTH).map_err(map_compressed_error)?;
+            if length > 15 { return Ok(base); }
+        }
+    }
+    // complex_code_valid_exec scans all 18 already-validated cells first.
+    // Later scalar failures do not retroactively remove that scan.
+    if symbol >= limit || (repeat != 0 && repeat < 3)
+        || prefix_bits >= (1u8 << prefix_width) || singleton >= 18 { return Ok(base + 18); }
+    // The original helper scans the singleton BEFORE checking prefix_width==0.
+    let reads = plan_saved_singleton_validation_reads(workspace, window_bytes, budget, singleton)?;
+    Ok(base + 18 + reads)
+}
+
 fn plan_saved_aux_load(workspace: &[u8], window_bytes: u32,
     budget: &mut crate::brotli::RequestBudget,
-) -> (r: Result<u64, CoreFailure>)
+) -> (r: Result<(u64, bool), CoreFailure>)
     requires old(budget).valid(), b3b_workspace_shape(workspace@.len() as nat, window_bytes),
     ensures final(budget).valid(), final(budget).limits == old(budget).limits,
         final(budget).input_remaining == old(budget).input_remaining,
@@ -28578,15 +29517,16 @@ fn plan_saved_aux_load(workspace: &[u8], window_bytes: u32,
         r.is_err() ==> r == Err(CoreFailure::ResourceLimit),
         r.is_err() ==> final(budget).work_remaining == 0,
         r.is_ok() ==> {
-            &&& r.unwrap() <= 18
-            &&& r.unwrap() as nat == saved_aux_copy_read_units(workspace@, window_bytes)
-            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap()
+            &&& r.unwrap().1 == saved_aux_load_valid(workspace@, window_bytes)
+            &&& r.unwrap().0 <= 18
+            &&& r.unwrap().0 as nat == saved_aux_copy_read_units(workspace@, window_bytes)
+            &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().0
         },
 {
-    reveal(saved_aux_copy_read_units);
+    reveal(saved_aux_copy_read_units); reveal(saved_aux_load_valid); reveal(saved_aux_load_eligible);
     let maximum = state_u16(workspace, window_bytes, B3B_ALPHABET_MAX).map_err(map_compressed_error)?;
     let limit = state_u16(workspace, window_bytes, B3B_ALPHABET_LIMIT).map_err(map_compressed_error)?;
-    if maximum == 0 || maximum > 704 || limit == 0 || limit > maximum { return Ok(0); }
+    if maximum == 0 || maximum > 704 || limit == 0 || limit > maximum { return Ok((0, false)); }
     let mut i = 0usize;
     while i < 18
         invariant i <= 18, b3b_workspace_shape(workspace@.len() as nat, window_bytes),
@@ -28620,13 +29560,13 @@ fn plan_saved_aux_load(workspace: &[u8], window_bytes: u32,
                 saved_aux_bad_indices_agree(workspace@, window_bytes, i as int, bad as int);
                 reveal(saved_aux_copy_read_units);
             }
-            return Ok(i as u64 + 1);
+            return Ok((i as u64 + 1, false));
         }
         proof { reveal(saved_aux_copy_prefix); }
         i += 1;
     }
     proof { reveal(saved_aux_copy_prefix); reveal(saved_aux_copy_read_units); }
-    Ok(18)
+    Ok((18, true))
 }
 
 spec fn code_field_total_read_units(before: CodeDescriptionDecoder, input: Seq<u8>,
@@ -28774,13 +29714,19 @@ fn plan_serialized_tree(
     };
     proof { reveal(serialized_b3b_queue); }
     let before_load_work = budget.work_remaining;
-    let saved_load_reads = plan_saved_aux_load(workspace, window_bytes, budget)?;
-    if !budget.charge_work(saved_load_reads) { return Err(CoreFailure::ResourceLimit); }
+    let (saved_load_reads, saved_aux_valid) = plan_saved_aux_load(workspace, window_bytes, budget)?;
+    let loader_reads = plan_saved_loader_read_units(workspace, window_bytes, budget, saved_load_reads, saved_aux_valid)?;
+    if !budget.charge_work(loader_reads) { return Err(CoreFailure::ResourceLimit); }
     let initial_planning_work = before_load_work - budget.work_remaining;
+    proof {
+        assert(loader_reads as nat == loader_table_read_units(workspace@, window_bytes));
+        assert(initial_planning_work as nat == saved_aux_copy_read_units(workspace@, window_bytes)
+            + loader_forecast_table_reads(workspace@, window_bytes) + loader_table_read_units(workspace@, window_bytes));
+    }
     let mut decoder = match load_code_description_decoder(workspace, window_bytes, queue) {
         Ok(value) => value,
         Err(error) => return Ok(SerializedTreePlan { planning_work: initial_planning_work,
-            execution_work: saved_load_reads, consumed: 0,
+            execution_work: loader_reads, consumed: 0,
             status: SerializedTreeStatus::Failed(error) }),
     };
     proof { code_phase_rank_is_bounded(decoder); }
@@ -28832,7 +29778,7 @@ fn plan_serialized_tree(
         invariant
             consumed <= input.len(),
             iterations <= 5_696,
-            planning_work <= 740 + iterations as u64 * 8192,
+            planning_work <= 798 + iterations as u64 * 8192,
             execution_work <= iterations as u64 * 8192,
             budget.work_remaining as int == old(budget).work_remaining as int
                 - planning_work as int,
@@ -28851,7 +29797,14 @@ fn plan_serialized_tree(
         decreases 5_696 - iterations,
     {
         let ghost before_iteration = decoder;
-        execution_work = checked_planned_work_add(execution_work, 18)?;
+        let ghost before_reload_work = execution_work;
+        let reload_reads = valid_code_loader_read_units(&decoder);
+        execution_work = checked_planned_work_add(execution_work, reload_reads)?;
+        proof {
+            assert(execution_work as nat == before_reload_work as nat
+                + 22 + phase_validation_read_units(before_iteration.phase,
+                    before_iteration.alphabet_max, before_iteration.alphabet_limit));
+        }
         let (step, field_planning, field_reads) = if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
             (CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress }, 0u64, 0u64)
         } else { plan_code_description_field(&mut decoder, budget, &input[consumed..], end_of_input)? };
@@ -36511,6 +37464,140 @@ mod tests {
     }
 
     #[test]
+    fn m1_k5_three_step_tree_charges_each_reloaded_descriptor() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        use crate::brotli_prefix::TreeRegion;
+        let (mut workspace, window) = fresh_b3b_workspace();
+        start_serialized_tree(&mut workspace, window, TreeRegion::Literal, 0, 16, 16).unwrap();
+        let original = workspace.clone();
+        // 01 selects simple, 00 selects one symbol, 0000 selects symbol zero.
+        // The three loader phases have no validation operands: 22 cells each.
+        // Planning: 18 auxiliary forecast + 22 copied cells + 2*(1 byte+8 bits).
+        // Execution: 3*22 reads + 9 bit/byte reads + 3*10 queue writes
+        //            + 4+16 descriptor writes + 2 transitions + 5 installation.
+        let mut budget = RequestBudget::new(RequestLimits { max_input: 1, max_output: 0,
+            max_work: 58 + 132, max_calls: 0, max_initializations: 0, max_window_bits: 16 }).unwrap();
+        let plan = plan_serialized_tree(&workspace, window, &mut budget, &[1], false).unwrap();
+        assert_eq!((plan.planning_work, plan.execution_work, plan.consumed), (58, 132, 1));
+        assert_eq!(plan.status, SerializedTreeStatus::Complete);
+        assert_eq!(workspace, original);
+        assert_eq!(budget.work_remaining, 132);
+        assert!(!budget.charge_work(133));
+        assert_eq!(workspace, original);
+        assert!(budget.charge_work(132));
+        let result = advance_serialized_tree(&mut workspace, window, &[1], false);
+        assert_eq!((result.consumed, result.status), (1, SerializedTreeStatus::Complete));
+        assert_eq!(budget.work_remaining, 0);
+    }
+
+    #[test]
+    fn m1_k5_loader_forecasts_cover_guard_order_and_exact_credit() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        use crate::brotli_prefix::TreeRegion;
+        let (mut base, window) = fresh_b3b_workspace();
+        start_serialized_tree(&mut base, window, TreeRegion::Literal, 0, 16, 16).unwrap();
+        let limits = |work| RequestLimits { max_input: 7, max_output: 9, max_work: work,
+            max_calls: 11, max_initializations: 13, max_window_bits: 16 };
+        let mut checked = 0usize;
+        let mut check = |name: &str, ws: &[u8], aux: u64, valid: bool, reads: u64, own: u64, ok: bool| {
+            let before = ws.to_vec();
+            for credit in 0..=aux + own + reads {
+                let mut budget = RequestBudget::new(limits(credit)).unwrap();
+                let receipt = plan_saved_aux_load(ws, window, &mut budget);
+                if credit < aux {
+                    assert_eq!(receipt, Err(CoreFailure::ResourceLimit), "{name} credit={credit}");
+                    assert_eq!(budget.work_remaining, 0);
+                } else {
+                    assert_eq!(receipt, Ok((aux, valid)), "{name} credit={credit}");
+                    let forecast = plan_saved_loader_read_units(ws, window, &mut budget, aux, valid);
+                    if credit < aux + own {
+                        assert_eq!(forecast, Err(CoreFailure::ResourceLimit), "{name} credit={credit}");
+                        assert_eq!(budget.work_remaining, 0);
+                    } else {
+                        assert_eq!(forecast, Ok(reads), "{name} credit={credit}");
+                        assert_eq!(budget.work_remaining, credit - aux - own);
+                        if budget.charge_work(reads) {
+                            let actual = load_code_description_decoder(ws, window, BitQueue::new());
+                            assert_eq!(actual.is_ok(), ok, "{name} credit={credit}: {actual:?}");
+                            if !ok { assert_eq!(actual, Err(CompressedHeaderError::InternalState)); }
+                            assert_eq!(budget.work_remaining, credit - aux - own - reads);
+                        } else { assert_eq!(budget.work_remaining, credit - aux - own); }
+                    }
+                }
+                assert_eq!((budget.input_remaining, budget.output_remaining, budget.calls_remaining,
+                    budget.initializations_remaining), (7, 9, 11, 13));
+            }
+            assert_eq!(ws, before);
+            checked += 1;
+        };
+        check("selector", &base, 18, true, 22, 0, true);
+        let mut ws = base.clone();
+        put_state_u16(&mut ws, window, B3B_ALPHABET_MAX, 0).unwrap();
+        check("invalid-alphabet", &ws, 0, false, 0, 0, false);
+        ws = base.clone();
+        put_state_byte(&mut ws, window, B3B_CODE_PHASE, 4).unwrap();
+        put_state_byte(&mut ws, window, B3B_CODE_AUX_PHASE, 1).unwrap();
+        put_state_byte(&mut ws, window, B3B_AUX_SPACE, 32).unwrap();
+        check("complex-prefix", &ws, 18, true, 40, 0, true);
+        for bad in 0u16..18 {
+            let mut invalid = ws.clone();
+            put_state_byte(&mut invalid, window, B3B_AUX_LENGTHS + bad, 6).unwrap();
+            check("bad-aux-prefix", &invalid, bad as u64 + 1, false, 4 + bad as u64 + 1, 0, false);
+        }
+        ws = base.clone();
+        put_state_byte(&mut ws, window, B3B_CODE_PHASE, 3).unwrap();
+        put_state_byte(&mut ws, window, B3B_SIMPLE_SELECTOR, 3).unwrap();
+        put_state_byte(&mut ws, window, B3B_SIMPLE_COUNT, 4).unwrap();
+        write_simple_symbols(&mut ws, window, [0, 1, 2, 3]).unwrap();
+        check("simple-shape", &ws, 18, true, 38, 16, true);
+        for bad in 0usize..4 {
+            let mut invalid = ws.clone(); let mut symbols = [0, 1, 2, 3]; symbols[bad] = 16;
+            write_simple_symbols(&mut invalid, window, symbols).unwrap();
+            check("simple-range-prefix", &invalid, 18, true, 22 + bad as u64 + 1, bad as u64 + 1, false);
+        }
+        for (symbols, operands) in [([0, 0, 2, 3], 6u64), ([0, 1, 0, 3], 8),
+            ([0, 1, 2, 0], 10), ([0, 1, 1, 3], 12), ([0, 1, 2, 1], 14), ([0, 1, 2, 2], 16)] {
+            let mut invalid = ws.clone(); write_simple_symbols(&mut invalid, window, symbols).unwrap();
+            check("simple-duplicate-prefix", &invalid, 18, true, 22 + operands, operands, false);
+        }
+        ws = base.clone();
+        put_state_byte(&mut ws, window, B3B_CODE_PHASE, 5).unwrap();
+        put_state_byte(&mut ws, window, B3B_PREVIOUS_LENGTH, 8).unwrap();
+        put_state_u16(&mut ws, window, B3B_FINAL_SYMBOL, 4).unwrap();
+        put_state_u32(&mut ws, window, B3B_FINAL_SPACE, 32768).unwrap();
+        put_state_byte(&mut ws, window, B3B_AUX_SINGLETON, 18).unwrap();
+        check("complex-symbol", &ws, 18, true, 40, 0, true);
+        let mut invalid = ws.clone(); put_state_u32(&mut invalid, window, B3B_CHAINED_REPEAT, 1).unwrap();
+        check("late-repeat-count-guard", &invalid, 18, true, 40, 0, false);
+        let mut singleton = ws.clone();
+        put_state_byte(&mut singleton, window, B3B_AUX_SINGLETON, 7).unwrap();
+        put_state_byte(&mut singleton, window, B3B_AUX_LENGTHS + 7, 1).unwrap();
+        check("complex-singleton", &singleton, 18, true, 58, 18, true);
+        let mut invalid = singleton.clone(); put_state_byte(&mut invalid, window, B3B_AUX_LENGTHS + 7, 0).unwrap();
+        check("missing-selected-singleton", &invalid, 18, true, 41, 1, false);
+        for bad in [0u16, 6, 8, 17] {
+            let mut invalid = singleton.clone(); put_state_byte(&mut invalid, window, B3B_AUX_LENGTHS + bad, 1).unwrap();
+            let visits = if bad < 7 { bad as u64 + 2 } else { bad as u64 + 1 };
+            check("extra-singleton-prefix", &invalid, 18, true, 40 + visits, visits, false);
+        }
+        invalid = singleton.clone(); put_state_byte(&mut invalid, window, B3B_FINAL_PREFIX_WIDTH, 1).unwrap();
+        check("singleton-before-prefix-width-guard", &invalid, 18, true, 58, 18, false);
+        invalid = ws.clone(); put_state_byte(&mut invalid, window, B3B_FINAL_PREFIX_WIDTH, 5).unwrap();
+        check("early-prefix-width-guard", &invalid, 18, true, 22, 0, false);
+        invalid = ws.clone(); put_state_byte(&mut invalid, window, B3B_CODE_PHASE, 6).unwrap();
+        put_state_byte(&mut invalid, window, B3B_PENDING_SPAN_LENGTH, 16).unwrap();
+        check("early-repeat-length-guard", &invalid, 18, true, 22, 0, false);
+        let mut span = singleton.clone(); put_state_byte(&mut span, window, B3B_CODE_PHASE, 7).unwrap();
+        put_state_u16(&mut span, window, B3B_FINAL_SYMBOL, 16).unwrap();
+        check("pending-symbol-equals-limit", &span, 18, true, 40, 0, false);
+        put_state_u16(&mut span, window, B3B_FINAL_SYMBOL, 15).unwrap();
+        put_state_u32(&mut span, window, B3B_FINAL_SPACE, 0).unwrap();
+        check("pending-trailing-ignores-singleton", &span, 18, true, 40, 0, true);
+        drop(check);
+        assert!(checked >= 40);
+    }
+
+    #[test]
     fn m1_saved_auxiliary_loads_charge_exactly_the_inspected_prefix() {
         use crate::brotli_prefix::{ContextMapKind, TreeRegion};
         for bad in [None, Some(0usize), Some(5), Some(17)] {
@@ -36546,7 +37633,7 @@ mod tests {
                 assert_eq!(
                     result,
                     if credit == expected_reads {
-                        Ok(expected_reads)
+                        Ok((expected_reads, bad.is_none()))
                     } else {
                         Err(CoreFailure::ResourceLimit)
                     }
@@ -36580,9 +37667,9 @@ mod tests {
                     (plan.consumed, plan.status),
                     (expected.consumed, expected.status)
                 );
-                assert_eq!(plan.planning_work, 2 * expected_reads);
-                assert_eq!(plan.execution_work, expected_reads);
-                assert_eq!(u64::MAX - budget.work_remaining, 2 * expected_reads);
+                assert_eq!(plan.planning_work, 4 + 2 * expected_reads);
+                assert_eq!(plan.execution_work, 4 + expected_reads);
+                assert_eq!(u64::MAX - budget.work_remaining, 4 + 2 * expected_reads);
                 store_terminal_error(&mut reference, window, CompressedHeaderError::InternalState)
                     .unwrap();
                 for short in [false, true] {
@@ -36591,7 +37678,7 @@ mod tests {
                         crate::brotli::RequestBudget::new(crate::brotli::RequestLimits {
                             max_input: 0,
                             max_output: 0,
-                            max_work: 3 * expected_reads + 5 - u64::from(short),
+                            max_work: 8 + 3 * expected_reads + 5 - u64::from(short),
                             max_calls: 0,
                             max_initializations: 0,
                             max_window_bits: 16,
@@ -36608,7 +37695,7 @@ mod tests {
                             })
                         );
                         assert_eq!(actual, workspace);
-                        assert_eq!(request.work_remaining, expected_reads + 4);
+                        assert_eq!(request.work_remaining, expected_reads + 8);
                     } else {
                         assert_eq!(
                             result,

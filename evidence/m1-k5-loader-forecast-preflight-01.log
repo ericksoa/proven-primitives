@@ -1,0 +1,29 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (52593,13): 'if' cannot be used in patterns.
+WARNING: (60508,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:29080:1
+      |
+29080 | / fn plan_saved_loader_read_units(workspace: &[u8], window_bytes: u32,
+29081 | |     budget: &mut crate::brotli::RequestBudget, aux_reads: u64, aux_valid: bool,
+29082 | | ) -> (r: Result<u64, CoreFailure>)
+      | |_________________________________^
+
+error: postcondition not satisfied
+     --> src/brotli_input.rs:29095:9
+      |
+29095 | /         r.is_ok() ==> {
+29096 | |             &&& r.unwrap() as nat == loader_table_read_units(workspace@, window_bytes)
+29097 | |             &&& r.unwrap() <= 58
+29098 | |             &&& final(budget).work_remaining as nat + loader_forecast_table_reads(workspace@, window_bytes)
+29099 | |                 == old(budget).work_remaining as nat
+29100 | |         },
+      | |_________^ failed this postcondition
+...
+29134 |           if count != expected { return Ok(base); }
+      |                                  --------------- at this exit
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

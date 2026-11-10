@@ -1,0 +1,19 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (52080,13): 'if' cannot be used in patterns.
+WARNING: (59480,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:28671:5
+      |
+28671 |     while i < 18
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:28647:1
+      |
+28647 | / fn plan_saved_aux_load(workspace: &[u8], window_bytes: u32,
+28648 | |     budget: &mut crate::brotli::RequestBudget,
+28649 | | ) -> (r: Result<(u64, bool), CoreFailure>)
+      | |_________________________________________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)

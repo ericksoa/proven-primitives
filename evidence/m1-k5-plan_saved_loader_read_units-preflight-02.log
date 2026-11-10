@@ -1,0 +1,13 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (52593,13): 'if' cannot be used in patterns.
+WARNING: (60508,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:29091:1
+      |
+29091 | / fn plan_saved_loader_read_units(workspace: &[u8], window_bytes: u32,
+29092 | |     budget: &mut crate::brotli::RequestBudget, aux_reads: u64, aux_valid: bool,
+29093 | | ) -> (r: Result<u64, CoreFailure>)
+      | |_________________________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

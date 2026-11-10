@@ -145,11 +145,16 @@ formulas, W1 interfaces, 5,696-action bounds and the 425-unit reset charge.
 Preserve the failed repeat-history evidence and separately approved F2 fixture
 policy. Any F2 expectation change requires a separate direct human decision.
 
-Candidate K5 in `BROTLI_M1_LOADER_VALIDATION_METERING_DECISION.md` remains
-proposed and unimplemented. Do not classify the four saved simple-symbol
-copies as new table reads, change the private pre-scan receipt, or change the
-loader quota terms under K5 without direct human approval. K4 remains approved;
-other already-approved M1 proof work may continue within its existing scope.
+The human explicitly approved K5 as written in
+`BROTLI_M1_LOADER_VALIDATION_METERING_DECISION.md` on 2026-11-10. Charge the
+four saved simple-symbol entries and every loader validation table operand in
+both planning and every W1 reload, preserving exact early exits. Extend only
+`plan_saved_aux_load`'s private receipt to `(u64, bool)` as specified, and raise
+only its proof-only initial planning bound from 740 to 798. Keep existing
+mutation/serialization/reset formulas, W1 interfaces, B3c budget ownership,
+workspace, 5,696-action caps and the 425-unit reset charge. K4 and the separate
+F2 fixture policy remain fixed. Other architectural decisions still require
+direct, exact human approval.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,

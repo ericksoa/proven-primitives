@@ -1,0 +1,21 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (52568,13): 'if' cannot be used in patterns.
+WARNING: (59968,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3021:5
+     |
+3021 |     while i < count as usize
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3011:1
+     |
+3011 | / fn active_symbols_in_range(
+3012 | |     symbols: &[u16; 4],
+3013 | |     count: u8,
+3014 | |     alphabet_limit: u16,
+3015 | | ) -> (r: bool)
+     | |_____________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)

@@ -1,0 +1,47 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (53085,13): 'if' cannot be used in patterns.
+WARNING: (60949,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-87134/src/brotli_input.rs:29748:5
+      |
+29748 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-87134/src/brotli_input.rs:29849:17
+      |
+29849 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-87134/src/brotli_input.rs:29777:5
+      |
+29777 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-87134/src/brotli_input.rs:29665:1
+      |
+29665 | / fn plan_serialized_tree(
+29666 | |     workspace: &[u8],
+29667 | |     window_bytes: u32,
+29668 | |     budget: &mut crate::brotli::RequestBudget,
+29669 | |     input: &[u8],
+29670 | |     end_of_input: bool,
+29671 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-87134/src/brotli_input.rs:29804:20
+      |
+29804 |               assert(execution_work as nat == before_reload_work as nat
+      |  ____________________^
+29805 | |                 + 22 + phase_validation_read_units(before_iteration.phase,
+29806 | |                     before_iteration.alphabet_max, before_iteration.alphabet_limit));
+      | |___________________________________________________________________________________^ assertion failed
+
+error: aborting due to 1 previous error
+

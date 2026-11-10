@@ -1,0 +1,20 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (52568,13): 'if' cannot be used in patterns.
+WARNING: (59968,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3110:5
+     |
+3110 |     while i < 18
+     |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_input.rs:3091:1
+     |
+3091 | / fn singleton_code_valid_exec(
+3092 | |     code: &ComplexCodeLengthAlphabet,
+3093 | |     singleton: u8,
+3094 | | ) -> (r: bool)
+     | |_____________^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)
