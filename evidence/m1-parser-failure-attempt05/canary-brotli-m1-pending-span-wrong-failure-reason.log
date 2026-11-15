@@ -1,0 +1,33 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-65025/src/brotli_input.rs:14725:5
+      |
+14725 |     while written < span_count
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-65025/src/brotli_input.rs:14617:1
+      |
+14617 | / fn drain_serialized_pending_span(
+14618 | |     workspace: &mut [u8],
+14619 | |     window_bytes: u32,
+14620 | |     decoder: &mut CodeDescriptionDecoder,
+14621 | | ) -> (r: Result<CodeDescriptionStep, CompressedHeaderError>)
+      | |___________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-65025/src/brotli_input.rs:14627:9
+      |
+14627 |         r.is_err() ==> r.unwrap_err() == CompressedHeaderError::InternalState,
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+14721 |         return Err(CompressedHeaderError::Truncated);
+      |         -------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

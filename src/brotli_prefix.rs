@@ -2273,7 +2273,11 @@ impl TreeMetadata {
         symbols: u16,
         symbol: u16,
     ) -> (r: Result<Self, WorkspaceError>)
-        ensures r.is_ok() ==> {
+        ensures
+            r == if symbols == 0 || symbols as nat > tree_region_symbols(region) || symbol >= symbols {
+                Err(WorkspaceError::InvalidSymbol)
+            } else { Ok(Self { symbols, storage: TreeStorageState::Single { symbol } }) },
+            r.is_ok() ==> {
             &&& r.unwrap().valid_for(region)
             &&& r.unwrap().symbols == symbols
             &&& r.unwrap().storage == TreeStorageState::Single { symbol }
@@ -2290,7 +2294,11 @@ impl TreeMetadata {
         region: TreeRegion,
         symbols: u16,
     ) -> (r: Result<Self, WorkspaceError>)
-        ensures r.is_ok() ==> {
+        ensures
+            r == if symbols == 0 || symbols as nat > tree_region_symbols(region) {
+                Err(WorkspaceError::InvalidSymbol)
+            } else { Ok(Self { symbols, storage: TreeStorageState::Canonical { initialized: 0 } }) },
+            r.is_ok() ==> {
             &&& r.unwrap().valid_for(region)
             &&& r.unwrap().symbols == symbols
             &&& r.unwrap().storage == TreeStorageState::Canonical { initialized: 0 }
@@ -3193,7 +3201,19 @@ pub(crate) fn install_simple_tree(
     count: u8,
     symbols: [u16; 4],
 ) -> (r: Result<TreeMetadata, WorkspaceError>)
-    ensures r.is_ok() ==> {
+    ensures
+        window_bytes <= 16_777_216
+            && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+            && 1 <= alphabet_limit <= 704 && selector <= 4
+            && count as nat == simple_selector_count(selector)
+            && (forall|i: int| 0 <= i < count ==> #[trigger] symbols@[i] < alphabet_limit)
+            && (forall|i: int, j: int| 0 <= i < j < count ==> #[trigger] symbols@[i] != #[trigger] symbols@[j]) ==> {
+                let destination_valid = alphabet_limit as nat <= tree_region_symbols(region)
+                    && (tree as nat) < tree_region_count(region);
+                &&& r.is_ok() == destination_valid
+                &&& (!destination_valid ==> r == Err(WorkspaceError::InvalidSymbol))
+            },
+        r.is_ok() ==> {
         &&& r.unwrap().valid_for(region)
         &&& r.unwrap().symbols == alphabet_limit
         &&& (tree as nat) < tree_region_count(region)
@@ -4886,6 +4906,13 @@ pub(crate) fn install_builder_canonical_tree(
 ) -> (r: Result<(), WorkspaceError>)
     requires old(meta).valid_for(region),
     ensures
+        window_bytes <= 16_777_216
+            && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+            && (tree as nat) >= tree_region_count(region) ==> {
+                &&& r == Err(WorkspaceError::InvalidTree)
+                &&& final(workspace)@ == old(workspace)@
+                &&& *final(meta) == *old(meta)
+            },
         window_bytes <= 16_777_216
             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && (tree as nat) < tree_region_count(region)

@@ -1,0 +1,55 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-21188/src/brotli_input.rs:31500:5
+      |
+31500 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-21188/src/brotli_input.rs:31654:17
+      |
+31654 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-21188/src/brotli_input.rs:31548:5
+      |
+31548 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-21188/src/brotli_input.rs:31410:1
+      |
+31410 | / fn plan_serialized_tree(
+31411 | |     workspace: &[u8],
+31412 | |     window_bytes: u32,
+31413 | |     budget: &mut crate::brotli::RequestBudget,
+31414 | |     input: &[u8],
+31415 | |     end_of_input: bool,
+31416 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-21188/src/brotli_input.rs:31695:28
+      |
+31695 |                       assert(execution_work as nat == before_simple_install_work as nat
+      |  ____________________________^
+31696 | |                         + (if code.selector == 0 { 5nat } else { 3 * decoder.alphabet_limit as nat + 5 })
+31697 | |                         + k6_simple_install_read_units(decoder.alphabet_limit, code.selector));
+      | |_____________________________________________________________________________________________^ assertion failed
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-21188/src/brotli_input.rs:31504:20
+      |
+31504 |                 == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+error: aborting due to 1 previous error
+

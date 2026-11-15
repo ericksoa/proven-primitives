@@ -1,0 +1,53 @@
+from pathlib import Path
+import hashlib,json,gzip,shutil,subprocess,os,re,datetime
+main=Path.cwd();snap=main/'target/m1-k7-k8-controls';ev=main/'evidence';out=ev/'m1-k7-k8-attempt01'
+load=lambda p:json.loads(p.read_text())
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+rel=lambda p:str(p.relative_to(main))
+f=load(ev/'m1-k7-k8-attempt01-source-freeze.json');v=load(ev/'brotli-b3c-m1-k7-k8-attempt01-verification.json')
+assert f['exit_code']==0 and f['source_unchanged'] and '--no-cheating' in f['command']
+assert v['verification-results']['success'] and v['verification-results']['errors']==0 and v['verification-results']['is-verifying-entire-crate']
+for n,identity in {**f['source_sha256'],**f['validation_source_sha256']}.items():assert h(main/n)==identity and h(snap/n)==identity,n
+rows=load(snap/'evidence/m1-k7-k8-attempt01-controls-results.json');assert sum(r['expected_mutants'] for r in rows)==29
+assert all(r['exit_code']==0 and r['source_unchanged'] and len(r['mutants'])==r['expected_mutants'] and all(m['semantic_rejection'] for m in r['mutants']) for r in rows)
+assert sum(map(int,re.findall(r'test result: ok\. (\d+) passed; 0 failed',(ev/'m1-k7-k8-attempt01-runtime.log').read_text())))==108
+old_index=load(main/'target/m1-k8-working-base/index-sha256.json');env={**os.environ,'DEVELOPER_DIR':'/Library/Developer/CommandLineTools'}
+for n,identity in old_index.items():
+ b=subprocess.check_output(['git','show',':'+n],env=env);assert hashlib.sha256(b).hexdigest()==identity,n
+ if n.startswith('evidence/'):assert h(main/n)==identity,('Old K6 evidence was overwritten',n)
+verus=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos');binaries={n:h(verus/n) for n in ['verus','rust_verify','z3']};assert binaries==load(ev/'brotli-b3c-m1-k6.json')['verifier_binary']
+out.mkdir(exist_ok=True)
+for p in (snap/'evidence').rglob('*'):
+ if p.is_file() and ('canary-' in p.name or p.name.startswith('controls-') or 'controls-results' in p.name or 'controls-driver' in p.name or p.name=='preceding-main-positive.json'):
+  shutil.copy2(p,out/p.name)
+rows=json.loads(json.dumps(rows))
+for r in rows:
+ r['log']=rel(out/Path(r['log']).name);assert h(main/r['log'])==r['sha256']
+ for m in r['mutants']:
+  m['log']=rel(out/Path(m['log']).name);assert h(main/m['log'])==m['sha256']
+for n in ['src/brotli_input.rs','src/brotli_prefix.rs','tests/proof_rejection.rs']:(out/('source-'+Path(n).name+'.gz')).write_bytes(gzip.compress((main/n).read_bytes(),mtime=0))
+for n in ['verification','controls']:shutil.copy2(main/('target/m1-k7-k8-'+n+'-driver.py'),out/(n+'-driver.py.txt'))
+shutil.copy2(main/'target/m1-k7-k8-finalize.py',out/'finalize.py.txt')
+report={
+ 'component':'Brotli M1 approved K7/K8 result-contract implementation; M1 remains incomplete',
+ 'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+ 'authority':{'K7':'Human Approved reply to exact K7 request on 2026-11-12','K8':'Human instruction please progress and implement the contracts on 2026-11-15, referring to the two concrete proposed K8 contracts'},
+ 'implemented_contracts':['TreeMetadata::canonical exact existing result for every input','install_simple_tree conditional success/invalid-destination classification for the original valid decoded description domain','TreeMetadata::single exact existing result for every input','install_builder_canonical_tree exact InvalidTree result and unchanged workspace/metadata under valid workspace/window and invalid tree index'],
+ 'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],
+ 'verification_results':v['verification-results'],'verification_options':f['command'],'verifier_binary':binaries,'verification_elapsed_seconds':f['elapsed_seconds'],
+ 'whole_log':{'path':'evidence/m1-k7-k8-attempt01-whole-crate.log','sha256':h(ev/'m1-k7-k8-attempt01-whole-crate.log')},
+ 'verification_evidence':{'path':'evidence/brotli-b3c-m1-k7-k8-attempt01-verification.json','sha256':h(ev/'brotli-b3c-m1-k7-k8-attempt01-verification.json')},
+ 'source_freeze':{'path':'evidence/m1-k7-k8-attempt01-source-freeze.json','sha256':h(ev/'m1-k7-k8-attempt01-source-freeze.json')},
+ 'audit':{'path':'evidence/m1-k7-k8-source-and-control-audit.json','sha256':h(ev/'m1-k7-k8-source-and-control-audit.json')},
+ 'runtime_tests':{'passed':108,'failed':0,'library':97,'primitives':9,'trust_scan':1,'upstream_comparison':1,'path':'evidence/m1-k7-k8-attempt01-runtime.log','sha256':h(ev/'m1-k7-k8-attempt01-runtime.log')},
+ 'controls':{'new_result_contract_defects':6,'legacy_affected_defects':23,'semantic_rejections':29,'recorded_main_whole_positive_precedes_all':True,'control_snapshot_matches_every_frozen_library_config_and_validation_byte':True,'rows':rows},
+ 'preserved':['All four existing prefix signatures, requirements, executable and ghost body bytes','All earlier metadata/record/frame/unchanged-on-error guarantees','No additional mathematical visibility or cross-module helper','Original accepted inputs, algorithms and guard/error order','W1 interfaces/results, B3c ownership, workspace, K4 codec and F2 policy','K6 read/write formulas,5696 caps,798/8192 proof bounds and425-unit reset charge','Pinned tools/dependencies and proof trust boundary'],
+ 'implementation_location':'Current working source; older K6 index snapshot preserved for its authorized signed commit',
+ 'publication':'No new commit or push; configured encrypted SSH signing key is not loaded and signing was not bypassed',
+ 'inherited_parser_refinement':'Working input source includes the previously healthy whole-verified normal/non-workspace failure traces and conditional owner agreement. Its separate new-eight-control resource failures remain unresolved; these are not counted in this 29-control result-contract checkpoint.',
+ 'remaining':['Unconditional full tree planner/action failure agreement, including workspace and initial-encoding errors','Complete exact source-operation/outcome frame ledgers and full M1 control closure','Remaining B3c/B3d/B4 and independent human specification review'],
+ 'trusted_components':['Mathematical specifications and their interpretation','Pinned Verus/Z3/vstd','Rust/LLVM and Apple build tools','Machine and operating environment'],
+ 'release_gate':'incomplete','supported_decoder_or_full_mathematical_safety_claim':False
+}
+(ev/'brotli-b3c-m1-k7-k8.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({'verified':v['verification-results']['verified'],'errors':0,'runtime':108,'semantic_rejections':29,'old_K6_index_and_evidence_preserved':True,'receipt':'evidence/brotli-b3c-m1-k7-k8.json'}))

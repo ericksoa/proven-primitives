@@ -1,0 +1,47 @@
+verification results:: 4 verified, 0 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-60974/src/brotli_input.rs:31656:5
+      |
+31656 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-60974/src/brotli_input.rs:31825:17
+      |
+31825 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-60974/src/brotli_input.rs:31706:5
+      |
+31706 |     while iterations < action_cap
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 38 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-60974/src/brotli_input.rs:31706:5
+      |
+31706 |     while iterations < action_cap
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-60974/src/brotli_input.rs:31706:5
+      |
+31706 |     while iterations < action_cap
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-60974/src/brotli_input.rs:31545:1
+      |
+31545 | / fn plan_serialized_tree(
+31546 | |     workspace: &[u8],
+31547 | |     window_bytes: u32,
+31548 | |     budget: &mut crate::brotli::RequestBudget,
+31549 | |     input: &[u8],
+31550 | |     end_of_input: bool,
+31551 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+

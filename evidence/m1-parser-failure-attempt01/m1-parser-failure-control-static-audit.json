@@ -1,0 +1,27 @@
+[
+  {
+    "name": "brotli-m1-executor-parser-error-replaced",
+    "unique_body_anchor": true,
+    "root_contract_unchanged": true
+  },
+  {
+    "name": "brotli-m1-executor-bad-span-error-replaced",
+    "unique_body_anchor": true,
+    "root_contract_unchanged": true
+  },
+  {
+    "name": "brotli-m1-executor-canonical-error-replaced",
+    "unique_body_anchor": true,
+    "root_contract_unchanged": true
+  },
+  {
+    "name": "brotli-m1-executor-empty-input-fabricates-error",
+    "unique_body_anchor": true,
+    "root_contract_unchanged": true
+  },
+  {
+    "name": "brotli-m1-pending-span-wrong-failure-reason",
+    "unique_body_anchor": true,
+    "root_contract_unchanged": true
+  }
+]

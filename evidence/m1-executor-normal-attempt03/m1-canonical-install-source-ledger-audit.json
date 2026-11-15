@@ -1,0 +1,44 @@
+{
+  "type": "source-derived audit, not checked ledger completion",
+  "variables": {
+    "S": "alphabet symbol count",
+    "N": "nonzero code-length count",
+    "I": "sum of zero-based indices of nonzero code lengths"
+  },
+  "successful_installer_parts": [
+    {
+      "part": "validation scan",
+      "units": "S",
+      "basis": "one reached code-length read per symbol"
+    },
+    {
+      "part": "16 count scans and count writes",
+      "units": "16*S + 32",
+      "basis": "16 full length scans and 16 two-byte count writes"
+    },
+    {
+      "part": "chain initialization",
+      "units": "1440",
+      "basis": "720 two-byte writes"
+    },
+    {
+      "part": "15 chain scans and links",
+      "units": "15*S + 2*N",
+      "basis": "15 full length scans and one two-byte link per nonzero symbol"
+    },
+    {
+      "part": "next-code construction",
+      "units": "92",
+      "basis": "16 four-byte writes and 14 two-byte prior-count reads"
+    },
+    {
+      "part": "records",
+      "units": "4*S + 4*N + I",
+      "basis": "one code-length read and three record writes per symbol, four-byte next-code reads per nonzero, preceding-symbol scan lengths"
+    }
+  ],
+  "successful_installer_sum": "36*S + 6*N + I + 1564",
+  "separate_existing_tail": "4 metadata byte writes + 1 installation transition",
+  "no_quota_change_proposed": true,
+  "remaining": "Exact checked source counters, early invalid-prefix exits, and plan/action binding remain open; no complete-ledger claim"
+}

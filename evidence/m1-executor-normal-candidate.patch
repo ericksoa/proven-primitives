@@ -1,0 +1,1117 @@
+--- a/src/brotli_input.rs
++++ b/src/brotli_input.rs
+@@ -3146,7 +3146,12 @@
+     }
+     match decoder.phase {
+         CodeDescriptionPhase::SimpleSymbols { index, symbols, .. } => {
+-            proof { valid_simple_scan_is_square(symbols@, index as nat, decoder.alphabet_limit); }
++            proof {
++                valid_simple_scan_is_square(symbols@, index as nat, decoder.alphabet_limit);
++                assert(index <= 4);
++                assert(22nat + index as nat * index as nat <= 38nat) by (nonlinear_arith)
++                    requires index <= 4;
++            }
+             22 + index as u64 * index as u64
+         },
+         CodeDescriptionPhase::SimpleShape { symbols } => {
+@@ -5820,7 +5825,9 @@
+         lemma2_to64();
+         assert(pow2(0) == 1);
+         assert(pow2(bits.len()) == pow2(0));
+-        assert(bit as nat * pow2(bits.len()) == bit as nat);
++        assert(pow2(bits.len()) == 1);
++        assert(bit as nat * pow2(bits.len()) == bit as nat) by (nonlinear_arith)
++            requires pow2(bits.len()) == 1;
+         assert(bits_value(bits + seq![bit])
+             == bits_value(bits) + bit as nat * pow2(bits.len()));
+     } else {
+@@ -14867,6 +14874,11 @@
+         old(decoder).valid(),
+         matches!(old(decoder).phase, CodeDescriptionPhase::ComplexPendingSpan { .. }),
+     ensures
++        r.is_ok() ==> match old(decoder).phase {
++            CodeDescriptionPhase::ComplexPendingSpan { start, .. } =>
++                b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) == start,
++            _ => false,
++        },
+         r.is_ok() ==> m1_tree_builder_values(final(workspace)@, window_bytes, final(decoder).alphabet_limit,
+             b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) as u16)
+             == m1_tree_builder_span_values(m1_tree_builder_values(old(workspace)@, window_bytes, old(decoder).alphabet_limit,
+@@ -15251,6 +15263,8 @@
+         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT)
+             == alphabet_limit,
+     ensures
++        r.is_ok() ==> alphabet_limit as nat <= crate::brotli_prefix::tree_region_symbols(region)
++            && (tree as nat) < crate::brotli_prefix::tree_region_count(region),
+         code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+         match r {
+             Ok(meta) => {
+@@ -15628,6 +15642,12 @@
+     }
+ }
+ 
++proof fn m1_tree_builder_values_have_length(workspace: Seq<u8>, window_bytes: u32, limit: u16, initialized: u16)
++    ensures m1_tree_builder_values(workspace, window_bytes, limit, initialized).len() == 704,
++{
++    reveal(m1_tree_builder_values);
++}
++
+ proof fn m1_tree_builder_values_from_prefix(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
+     limit: u16, initialized: u16)
+     requires forall|i: int| initialized <= limit && 0 <= i < initialized ==>
+@@ -15999,6 +16019,46 @@
+     }
+ }
+ 
++proof fn m1_tree_traced_results_agree(workspace: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool,
++    left: SerializedTreeStep, right: SerializedTreeStep)
++    requires m1_tree_result_has_trace(workspace, window_bytes, input, end, left),
++        m1_tree_result_has_trace(workspace, window_bytes, input, end, right),
++    ensures left == right,
++{
++    reveal(m1_tree_result_has_trace);
++    let (li, lr, lt, la, ll, lp) = choose|initial: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion, tree: u16,
++        actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), prefix_consumed: nat| {
++        &&& m1_code_decoder_image(workspace, window_bytes, initial.queue, initial)
++        &&& serialized_b3b_queue(workspace, window_bytes, initial.queue)
++        &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region)
++        &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_ACTIVE_TREE) == tree
++        &&& #[trigger] m1_finished_tree_trace(actions, last, input, end, region, tree, initial,
++            b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16,
++            m1_tree_builder_values(workspace, window_bytes, initial.alphabet_limit,
++                b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16), prefix_consumed, left)
++    };
++    let (ri, rr, rt, ra, rl, rp) = choose|initial: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion, tree: u16,
++        actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), prefix_consumed: nat| {
++        &&& m1_code_decoder_image(workspace, window_bytes, initial.queue, initial)
++        &&& serialized_b3b_queue(workspace, window_bytes, initial.queue)
++        &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region)
++        &&& b3b_scalar_u16_at(workspace, window_bytes, B3B_ACTIVE_TREE) == tree
++        &&& #[trigger] m1_finished_tree_trace(actions, last, input, end, region, tree, initial,
++            b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16,
++            m1_tree_builder_values(workspace, window_bytes, initial.alphabet_limit,
++                b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16), prefix_consumed, right)
++    };
++    m1_code_images_agree(workspace, window_bytes, li, ri);
++    reveal(m1_code_states_agree);
++    assert(li.alphabet_limit == ri.alphabet_limit);
++    assert(lr == rr);
++    assert(lt == rt);
++    let initialized = b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
++    let values = m1_tree_builder_values(workspace, window_bytes, li.alphabet_limit, initialized);
++    m1_finished_tree_traces_agree(la, ll, lp, left, ra, rl, rp, right,
++        input, end, lr, lt, li, ri, initialized, values);
++}
++
+ proof fn m1_tree_record_finished_trace(workspace: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool,
+     initial: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion, tree: u16,
+     initialized: u16, values: Seq<u8>, actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, last: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), prefix_consumed: nat, result: SerializedTreeStep)
+@@ -16067,6 +16127,480 @@
+     reveal(m1_tree_iteration_status);
+ }
+ 
++proof fn m1_tree_queue_store_preserves_builder(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, limit: u16)
++    requires b3b_workspace_shape(before.len(), window_bytes), before.len() == after.len(), limit <= 704,
++        forall|at: int| 0 <= at < before.len()
++            && !(b3b_scalar_base(window_bytes) <= at < b3b_scalar_base(window_bytes) + 10)
++            ==> #[trigger] after[at] == before[at],
++    ensures b3b_scalar_u16_at(after, window_bytes, B3B_BUILDER_INITIALIZED)
++            == b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED),
++        m1_tree_builder_values(after, window_bytes, limit,
++            b3b_scalar_u16_at(after, window_bytes, B3B_BUILDER_INITIALIZED) as u16)
++            == m1_tree_builder_values(before, window_bytes, limit,
++                b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED) as u16),
++{
++    reveal(b3b_scalar_u16_at); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
++    reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact();
++    let initialized = b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
++    assert forall|i: int| initialized <= limit && 0 <= i < initialized implies #[trigger]
++        before[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i]
++            == after[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] by {}
++    m1_tree_builder_values_from_prefix(before, after, window_bytes, limit, initialized);
++}
++
++proof fn m1_tree_descriptor_store_preserves_builder(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, limit: u16)
++    requires b3b_workspace_shape(before.len(), window_bytes), limit <= 704,
++        code_descriptor_store_frame(before, after, window_bytes),
++    ensures b3b_scalar_u16_at(after, window_bytes, B3B_BUILDER_INITIALIZED)
++            == b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED),
++        m1_tree_builder_values(after, window_bytes, limit,
++            b3b_scalar_u16_at(after, window_bytes, B3B_BUILDER_INITIALIZED) as u16)
++            == m1_tree_builder_values(before, window_bytes, limit,
++                b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED) as u16),
++{
++    reveal(code_descriptor_store_frame);
++    reveal(b3b_scalar_u16_at); reveal(b3b_scalar_byte_at); reveal(b3b_scalar_base);
++    reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact();
++    let initialized = b3b_scalar_u16_at(before, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
++    assert forall|i: int| initialized <= limit && 0 <= i < initialized implies #[trigger]
++        before[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i]
++            == after[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i] by {}
++    m1_tree_builder_values_from_prefix(before, after, window_bytes, limit, initialized);
++}
++
++proof fn m1_tree_trace_span_action(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>, end: bool)
++    requires a.0.valid(), a.1.valid(), a.3.valid(), a.4.valid(), a.7.len() == 704, a.8.len() == 704,
++        code_rank_aligned(a.0.phase), code_rank_aligned(a.1.phase), code_rank_aligned(a.3.phase), code_rank_aligned(a.4.phase),
++        m1_tree_field_action(a.0, input, end, a.1, a.2), m1_tree_aux_start(a.1, a.3),
++        match a.3.phase {
++            CodeDescriptionPhase::ComplexPendingSpan { start, span_count, .. } => {
++                &&& a.5 == start && a.6 as nat == start as nat + span_count as nat
++                &&& a.4 == m1_acknowledged_span_decoder(a.3)
++                &&& a.8 == m1_tree_builder_span_values(a.7, a.3.phase)
++            },
++            _ => false,
++        },
++    ensures m1_tree_iteration_holds(a, input, end),
++{
++    reveal(m1_tree_iteration_holds);
++}
++
++proof fn m1_tree_trace_continuing_status(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), region: crate::brotli_prefix::TreeRegion, tree: u16)
++    requires match a.3.phase {
++        CodeDescriptionPhase::ComplexPendingSpan { start, .. } => a.5 == start,
++        CodeDescriptionPhase::CompleteSimple(_) | CodeDescriptionPhase::CompleteComplex { .. } | CodeDescriptionPhase::Failed(_) => false,
++        _ => a.2.status != CodeDescriptionStatus::NeedInput,
++    },
++    ensures m1_tree_iteration_status(a, region, tree).is_none(),
++{
++    reveal(m1_tree_iteration_status);
++}
++
++proof fn m1_tree_trace_continuing_predecessor(a: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>, end: bool,
++    region: crate::brotli_prefix::TreeRegion, tree: u16)
++    requires m1_tree_iteration_holds(a, input, end), m1_tree_iteration_status(a, region, tree).is_none(),
++        a.2.status == CodeDescriptionStatus::NeedInput ==> {
++            &&& a.1.phase == a.0.phase
++            &&& code_phase_width(a.0.phase, a.0.alphabet_max) > 0
++        },
++    ensures !code_phase_terminal(a.0.phase), a.2.status != CodeDescriptionStatus::NeedInput,
++{
++    reveal(m1_tree_iteration_holds); reveal(m1_tree_field_action); reveal(m1_tree_aux_start);
++    reveal(m1_tree_iteration_status); reveal(code_field_step_refines);
++    reveal(code_phase_terminal); reveal(code_phase_width);
++    if code_phase_terminal(a.0.phase) {
++        assert(a.1 == a.0);
++        assert(a.3 == a.1);
++        assert(false);
++    }
++    if a.2.status == CodeDescriptionStatus::NeedInput {
++        assert(!matches!(a.0.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }));
++        assert(!matches!(a.1.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)));
++        assert(a.3 == a.1);
++        assert(false);
++    }
++}
++
++proof fn m1_tree_aux_start_action_matches(before: CodeDescriptionDecoder, after: CodeDescriptionDecoder, step: CodeDescriptionStep)
++    requires before.valid(), matches!(before.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)),
++        code_field_step_refines(before, Seq::empty(), false, after, step),
++    ensures step.consumed == 0, step.status == CodeDescriptionStatus::Progress,
++        matches!(after.phase, CodeDescriptionPhase::ComplexSymbol(_)), m1_tree_aux_start(before, after),
++{
++    reveal(code_field_step_refines); reveal(code_phase_width); reveal(code_phase_terminal);
++    reveal(code_transition_holds); reveal(m1_tree_aux_start);
++}
++
++proof fn m1_tree_code_state_reflexive(decoder: CodeDescriptionDecoder)
++    ensures m1_code_states_agree(decoder, decoder),
++{
++    reveal(m1_code_states_agree);
++}
++
++#[verifier::opaque]
++spec fn m1_tree_queue_frame(before: Seq<u8>, after: Seq<u8>, window_bytes: u32) -> bool {
++    &&& before.len() == after.len()
++    &&& forall|index: int| 0 <= index < before.len()
++        && !(b3b_scalar_base(window_bytes) <= index < b3b_scalar_base(window_bytes) + 10)
++        ==> #[trigger] after[index] == before[index]
++}
++
++proof fn m1_tree_image_saved_aux(workspace: Seq<u8>, window_bytes: u32, decoder: CodeDescriptionDecoder)
++    requires m1_code_decoder_image(workspace, window_bytes, decoder.queue, decoder),
++    ensures saved_aux_copy_prefix(workspace, window_bytes, 18),
++{
++    reveal(m1_code_decoder_image); reveal(saved_aux_load_valid);
++}
++
++fn m1_tree_store_queue(
++    workspace: &mut [u8],
++    window_bytes: u32,
++    queue: &BitQueue,
++    limit: u16,
++) -> (r: Result<(), CompressedHeaderError>)
++    requires queue.valid(), limit <= 704, b3b_workspace_shape(old(workspace)@.len(), window_bytes),
++    ensures
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED),
++        m1_tree_builder_values(final(workspace)@, window_bytes, limit,
++            b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) as u16)
++            == m1_tree_builder_values(old(workspace)@, window_bytes, limit,
++                b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) as u16),
++        saved_aux_copy_prefix(old(workspace)@, window_bytes, 18) ==>
++            saved_aux_copy_prefix(final(workspace)@, window_bytes, 18),
++        forall|phase: CodeDescriptionPhase| #[trigger]
++            m1_pending_history_supports(old(workspace)@, window_bytes, phase) ==>
++                m1_pending_history_supports(final(workspace)@, window_bytes, phase),
++        final(workspace)@.len() == old(workspace)@.len(),
++        m1_tree_queue_frame(old(workspace)@, final(workspace)@, window_bytes),
++        r.is_err() ==> final(workspace)@ == old(workspace)@,
++        serialized_context_data_ok(old(workspace)@, window_bytes)
++            ==> serialized_context_data_ok(final(workspace)@, window_bytes),
++        serialized_context_state_ok(old(workspace)@, window_bytes)
++            ==> serialized_context_state_ok(final(workspace)@, window_bytes),
++        serialized_mtf_state_ok(old(workspace)@, window_bytes)
++            ==> serialized_mtf_state_ok(final(workspace)@, window_bytes),
++        compressed_decoder_state_ok(old(workspace)@, window_bytes)
++            ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
++        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes) ==> r.is_ok(),
++        b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes) ==>
++            b3c_scalar_byte_at(
++                final(workspace)@,
++                window_bytes,
++                B3C_STREAM_PHASE as int,
++            ) == b3c_scalar_byte_at(
++                old(workspace)@,
++                window_bytes,
++                B3C_STREAM_PHASE as int,
++            ),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_ACTIVE_REGION)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_ACTIVE_REGION),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_ACTIVE_TREE)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ACTIVE_TREE),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_ALPHABET_MAX)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_MAX),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_ALPHABET_LIMIT)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_GROUP_KIND)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_GROUP_KIND),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_GROUP_PHASE)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_GROUP_PHASE),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_TREE_INDEX)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_TREE_INDEX),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_TREE_COUNT)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_TREE_COUNT),
++        b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes)
++            ==> r.is_ok(),
++        r.is_ok() ==> serialized_b3b_queue(final(workspace)@, window_bytes, *queue),
++        b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes) ==> {
++            &&& b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_CONTEXT_KIND)
++                == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_KIND)
++            &&& b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_CONTEXT_PHASE)
++                == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE)
++            &&& b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_MAP_SIZE)
++                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE)
++            &&& b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_MAP_TREES)
++                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_TREES)
++            &&& b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_MAP_INITIALIZED)
++                == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_INITIALIZED)
++            &&& b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_MAX_RUN_PREFIX)
++                == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_MAX_RUN_PREFIX)
++            &&& b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_PENDING_RUN)
++                == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_PENDING_RUN)
++            &&& b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_OUTER_PHASE)
++                == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE)
++            &&& b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_CURRENT_KIND)
++                == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CURRENT_KIND)
++        },
++{
++    let ghost before = workspace@;
++    let result = store_b3b_queue(workspace, window_bytes, queue);
++    proof {
++        reveal(m1_tree_queue_frame);
++        m1_tree_queue_store_preserves_builder(before, workspace@, window_bytes, limit);
++        reveal(saved_aux_copy_prefix); reveal(b3b_workspace_shape); reveal(b3b_scalar_base);
++        reveal(m1_pending_history_supports); reveal(m1_retained_progress_supports_end);
++        reveal(b3b_scalar_byte_at); reveal(b3b_scalar_u16_at); reveal(b3b_scalar_u32_at);
++        b3b_scalar_layout_is_exact();
++    }
++    result
++}
++
++proof fn m1_tree_saved_queue_is_valid(workspace: Seq<u8>, window_bytes: u32, queue: BitQueue)
++    requires serialized_b3b_queue(workspace, window_bytes, queue),
++    ensures queue.valid(),
++{
++    reveal(serialized_b3b_queue);
++}
++
++proof fn m1_tree_full_builder_sequence(workspace: Seq<u8>, window_bytes: u32, limit: u16)
++    requires limit <= 704,
++    ensures m1_tree_builder_values(workspace, window_bytes, limit, limit).take(limit as int)
++        == crate::brotli_prefix::builder_length_sequence(workspace, window_bytes, limit),
++{
++    reveal(m1_tree_builder_values);
++    reveal(crate::brotli_prefix::builder_length_sequence);
++    assert(m1_tree_builder_values(workspace, window_bytes, limit, limit).take(limit as int)
++        =~= crate::brotli_prefix::builder_length_sequence(workspace, window_bytes, limit));
++}
++
++proof fn m1_tree_prefix_rebase_current(actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)>, input: Seq<u8>, end: bool,
++    region: crate::brotli_prefix::TreeRegion, tree: u16,
++    initial: CodeDescriptionDecoder, initial_initialized: u16, initial_values: Seq<u8>,
++    current: CodeDescriptionDecoder, next: CodeDescriptionDecoder, initialized: u16, values: Seq<u8>, consumed: nat)
++    requires m1_tree_prefix(actions, input, end, region, tree, initial, initial_initialized, initial_values,
++        current, initialized, values, consumed), m1_code_states_agree(current, next),
++    ensures m1_tree_prefix(actions, input, end, region, tree, initial, initial_initialized, initial_values,
++        next, initialized, values, consumed),
++    decreases actions.len(),
++{
++    reveal_with_fuel(m1_tree_prefix, 2);
++    if actions.len() == 0 {
++        m1_code_state_agreement_transitive(initial, current, next);
++    } else {
++        let first = actions[0];
++        m1_tree_prefix_rebase_current(actions.skip(1), input.skip(first.2.consumed as int), end, region, tree,
++            first.4, first.6, first.8, current, next, initialized, values, (consumed - first.2.consumed as nat) as nat);
++    }
++}
++
++// The existing complete-complex branch, isolated without changing its operations.
++#[verifier::rlimit(600)]
++#[verifier::spinoff_prover]
++fn m1_tree_complete_canonical(workspace: &mut [u8], window_bytes: u32,
++    region: crate::brotli_prefix::TreeRegion, tree: u16, decoder: CodeDescriptionDecoder)
++    -> (r: Result<(), CompressedHeaderError>)
++    requires
++        b3b_workspace_shape(old(workspace)@.len(), window_bytes),
++        decoder.valid(),
++        matches!(decoder.phase, CodeDescriptionPhase::CompleteComplex { .. }),
++        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region),
++        b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ACTIVE_TREE) == tree,
++        b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == decoder.alphabet_limit,
++    ensures
++        r.is_ok() ==> {
++            &&& (tree as nat) < crate::brotli_prefix::tree_region_count(region)
++            &&& decoder.alphabet_limit as nat <= crate::brotli_prefix::tree_region_symbols(region)
++            &&& b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) == decoder.alphabet_limit
++            &&& crate::brotli_prefix::valid_builder_lengths(crate::brotli_prefix::builder_length_sequence(
++                old(workspace)@, window_bytes, decoder.alphabet_limit))
++            &&& match decoder.phase { CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } =>
++                decoded_symbols == decoder.alphabet_limit, _ => false }
++        },
++        final(workspace)@.len() == old(workspace)@.len(),
++        serialized_context_data_ok(old(workspace)@, window_bytes)
++            ==> serialized_context_data_ok(final(workspace)@, window_bytes),
++        serialized_context_state_ok(old(workspace)@, window_bytes)
++            ==> serialized_context_state_ok(final(workspace)@, window_bytes),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_CONTEXT_KIND)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_KIND),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_CONTEXT_PHASE)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_MAP_SIZE)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_OUTER_PHASE)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_ACTIVE_REGION)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_ACTIVE_REGION),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_ACTIVE_TREE)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ACTIVE_TREE),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_ALPHABET_MAX)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_MAX),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_ALPHABET_LIMIT)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_GROUP_KIND)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_GROUP_KIND),
++        b3b_scalar_byte_at(final(workspace)@, window_bytes, B3B_GROUP_PHASE)
++            == b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_GROUP_PHASE),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_TREE_INDEX)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_TREE_INDEX),
++        b3b_scalar_u16_at(final(workspace)@, window_bytes, B3B_TREE_COUNT)
++            == b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_TREE_COUNT),
++        compressed_decoder_state_ok(old(workspace)@, window_bytes)
++            ==> compressed_decoder_state_ok(final(workspace)@, window_bytes),
++        r.is_ok() ==> active_tree_metadata_complete(final(workspace)@, window_bytes),
++{
++    let ghost original = workspace@;
++    let decoded_symbols = match decoder.phase {
++        CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } => decoded_symbols,
++        _ => { proof { assert(false); } 0u16 },
++    };
++    let initialized = match state_u16(
++        workspace, window_bytes, B3B_BUILDER_INITIALIZED) {
++        Ok(value) => value,
++        Err(error) => return Err(error),
++    };
++    if initialized != decoded_symbols || decoded_symbols != decoder.alphabet_limit {
++        return Err(CompressedHeaderError::InternalState);
++    }
++    let mut meta = match crate::brotli_prefix::TreeMetadata::canonical(
++        region, decoder.alphabet_limit) {
++        Ok(value) => value,
++        Err(error) => return Err(CompressedHeaderError::Workspace(error)),
++    };
++    let ghost before_install = workspace@;
++    let install_result = crate::brotli_prefix::install_builder_canonical_tree(
++        workspace,
++        window_bytes,
++        initialized,
++        region,
++        tree,
++        &mut meta,
++    );
++    proof {
++        if (tree as nat) < crate::brotli_prefix::tree_region_count(region) {
++            canonical_installer_frame_preserves_context_state(
++                before_install,
++                workspace@,
++                window_bytes,
++                region,
++                tree,
++                decoder.alphabet_limit,
++            );
++        } else {
++            assert(workspace@ == before_install);
++        }
++    }
++    match install_result {
++        Ok(()) => {}
++        Err(error) => return Err(CompressedHeaderError::Workspace(error)),
++    }
++    let ghost before_metadata = workspace@;
++    match crate::brotli_prefix::write_tree_metadata(
++        workspace, window_bytes, region, tree, meta) {
++        Ok(()) => {
++            proof {
++                let at = crate::brotli_prefix::tree_metadata_at(
++                    window_bytes,
++                    region,
++                    tree,
++                );
++                assert forall|i: int| 0 <= i < before_metadata.len()
++                    && !(at <= i < at + 4) implies
++                    #[trigger] workspace@[i] == before_metadata[i] by {}
++                metadata_frame_preserves_context_state(
++                    before_metadata,
++                    workspace@,
++                    window_bytes,
++                    region,
++                    tree,
++                );
++                assert(b3b_scalar_byte_at(
++                    workspace@,
++                    window_bytes,
++                    B3B_ACTIVE_REGION,
++                ) == b3b_scalar_byte_at(
++                    before_metadata,
++                    window_bytes,
++                    B3B_ACTIVE_REGION,
++                ));
++                assert(b3b_scalar_u16_at(
++                    workspace@,
++                    window_bytes,
++                    B3B_ACTIVE_TREE,
++                ) == b3b_scalar_u16_at(
++                    before_metadata,
++                    window_bytes,
++                    B3B_ACTIVE_TREE,
++                ));
++                assert(b3b_scalar_u16_at(
++                    workspace@,
++                    window_bytes,
++                    B3B_ALPHABET_LIMIT,
++                ) == b3b_scalar_u16_at(
++                    before_metadata,
++                    window_bytes,
++                    B3B_ALPHABET_LIMIT,
++                ));
++                assert(b3b_scalar_byte_at(
++                    before_metadata,
++                    window_bytes,
++                    B3B_ACTIVE_REGION,
++                ) == b3b_scalar_byte_at(
++                    original,
++                    window_bytes,
++                    B3B_ACTIVE_REGION,
++                ));
++                assert(b3b_scalar_u16_at(
++                    before_metadata,
++                    window_bytes,
++                    B3B_ACTIVE_TREE,
++                ) == b3b_scalar_u16_at(
++                    original,
++                    window_bytes,
++                    B3B_ACTIVE_TREE,
++                ));
++                assert(b3b_scalar_u16_at(
++                    before_metadata,
++                    window_bytes,
++                    B3B_ALPHABET_LIMIT,
++                ) == b3b_scalar_u16_at(
++                    original,
++                    window_bytes,
++                    B3B_ALPHABET_LIMIT,
++                ));
++                assert(decoder.alphabet_limit as nat == b3b_scalar_u16_at(
++                    original,
++                    window_bytes,
++                    B3B_ALPHABET_LIMIT,
++                ));
++                reveal(tree_metadata_complete);
++                assert(tree_metadata_complete(
++                    workspace@,
++                    window_bytes,
++                    region,
++                    tree,
++                    decoder.alphabet_limit,
++                ));
++                assert(b3b_scalar_byte_at(
++                    workspace@,
++                    window_bytes,
++                    B3B_ACTIVE_REGION,
++                ) == tree_region_tag_spec(region));
++                assert(b3b_scalar_u16_at(
++                    workspace@,
++                    window_bytes,
++                    B3B_ACTIVE_TREE,
++                ) == tree);
++                assert(b3b_scalar_u16_at(
++                    workspace@,
++                    window_bytes,
++                    B3B_ALPHABET_LIMIT,
++                ) == decoder.alphabet_limit);
++                active_tree_complete_from_fields(
++                    workspace@,
++                    window_bytes,
++                    region,
++                    tree,
++                    decoder.alphabet_limit,
++                );
++            }
++            return Ok(());
++        }
++        Err(error) => return Err(CompressedHeaderError::Workspace(error)),
++    }
++}
++
+ // Isolate the existing bounded tree-progress proof from accumulated solver context.
+ #[verifier::rlimit(600)]
+ #[verifier::spinoff_prover]
+@@ -16077,6 +16611,8 @@
+     end_of_input: bool,
+ ) -> (r: SerializedTreeStep)
+     ensures
++        !matches!(r.status, SerializedTreeStatus::Failed(_)) ==>
++            m1_tree_result_has_trace(old(workspace)@, window_bytes, input@, end_of_input, r),
+         final(workspace)@.len() == old(workspace)@.len(),
+         serialized_context_data_ok(old(workspace)@, window_bytes)
+             ==> serialized_context_data_ok(final(workspace)@, window_bytes),
+@@ -16116,8 +16652,15 @@
+         r.status == SerializedTreeStatus::Complete ==>
+             active_tree_metadata_complete(final(workspace)@, window_bytes),
+ {
++    hide(code_field_step_refines);
++    hide(code_transition_holds);
++    hide(b3b_queue_encoding_valid);
++    hide(serialized_b3b_queue);
++    hide(code_descriptor_store_frame);
+     let ghost original = workspace@;
+-    proof { assert(original == old(workspace)@); }
++    proof {
++        assert(original == old(workspace)@);
++    }
+     let region_tag = match state_byte(workspace, window_bytes, B3B_ACTIVE_REGION) {
+         Ok(value) => value,
+         Err(error) => return SerializedTreeStep { consumed: 0, status: SerializedTreeStatus::Failed(error) },
+@@ -16150,8 +16693,28 @@
+     let mut consumed: usize = 0;
+     let mut work: u16 = 0;
+     let ghost mut previous_decoder: Option<CodeDescriptionDecoder> = None;
++    let ghost mut initial_decoder: Option<CodeDescriptionDecoder> = None;
++    let ghost initial_initialized = b3b_scalar_u16_at(original, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
++    let ghost initial_values = m1_tree_builder_values(original, window_bytes, loop_limit, initial_initialized);
++    let ghost mut actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)> = Seq::empty();
+     while work < 5_696
+         invariant consumed <= input.len(), work <= 5_696,
++            initial_initialized == b3b_scalar_u16_at(original, window_bytes, B3B_BUILDER_INITIALIZED) as u16,
++            initial_values == m1_tree_builder_values(original, window_bytes, loop_limit, initial_initialized),
++            actions.len() == work as nat,
++            work == 0 ==> consumed == 0 && workspace@ == original && initial_decoder.is_none() && previous_decoder.is_none(),
++            work > 0 ==> {
++                &&& initial_decoder.is_some() && previous_decoder.is_some()
++                &&& initial_decoder.unwrap().alphabet_limit == loop_limit
++                &&& m1_code_decoder_image(original, window_bytes, initial_decoder.unwrap().queue, initial_decoder.unwrap())
++                &&& serialized_b3b_queue(original, window_bytes, initial_decoder.unwrap().queue)
++                &&& m1_tree_prefix(actions, input@, end_of_input, region, tree,
++                    initial_decoder.unwrap(), initial_initialized, initial_values,
++                    previous_decoder.unwrap(),
++                    b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED) as u16,
++                    m1_tree_builder_values(workspace@, window_bytes, loop_limit,
++                        b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED) as u16), consumed as nat)
++            },
+             previous_decoder.is_some() ==> {
+                 &&& previous_decoder.unwrap().valid()
+                 &&& m1_code_decoder_image(workspace@, window_bytes,
+@@ -16204,6 +16767,7 @@
+             Ok(value) => value,
+             Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
+         };
++        proof { m1_tree_saved_queue_is_valid(workspace@, window_bytes, queue); }
+         let loaded = load_code_description_decoder(workspace, window_bytes, queue);
+         proof {
+             if let Some(previous) = previous_decoder {
+@@ -16237,6 +16801,41 @@
+             assert(work as nat + code_phase_rank(decoder.phase, loop_limit) <= 5_695);
+         }
+         let ghost before_field = decoder;
++        let ghost before_initialized = b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
++        let ghost before_values = m1_tree_builder_values(workspace@, window_bytes, loop_limit, before_initialized);
++        proof { m1_tree_builder_values_have_length(workspace@, window_bytes, loop_limit, before_initialized); }
++        let ghost before_consumed = consumed;
++        let ghost iteration_workspace = workspace@;
++        proof {
++            if work == 0 {
++                initial_decoder = Some(before_field);
++                assert(before_field.alphabet_limit == loop_limit);
++                assert(m1_code_decoder_image(original, window_bytes, before_field.queue, before_field));
++                m1_tree_empty_prefix(before_field, initial_initialized, initial_values, input@, end_of_input, region, tree);
++            }
++            if let Some(previous) = reloaded_decoder {
++                m1_code_images_agree(workspace@, window_bytes, previous, before_field);
++            }
++        }
++        let ghost current_model = match reloaded_decoder { Some(previous) => previous, None => before_field };
++        proof {
++            if work == 0 {
++                assert(before_consumed == 0);
++                assert(actions =~= Seq::empty());
++                assert(before_initialized == initial_initialized);
++                assert(before_values == initial_values);
++            }
++            assert(m1_tree_prefix(actions, input@, end_of_input, region, tree,
++                initial_decoder.unwrap(), initial_initialized, initial_values,
++                current_model, before_initialized, before_values, before_consumed as nat));
++        }
++        proof {
++            if reloaded_decoder.is_none() { m1_tree_code_state_reflexive(before_field); }
++            assert(m1_code_states_agree(current_model, before_field));
++            m1_tree_prefix_rebase_current(actions, input@, end_of_input, region, tree,
++                initial_decoder.unwrap(), initial_initialized, initial_values,
++                current_model, before_field, before_initialized, before_values, before_consumed as nat);
++        }
+         let step = if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+             CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress }
+         } else { decoder.advance_field(&input[consumed..], end_of_input) };
+@@ -16267,35 +16866,49 @@
+             }
+             assert(code_rank_aligned(decoder.phase));
+         }
++        let ghost field_after = decoder;
++        proof {
++            assert(m1_tree_field_action(before_field, input@.skip(consumed as int), end_of_input, field_after, step)) by {
++                reveal(m1_tree_field_action);
++            }
++        }
+         // The completed auxiliary alphabet is a transient B3a result, without
+         // an E1 serialized tag. Enter its existing zero-input symbol state
+         // before storing, rather than rejecting a valid complex tree.
+         if matches!(decoder.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
+             let ghost before_start = decoder;
+-            let start_step = decoder.advance_field(&[], false);
++            let start_input: [u8; 0] = [];
++            let start_step = decoder.advance_field(&start_input, false);
+             proof {
++                assert(start_input@ =~= Seq::<u8>::empty());
++                m1_tree_aux_start_action_matches(before_start, decoder, start_step);
+                 assert(start_step.status != CodeDescriptionStatus::NeedInput);
++                assert(m1_tree_aux_start(field_after, decoder));
+                 code_field_rank_decreases(before_start, Seq::empty(), false, decoder, start_step);
+-                assert(matches!(decoder.phase, CodeDescriptionPhase::ComplexSymbol(_))) by {
+-                    reveal(code_field_step_refines); reveal(code_transition_holds);
+-                    reveal(code_phase_terminal); reveal(code_phase_width);
+-                }
+-            }
+-        }
++            }
++        }
++        proof {
++            if !matches!(field_after.phase, CodeDescriptionPhase::CompleteComplexAlphabet(_)) {
++                assert(decoder == field_after);
++                assert(m1_tree_aux_start(field_after, decoder)) by { reveal(m1_tree_aux_start); }
++            }
++        }
++        let ghost started = decoder;
+         consumed = consumed + step.consumed;
++        proof { m1_tree_image_saved_aux(workspace@, window_bytes, before_field); }
+         let ghost before_queue_store = workspace@;
+-        match store_b3b_queue(workspace, window_bytes, &decoder.queue) {
++        match m1_tree_store_queue(workspace, window_bytes, &decoder.queue, decoder.alphabet_limit) {
+             Ok(()) => {}
+             Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
+         }
+ 
+         proof {
++            assert(b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED) as u16 == before_initialized);
++            assert(m1_tree_builder_values(workspace@, window_bytes, loop_limit, before_initialized) == before_values);
++        }
++        proof {
+             if matches!(decoder.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
+-                assert(m1_pending_history_supports(workspace@, window_bytes, decoder.phase)) by {
+-                    reveal(m1_pending_history_supports); reveal(m1_retained_progress_supports_end);
+-                    reveal(b3b_scalar_byte_at); reveal(b3b_scalar_u32_at); reveal(b3b_scalar_base);
+-                    reveal(b3b_workspace_shape); b3b_scalar_layout_is_exact();
+-                }
++                assert(m1_pending_history_supports(workspace@, window_bytes, decoder.phase));
+             }
+         }
+         match decoder.phase {
+@@ -16326,9 +16939,18 @@
+                 );
+                 proof { reveal(code_store_frame); }
+                 match installed {
+-                    Ok(_) => return SerializedTreeStep {
+-                        consumed,
+-                        status: SerializedTreeStatus::Complete,
++                    Ok(_) => {
++                        proof {
++                            let action = (before_field, field_after, step, started, started,
++                                before_initialized, before_initialized, before_values, before_values);
++                            m1_tree_trace_unspanned_action(before_field, field_after, step, started,
++                                before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
++                            m1_tree_trace_simple_status(action, region, tree);
++                            m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
++                                initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
++                                actions, action, before_consumed as nat, SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete });
++                        }
++                        return SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete };
+                     },
+                     Err(error) => return SerializedTreeStep {
+                         consumed,
+@@ -16336,176 +16958,26 @@
+                     },
+                 }
+             }
+-            CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } => {
+-                let initialized = match state_u16(
+-                    workspace, window_bytes, B3B_BUILDER_INITIALIZED) {
+-                    Ok(value) => value,
+-                    Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
++            CodeDescriptionPhase::CompleteComplex { .. } => {
++                let ghost before_canonical = workspace@;
++                let status = match m1_tree_complete_canonical(workspace, window_bytes, region, tree, decoder) {
++                    Ok(()) => {
++                        proof { m1_tree_full_builder_sequence(before_canonical, window_bytes, decoder.alphabet_limit); }
++                        proof {
++                            let action = (before_field, field_after, step, started, started,
++                                before_initialized, before_initialized, before_values, before_values);
++                            m1_tree_trace_unspanned_action(before_field, field_after, step, started,
++                                before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
++                            m1_tree_trace_canonical_status(action, region, tree);
++                            m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
++                                initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
++                                actions, action, before_consumed as nat, SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete });
++                        }
++                        SerializedTreeStatus::Complete
++                    },
++                    Err(error) => SerializedTreeStatus::Failed(error),
+                 };
+-                if initialized != decoded_symbols || decoded_symbols != decoder.alphabet_limit {
+-                    return SerializedTreeStep {
+-                        consumed,
+-                        status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),
+-                    };
+-                }
+-                let mut meta = match crate::brotli_prefix::TreeMetadata::canonical(
+-                    region, decoder.alphabet_limit) {
+-                    Ok(value) => value,
+-                    Err(error) => return SerializedTreeStep {
+-                        consumed,
+-                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(error)),
+-                    },
+-                };
+-                let ghost before_install = workspace@;
+-                let install_result = crate::brotli_prefix::install_builder_canonical_tree(
+-                    workspace,
+-                    window_bytes,
+-                    initialized,
+-                    region,
+-                    tree,
+-                    &mut meta,
+-                );
+-                proof {
+-                    if (tree as nat) < crate::brotli_prefix::tree_region_count(region) {
+-                        canonical_installer_frame_preserves_context_state(
+-                            before_install,
+-                            workspace@,
+-                            window_bytes,
+-                            region,
+-                            tree,
+-                            decoder.alphabet_limit,
+-                        );
+-                    } else {
+-                        assert(workspace@ == before_install);
+-                    }
+-                }
+-                match install_result {
+-                    Ok(()) => {}
+-                    Err(error) => return SerializedTreeStep {
+-                        consumed,
+-                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(error)),
+-                    },
+-                }
+-                let ghost before_metadata = workspace@;
+-                match crate::brotli_prefix::write_tree_metadata(
+-                    workspace, window_bytes, region, tree, meta) {
+-                    Ok(()) => {
+-                        proof {
+-                            let at = crate::brotli_prefix::tree_metadata_at(
+-                                window_bytes,
+-                                region,
+-                                tree,
+-                            );
+-                            assert forall|i: int| 0 <= i < before_metadata.len()
+-                                && !(at <= i < at + 4) implies
+-                                #[trigger] workspace@[i] == before_metadata[i] by {}
+-                            metadata_frame_preserves_context_state(
+-                                before_metadata,
+-                                workspace@,
+-                                window_bytes,
+-                                region,
+-                                tree,
+-                            );
+-                            assert(b3b_scalar_byte_at(
+-                                workspace@,
+-                                window_bytes,
+-                                B3B_ACTIVE_REGION,
+-                            ) == b3b_scalar_byte_at(
+-                                before_metadata,
+-                                window_bytes,
+-                                B3B_ACTIVE_REGION,
+-                            ));
+-                            assert(b3b_scalar_u16_at(
+-                                workspace@,
+-                                window_bytes,
+-                                B3B_ACTIVE_TREE,
+-                            ) == b3b_scalar_u16_at(
+-                                before_metadata,
+-                                window_bytes,
+-                                B3B_ACTIVE_TREE,
+-                            ));
+-                            assert(b3b_scalar_u16_at(
+-                                workspace@,
+-                                window_bytes,
+-                                B3B_ALPHABET_LIMIT,
+-                            ) == b3b_scalar_u16_at(
+-                                before_metadata,
+-                                window_bytes,
+-                                B3B_ALPHABET_LIMIT,
+-                            ));
+-                            assert(b3b_scalar_byte_at(
+-                                before_metadata,
+-                                window_bytes,
+-                                B3B_ACTIVE_REGION,
+-                            ) == b3b_scalar_byte_at(
+-                                original,
+-                                window_bytes,
+-                                B3B_ACTIVE_REGION,
+-                            ));
+-                            assert(b3b_scalar_u16_at(
+-                                before_metadata,
+-                                window_bytes,
+-                                B3B_ACTIVE_TREE,
+-                            ) == b3b_scalar_u16_at(
+-                                original,
+-                                window_bytes,
+-                                B3B_ACTIVE_TREE,
+-                            ));
+-                            assert(b3b_scalar_u16_at(
+-                                before_metadata,
+-                                window_bytes,
+-                                B3B_ALPHABET_LIMIT,
+-                            ) == b3b_scalar_u16_at(
+-                                original,
+-                                window_bytes,
+-                                B3B_ALPHABET_LIMIT,
+-                            ));
+-                            assert(decoder.alphabet_limit as nat == b3b_scalar_u16_at(
+-                                original,
+-                                window_bytes,
+-                                B3B_ALPHABET_LIMIT,
+-                            ));
+-                            reveal(tree_metadata_complete);
+-                            assert(tree_metadata_complete(
+-                                workspace@,
+-                                window_bytes,
+-                                region,
+-                                tree,
+-                                decoder.alphabet_limit,
+-                            ));
+-                            assert(b3b_scalar_byte_at(
+-                                workspace@,
+-                                window_bytes,
+-                                B3B_ACTIVE_REGION,
+-                            ) == tree_region_tag_spec(region));
+-                            assert(b3b_scalar_u16_at(
+-                                workspace@,
+-                                window_bytes,
+-                                B3B_ACTIVE_TREE,
+-                            ) == tree);
+-                            assert(b3b_scalar_u16_at(
+-                                workspace@,
+-                                window_bytes,
+-                                B3B_ALPHABET_LIMIT,
+-                            ) == decoder.alphabet_limit);
+-                            active_tree_complete_from_fields(
+-                                workspace@,
+-                                window_bytes,
+-                                region,
+-                                tree,
+-                                decoder.alphabet_limit,
+-                            );
+-                        }
+-                        return SerializedTreeStep {
+-                            consumed,
+-                            status: SerializedTreeStatus::Complete,
+-                        };
+-                    }
+-                    Err(error) => return SerializedTreeStep {
+-                        consumed,
+-                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(error)),
+-                    },
+-                }
++                return SerializedTreeStep { consumed, status };
+             }
+             CodeDescriptionPhase::Failed(error) => return SerializedTreeStep {
+                 consumed,
+@@ -16516,17 +16988,9 @@
+                     assert(m1_payload_store_context(workspace@, window_bytes, decoder.phase)) by {
+                         reveal(m1_payload_store_context);
+                     }
+-                    assert(saved_aux_copy_prefix(workspace@, window_bytes, 18)) by {
+-                        reveal(saved_aux_copy_prefix); reveal(b3b_workspace_shape); reveal(b3b_scalar_base);
+-                        b3b_scalar_layout_is_exact();
+-                        assert forall|i: int| 0 <= i < 18 implies #[trigger]
+-                            workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i] <= 5 by {
+-                            let at = b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i;
+-                            assert(before_queue_store[at] <= 5);
+-                            assert(workspace@[at] == before_queue_store[at]);
+-                        }
+-                    }
++                    assert(saved_aux_copy_prefix(workspace@, window_bytes, 18));
+                 }
++                let ghost before_descriptor_store = workspace@;
+                 match store_code_description_decoder(workspace, window_bytes, decoder) {
+                     Ok(()) => {}
+                     Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
+@@ -16534,19 +16998,50 @@
+                 proof {
+                     assert(m1_code_decoder_image(workspace@, window_bytes, decoder.queue, decoder));
+                     assert(serialized_b3b_queue(workspace@, window_bytes, decoder.queue));
++                    m1_tree_descriptor_store_preserves_builder(before_descriptor_store, workspace@, window_bytes, loop_limit);
++                    assert(b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED) as u16 == before_initialized);
+                     previous_decoder = Some(decoder);
+                 }
+                 if matches!(step.status, CodeDescriptionStatus::NeedInput) {
++                        proof {
++                            let action = (before_field, field_after, step, started, started,
++                                before_initialized, before_initialized, before_values, before_values);
++                            m1_tree_trace_unspanned_action(before_field, field_after, step, started,
++                                before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
++                            m1_tree_trace_need_input_status(action, region, tree);
++                            m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
++                                initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
++                                actions, action, before_consumed as nat, SerializedTreeStep { consumed, status: SerializedTreeStatus::NeedInput });
++                        }
+                     return SerializedTreeStep { consumed, status: SerializedTreeStatus::NeedInput };
+                 }
+             }
+         }
+         proof {
+-            reveal(code_field_step_refines); reveal(code_transition_holds);
++            let after_initialized = b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
++            let after_values = m1_tree_builder_values(workspace@, window_bytes, loop_limit, after_initialized);
++            m1_tree_builder_values_have_length(workspace@, window_bytes, loop_limit, after_initialized);
++            let action = (before_field, field_after, step, started, decoder,
++                before_initialized, after_initialized, before_values, after_values);
++            if matches!(started.phase, CodeDescriptionPhase::ComplexPendingSpan { .. }) {
++                m1_tree_trace_span_action(action, input@.skip(before_consumed as int), end_of_input);
++            } else {
++                assert(decoder == started && after_initialized == before_initialized && after_values == before_values);
++                m1_tree_trace_unspanned_action(before_field, field_after, step, started,
++                    before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
++            }
++            m1_tree_trace_continuing_status(action, region, tree);
++            m1_tree_trace_continuing_predecessor(action, input@.skip(before_consumed as int), end_of_input, region, tree);
+             assert(!code_phase_terminal(before_field.phase));
+             assert(step.status != CodeDescriptionStatus::NeedInput);
+             assert(serialized_code_rank(workspace@, window_bytes, loop_limit)
+                 < code_phase_rank(before_field.phase, loop_limit));
++            if reloaded_decoder.is_none() { m1_tree_code_state_reflexive(before_field); }
++            assert(m1_code_states_agree(current_model, before_field));
++            m1_tree_prefix_append(actions, action, input@, end_of_input, region, tree,
++                initial_decoder.unwrap(), initial_initialized, initial_values,
++                current_model, before_initialized, before_values, before_consumed as nat);
++            actions = actions.push(action);
+         }
+         work = work + 1;
+     }
+--- a/tests/proof_rejection.rs
++++ b/tests/proof_rejection.rs
+@@ -4962,3 +4962,67 @@
+     }
+     fs::remove_dir_all(temporary).unwrap();
+ }
++
++#[test]
++#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
++fn the_prover_rejects_four_m1_executor_normal_trace_defects() {
++    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
++    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
++    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
++    let temporary = std::env::temp_dir().join(format!(
++        "proven-primitives-m1-executor-normal-canary-{}",
++        std::process::id(),
++    ));
++    fs::create_dir(&temporary).expect("fresh private temporary directory");
++    fs::create_dir(temporary.join("src")).unwrap();
++    for entry in fs::read_dir(project.join("src")).unwrap() {
++        let entry = entry.unwrap();
++        if entry.file_type().unwrap().is_file() {
++            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
++        }
++    }
++    let path = temporary.join("src/brotli_input.rs");
++    let original = fs::read_to_string(&path).unwrap();
++    for (name, function, old, new) in [
++        ("brotli-m1-executor-simple-loses-consumption", "advance_serialized_tree",
++            "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete };",
++            "return SerializedTreeStep { consumed: 0, status: SerializedTreeStatus::Complete };"),
++        ("brotli-m1-executor-canonical-loses-consumption", "advance_serialized_tree",
++            "return SerializedTreeStep { consumed, status };",
++            "return SerializedTreeStep { consumed: 0, status };"),
++        ("brotli-m1-executor-simple-false-need-input", "advance_serialized_tree",
++            "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete };",
++            "return SerializedTreeStep { consumed, status: if !end_of_input && consumed == input.len() { SerializedTreeStatus::NeedInput } else { SerializedTreeStatus::Complete } };"),
++        ("brotli-m1-executor-canonical-false-need-input", "advance_serialized_tree",
++            "return SerializedTreeStep { consumed, status };",
++            "return SerializedTreeStep { consumed, status: if status == SerializedTreeStatus::Complete && !end_of_input && consumed == input.len() { SerializedTreeStatus::NeedInput } else { status } };"),
++    ] {
++        let start = original.find(&format!("fn {function}(")).expect("selected function exists");
++        let end = start + original[start..].find("\n}\n").expect("selected function ends") + 3;
++        let selected = &original[start..end];
++        let body = selected.find("\n{\n").expect("function body");
++        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
++        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
++        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
++        let mutated = format!("{}{}{}", &original[..start], replacement, &original[end..]);
++        fs::write(&path, mutated).unwrap();
++        let result = check_brotli_input_function(&verus, &temporary, function);
++        let log = transcript(&result);
++        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
++        assert!(!result.status.success(), "prover accepted {name}");
++        assert!(log.contains("postcondition not satisfied")
++            || log.contains("precondition not satisfied")
++            || log.contains("invariant not satisfied")
++            || log.contains("requires not satisfied")
++            || log.contains("assertion failed"),
++            "expected a proof rejection, not a tooling error: {log}");
++        let lower = log.to_ascii_lowercase();
++        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
++            && !lower.contains("expected rlimit-count") && !lower.contains("unexpected smt output"),
++            "tool/resource failure is not a semantic rejection: {log}");
++        println!("REJECTED {name}: deliberate executable defect, unchanged specification");
++        fs::write(&path, &original).unwrap();
++    }
++    fs::remove_dir_all(temporary).unwrap();
++}
++

@@ -1,0 +1,28 @@
+{
+  "canonical_storage_and_read_order_unchanged": [
+    {
+      "operation": "state_u16(",
+      "original_count": 1,
+      "candidate_count": 1
+    },
+    {
+      "operation": "crate::brotli_prefix::TreeMetadata::canonical(",
+      "original_count": 1,
+      "candidate_count": 1
+    },
+    {
+      "operation": "crate::brotli_prefix::install_builder_canonical_tree(",
+      "original_count": 1,
+      "candidate_count": 1
+    },
+    {
+      "operation": "crate::brotli_prefix::write_tree_metadata(",
+      "original_count": 1,
+      "candidate_count": 1
+    }
+  ],
+  "queue_wrapper_calls_existing_writer_once": true,
+  "K6_formula_full_planner_and_shared_trace_theorem_unchanged": true,
+  "prefix_source_identical_to_K6": true,
+  "scope": "Source audit of named operations and retained definitions; not a complete source-operation ledger or source-to-binary theorem"
+}

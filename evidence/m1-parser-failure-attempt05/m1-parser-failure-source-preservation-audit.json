@@ -1,0 +1,36 @@
+{
+  "functions": [
+    {
+      "function": "drain_serialized_pending_span",
+      "signature_and_requirements_unchanged": true,
+      "named_operation_sequence_unchanged": true
+    },
+    {
+      "function": "drain_and_store_serialized_pending_span",
+      "signature_and_requirements_unchanged": true,
+      "named_operation_sequence_unchanged": true
+    },
+    {
+      "function": "m1_tree_complete_canonical",
+      "signature_and_requirements_unchanged": true,
+      "named_operation_sequence_unchanged": true
+    },
+    {
+      "function": "advance_serialized_tree",
+      "signature_and_requirements_unchanged": true,
+      "named_operation_sequence_unchanged": true
+    },
+    {
+      "function": "plan_serialized_tree",
+      "signature_and_requirements_unchanged": true,
+      "named_operation_sequence_unchanged": true
+    },
+    {
+      "function": "advance_planned_context_tree",
+      "signature_and_requirements_unchanged": true,
+      "named_operation_sequence_unchanged": true
+    }
+  ],
+  "prefix_byte_identical_K6": true,
+  "scope": "Named call and header audit; not complete source-operation ledger or source-to-binary equivalence"
+}

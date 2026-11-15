@@ -1,0 +1,36 @@
+verification results:: 4 verified, 2 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-19184/src/brotli_prefix.rs:3194:1
+     |
+3194 | / pub(crate) fn install_simple_tree(
+3195 | |     workspace: &mut [u8],
+3196 | |     window_bytes: u32,
+3197 | |     region: TreeRegion,
+...    |
+3202 | |     symbols: [u16; 4],
+3203 | | ) -> (r: Result<TreeMetadata, WorkspaceError>)
+     | |_____________________________________________^
+
+error: invariant not satisfied before loop
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-19184/src/brotli_prefix.rs:3289:17
+     |
+3289 |                 source_reads == i as nat * i as nat + 1 + 2 * j as nat,
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-19184/src/brotli_prefix.rs:3411:16
+     |
+3411 |         assert(source_reads == count as nat * alphabet_limit as nat + count as nat * (count as nat + 1) / 2);
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-19184/src/brotli_prefix.rs:3313:20
+     |
+3313 |             assert(source_reads == 2);
+     |                    ^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 3 previous errors
+

@@ -4962,3 +4962,212 @@ fn the_prover_rejects_twelve_k6_simple_install_metering_defects() {
     }
     fs::remove_dir_all(temporary).unwrap();
 }
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_four_m1_executor_normal_trace_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-executor-normal-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-m1-executor-simple-loses-consumption", "advance_serialized_tree",
+            "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete };",
+            "return SerializedTreeStep { consumed: 0, status: SerializedTreeStatus::Complete };"),
+        ("brotli-m1-executor-canonical-loses-consumption", "advance_serialized_tree",
+            "return SerializedTreeStep { consumed, status };",
+            "return SerializedTreeStep { consumed: 0, status };"),
+        ("brotli-m1-executor-simple-false-need-input", "advance_serialized_tree",
+            "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete };",
+            "return SerializedTreeStep { consumed, status: if !end_of_input && consumed == input.len() { SerializedTreeStatus::NeedInput } else { SerializedTreeStatus::Complete } };"),
+        ("brotli-m1-executor-canonical-false-need-input", "advance_serialized_tree",
+            "return SerializedTreeStep { consumed, status };",
+            "return SerializedTreeStep { consumed, status: if status == SerializedTreeStatus::Complete && !end_of_input && consumed == input.len() { SerializedTreeStatus::NeedInput } else { status } };"),
+    ] {
+        let start = original.find(&format!("fn {function}(")).expect("selected function exists");
+        let end = start + original[start..].find("\n}\n").expect("selected function ends") + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").expect("function body");
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        let mutated = format!("{}{}{}", &original[..start], replacement, &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("requires not satisfied")
+            || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}");
+        let lower = log.to_ascii_lowercase();
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count") && !lower.contains("unexpected smt output"),
+            "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate executable defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_eight_m1_parser_failure_relation_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-executor-parser-failure-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-m1-executor-parser-error-replaced", "advance_serialized_tree",
+            "map_code_description_error(error)", "CompressedHeaderError::InternalState"),
+        ("brotli-m1-executor-bad-span-error-replaced", "advance_serialized_tree",
+            "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) };",
+            "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(CompressedHeaderError::Truncated) };"),
+        ("brotli-m1-executor-canonical-error-replaced", "advance_serialized_tree",
+            "SerializedTreeStatus::Failed(error)\n                    },\n                };\n                return SerializedTreeStep { consumed, status };",
+            "SerializedTreeStatus::Failed(CompressedHeaderError::Truncated)\n                    },\n                };\n                return SerializedTreeStep { consumed, status };"),
+        ("brotli-m1-executor-empty-input-fabricates-error", "advance_serialized_tree",
+            "let mut consumed: usize = 0;",
+            "if input.is_empty() { return SerializedTreeStep { consumed: 0, status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) }; }\n    let mut consumed: usize = 0;"),
+        ("brotli-m1-pending-span-wrong-failure-reason", "drain_serialized_pending_span",
+            "return Err(CompressedHeaderError::InternalState);\n    }\n    let mut written",
+            "return Err(CompressedHeaderError::Truncated);\n    }\n    let mut written"),
+        ("brotli-m1-planner-parser-error-replaced", "plan_serialized_tree",
+            "map_code_description_error(error)", "CompressedHeaderError::InternalState"),
+        ("brotli-m1-planner-bad-span-error-replaced", "plan_serialized_tree",
+            "if builder_initialized != start\n                    || start as u32 + span_count as u32 > decoder.alphabet_limit as u32\n                {\n                    let failed_result = SerializedTreePlan { planning_work, execution_work, consumed,\n                        status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) };",
+            "if builder_initialized != start\n                    || start as u32 + span_count as u32 > decoder.alphabet_limit as u32\n                {\n                    let failed_result = SerializedTreePlan { planning_work, execution_work, consumed,\n                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Truncated) };"),
+        ("brotli-m1-planner-bad-builder-error-replaced", "plan_serialized_tree",
+            "if builder_initialized != decoded_symbols\n                    || decoded_symbols != decoder.alphabet_limit\n                {\n                    let failed_result = SerializedTreePlan { planning_work, execution_work, consumed,\n                        status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) };",
+            "if builder_initialized != decoded_symbols\n                    || decoded_symbols != decoder.alphabet_limit\n                {\n                    let failed_result = SerializedTreePlan { planning_work, execution_work, consumed,\n                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Truncated) };"),
+    ] {
+        let start = original.find(&format!("fn {function}(")).expect("selected function exists");
+        let end = start + original[start..].find("\n}\n").expect("selected function ends") + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").expect("function body");
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        let mutated = format!("{}{}{}", &original[..start], replacement, &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("requires not satisfied")
+            || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}");
+        let lower = log.to_ascii_lowercase();
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count") && !lower.contains("unexpected smt output"),
+            "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate executable defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+
+#[test]
+#[ignore = "requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_k7_k8_result_contract_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-k7-k8-result-canary-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    for (name, module, function, old, new) in [
+        ("brotli-k7-canonical-constructor-spurious-error", "prefix", "canonical",
+            "Ok(Self { symbols, storage: TreeStorageState::Canonical { initialized: 0 } })",
+            "Err(WorkspaceError::InvalidSymbol)"),
+        ("brotli-k8-single-constructor-spurious-error", "prefix", "single",
+            "Ok(Self { symbols, storage: TreeStorageState::Single { symbol } })",
+            "Err(WorkspaceError::InvalidSymbol)"),
+        ("brotli-k7-singleton-install-spurious-error", "prefix", "install_simple_tree",
+            "return TreeMetadata::single(region, alphabet_limit, symbols[0]);",
+            "return Err(WorkspaceError::InvalidCodeLength);"),
+        ("brotli-k7-multi-install-spurious-error", "prefix", "install_simple_tree",
+            "let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {",
+            "if selector == 1 && alphabet_limit == 2 { return Err(WorkspaceError::InvalidCodeLength); }\n    let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {"),
+        ("brotli-k8-invalid-tree-error-replaced", "prefix", "install_builder_canonical_tree",
+            "if tree >= tree_region_count_exec(region) {\n        return Err(WorkspaceError::InvalidTree);\n    }",
+            "if tree >= tree_region_count_exec(region) {\n        return Err(WorkspaceError::InvalidSymbol);\n    }"),
+        ("brotli-k8-invalid-tree-mutates-metadata", "prefix", "install_builder_canonical_tree",
+            "if tree >= tree_region_count_exec(region) {\n        return Err(WorkspaceError::InvalidTree);\n    }",
+            "if tree >= tree_region_count_exec(region) {\n        meta.storage = TreeStorageState::Unused;\n        return Err(WorkspaceError::InvalidTree);\n    }"),
+    ] {
+        let source_name = if module == "prefix" { "src/brotli_prefix.rs" } else { "src/brotli_input.rs" };
+        let path = temporary.join(source_name);
+        let original = fs::read_to_string(&path).unwrap();
+        let start = original.find(&format!("fn {function}(")).unwrap();
+        let line = original[..start].rsplit('\n').next().unwrap();
+        let indent = line.chars().take_while(|ch| ch.is_whitespace()).count();
+        let closing = format!("\n{}}}\n", " ".repeat(indent));
+        let end = start + original[start..].find(&closing).unwrap() + closing.len();
+        let selected = &original[start..end];
+        let opening = format!("\n{}{{\n", " ".repeat(indent));
+        let body = selected.find(&opening).unwrap();
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let selector = if function == "canonical" || function == "single" { format!("TreeMetadata::{function}") } else { function.to_string() };
+        let result = if module == "prefix" { check_brotli_prefix_function(&verus, &temporary, &selector) }
+            else { check_brotli_input_function(&verus, &temporary, function) };
+        let log = transcript(&result);
+        let lower = log.to_ascii_lowercase();
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(lower.contains("postcondition not satisfied") || lower.contains("precondition not satisfied")
+            || lower.contains("invariant not satisfied") || lower.contains("assertion failed"),
+            "expected a semantic proof rejection: {log}");
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count"), "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate source defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+

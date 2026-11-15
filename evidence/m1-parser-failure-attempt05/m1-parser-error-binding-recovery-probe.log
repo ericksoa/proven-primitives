@@ -1,0 +1,64 @@
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31656:5
+      |
+31656 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31825:17
+      |
+31825 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:31704:5
+      |
+31704 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 4 seconds
+     --> src/brotli_input.rs:31704:5
+      |
+31704 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: assertion failed
+     --> src/brotli_input.rs:31969:32
+      |
+31969 |                         assert(failed_result.status == SerializedTreeStatus::Failed(map_code_description_error_spec(error)));
+      |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31704:5
+      |
+31704 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:31545:1
+      |
+31545 | / fn plan_serialized_tree(
+31546 | |     workspace: &[u8],
+31547 | |     window_bytes: u32,
+31548 | |     budget: &mut crate::brotli::RequestBudget,
+31549 | |     input: &[u8],
+31550 | |     end_of_input: bool,
+31551 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+note: recommendation not met
+     --> src/brotli_input.rs:31660:20
+      |
+31660 |                 == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

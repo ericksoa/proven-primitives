@@ -1,0 +1,9 @@
+{
+  "semantic_rejection": true,
+  "assertion": "failed_result.status == existing mapped-error specification",
+  "original_root_contract_unchanged": true,
+  "library_preceding_positive": "m1-parser-failure-attempt05-source-freeze.json",
+  "probe_only_not_an_additional_distinct_defect": true,
+  "log": "m1-parser-error-binding-recovery-probe.log",
+  "sha256": "ad778c6059d0150813e8697e813b16feb30c0bfb38901dad9834bf9559f1d972"
+}

@@ -1,0 +1,36 @@
+{
+  "status": "K7 approved; partially implemented; no whole-crate completion claim",
+  "approval": "Direct human Approved reply to K7 request on 2026-11-12",
+  "candidate": "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-k7-proof-01",
+  "base": "Verified executor-normal candidate 23",
+  "source_sha256": {
+    "src/brotli_prefix.rs": "48ee43d846bf6d829e8ccb58270f306b0a0913389f460e361f2512a067751701",
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+    "src/brotli_input.rs": "d282cc349c795454fcb915c0b2be0599dbde7ac56272b9791fa18a3cddb00eed",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189"
+  },
+  "canonical_metadata_contract": {
+    "verified": 1,
+    "errors": 0,
+    "log": "evidence/m1-k7-progress/m1-k7-canonical-constructor-preflight-01.log"
+  },
+  "simple_installer_contract": {
+    "verified": 5,
+    "unresolved": 1,
+    "location": "return TreeMetadata::single(...)",
+    "log": "evidence/m1-k7-progress/m1-k7-simple-installer-preflight-01.log",
+    "interpretation": "Missing supporting success contract; not a demonstrated runtime defect"
+  },
+  "preserved": "All canonical/single/installer executable and ghost body bytes equal the verified K6 prefix; only two K7 ensures clauses added",
+  "K8_status": "Proposed; not approved or implemented",
+  "whole_positive": false,
+  "deliberate_defects_executed": false,
+  "signing": "Configured signing identity remains locked; no commit/push performed"
+}

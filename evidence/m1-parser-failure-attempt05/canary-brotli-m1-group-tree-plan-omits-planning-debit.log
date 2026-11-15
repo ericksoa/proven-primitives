@@ -1,0 +1,35 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-65624/src/brotli_input.rs:32213:1
+      |
+32213 | / fn plan_tree_group_action(
+32214 | |     workspace: &[u8],
+32215 | |     window_bytes: u32,
+32216 | |     budget: &mut crate::brotli::RequestBudget,
+32217 | |     input: &[u8],
+32218 | |     end_of_input: bool,
+32219 | | ) -> (r: Result<CompressedActionPlan, CoreFailure>)
+      | |__________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-65624/src/brotli_input.rs:32230:9
+      |
+32230 | /         r.is_ok() ==> final(budget).work_remaining as int
+32231 | |             == old(budget).work_remaining as int - r.unwrap().planning_work as int,
+      | |__________________________________________________________________________________^ failed this postcondition
+32232 | / {
+32233 | |     let tree = plan_serialized_tree(
+32234 | |         workspace,
+32235 | |         window_bytes,
+...     |
+32282 | |     })
+32283 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

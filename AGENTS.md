@@ -185,6 +185,25 @@ Its exact simple-install reservations, private source operand counters and
 prepayment term are checked. K6 is complete; it does not complete M1 or grant
 another architectural or quota decision. Continue remaining approved M1 work.
 
+The human approved K7 as written on 2026-11-12, then directed implementation
+of the proposed K8 contracts on 2026-11-15 ("please progress and implement the
+contracts"). K7's two contracts are documented in
+`BROTLI_M1_INSTALL_RESULT_PROOF_BOUNDARY_DECISION.md`; K8's two supporting
+contracts are in `BROTLI_M1_SUPPORTING_INSTALL_RESULT_DECISION.md`.
+Implement only those exact existing result guarantees and their dependent
+proofs/controls. Preserve every original signature, requirement, executable
+body, admitted input, guard/error order, workspace and quota. No other
+cross-module contract, visibility or architectural change is authorized.
+
+The K7/K8 result-contract checkpoint is implemented in current working source
+and recorded in `evidence/brotli-b3c-m1-k7-k8.json`: 1,300 whole-crate checks,
+108 runtime tests and 29 semantic defect rejections. All four prefix bodies,
+signatures and admitted requirements are unchanged. This completes those four
+result-contract guarantees, not full M1 refinement, source ledgers or control
+closure. Separate parser-failure control resource failures remain open.
+The earlier K6 checkpoint is signed in history. Current source contains the
+newer verified K7/K8 implementation; do not reset it to an earlier checkpoint.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

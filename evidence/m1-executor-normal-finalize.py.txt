@@ -1,0 +1,78 @@
+from pathlib import Path
+import json,hashlib,gzip,difflib,shutil,re,datetime,subprocess,os
+main=Path.cwd(); root=main/'target/m1-tree-execution-proof-23'; ev=main/'evidence'; cev=root/'evidence'
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def load(p):return json.loads(p.read_text())
+prefix='m1-executor-normal-attempt03'
+out=ev/prefix;out.mkdir(exist_ok=True)
+f=load(cev/(prefix+'-source-freeze.json'));v=load(cev/('brotli-b3c-'+prefix+'-verification.json'))
+assert f['exit_code']==0 and f['source_unchanged'] and v['verification-results']['success'] and v['verification-results']['is-verifying-entire-crate'] and v['verification-results']['errors']==0
+for name,h in {**f['source_sha256'],**f['validation_source_sha256']}.items():assert digest(root/name)==h,name
+rows=load(cev/(prefix+'-controls-results.json'))
+assert sum(x['expected_mutants'] for x in rows)==26
+assert all(x['exit_code']==0 and x['source_unchanged'] and len(x['mutants'])==x['expected_mutants'] and all(m['semantic_rejection'] for m in x['mutants']) for x in rows)
+runtime=(cev/(prefix+'-runtime.log')).read_text();counts=[int(x) for x in re.findall(r'test result: ok\. (\d+) passed; 0 failed',runtime)];assert sum(counts)==107
+k6=load(ev/'brotli-b3c-m1-k6.json')
+assert '--no-cheating' in f['command']
+verus_root=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+tools_sha={name:digest(verus_root/name) for name in ['verus','rust_verify','z3']}
+assert tools_sha==k6['verifier_binary'], 'Pinned verifier binaries changed'
+
+for name,h in {**k6['source_sha256'],**k6['validation_source_sha256']}.items():assert digest(main/name)==h,('K6 working source changed',name)
+for name in load(main/'target/m1-k6-publish-files.json'):
+ staged=subprocess.check_output(['git','show',':'+name],env={**os.environ,'DEVELOPER_DIR':'/Library/Developer/CommandLineTools'})
+ assert (main/name).read_bytes()==staged, ('K6 staged/working bytes differ',name)
+
+# Copy the portable exact check/control artifacts, including every raw mutant transcript.
+for p in cev.iterdir():
+ if p.is_file():shutil.copy2(p,out/p.name)
+raw_rows=rows
+rows=json.loads(json.dumps(raw_rows))
+for row in rows:
+ row['log']=str((out/Path(row['log']).name).relative_to(main))
+ for mutant in row['mutants']:
+  mutant['log']=str((out/Path(mutant['log']).name).relative_to(main))
+  assert digest(main/mutant['log'])==mutant['sha256']
+ assert digest(main/row['log'])==row['sha256']
+shutil.copy2(root/'verification-driver.py',out/(prefix+'-verification-driver.py.txt'))
+shutil.copy2(root/'controls-driver.py',out/(prefix+'-controls-driver.py.txt'))
+for name in ['src/brotli_input.rs','tests/proof_rejection.rs']:
+ (out/(prefix+'-source-'+Path(name).name+'.gz')).write_bytes(gzip.compress((root/name).read_bytes(),mtime=0))
+# Keep the original failed full run and the successful preliminary run distinct.
+prior=[]
+for directory,attempt,label in [('m1-tree-execution-proof-19','m1-executor-normal-attempt01','failed initial whole check'),('m1-tree-execution-proof-22','m1-executor-normal-attempt02','successful preliminary source')]:
+ p=main/'target'/directory
+ for name in [attempt+'-whole-crate.log',attempt+'-source-freeze.json','brotli-b3c-'+attempt+'-verification.json',attempt+'-runtime.log',attempt+'-driver.log']:
+  source=p/'evidence'/name
+  if source.exists():shutil.copy2(source,ev/name)
+ source=ev/(attempt+'-source-brotli_input.rs.gz');source.write_bytes(gzip.compress((p/'src/brotli_input.rs').read_bytes(),mtime=0))
+ prior.append({'status':label,'source_archive':{'path':str(source.relative_to(main)),'sha256':digest(source)},'source_freeze':str((ev/(attempt+'-source-freeze.json')).relative_to(main))})
+patch=''
+for name in ['src/brotli_input.rs','tests/proof_rejection.rs']:
+ patch+=''.join(difflib.unified_diff((main/name).read_text().splitlines(keepends=True),(root/name).read_text().splitlines(keepends=True),fromfile='a/'+name,tofile='b/'+name))
+patchfile=ev/'m1-executor-normal-candidate.patch';patchfile.write_text(patch)
+shutil.copy2(main/'target/m1-executor-normal-finalize.py',ev/'m1-executor-normal-finalize.py.txt')
+report={
+ 'component':'Brotli M1 isolated executor normal-result trace checkpoint; M1 incomplete',
+ 'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+ 'candidate_directory':str(root),
+ 'adoption':'Validated isolated candidate. Main working/index K6 source intentionally preserved pending configured signing-key unlock; no executor change committed or pushed.',
+ 'claim':'Every actual executor Complete/NeedInput result has a checked finite field/auxiliary/span replay trace from its initial serialized decoder and builder snapshot. Continuing iterations preserve that prefix. Same-start traced results agree. This is not full failure-result or planner/action/ledger closure.',
+ 'authority':'Existing human-approved M1 and E2 bounded input-private helper refactoring. K1-K6 retained. K7 is proposed and not implemented.',
+ 'verification_results':v['verification-results'],'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],
+ 'verifier_binary':tools_sha,'verification_options':f['command'],'verification_elapsed_seconds':f['elapsed_seconds'],
+ 'trusted_components':['Mathematical specifications and their interpretation','Pinned Verus/Z3/vstd','Pinned Rust/LLVM and Apple native build tools','Machine and operating environment'],
+
+ 'verification_evidence':{'path':str((out/('brotli-b3c-'+prefix+'-verification.json')).relative_to(main)),'sha256':digest(out/('brotli-b3c-'+prefix+'-verification.json'))},
+ 'source_freeze':{'path':str((out/(prefix+'-source-freeze.json')).relative_to(main)),'sha256':digest(out/(prefix+'-source-freeze.json'))},
+ 'whole_log':{'path':str((out/(prefix+'-whole-crate.log')).relative_to(main)),'sha256':digest(out/(prefix+'-whole-crate.log'))},
+ 'runtime_tests':{'passed':107,'failed':0,'library':96,'primitives':9,'trust_scan':1,'upstream_comparison':1,'path':str((out/(prefix+'-runtime.log')).relative_to(main)),'sha256':digest(out/(prefix+'-runtime.log'))},
+ 'negative_controls':{'new_defects':4,'legacy_defects':22,'semantic_rejections':26,'raw_results':{'path':str((out/(prefix+'-controls-results.json')).relative_to(main)),'sha256':digest(out/(prefix+'-controls-results.json'))},'preceded_by_exact_final_source_whole_positive':True,'rows':rows},
+ 'patch':{'path':str(patchfile.relative_to(main)),'sha256':digest(patchfile),'base_source_sha256':k6['source_sha256'],'base_validation_source_sha256':k6['validation_source_sha256']},
+ 'superseded_runs':prior,
+ 'preserved':['All original root requirements and guarantees','K6 formula and prefix source','Full planner and shared final-state/unit trace theorem','W1 interfaces/results and B3c budget ownership','Workspace/K4 codec/F2 policy','5696-action caps,798/8192 proof bounds,425-unit reset charge','Pinned tools/dependencies and no-cheating trust boundary'],
+ 'not_established':['Failure-result traces and unconditional executor/planner agreement','Complete remaining source-operation and outcome-specific frame ledgers','Full M1 controls and B3c/B3d/B4','Independent human specification review and supported decoder or full mathematical safety'],
+ 'release_gate':'incomplete','publication_blocker':'Configured encrypted SSH signing key is not loaded; signing was not bypassed.'
+}
+(ev/'brotli-b3c-m1-executor-normal.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({'verified':v['verification-results']['verified'],'errors':0,'runtime_tests':107,'semantic_rejections':26,'candidate_patch':str(patchfile)}))

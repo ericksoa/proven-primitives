@@ -849,3 +849,26 @@ context-map kinds with exact/short reservations and complete workspace compariso
 Evidence is in `evidence/brotli-b3c-m1-k6.json`. K6 is complete; M1's full
 executor/failure trace, remaining source-ledger/control obligations and all
 remaining B3c/B3d/B4 and independent human review obligations remain open.
+
+
+### Approved K7/K8 result-contract implementation
+
+The human approved K7 and then directed implementation of the two proposed K8
+supporting contracts on 2026-11-15. The existing canonical and singleton metadata
+constructors now specify their exact results. The simple installer guarantees
+success/error classification in its original valid decoded-description domain;
+the canonical installer specifies its existing invalid-tree error and unchanged
+workspace and metadata. All previous requirements, guarantees and executable
+bodies are retained. K6 formulas, W1 interfaces, B3c ownership, workspace, K4
+encoding, F2 policy, 5,696-action caps, 798/8,192 proof bounds and the 425-unit
+reset charge are unchanged.
+
+The exact final source passed 1,300 whole-crate proof checks with zero errors,
+108 runtime tests and 29 affected semantic defect rejections, including six new
+result-contract defects. See `evidence/brotli-b3c-m1-k7-k8.json`. The earlier
+unresolved singleton proof is preserved and is now discharged. Broader parser
+failure-trace experiments include resource-only control failures; those do not
+count as semantic rejections and do not complete M1. Remaining full tree/action,
+source-operation, outcome-frame and control closure, B3c/B3d/B4 and independent
+human specification review remain open. No supported-decoder or complete
+mathematical-safety claim is made.
