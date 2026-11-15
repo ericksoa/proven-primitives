@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (57154,13): 'if' cannot be used in patterns.
+WARNING: (64810,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-62575/src/brotli_input.rs:16406:1
+      |
+16406 | / fn m1_tree_complete_simple_status(workspace: &mut [u8], window_bytes: u32,
+16407 | |     region: crate::brotli_prefix::TreeRegion, tree: u16, alphabet_limit: u16,
+16408 | |     code: SimpleCodeDescription) -> (status: SerializedTreeStatus)
+      | |_________________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-62575/src/brotli_input.rs:16418:9
+      |
+16418 | /         status == if alphabet_limit as nat <= crate::brotli_prefix::tree_region_symbols(region)
+16419 | |             && (tree as nat) < crate::brotli_prefix::tree_region_count(region) {
+16420 | |                 SerializedTreeStatus::Complete
+16421 | |             } else { SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
+16422 | |                 crate::brotli_prefix::WorkspaceError::InvalidSymbol)) },
+      | |_______________________________________________________________________^ failed this postcondition
+...
+16427 | /     match install_completed_simple_tree(workspace, window_bytes, region, tree, alphabet_limit, code) {
+16428 | |         Ok(_) => SerializedTreeStatus::Complete,
+16429 | |         Err(_error) => SerializedTreeStatus::Failed(CompressedHeaderError::Truncated),
+16430 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

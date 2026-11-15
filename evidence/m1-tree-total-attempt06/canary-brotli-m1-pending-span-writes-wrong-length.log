@@ -1,0 +1,33 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (57154,13): 'if' cannot be used in patterns.
+WARNING: (64810,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-66187/src/brotli_input.rs:14725:5
+      |
+14725 |     while written < span_count
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-66187/src/brotli_input.rs:14617:1
+      |
+14617 | / fn drain_serialized_pending_span(
+14618 | |     workspace: &mut [u8],
+14619 | |     window_bytes: u32,
+14620 | |     decoder: &mut CodeDescriptionDecoder,
+14621 | | ) -> (r: Result<CodeDescriptionStep, CompressedHeaderError>)
+      | |___________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-66187/src/brotli_input.rs:14792:20
+      |
+14792 |               assert(workspace@ == before_length.update(window_bytes as int
+      |  ____________________^
+14793 | |                 + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int
+14794 | |                 + _old_initialized as int, length));
+      | |__________________________________________________^ assertion failed
+
+error: aborting due to 1 previous error
+

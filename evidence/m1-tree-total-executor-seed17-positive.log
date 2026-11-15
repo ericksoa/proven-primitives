@@ -1,0 +1,47 @@
+note: preparing crate for verification
+
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> src/brotli_input.rs:16808:5
+      |
+16808 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 265 seconds
+     --> src/brotli_input.rs:16808:5
+      |
+16808 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: done with module brotli_input, function lib::brotli_input::advance_serialized_tree
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)
+(use --output-json for machine-readable output)
+verus-build-info
+Verus
+  Version: 0.2026.10.18.7d82994
+  Profile: release
+  Platform: macos_aarch64
+  Toolchain: 1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)
+
+total-time:          279923 ms
+    rust-time:                8608 ms
+        init-and-types:           5017 ms
+        trait-conflicts:            96 ms
+        compile-time:             3494 ms
+    verification-time:      270205 ms
+        vir-time:                 3824 ms
+            hir-time:                  799 ms
+            import-time:               170 ms
+            rust-to-vir:              1087 ms
+        verify-crate-time:      266381 ms
+    unaccounted-time:         1109 ms
+
+verify-crate-time-breakdown
+    total verify-time:         266005 ms   (1 threads)
+        total air-time:               328 ms   (1 threads)
+        total smt-time:            265524 ms   (1 threads)
+            total smt-init:                 0 ms,     6493 rlimit (1 threads)
+            total smt-run:             265524 ms, 811937018 rlimit (1 threads)

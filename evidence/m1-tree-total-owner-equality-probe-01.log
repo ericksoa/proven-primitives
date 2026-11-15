@@ -1,0 +1,140 @@
+note: preparing crate for verification
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> src/brotli_input.rs:33868:1
+      |
+33868 | / fn advance_planned_context_tree(
+33869 | |     workspace: &mut [u8], window_bytes: u32,
+33870 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+33871 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: assertion failed
+     --> src/brotli_input.rs:33918:65
+      |
+33918 |                     SerializedTreeStatus::NeedInput => { assert(false); },
+      |                                                                 ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33919:64
+      |
+33919 |                     SerializedTreeStatus::Complete => { assert(false); },
+      |                                                                ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33920:96
+      |
+33920 |                     SerializedTreeStatus::Failed(CompressedHeaderError::Truncated) => { assert(false); },
+      |                                                                                                ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33921:102
+      |
+33921 |                     SerializedTreeStatus::Failed(CompressedHeaderError::UnsupportedMode) => { assert(false); },
+      |                                                                                                      ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33922:100
+      |
+33922 |                     SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) => { assert(false); },
+      |                                                                                                    ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33923:153
+      |
+33923 | ...ix::WorkspaceError::InvalidWindowBits)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33924:153
+      |
+33924 | ...ix::WorkspaceError::WorkspaceTooSmall)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33925:147
+      |
+33925 | ...i_prefix::WorkspaceError::InvalidTree)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33929:142
+      |
+33929 | ...pressedFormatError::InvalidPrefixCode)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33930:146
+      |
+33930 | ...sedFormatError::DuplicateSimpleSymbol)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33931:140
+      |
+33931 | ...ompressedFormatError::CodeLengthSpace)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33932:143
+      |
+33932 | ...ressedFormatError::InvalidBlockLength)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33933:141
+      |
+33933 | ...mpressedFormatError::ContextMapRepeat)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33934:140
+      |
+33934 | ...ompressedFormatError::ContextMapValue)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33935:143
+      |
+33935 | ...ressedFormatError::ContextMapCoverage)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33936:143
+      |
+33936 | ...ressedFormatError::InvalidBlockSwitch)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33937:140
+      |
+33937 | ...ompressedFormatError::InvalidSequence)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33938:140
+      |
+33938 | ...ompressedFormatError::InvalidMetadata)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33939:148
+      |
+33939 | ...dFormatError::InvalidDistanceAlphabet)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+error: assertion failed
+     --> src/brotli_input.rs:33940:148
+      |
+33940 | ...dFormatError::InvalidBlockDeclaration)) => { assert(false); },
+      |                                                        ^^^^^ assertion failed
+
+note: done with module brotli_input
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 20 previous errors
+

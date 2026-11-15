@@ -1,0 +1,110 @@
+[
+  {
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "name": "brotli-m1-tree-simple-rejection-is-truncated",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "name": "brotli-m1-tree-canonical-rejection-is-internal",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "name": "brotli-m1-tree-simple-plan-reports-invalid-tree",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "name": "brotli-m1-tree-canonical-plan-loses-tree-priority",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "name": "brotli-m1-tree-canonical-plan-loses-length-error",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "name": "brotli-m1-tree-owner-flags-matching-workspace-error",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "name": "brotli-m1-executor-parser-error-replaced",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "name": "brotli-m1-executor-bad-span-error-replaced",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "name": "brotli-m1-executor-canonical-error-replaced",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "name": "brotli-m1-executor-empty-input-fabricates-error",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "name": "brotli-m1-pending-span-wrong-failure-reason",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "name": "brotli-m1-planner-parser-error-replaced",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "name": "brotli-m1-planner-bad-span-error-replaced",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "name": "brotli-m1-planner-bad-builder-error-replaced",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+    "name": "brotli-m1-executor-simple-loses-consumption",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+    "name": "brotli-m1-executor-canonical-loses-consumption",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+    "name": "brotli-m1-executor-simple-false-need-input",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+    "name": "brotli-m1-executor-canonical-false-need-input",
+    "root_contract_unchanged": true,
+    "unique_body_anchor": true
+  }
+]

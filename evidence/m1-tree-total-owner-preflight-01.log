@@ -1,0 +1,44 @@
+note: preparing crate for verification
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+error: assertion failed
+     --> src/brotli_input.rs:33913:24
+      |
+33913 |         proof { assert(!m1_tree_has_decodable_start(before_tree_action, window_bytes)); }
+      |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+note: done with module brotli_input
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+
+(use --output-json for machine-readable output)
+verus-build-info
+Verus
+  Version: 0.2026.10.18.7d82994
+  Profile: release
+  Platform: macos_aarch64
+  Toolchain: 1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)
+
+total-time:           17478 ms
+    rust-time:                5160 ms
+        init-and-types:           5062 ms
+        trait-conflicts:            97 ms
+        compile-time:                0 ms
+    verification-time:       11175 ms
+        vir-time:                 3917 ms
+            hir-time:                  789 ms
+            import-time:               168 ms
+            rust-to-vir:              1072 ms
+        verify-crate-time:        7258 ms
+    unaccounted-time:         1143 ms
+
+verify-crate-time-breakdown
+    total verify-time:           6756 ms   (1 threads)
+        total air-time:              4852 ms   (1 threads)
+        total smt-time:               372 ms   (1 threads)
+            total smt-init:                 0 ms,     2417 rlimit (1 threads)
+            total smt-run:                372 ms,   824577 rlimit (1 threads)

@@ -1,0 +1,52 @@
+from pathlib import Path
+import json,hashlib,gzip,shutil,re,subprocess,os,datetime
+main=Path.cwd();ev=main/'evidence';prefix='m1-tree-total-attempt06';out=ev/prefix;snap=main/'target/m1-tree-total-controls06'
+load=lambda p:json.loads(p.read_text())
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+rel=lambda p:str(p.relative_to(main))
+f=load(ev/(prefix+'-source-freeze.json'));v=load(ev/('brotli-b3c-'+prefix+'-verification.json'))
+assert f['exit_code']==0 and f['source_unchanged'] and '--no-cheating' in f['command']
+assert v['verification-results']['success'] and v['verification-results']['errors']==0 and v['verification-results']['is-verifying-entire-crate']
+for n,d in {**f['source_sha256'],**f['validation_source_sha256']}.items():assert h(main/n)==h(snap/n)==d,n
+rows=load(snap/'evidence'/(prefix+'-controls-results.json'));assert sum(r['expected_mutants'] for r in rows)==22
+assert all(r['exit_code']==0 and r['source_unchanged'] and len(r['mutants'])==r['expected_mutants'] and all(m['semantic_rejection'] for m in r['mutants']) for r in rows)
+assert sum(map(int,re.findall(r'test result: ok\. (\d+) passed; 0 failed',(ev/(prefix+'-runtime.log')).read_text())))==109
+out.mkdir(exist_ok=True)
+for p in (snap/'evidence').rglob('*'):
+ if p.is_file() and ('canary-' in p.name or 'controls-' in p.name or p.name=='preceding-main-positive.json'):shutil.copy2(p,out/p.name)
+rows=json.loads(json.dumps(rows))
+for r in rows:
+ r['log']=rel(out/Path(r['log']).name);assert h(main/r['log'])==r['sha256']
+ for m in r['mutants']:
+  m['log']=rel(out/Path(m['log']).name);assert h(main/m['log'])==m['sha256']
+for n in ['src/brotli_input.rs','tests/proof_rejection.rs']:(out/('source-'+Path(n).name+'.gz')).write_bytes(gzip.compress((main/n).read_bytes(),mtime=0))
+for n in ['verification','controls']:shutil.copy2(main/('target/m1-tree-total-'+n+'-driver.py'),out/(n+'-driver.py.txt'))
+shutil.copy2(main/'target/m1-tree-total-finalize.py',out/'finalize.py.txt')
+prior=load(ev/'brotli-b3c-m1-k7-k8.json');tool=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos');binaries={n:h(tool/n) for n in ['verus','rust_verify','z3']};assert binaries==prior['verifier_binary']
+report={
+ 'component':'Brotli M1 all serialized-tree outcomes from a decodable saved start; full M1 incomplete',
+ 'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+ 'base_commit':'4084cbe3dbe51549a0a99e687de26f1ea06fe29e',
+ 'claim':'Read-only planning and the actual serialized-tree executor now bind normal and every installation-error result to the existing replay trace from a decodable saved start. The context-tree caller proves equal consumption/status for every such result and excludes its mismatch branch under that same condition.',
+ 'authority':'Previously human-approved M1, E2 bounded input-private refactoring and K1/K7/K8 result contracts. No new cross-module API, layout, dependency, policy or architectural choice.',
+ 'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],
+ 'verification_results':v['verification-results'],'verification_options':f['command'],'verification_elapsed_seconds':f['elapsed_seconds'],'verifier_binary':binaries,
+ 'verification_evidence':{'path':rel(ev/('brotli-b3c-'+prefix+'-verification.json')),'sha256':h(ev/('brotli-b3c-'+prefix+'-verification.json'))},
+ 'source_freeze':{'path':rel(ev/(prefix+'-source-freeze.json')),'sha256':h(ev/(prefix+'-source-freeze.json'))},
+ 'whole_log':{'path':rel(ev/(prefix+'-whole-crate.log')),'sha256':h(ev/(prefix+'-whole-crate.log'))},
+ 'runtime':{'passed':109,'failed':0,'library':98,'primitives':9,'trust_scan':1,'upstream_comparison':1,'path':rel(ev/(prefix+'-runtime.log')),'sha256':h(ev/(prefix+'-runtime.log'))},
+ 'controls':{'new_install_outcome_defects':6,'legacy_affected_defects':16,'semantic_rejections':22,'all_after_exact_source_main_positive':True,'snapshot_byte_identical_to_frozen_main_source':True,'rows':rows},
+ 'source_audit':{'path':'evidence/m1-tree-total-source-audit.json','sha256':h(ev/'m1-tree-total-source-audit.json')},
+ 'error_aliases':'Three function-local aliases retain the original returned error variants. Exact compute_only assertions and matching loop invariants bind them to the existing replay specification. Three deliberate alias substitutions fail with expression simplifies to false before SMT; only those named cases accept this exact diagnostic.',
+ 'action_extraction':'E2 input-private completed-simple helper calls the original installer once and maps its actual result. The root uses that actual status in the checked trace. Named-call audit expands this helper before comparison.',
+ 'historical_attempts':{'01':'Healthy 1300/0; simple-error mutant resource-only','02':'Healthy 1300/0; simple-error mutant resource-only','03':'Healthy 1301/0; planner-error mutant resource-only','04':'Interrupted whole verification; no positive result','05':'Healthy 1304/0; older harness misclassified an actual computed proof contradiction','06':'Final exact-source whole positive followed by all 22 semantic rejections'},
+ 'scalar_comparison':'Existing derived enum comparison normalized inline to the exact same 23 equal scalar-variant pairs, preserving consumed-first short-circuit evaluation. Unconditional checked equality to logical status/consumption mismatch; no parser resource event added.',
+ 'runtime_matrix':'All six tree regions, simple/canonical completion, invalid tree/alphabet, simultaneous errors, invalid code-length tables, read-only planning and exact W1 status/consumption/error precedence; rejected completed states preserve entire workspace.',
+ 'preserved':['All prior executable signatures, requirements and guarantees','Original existing tree-state and canonical length specifications','W1 result/interface, B3c budget ownership, workspace, K4 codec and F2 policy','K6 formulas,5696 caps,798/8192 proof bounds,425 reset charge','Pinned tools/dependencies and proof trust boundary'],
+ 'remaining':['Initial malformed encodings outside the decodable-start predicate','Complete source-operation ledger, outcome byte frames and full M1 control closure','Remaining B3c/B3d/B4 and independent human specification review'],
+ 'trusted_components':['Mathematical specifications and interpretation','Pinned Verus/Z3/vstd','Rust/LLVM and Apple build tools','Machine and operating environment'],
+ 'not_claimed':'Complete M1, supported decoder, universal caller composition, side-channel resistance or source-to-binary correctness',
+ 'release_gate':'incomplete'
+}
+(ev/'brotli-b3c-m1-tree-total.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({'verified':v['verification-results']['verified'],'errors':0,'runtime':109,'semantic_rejections':22,'receipt':'evidence/brotli-b3c-m1-tree-total.json'}))

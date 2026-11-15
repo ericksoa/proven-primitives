@@ -15272,6 +15272,11 @@ fn install_completed_simple_tree(
         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT)
             == alphabet_limit,
     ensures
+        r.is_ok() == (alphabet_limit as nat <= crate::brotli_prefix::tree_region_symbols(region)
+            && (tree as nat) < crate::brotli_prefix::tree_region_count(region)),
+        alphabet_limit as nat > crate::brotli_prefix::tree_region_symbols(region)
+            || (tree as nat) >= crate::brotli_prefix::tree_region_count(region) ==>
+                r == Err(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidSymbol)),
         r.is_ok() ==> alphabet_limit as nat <= crate::brotli_prefix::tree_region_symbols(region)
             && (tree as nat) < crate::brotli_prefix::tree_region_count(region),
         code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
@@ -15301,6 +15306,10 @@ fn install_completed_simple_tree(
         },
 {
     let ghost original = workspace@;
+    proof {
+        reveal(SimpleCodeDescription::valid); reveal(simple_count); reveal(active_symbols_distinct);
+        reveal(b3b_workspace_shape);
+    }
     let meta = match crate::brotli_prefix::install_simple_tree(
         workspace,
         window_bytes,
@@ -16393,6 +16402,34 @@ proof fn m1_tree_prefix_rebase_current(actions: Seq<(CodeDescriptionDecoder, Cod
     }
 }
 
+// The existing completed-simple installation and status mapping, kept private.
+fn m1_tree_complete_simple_status(workspace: &mut [u8], window_bytes: u32,
+    region: crate::brotli_prefix::TreeRegion, tree: u16, alphabet_limit: u16,
+    code: SimpleCodeDescription) -> (status: SerializedTreeStatus)
+    requires
+        b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+        code.valid(alphabet_limit),
+        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_ACTIVE_REGION)
+            == tree_region_tag_spec(region),
+        b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ACTIVE_TREE) == tree,
+        b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT)
+            == alphabet_limit,
+    ensures
+        status == if alphabet_limit as nat <= crate::brotli_prefix::tree_region_symbols(region)
+            && (tree as nat) < crate::brotli_prefix::tree_region_count(region) {
+                SerializedTreeStatus::Complete
+            } else { SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
+                crate::brotli_prefix::WorkspaceError::InvalidSymbol)) },
+        code_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+        status == SerializedTreeStatus::Complete ==>
+            active_tree_metadata_complete(final(workspace)@, window_bytes),
+{
+    match install_completed_simple_tree(workspace, window_bytes, region, tree, alphabet_limit, code) {
+        Ok(_) => SerializedTreeStatus::Complete,
+        Err(error) => SerializedTreeStatus::Failed(error),
+    }
+}
+
 // The existing complete-complex branch, isolated without changing its operations.
 #[verifier::rlimit(600)]
 #[verifier::spinoff_prover]
@@ -16407,6 +16444,16 @@ fn m1_tree_complete_canonical(workspace: &mut [u8], window_bytes: u32,
         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ACTIVE_TREE) == tree,
         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_ALPHABET_LIMIT) == decoder.alphabet_limit,
     ensures
+        {
+            let initialized = b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
+            let values = m1_tree_builder_values(old(workspace)@, window_bytes, decoder.alphabet_limit, initialized);
+            let action = (decoder, decoder, CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress },
+                decoder, decoder, initialized, initialized, values, values);
+            m1_tree_iteration_status(action, region, tree) == Some(match r {
+                Ok(()) => SerializedTreeStatus::Complete,
+                Err(error) => SerializedTreeStatus::Failed(error),
+            })
+        },
         r.is_err() ==> matches!(r.unwrap_err(), CompressedHeaderError::InternalState | CompressedHeaderError::Workspace(_)),
         r == Err(CompressedHeaderError::InternalState) ==> {
             &&& final(workspace)@ == old(workspace)@
@@ -16457,6 +16504,11 @@ fn m1_tree_complete_canonical(workspace: &mut [u8], window_bytes: u32,
         r.is_ok() ==> active_tree_metadata_complete(final(workspace)@, window_bytes),
 {
     let ghost original = workspace@;
+    proof {
+        reveal(m1_tree_iteration_status); reveal(CodeDescriptionDecoder::valid);
+        reveal(b3b_workspace_shape);
+        m1_tree_full_builder_sequence(original, window_bytes, decoder.alphabet_limit);
+    }
     let decoded_symbols = match decoder.phase {
         CodeDescriptionPhase::CompleteComplex { decoded_symbols, .. } => decoded_symbols,
         _ => { proof { assert(false); } 0u16 },
@@ -16690,9 +16742,8 @@ fn advance_serialized_tree(
     end_of_input: bool,
 ) -> (r: SerializedTreeStep)
     ensures
-        m1_tree_has_decodable_start(old(workspace)@, window_bytes)
-            && !matches!(r.status, SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(_))) ==>
-                m1_tree_result_has_trace(old(workspace)@, window_bytes, input@, end_of_input, r),
+        m1_tree_has_decodable_start(old(workspace)@, window_bytes) ==>
+            m1_tree_result_has_trace(old(workspace)@, window_bytes, input@, end_of_input, r),
         !matches!(r.status, SerializedTreeStatus::Failed(_)) ==>
             m1_tree_result_has_trace(old(workspace)@, window_bytes, input@, end_of_input, r),
         final(workspace)@.len() == old(workspace)@.len(),
@@ -17039,70 +17090,43 @@ fn advance_serialized_tree(
                 }
             }
             CodeDescriptionPhase::CompleteSimple(code) => {
-                let installed = install_completed_simple_tree(
-                    workspace,
-                    window_bytes,
-                    region,
-                    tree,
-                    decoder.alphabet_limit,
-                    code,
-                );
+                let status = m1_tree_complete_simple_status(workspace, window_bytes, region, tree,
+                    decoder.alphabet_limit, code);
                 proof { reveal(code_store_frame); }
-                match installed {
-                    Ok(_) => {
-                        proof {
-                            let action = (before_field, field_after, step, started, started,
-                                before_initialized, before_initialized, before_values, before_values);
-                            m1_tree_trace_unspanned_action(before_field, field_after, step, started,
-                                before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
-                            m1_tree_trace_simple_status(action, region, tree);
-                            m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
-                                initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
-                                actions, action, before_consumed as nat, SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete });
-                        }
-                        return SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete };
-                    },
-                    Err(error) => return SerializedTreeStep {
-                        consumed,
-                        status: SerializedTreeStatus::Failed(error),
-                    },
+                let simple_result = SerializedTreeStep { consumed, status };
+                proof {
+                    let action = (before_field, field_after, step, started, started,
+                        before_initialized, before_initialized, before_values, before_values);
+                    m1_tree_trace_unspanned_action(before_field, field_after, step, started,
+                        before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
+                    assert(m1_tree_iteration_status(action, region, tree) == Some(simple_result.status)) by {
+                        reveal(m1_tree_iteration_status);
+                    }
+                    m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
+                        initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
+                        actions, action, before_consumed as nat, simple_result);
                 }
+                return simple_result;
             }
             CodeDescriptionPhase::CompleteComplex { .. } => {
                 let ghost before_canonical = workspace@;
-                let status = match m1_tree_complete_canonical(workspace, window_bytes, region, tree, decoder) {
-                    Ok(()) => {
-                        proof { m1_tree_full_builder_sequence(before_canonical, window_bytes, decoder.alphabet_limit); }
-                        proof {
-                            let action = (before_field, field_after, step, started, started,
-                                before_initialized, before_initialized, before_values, before_values);
-                            m1_tree_trace_unspanned_action(before_field, field_after, step, started,
-                                before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
-                            m1_tree_trace_canonical_status(action, region, tree);
-                            m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
-                                initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
-                                actions, action, before_consumed as nat, SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete });
-                        }
-                        SerializedTreeStatus::Complete
-                    },
-                    Err(error) => {
-                        proof {
-                            if !matches!(error, CompressedHeaderError::Workspace(_)) {
-                                {
-                                    let action = (before_field, field_after, step, started, started,
-                                        before_initialized, before_initialized, before_values, before_values);
-                                    m1_tree_trace_unspanned_action(before_field, field_after, step, started,
-                                        before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
-                                    m1_tree_trace_bad_canonical_builder(action, region, tree);
-                                    m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
-                                        initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
-                                        actions, action, before_consumed as nat, SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) });
-                                }
-                            }
-                        }
-                        SerializedTreeStatus::Failed(error)
-                    },
+                let installed = m1_tree_complete_canonical(workspace, window_bytes, region, tree, decoder);
+                let status = match installed {
+                    Ok(()) => SerializedTreeStatus::Complete,
+                    Err(error) => SerializedTreeStatus::Failed(error),
                 };
+                proof {
+                    let action = (before_field, field_after, step, started, started,
+                        before_initialized, before_initialized, before_values, before_values);
+                    m1_tree_trace_unspanned_action(before_field, field_after, step, started,
+                        before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
+                    assert(m1_tree_iteration_status(action, region, tree) == Some(status)) by {
+                        reveal(m1_tree_iteration_status);
+                    }
+                    m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
+                        initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
+                        actions, action, before_consumed as nat, SerializedTreeStep { consumed, status });
+                }
                 return SerializedTreeStep { consumed, status };
             }
             CodeDescriptionPhase::Failed(error) => {
@@ -31551,10 +31575,9 @@ fn plan_serialized_tree(
 ) -> (r: Result<SerializedTreePlan, CoreFailure>)
     requires old(budget).valid(),
     ensures
-        r.is_ok() && m1_tree_has_decodable_start(workspace@, window_bytes)
-            && !matches!(r.unwrap().status, SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(_))) ==>
-                m1_tree_result_has_trace(workspace@, window_bytes, input@, end_of_input,
-                    SerializedTreeStep { consumed: r.unwrap().consumed, status: r.unwrap().status }),
+        r.is_ok() && m1_tree_has_decodable_start(workspace@, window_bytes) ==>
+            m1_tree_result_has_trace(workspace@, window_bytes, input@, end_of_input,
+                SerializedTreeStep { consumed: r.unwrap().consumed, status: r.unwrap().status }),
         r.is_ok() && !matches!(r.unwrap().status, SerializedTreeStatus::Failed(_)) ==>
             m1_tree_result_has_trace(workspace@, window_bytes, input@, end_of_input,
                 SerializedTreeStep { consumed: r.unwrap().consumed, status: r.unwrap().status }),
@@ -31571,6 +31594,14 @@ fn plan_serialized_tree(
         r.is_ok() ==> final(budget).work_remaining as int
             == old(budget).work_remaining as int - r.unwrap().planning_work as int,
 {
+    const SIMPLE_DESTINATION_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidSymbol;
+    const CANONICAL_TREE_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidTree;
+    const CANONICAL_LENGTH_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidCodeLength;
+    proof {
+        assert(matches!(SIMPLE_DESTINATION_ERROR, crate::brotli_prefix::WorkspaceError::InvalidSymbol)) by (compute_only);
+        assert(matches!(CANONICAL_TREE_ERROR, crate::brotli_prefix::WorkspaceError::InvalidTree)) by (compute_only);
+        assert(matches!(CANONICAL_LENGTH_ERROR, crate::brotli_prefix::WorkspaceError::InvalidCodeLength)) by (compute_only);
+    }
     proof {
         if m1_tree_has_decodable_start(workspace@, window_bytes) {
             m1_tree_decodable_start_facts(workspace@, window_bytes);
@@ -31703,6 +31734,9 @@ fn plan_serialized_tree(
     let mut iterations = 0u16;
     while iterations < 5_696
         invariant
+            matches!(SIMPLE_DESTINATION_ERROR, crate::brotli_prefix::WorkspaceError::InvalidSymbol),
+            matches!(CANONICAL_TREE_ERROR, crate::brotli_prefix::WorkspaceError::InvalidTree),
+            matches!(CANONICAL_LENGTH_ERROR, crate::brotli_prefix::WorkspaceError::InvalidCodeLength),
             consumed <= input.len(),
             actions.len() == iterations as nat,
             capacity as nat == crate::brotli_prefix::tree_region_symbols(region),
@@ -31853,9 +31887,23 @@ fn plan_serialized_tree(
                 // W1 validates the install destination only after parsing the
                 // description and storing its queue, including on bad state.
                 if decoder.alphabet_limit > capacity || tree >= tree_count {
-                    return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
+                    let rejected_result = SerializedTreePlan { planning_work, execution_work, consumed,
                         status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
-                            crate::brotli_prefix::WorkspaceError::InvalidSymbol)) });
+                            SIMPLE_DESTINATION_ERROR)) };
+                    proof {
+                        let action = (before_iteration, field_after, step, started, decoder,
+                            before_initialized, builder_initialized, before_values, lengths@);
+                        m1_tree_trace_unspanned_action(before_iteration, field_after, step, started,
+                            before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
+                        assert(m1_tree_iteration_status(action, region, tree) == Some(rejected_result.status)) by {
+                            reveal(m1_tree_iteration_status);
+                        }
+                        m1_tree_record_finished_trace(workspace@, window_bytes, input@, end_of_input,
+                            initial_decoder, region, tree, initial_initialized, initial_values,
+                            actions, action, before_consumed as nat,
+                            SerializedTreeStep { consumed: rejected_result.consumed, status: rejected_result.status });
+                    }
+                    return Ok(rejected_result);
                 }
                 let ghost before_simple_install_work = execution_work;
                 execution_work = checked_planned_work_add(
@@ -31913,9 +31961,23 @@ fn plan_serialized_tree(
                 if decoder.alphabet_limit > capacity || tree >= tree_count {
                     let error = if decoder.alphabet_limit > capacity {
                         crate::brotli_prefix::WorkspaceError::InvalidSymbol
-                    } else { crate::brotli_prefix::WorkspaceError::InvalidTree };
-                    return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
-                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(error)) });
+                    } else { CANONICAL_TREE_ERROR };
+                    let rejected_result = SerializedTreePlan { planning_work, execution_work, consumed,
+                        status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(error)) };
+                    proof {
+                        let action = (before_iteration, field_after, step, started, decoder,
+                            before_initialized, builder_initialized, before_values, lengths@);
+                        m1_tree_trace_unspanned_action(before_iteration, field_after, step, started,
+                            before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
+                        assert(m1_tree_iteration_status(action, region, tree) == Some(rejected_result.status)) by {
+                            reveal(m1_tree_iteration_status);
+                        }
+                        m1_tree_record_finished_trace(workspace@, window_bytes, input@, end_of_input,
+                            initial_decoder, region, tree, initial_initialized, initial_values,
+                            actions, action, before_consumed as nat,
+                            SerializedTreeStep { consumed: rejected_result.consumed, status: rejected_result.status });
+                    }
+                    return Ok(rejected_result);
                 }
                 let (install_planning, install_execution, install_valid) = plan_canonical_tree_install(
                     &lengths,
@@ -31931,9 +31993,23 @@ fn plan_serialized_tree(
                     install_execution,
                 )?;
                 if !install_valid {
-                    return Ok(SerializedTreePlan { planning_work, execution_work, consumed,
+                    let rejected_result = SerializedTreePlan { planning_work, execution_work, consumed,
                         status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
-                            crate::brotli_prefix::WorkspaceError::InvalidCodeLength)) });
+                            CANONICAL_LENGTH_ERROR)) };
+                    proof {
+                        let action = (before_iteration, field_after, step, started, decoder,
+                            before_initialized, builder_initialized, before_values, lengths@);
+                        m1_tree_trace_unspanned_action(before_iteration, field_after, step, started,
+                            before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
+                        assert(m1_tree_iteration_status(action, region, tree) == Some(rejected_result.status)) by {
+                            reveal(m1_tree_iteration_status);
+                        }
+                        m1_tree_record_finished_trace(workspace@, window_bytes, input@, end_of_input,
+                            initial_decoder, region, tree, initial_initialized, initial_values,
+                            actions, action, before_consumed as nat,
+                            SerializedTreeStep { consumed: rejected_result.consumed, status: rejected_result.status });
+                    }
+                    return Ok(rejected_result);
                 }
                 let normal_result = SerializedTreePlan {
                     planning_work,
@@ -33843,16 +33919,48 @@ fn advance_planned_context_tree(
     let step = advance_serialized_tree(workspace, window_bytes,
         &input[..allowed], end_of_input && allowed == input.len());
     proof {
-        if m1_tree_has_decodable_start(before_tree_action, window_bytes)
-            && !matches!(plan.status, SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(_)))
-            && !matches!(step.status, SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(_))) {
+        if m1_tree_has_decodable_start(before_tree_action, window_bytes) {
             m1_tree_traced_results_agree(before_tree_action, window_bytes, input@.take(allowed as int),
                 end_of_input && allowed == input.len(),
                 SerializedTreeStep { consumed: plan.consumed, status: plan.status }, step);
             assert(step.consumed == plan.consumed && step.status == plan.status);
         }
     }
-    if step.consumed != plan.consumed || step.status != plan.status {
+    // Preserve the existing short-circuit comparison order. These are exactly
+    // the equal scalar variants of the derived comparison used previously.
+    let outcomes_disagree = if step.consumed != plan.consumed { true } else {
+        match (step.status, plan.status) {
+            (SerializedTreeStatus::NeedInput, SerializedTreeStatus::NeedInput) => false,
+            (SerializedTreeStatus::Complete, SerializedTreeStatus::Complete) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::Truncated), SerializedTreeStatus::Failed(CompressedHeaderError::Truncated)) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::UnsupportedMode), SerializedTreeStatus::Failed(CompressedHeaderError::UnsupportedMode)) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InternalState), SerializedTreeStatus::Failed(CompressedHeaderError::InternalState)) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidWindowBits)), SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidWindowBits))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::WorkspaceTooSmall)), SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::WorkspaceTooSmall))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidTree)), SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidTree))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidSymbol)), SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidSymbol))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidCodeLength)), SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidCodeLength))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::UninitializedRecord)), SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::UninitializedRecord))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidPrefixCode))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::DuplicateSimpleSymbol)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::DuplicateSimpleSymbol))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::CodeLengthSpace)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::CodeLengthSpace))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidBlockLength)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidBlockLength))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapValue)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapValue))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapCoverage)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapCoverage))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidBlockSwitch)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidBlockSwitch))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidSequence)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidSequence))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidMetadata)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidMetadata))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidDistanceAlphabet)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidDistanceAlphabet))) => false,
+            (SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidBlockDeclaration)), SerializedTreeStatus::Failed(CompressedHeaderError::InvalidFormat(CompressedFormatError::InvalidBlockDeclaration))) => false,
+            _ => true,
+        }
+    };
+    proof {
+        assert(outcomes_disagree == (step.consumed != plan.consumed || step.status != plan.status));
+    }
+    if outcomes_disagree {
+        proof { assert(!m1_tree_has_decodable_start(before_tree_action, window_bytes)); }
         return Err(CompressedStep { consumed: step.consumed, status: CompressedStatus::Failed(core_state_failure()) });
     }
     if !budget.charge_input(step.consumed as u64) {
@@ -41618,6 +41726,80 @@ mod tests {
             let step = advance_serialized_tree(&mut workspace, window, &[], false);
             assert_eq!((step.consumed, step.status), (plan.consumed, plan.status));
             assert_eq!(workspace, original);
+        }
+    }
+
+    #[test]
+    fn m1_tree_install_results_match_w1_across_regions_and_error_priority() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        use crate::brotli_prefix::{TreeRegion, WorkspaceError};
+        let regions = [TreeRegion::Literal, TreeRegion::Command, TreeRegion::Distance,
+            TreeRegion::BlockType, TreeRegion::BlockLength, TreeRegion::TemporaryContext];
+        for region in regions {
+            let (capacity, tree_count) = match region {
+                TreeRegion::Literal => (crate::brotli_prefix::LITERAL_SYMBOLS, 256u16),
+                TreeRegion::Command => (crate::brotli_prefix::COMMAND_SYMBOLS, 256),
+                TreeRegion::Distance => (crate::brotli_prefix::DISTANCE_SYMBOLS, 256),
+                TreeRegion::BlockType => (crate::brotli_prefix::BLOCK_TYPE_SYMBOLS, 3),
+                TreeRegion::BlockLength => (crate::brotli_prefix::BLOCK_LENGTH_SYMBOLS, 3),
+                TreeRegion::TemporaryContext => (crate::brotli_prefix::TEMP_CONTEXT_SYMBOLS, 1),
+            };
+            for canonical in [false, true] {
+                for (bad_tree, bad_alphabet, invalid_lengths) in [
+                    (false, false, false), (true, false, false),
+                    (false, true, false), (true, true, false),
+                    (false, false, true), (true, false, true),
+                ] {
+                    if invalid_lengths && !canonical { continue; }
+                    let alphabet = if bad_alphabet { capacity + 1 } else { 2 };
+                    if alphabet > 704 { continue; }
+                    let tree = if bad_tree { tree_count } else { 0 };
+                    let (mut workspace, window) = fresh_b3b_workspace();
+                    start_serialized_tree(&mut workspace, window, region, tree, alphabet, alphabet).unwrap();
+                    if canonical {
+                        let mut aux = [0u8; 18]; aux[1] = 1;
+                        let code = ComplexCodeLengthAlphabet { skip: 0, lengths: aux };
+                        let decoder = CodeDescriptionDecoder { queue: BitQueue::new(),
+                            alphabet_max: alphabet, alphabet_limit: alphabet,
+                            phase: CodeDescriptionPhase::ComplexSymbol(ComplexSymbolProgress {
+                                code, symbol: 0, prev_code_len: 8, repeat: 0, repeat_code_len: 0,
+                                space: 32_768, prefix_width: 0, prefix_bits: 0, singleton: 1 }) };
+                        store_code_description_decoder(&mut workspace, window, decoder).unwrap();
+                        store_code_description_decoder(&mut workspace, window, CodeDescriptionDecoder {
+                            phase: CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: alphabet }, ..decoder
+                        }).unwrap();
+                        for symbol in 0..alphabet {
+                            workspace[window as usize + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as usize
+                                + symbol as usize] = if !invalid_lengths && symbol < 2 { 1 } else { 0 };
+                        }
+                        put_state_u16(&mut workspace, window, B3B_BUILDER_INITIALIZED, alphabet).unwrap();
+                    } else {
+                        store_code_description_decoder(&mut workspace, window, CodeDescriptionDecoder {
+                            queue: BitQueue::new(), alphabet_max: alphabet, alphabet_limit: alphabet,
+                            phase: CodeDescriptionPhase::CompleteSimple(SimpleCodeDescription {
+                                selector: 1, count: 2, symbols: [0, 1, 0xffff, 0xffff] })
+                        }).unwrap();
+                    }
+                    let queue = load_b3b_queue(&workspace, window).unwrap();
+                    assert!(load_code_description_decoder(&workspace, window, queue).is_ok());
+                    let expected = if bad_alphabet || (!canonical && bad_tree) {
+                        SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(WorkspaceError::InvalidSymbol))
+                    } else if bad_tree {
+                        SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(WorkspaceError::InvalidTree))
+                    } else if invalid_lengths {
+                        SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(WorkspaceError::InvalidCodeLength))
+                    } else { SerializedTreeStatus::Complete };
+                    let before = workspace.clone();
+                    let mut budget = RequestBudget::new(RequestLimits { max_input: 0, max_output: 0,
+                        max_work: u64::MAX, max_calls: 0, max_initializations: 0, max_window_bits: 16 }).unwrap();
+                    let plan = plan_serialized_tree(&workspace, window, &mut budget, &[], false).unwrap();
+                    assert_eq!(workspace, before);
+                    let actual = advance_serialized_tree(&mut workspace, window, &[], false);
+                    assert_eq!((plan.consumed, plan.status), (0, expected));
+                    assert_eq!((actual.consumed, actual.status), (plan.consumed, plan.status));
+                    if expected != SerializedTreeStatus::Complete { assert_eq!(workspace, before); }
+                }
+            }
         }
     }
 

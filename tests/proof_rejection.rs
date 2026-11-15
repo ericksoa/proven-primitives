@@ -4985,14 +4985,14 @@ fn the_prover_rejects_four_m1_executor_normal_trace_defects() {
     let original = fs::read_to_string(&path).unwrap();
     for (name, function, old, new) in [
         ("brotli-m1-executor-simple-loses-consumption", "advance_serialized_tree",
-            "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete };",
-            "return SerializedTreeStep { consumed: 0, status: SerializedTreeStatus::Complete };"),
+            "let simple_result = SerializedTreeStep { consumed, status };",
+            "let simple_result = SerializedTreeStep { consumed: 0, status };"),
         ("brotli-m1-executor-canonical-loses-consumption", "advance_serialized_tree",
             "return SerializedTreeStep { consumed, status };",
             "return SerializedTreeStep { consumed: 0, status };"),
         ("brotli-m1-executor-simple-false-need-input", "advance_serialized_tree",
-            "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Complete };",
-            "return SerializedTreeStep { consumed, status: if !end_of_input && consumed == input.len() { SerializedTreeStatus::NeedInput } else { SerializedTreeStatus::Complete } };"),
+            "let simple_result = SerializedTreeStep { consumed, status };",
+            "let simple_result = SerializedTreeStep { consumed, status: if !end_of_input && consumed == input.len() { SerializedTreeStatus::NeedInput } else { status } };"),
         ("brotli-m1-executor-canonical-false-need-input", "advance_serialized_tree",
             "return SerializedTreeStep { consumed, status };",
             "return SerializedTreeStep { consumed, status: if status == SerializedTreeStatus::Complete && !end_of_input && consumed == input.len() { SerializedTreeStatus::NeedInput } else { status } };"),
@@ -5054,8 +5054,8 @@ fn the_prover_rejects_eight_m1_parser_failure_relation_defects() {
             "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) };",
             "return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(CompressedHeaderError::Truncated) };"),
         ("brotli-m1-executor-canonical-error-replaced", "advance_serialized_tree",
-            "SerializedTreeStatus::Failed(error)\n                    },\n                };\n                return SerializedTreeStep { consumed, status };",
-            "SerializedTreeStatus::Failed(CompressedHeaderError::Truncated)\n                    },\n                };\n                return SerializedTreeStep { consumed, status };"),
+            "Err(error) => SerializedTreeStatus::Failed(error),",
+            "Err(_error) => SerializedTreeStatus::Failed(CompressedHeaderError::Truncated),"),
         ("brotli-m1-executor-empty-input-fabricates-error", "advance_serialized_tree",
             "let mut consumed: usize = 0;",
             "if input.is_empty() { return SerializedTreeStep { consumed: 0, status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) }; }\n    let mut consumed: usize = 0;"),
@@ -5075,8 +5075,14 @@ fn the_prover_rejects_eight_m1_parser_failure_relation_defects() {
         let end = start + original[start..].find("\n}\n").expect("selected function ends") + 3;
         let selected = &original[start..end];
         let body = selected.find("\n{\n").expect("function body");
-        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
-        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        let (scope_start, scope_end) = if name == "brotli-m1-executor-bad-span-error-replaced" {
+            let begin = selected.find("match drain_and_store_serialized_pending_span(").unwrap();
+            let end = begin + selected[begin..].find("CodeDescriptionPhase::CompleteSimple(").unwrap();
+            (begin, end)
+        } else { (body, selected.len()) };
+        assert_eq!(selected[scope_start..scope_end].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}{}", &selected[..scope_start],
+            selected[scope_start..scope_end].replacen(old, new, 1), &selected[scope_end..]);
         assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
         let mutated = format!("{}{}{}", &original[..start], replacement, &original[end..]);
         fs::write(&path, mutated).unwrap();
@@ -5166,6 +5172,84 @@ fn the_prover_rejects_six_k7_k8_result_contract_defects() {
         assert!(!lower.contains("resource limit") && !lower.contains("panicked")
             && !lower.contains("expected rlimit-count"), "tool/resource failure is not a semantic rejection: {log}");
         println!("REJECTED {name}: deliberate source defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_m1_tree_install_outcome_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-tree-install-outcome-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-m1-tree-simple-rejection-is-truncated", "m1_tree_complete_simple_status",
+            "Err(error) => SerializedTreeStatus::Failed(error),",
+            "Err(_error) => SerializedTreeStatus::Failed(CompressedHeaderError::Truncated),"),
+        ("brotli-m1-tree-canonical-rejection-is-internal", "advance_serialized_tree",
+            "Err(error) => SerializedTreeStatus::Failed(error),",
+            "Err(_error) => SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),"),
+        ("brotli-m1-tree-simple-plan-reports-invalid-tree", "plan_serialized_tree",
+            "const SIMPLE_DESTINATION_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidSymbol;",
+            "const SIMPLE_DESTINATION_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidTree;"),
+        ("brotli-m1-tree-canonical-plan-loses-tree-priority", "plan_serialized_tree",
+            "const CANONICAL_TREE_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidTree;",
+            "const CANONICAL_TREE_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidSymbol;"),
+        ("brotli-m1-tree-canonical-plan-loses-length-error", "plan_serialized_tree",
+            "const CANONICAL_LENGTH_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidCodeLength;",
+            "const CANONICAL_LENGTH_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidSymbol;"),
+        ("brotli-m1-tree-owner-flags-matching-workspace-error", "advance_planned_context_tree",
+            "(SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidTree)), SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidTree))) => false,",
+            "(SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidTree)), SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(crate::brotli_prefix::WorkspaceError::InvalidTree))) => true,"),
+    ] {
+        let start = original.find(&format!("fn {function}(")).expect("selected function exists");
+        let end = start + original[start..].find("\n}\n").expect("selected function ends") + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").expect("function body");
+        let (scope_start, scope_end) = (body, selected.len());
+        assert_eq!(selected[scope_start..scope_end].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}{}", &selected[..scope_start],
+            selected[scope_start..scope_end].replacen(old, new, 1), &selected[scope_end..]);
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        let mutated = format!("{}{}{}", &original[..start], replacement, &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        let computed_contradiction = matches!(name,
+            "brotli-m1-tree-simple-plan-reports-invalid-tree"
+            | "brotli-m1-tree-canonical-plan-loses-tree-priority"
+            | "brotli-m1-tree-canonical-plan-loses-length-error")
+            && log.contains("error: expression simplifies to false")
+            && log.contains("assert(matches!(") && log.contains("by (compute_only)");
+        assert!(computed_contradiction || log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("requires not satisfied")
+            || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}");
+        let lower = log.to_ascii_lowercase();
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count") && !lower.contains("unexpected smt output"),
+            "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate executable defect, unchanged specification");
         fs::write(&path, &original).unwrap();
     }
     fs::remove_dir_all(temporary).unwrap();

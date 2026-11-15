@@ -1,0 +1,17 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k7-k8-result-canary-42540/src/brotli_prefix.rs:2277:13
+     |
+2277 | /             r == if symbols == 0 || symbols as nat > tree_region_symbols(region) || symbol >= symbols {
+2278 | |                 Err(WorkspaceError::InvalidSymbol)
+2279 | |             } else { Ok(Self { symbols, storage: TreeStorageState::Single { symbol } }) },
+     | |_________________________________________________________________________________________^ failed this postcondition
+...
+2290 |           Err(WorkspaceError::InvalidSymbol)
+     |           ---------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

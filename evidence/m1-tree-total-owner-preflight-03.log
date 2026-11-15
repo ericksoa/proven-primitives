@@ -1,0 +1,36 @@
+note: preparing crate for verification
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+note: done with module brotli_input
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)
+(use --output-json for machine-readable output)
+verus-build-info
+Verus
+  Version: 0.2026.10.18.7d82994
+  Profile: release
+  Platform: macos_aarch64
+  Toolchain: 1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)
+
+total-time:           20131 ms
+    rust-time:                8421 ms
+        init-and-types:           4868 ms
+        trait-conflicts:            94 ms
+        compile-time:             3458 ms
+    verification-time:       10631 ms
+        vir-time:                 3746 ms
+            hir-time:                  778 ms
+            import-time:               161 ms
+            rust-to-vir:              1066 ms
+        verify-crate-time:        6884 ms
+    unaccounted-time:         1077 ms
+
+verify-crate-time-breakdown
+    total verify-time:           6363 ms   (1 threads)
+        total air-time:              4600 ms   (1 threads)
+        total smt-time:               269 ms   (1 threads)
+            total smt-init:                 0 ms,     2036 rlimit (1 threads)
+            total smt-run:                269 ms,  1288058 rlimit (1 threads)

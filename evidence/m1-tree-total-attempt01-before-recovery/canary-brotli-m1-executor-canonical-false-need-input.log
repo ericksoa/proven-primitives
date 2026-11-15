@@ -1,0 +1,52 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-42908/src/brotli_input.rs:16808:5
+      |
+16808 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 4 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-42908/src/brotli_input.rs:16808:5
+      |
+16808 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-42908/src/brotli_input.rs:16717:9
+      |
+16717 | / ...   m1_tree_has_decodable_start(old(workspace)@, window_bytes) ==>
+16718 | | ...       m1_tree_result_has_trace(old(workspace)@, window_bytes, input@, end_of_input, r),
+      | |__________________________________________________________________________________________^ failed this postcondition
+...
+17124 |   ...           return SerializedTreeStep { consumed, status: if status == SerializedTreeStatus::Complete && !end_of_input && consumed == input.len() { SerializedTreeStatus::NeedInput } else { status } };
+      |                 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- at this exit
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-42908/src/brotli_input.rs:16808:5
+      |
+16808 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-42908/src/brotli_input.rs:16710:1
+      |
+16710 | / fn advance_serialized_tree(
+16711 | |     workspace: &mut [u8],
+16712 | |     window_bytes: u32,
+16713 | |     input: &[u8],
+16714 | |     end_of_input: bool,
+16715 | | ) -> (r: SerializedTreeStep)
+      | |___________________________^
+
+note: while loop finished in 3 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-42908/src/brotli_input.rs:16808:5
+      |
+16808 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,21 @@
+verification results:: 9 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k7-k8-result-canary-66188/src/brotli_prefix.rs:4909:9
+     |
+4909 | /         window_bytes <= 16_777_216
+4910 | |             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+4911 | |             && (tree as nat) >= tree_region_count(region) ==> {
+4912 | |                 &&& r == Err(WorkspaceError::InvalidTree)
+4913 | |                 &&& final(workspace)@ == old(workspace)@
+4914 | |                 &&& *final(meta) == *old(meta)
+4915 | |             },
+     | |_____________^ failed this postcondition
+...
+4990 |           return Err(WorkspaceError::InvalidTree);
+     |           --------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,28 @@
+from pathlib import Path
+import hashlib,json,re,subprocess,os
+root=Path.cwd(); env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools'); base='4084cbe3dbe51549a0a99e687de26f1ea06fe29e'
+old=subprocess.check_output(['git','show',base+':src/brotli_input.rs'],env=env,text=True); new=(root/'src/brotli_input.rs').read_text()
+def selected(s,n):
+ start=s.index('fn '+n+'('); end=s.index('\n}\n',start)+3; f=s[start:end]; b=f.index('\n{\n'); return f[:b],f[b:]
+names=set(re.findall(r'^fn (\w+)\(',old,re.M))
+names|={'install_simple_tree','install_canonical_tree','read_builder_code_length','write_builder_code_length','reset_builder'}
+def calls(s):return [n for n in re.findall(r'\b(\w+)\s*\(',s) if n in names]
+rows=[]
+for n in ['install_completed_simple_tree','m1_tree_complete_canonical','advance_serialized_tree','plan_serialized_tree','advance_planned_context_tree']:
+ oh,ob=selected(old,n); nh,nb=selected(new,n)
+ assert oh.split('    ensures')[0]==nh.split('    ensures')[0],n
+ oc=calls(ob);nc=calls(nb)
+ if n=='advance_serialized_tree':
+  assert nb.count('m1_tree_complete_simple_status(')==1
+  _,hb=selected(new,'m1_tree_complete_simple_status')
+  assert calls(hb)==['install_completed_simple_tree']
+  # Expand only the existing simple action extracted under approved E2.
+  expanded=nb.replace('m1_tree_complete_simple_status(', 'install_completed_simple_tree(')
+  nc=calls(expanded)
+ assert oc==nc,(n,oc,nc)
+ rows.append({'function':n,'executable_signature_and_requirements_unchanged':True,'named_existing_executable_calls_in_order':oc,'transitive_named_call_order_unchanged':True})
+prefix_old=subprocess.check_output(['git','show',base+':src/brotli_prefix.rs'],env=env)
+assert prefix_old==(root/'src/brotli_prefix.rs').read_bytes()
+report={'base_commit':base,'input_sha256':hashlib.sha256(new.encode()).hexdigest(),'prefix_byte_identical_to_signed_base':True,'input_private_functions':rows,'extraction':{'private_helper':'m1_tree_complete_simple_status','calls_existing_installer_once':True,'caller_uses_extracted_action_once':True,'authority':'E2 bounded input-private refactoring'},'scope':'Named existing executable-call sequence audit with simple-action extraction expanded. This is source-derived evidence, not a proof of binary equivalence. Exact scalar comparison equivalence is separately machine checked.'}
+(root/'evidence/m1-tree-total-source-audit.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({'functions':len(rows),'transitive_call_sequences_equal':True,'prefix_unchanged':True}))

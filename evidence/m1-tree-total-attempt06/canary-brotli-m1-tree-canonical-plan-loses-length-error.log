@@ -1,0 +1,11 @@
+
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+error: expression simplifies to false
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-66189/src/brotli_input.rs:31603:16
+      |
+31603 |         assert(matches!(CANONICAL_LENGTH_ERROR, crate::brotli_prefix::WorkspaceError::InvalidCodeLength)) by (compute_only);
+      |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

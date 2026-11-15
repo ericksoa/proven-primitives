@@ -1,0 +1,102 @@
+{
+  "base_commit": "4084cbe3dbe51549a0a99e687de26f1ea06fe29e",
+  "input_sha256": "097910355add55ac0801b5f101b444de7dbc01076c54f8055fb0f74dc8b1af4f",
+  "prefix_byte_identical_to_signed_base": true,
+  "input_private_functions": [
+    {
+      "function": "install_completed_simple_tree",
+      "executable_signature_and_requirements_unchanged": true,
+      "named_existing_executable_calls_in_order": [
+        "install_simple_tree"
+      ],
+      "transitive_named_call_order_unchanged": true
+    },
+    {
+      "function": "m1_tree_complete_canonical",
+      "executable_signature_and_requirements_unchanged": true,
+      "named_existing_executable_calls_in_order": [
+        "state_u16"
+      ],
+      "transitive_named_call_order_unchanged": true
+    },
+    {
+      "function": "advance_serialized_tree",
+      "executable_signature_and_requirements_unchanged": true,
+      "named_existing_executable_calls_in_order": [
+        "state_byte",
+        "decode_tree_region",
+        "state_u16",
+        "load_b3b_queue",
+        "load_code_description_decoder",
+        "m1_tree_store_queue",
+        "drain_and_store_serialized_pending_span",
+        "install_completed_simple_tree",
+        "m1_tree_complete_canonical",
+        "map_code_description_error",
+        "store_code_description_decoder"
+      ],
+      "transitive_named_call_order_unchanged": true
+    },
+    {
+      "function": "plan_serialized_tree",
+      "executable_signature_and_requirements_unchanged": true,
+      "named_existing_executable_calls_in_order": [
+        "state_byte",
+        "decode_tree_region",
+        "state_u16",
+        "load_b3b_queue",
+        "plan_saved_aux_load",
+        "plan_saved_loader_read_units",
+        "load_code_description_decoder",
+        "state_u16",
+        "read_builder_code_length",
+        "core_state_failure",
+        "valid_code_loader_read_units",
+        "checked_planned_work_add",
+        "plan_code_description_field",
+        "checked_planned_work_add",
+        "plan_code_description_field",
+        "checked_planned_work_add",
+        "checked_planned_work_add",
+        "checked_planned_work_add",
+        "acknowledge_serialized_pending_span",
+        "core_state_failure",
+        "checked_planned_work_add",
+        "code_description_store_writes",
+        "checked_planned_work_add",
+        "simple_tree_install_work",
+        "plan_canonical_tree_install",
+        "checked_planned_work_add",
+        "checked_planned_work_add",
+        "map_code_description_error",
+        "checked_planned_work_add",
+        "code_description_store_writes",
+        "core_state_failure"
+      ],
+      "transitive_named_call_order_unchanged": true
+    },
+    {
+      "function": "advance_planned_context_tree",
+      "executable_signature_and_requirements_unchanged": true,
+      "named_existing_executable_calls_in_order": [
+        "plan_serialized_tree",
+        "context_tree_action_work",
+        "advance_serialized_tree",
+        "core_state_failure",
+        "store_terminal_error",
+        "core_state_failure",
+        "map_compressed_error",
+        "store_context_phase",
+        "core_state_failure"
+      ],
+      "transitive_named_call_order_unchanged": true
+    }
+  ],
+  "extraction": {
+    "private_helper": "m1_tree_complete_simple_status",
+    "calls_existing_installer_once": true,
+    "caller_uses_extracted_action_once": true,
+    "authority": "E2 bounded input-private refactoring"
+  },
+  "scope": "Named existing executable-call sequence audit with simple-action extraction expanded. This is source-derived evidence, not a proof of binary equivalence. Exact scalar comparison equivalence is separately machine checked."
+}

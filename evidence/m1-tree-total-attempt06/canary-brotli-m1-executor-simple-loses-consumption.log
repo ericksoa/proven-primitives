@@ -1,0 +1,47 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-66875/src/brotli_input.rs:16836:5
+      |
+16836 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-66875/src/brotli_input.rs:16738:1
+      |
+16738 | / fn advance_serialized_tree(
+16739 | |     workspace: &mut [u8],
+16740 | |     window_bytes: u32,
+16741 | |     input: &[u8],
+16742 | |     end_of_input: bool,
+16743 | | ) -> (r: SerializedTreeStep)
+      | |___________________________^
+
+error: precondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-66875/src/brotli_input.rs:17105:21
+      |
+16093 |           result.consumed as nat == prefix_consumed + last.2.consumed as nat,
+      |           ------------------------------------------------------------------ failed precondition
+...
+17105 | /                     m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
+17106 | |                         initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
+17107 | |                         actions, action, before_consumed as nat, simple_result);
+      | |_______________________________________________________________________________^
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-66875/src/brotli_input.rs:16836:5
+      |
+16836 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 3 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-normal-canary-66875/src/brotli_input.rs:16836:5
+      |
+16836 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,4 @@
+{
+  "result": "interrupted superseded proof search; no semantic rejection or positive proof claimed",
+  "reason": "The three immutable error-choice facts were proved at entry but needed explicit handoff into the isolated parser loop. The invariant-augmented selected function passed 4/0."
+}

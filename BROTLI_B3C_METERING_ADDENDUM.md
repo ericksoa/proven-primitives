@@ -872,3 +872,22 @@ count as semantic rejections and do not complete M1. Remaining full tree/action,
 source-operation, outcome-frame and control closure, B3c/B3d/B4 and independent
 human specification review remain open. No supported-decoder or complete
 mathematical-safety claim is made.
+
+
+### Tree outcome agreement from a decodable saved start
+
+The planner and actual serialized-tree executor now bind all their tree
+outcomes, including simple/canonical installation errors, to the existing
+finite replay relation from a decodable saved start. The context-tree caller
+proves equal consumption and status for that domain. Approved E2 permits the
+bounded input-private extraction of the existing simple installation/status
+action; K1/K7/K8 supply the unchanged install-result contracts. The exact
+scalar comparison is checked equivalent to the previous comparison.
+
+The final whole check passed 1,304 proofs with zero errors and 109 runtime
+tests. Exact-source deliberate-defect evidence and prior attempts are recorded
+in `evidence/brotli-b3c-m1-tree-total.json`; scope and limitations are in
+`BROTLI_M1_TREE_OUTCOME_CHECKPOINT.md`. Initial malformed encodings, complete
+source-operation accounting, outcome-specific byte frames, full M1 control
+closure, later B3 work and independent human specification review remain open.
+All existing runtime interfaces, storage, quotas, K4 and F2 remain fixed.

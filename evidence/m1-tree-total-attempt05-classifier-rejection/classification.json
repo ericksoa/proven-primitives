@@ -1,0 +1,8 @@
+{
+  "whole_positive": 1304,
+  "whole_errors": 0,
+  "runtime_passed": 109,
+  "control_run_complete": false,
+  "reason": "Older harness rejected a genuine compute_only logical contradiction as an unrecognized diagnostic. Full final control run is attempt06.",
+  "not_counted_as_full_control_closure": true
+}

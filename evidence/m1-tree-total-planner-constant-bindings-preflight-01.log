@@ -1,0 +1,4 @@
+note: preparing crate for verification
+
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+

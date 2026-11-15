@@ -195,7 +195,8 @@ proofs/controls. Preserve every original signature, requirement, executable
 body, admitted input, guard/error order, workspace and quota. No other
 cross-module contract, visibility or architectural change is authorized.
 
-The K7/K8 result-contract checkpoint is implemented in current working source
+The K7/K8 result-contract checkpoint is published in signed commit
+`4084cbe3dbe51549a0a99e687de26f1ea06fe29e`
 and recorded in `evidence/brotli-b3c-m1-k7-k8.json`: 1,300 whole-crate checks,
 108 runtime tests and 29 semantic defect rejections. All four prefix bodies,
 signatures and admitted requirements are unchanged. This completes those four
@@ -203,6 +204,17 @@ result-contract guarantees, not full M1 refinement, source ledgers or control
 closure. Separate parser-failure control resource failures remain open.
 The earlier K6 checkpoint is signed in history. Current source contains the
 newer verified K7/K8 implementation; do not reset it to an earlier checkpoint.
+
+The subsequent tree-outcome checkpoint is documented in
+`BROTLI_M1_TREE_OUTCOME_CHECKPOINT.md` and
+`evidence/brotli-b3c-m1-tree-total.json`. From a decodable saved tree start,
+planning and execution now bind every result, including installation errors,
+to the existing replay relation; the context-tree caller proves matching
+consumption/status. The simple action extraction uses only the approved E2
+input-private rule. Initial malformed encodings, complete source-operation
+accounting, outcome-specific byte frames and full M1 control closure remain
+open. This checkpoint grants no new architectural authority and does not
+complete M1, the decoder or independent human specification review.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,

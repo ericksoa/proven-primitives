@@ -1,0 +1,48 @@
+note: preparing crate for verification
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+WARNING: (57142,13): 'if' cannot be used in patterns.
+WARNING: (64774,5): 'if' cannot be used in patterns.
+note: done with module brotli_input
+
+verification results:: 7 verified, 0 errors (partial verification with `--verify-*`)
+(use --output-json for machine-readable output)
+verus-build-info
+Verus
+  Version: 0.2026.10.18.7d82994
+  Profile: release
+  Platform: macos_aarch64
+  Toolchain: 1.99.1-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)
+
+total-time:           28507 ms
+    rust-time:                9126 ms
+        init-and-types:           5399 ms
+        trait-conflicts:           157 ms
+        compile-time:             3569 ms
+    verification-time:       18195 ms
+        vir-time:                 4309 ms
+            hir-time:                 1142 ms
+            import-time:               177 ms
+            rust-to-vir:              1181 ms
+        verify-crate-time:       13885 ms
+    unaccounted-time:         1185 ms
+
+verify-crate-time-breakdown
+    total verify-time:          13366 ms   (1 threads)
+        total air-time:              7423 ms   (1 threads)
+        total smt-time:              4277 ms   (1 threads)
+            total smt-init:                 0 ms,     2333 rlimit (1 threads)
+            total smt-run:               4277 ms, 99355344 rlimit (1 threads)
