@@ -3062,6 +3062,73 @@ proof fn selected_tree_frame_after_write(
     reveal(selected_tree_frame);
 }
 
+#[verifier::opaque]
+spec fn k6_simple_symbol_prefix(symbols: Seq<u16>, count: nat, alphabet: u16) -> bool {
+    &&& symbols.len() == 4 && count <= 4
+    &&& forall|i: int| 0 <= i < count ==> #[trigger] symbols[i] < alphabet
+    &&& forall|i: int, j: int| 0 <= i < j < count ==> #[trigger] symbols[i] != #[trigger] symbols[j]
+}
+
+#[verifier::opaque]
+spec fn k6_simple_probe_reads(symbols: Seq<u16>, count: nat, symbol: u16) -> nat {
+    if symbol == symbols[0] || count <= 1 { 1nat }
+    else if symbol == symbols[1] || count <= 2 { 2nat }
+    else if symbol == symbols[2] || count <= 3 { 3nat }
+    else { 4nat }
+}
+
+#[verifier::opaque]
+spec fn k6_simple_probe_savings(symbols: Seq<u16>, count: nat, stop: nat) -> nat {
+    (if count > 1 && (symbols[0] as nat) < stop { (count - 1) as nat } else { 0nat })
+        + (if count > 2 && (symbols[1] as nat) < stop { (count - 2) as nat } else { 0nat })
+        + (if count > 3 && (symbols[2] as nat) < stop { (count - 3) as nat } else { 0nat })
+}
+
+proof fn k6_simple_probe_savings_start(symbols: Seq<u16>, count: nat)
+    requires symbols.len() == 4, 1 <= count <= 4,
+    ensures k6_simple_probe_savings(symbols, count, 0) == 0,
+{
+    reveal(k6_simple_probe_savings);
+}
+
+proof fn k6_simple_probe_savings_end(symbols: Seq<u16>, count: nat, alphabet: u16)
+    requires 1 <= count <= 4, k6_simple_symbol_prefix(symbols, count, alphabet),
+    ensures k6_simple_probe_savings(symbols, count, alphabet as nat) == count * ((count - 1) as nat) / 2,
+{
+    reveal(k6_simple_symbol_prefix); reveal(k6_simple_probe_savings);
+    if count > 1 { assert(symbols[0] < alphabet); }
+    if count > 2 { assert(symbols[1] < alphabet); }
+    if count > 3 { assert(symbols[2] < alphabet); }
+    if count == 1 {
+        assert(k6_simple_probe_savings(symbols, count, alphabet as nat) == 0);
+        assert(count * ((count - 1) as nat) == 0) by (nonlinear_arith) requires count == 1;
+        assert(count * ((count - 1) as nat) / 2 == 0);
+    } else if count == 2 {
+        assert(k6_simple_probe_savings(symbols, count, alphabet as nat) == 1);
+        assert(count * ((count - 1) as nat) == 2) by (nonlinear_arith) requires count == 2;
+        assert(count * ((count - 1) as nat) / 2 == 1);
+    } else if count == 3 {
+        assert(k6_simple_probe_savings(symbols, count, alphabet as nat) == 3);
+        assert(count * ((count - 1) as nat) == 6) by (nonlinear_arith) requires count == 3;
+        assert(count * ((count - 1) as nat) / 2 == 3);
+    } else {
+        assert(count == 4);
+        assert(k6_simple_probe_savings(symbols, count, alphabet as nat) == 6);
+        assert(count * ((count - 1) as nat) == 12) by (nonlinear_arith) requires count == 4;
+        assert(count * ((count - 1) as nat) / 2 == 6);
+    }
+}
+
+proof fn k6_simple_probe_step(symbols: Seq<u16>, count: nat, alphabet: u16, symbol: u16)
+    requires 1 <= count <= 4, k6_simple_symbol_prefix(symbols, count, alphabet),
+    ensures k6_simple_probe_reads(symbols, count, symbol)
+            + k6_simple_probe_savings(symbols, count, symbol as nat + 1)
+        == count + k6_simple_probe_savings(symbols, count, symbol as nat),
+{
+    reveal(k6_simple_symbol_prefix); reveal(k6_simple_probe_reads); reveal(k6_simple_probe_savings);
+    if count == 1 {} else if count == 2 {} else if count == 3 {} else {}
+}
+
 fn simple_record_exec(
     selector: u8,
     count: u8,
@@ -3071,7 +3138,8 @@ fn simple_record_exec(
     requires 1 <= selector <= 4, count as nat == simple_selector_count(selector),
     ensures r == simple_record_for_symbol(selector, count, symbols@, symbol),
 {
-    if symbol == symbols[0] {
+    let ghost mut source_reads: nat = 0;
+    let record = if { proof { source_reads = source_reads + 1; } symbol == symbols[0] } {
         if selector == 1 {
             TreeRecord { length: 1, code: 0 }
         } else if selector == 2 {
@@ -3081,7 +3149,7 @@ fn simple_record_exec(
         } else {
             TreeRecord { length: 1, code: 0 }
         }
-    } else if count > 1 && symbol == symbols[1] {
+    } else if count > 1 && { proof { source_reads = source_reads + 1; } symbol == symbols[1] } {
         if selector == 1 {
             TreeRecord { length: 1, code: 1 }
         } else if selector == 2 {
@@ -3091,7 +3159,7 @@ fn simple_record_exec(
         } else {
             TreeRecord { length: 2, code: 2 }
         }
-    } else if count > 2 && symbol == symbols[2] {
+    } else if count > 2 && { proof { source_reads = source_reads + 1; } symbol == symbols[2] } {
         if selector == 2 {
             TreeRecord { length: 2, code: 3 }
         } else if selector == 3 {
@@ -3099,7 +3167,7 @@ fn simple_record_exec(
         } else {
             TreeRecord { length: 3, code: 6 }
         }
-    } else if count > 3 && symbol == symbols[3] {
+    } else if count > 3 && { proof { source_reads = source_reads + 1; } symbol == symbols[3] } {
         if selector == 3 {
             TreeRecord { length: 2, code: 3 }
         } else {
@@ -3107,7 +3175,12 @@ fn simple_record_exec(
         }
     } else {
         TreeRecord { length: 0, code: 0 }
+    };
+    proof {
+        reveal(k6_simple_probe_reads);
+        assert(source_reads == k6_simple_probe_reads(symbols@, count as nat, symbol));
     }
+    record
 }
 
 pub(crate) fn install_simple_tree(
@@ -3158,6 +3231,8 @@ pub(crate) fn install_simple_tree(
     },
     r.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut source_reads: nat = 0;
+    proof { reveal(k6_simple_symbol_prefix); }
     if window_bytes > 16_777_216 {
         return Err(WorkspaceError::InvalidWindowBits);
     }
@@ -3170,6 +3245,7 @@ pub(crate) fn install_simple_tree(
     }
     let capacity = tree_region_symbols_exec(region);
     if alphabet_limit == 0 || alphabet_limit > capacity || tree >= tree_region_count_exec(region) {
+        proof { assert(source_reads == 0); }
         return Err(WorkspaceError::InvalidSymbol);
     }
     let expected = if selector <= 2 { selector + 1 } else { 4 };
@@ -3179,24 +3255,43 @@ pub(crate) fn install_simple_tree(
     let mut i: u8 = 0;
     while i < count
         invariant i <= count <= 4,
+            source_reads == i as nat * i as nat,
+            k6_simple_symbol_prefix(symbols@, i as nat, alphabet_limit),
         decreases count - i,
     {
+        proof { reveal(k6_simple_symbol_prefix); source_reads = source_reads + 1; }
         if symbols[i as usize] >= alphabet_limit {
             return Err(WorkspaceError::InvalidSymbol);
         }
         let mut j: u8 = 0;
         while j < i
             invariant j <= i < count <= 4,
+                source_reads == i as nat * i as nat + 1 + 2 * j as nat,
+                k6_simple_symbol_prefix(symbols@, i as nat, alphabet_limit),
+                symbols@[i as int] < alphabet_limit,
+                forall|at: int| 0 <= at < j ==> #[trigger] symbols@[at] != symbols@[i as int],
             decreases i - j,
         {
+            proof { reveal(k6_simple_symbol_prefix); source_reads = source_reads + 2; }
             if symbols[j as usize] == symbols[i as usize] {
                 return Err(WorkspaceError::InvalidSymbol);
             }
             j = j + 1;
         }
+        proof {
+            reveal(k6_simple_symbol_prefix);
+            assert(k6_simple_symbol_prefix(symbols@, i as nat + 1, alphabet_limit));
+            assert(source_reads == (i as nat + 1) * (i as nat + 1)) by (nonlinear_arith)
+                requires source_reads == i as nat * i as nat + 1 + 2 * i as nat;
+        }
         i = i + 1;
     }
+    proof { assert(source_reads == count as nat * count as nat); }
     if selector == 0 {
+        proof {
+            source_reads = source_reads + 1;
+            assert(source_reads == 2);
+        }
         return TreeMetadata::single(region, alphabet_limit, symbols[0]);
     }
     let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {
@@ -3204,10 +3299,14 @@ pub(crate) fn install_simple_tree(
         Err(error) => return Err(error),
     };
     let ghost before_workspace = workspace@;
+    proof { k6_simple_probe_savings_start(symbols@, count as nat); }
     let mut symbol: u16 = 0;
     while symbol < alphabet_limit
         invariant
             symbol <= alphabet_limit <= tree_region_symbols(region),
+            k6_simple_symbol_prefix(symbols@, count as nat, alphabet_limit),
+            source_reads + k6_simple_probe_savings(symbols@, count as nat, symbol as nat)
+                == count as nat * count as nat + count as nat * symbol as nat,
             window_bytes <= 16_777_216,
             workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat,
             tree < tree_region_count(region),
@@ -3238,6 +3337,14 @@ pub(crate) fn install_simple_tree(
         decreases alphabet_limit - symbol,
     {
         let record = simple_record_exec(selector, count, &symbols, symbol);
+        proof {
+            k6_simple_probe_step(symbols@, count as nat, alphabet_limit, symbol);
+            source_reads = source_reads + k6_simple_probe_reads(symbols@, count as nat, symbol);
+            assert(source_reads + k6_simple_probe_savings(symbols@, count as nat, symbol as nat + 1)
+                == count as nat * count as nat + count as nat * (symbol as nat + 1)) by (nonlinear_arith)
+                requires source_reads + k6_simple_probe_savings(symbols@, count as nat, symbol as nat + 1)
+                    == count as nat * count as nat + count as nat * symbol as nat + count as nat;
+        }
         let ghost before_write = workspace@;
         match write_next_tree_record(
             workspace,
@@ -3277,6 +3384,13 @@ pub(crate) fn install_simple_tree(
             );
         }
         symbol = symbol + 1;
+    }
+    proof {
+        k6_simple_probe_savings_end(symbols@, count as nat, alphabet_limit);
+        if count == 1 {} else if count == 2 {} else if count == 3 {} else {}
+        assert(source_reads == count as nat * alphabet_limit as nat + count as nat * (count as nat + 1) / 2);
+        assert(source_reads == simple_selector_count(selector) * alphabet_limit as nat
+            + simple_selector_count(selector) * (simple_selector_count(selector) + 1) / 2);
     }
     Ok(meta)
 }

@@ -1,6 +1,7 @@
 # Brotli M1 simple-tree installation table-read decision
 
-Status: **Candidate K6 proposed; not approved or implemented.**
+Status: **Candidate K6 reviewed and approved as written by the human on
+2026-11-10. Implemented and validated in the K6 checkpoint.**
 
 ## Existing boundary and source evidence
 
@@ -84,7 +85,20 @@ supported-decoder release gate remain incomplete after this correction alone.
 
 ## Approval
 
-Exact direct human approval of Candidate K6 is required before implementing
-these quota/formula changes. Broad Brotli authorization does not replace the
-human approval rule in AGENTS.md. Independent replay/state proofs may continue
-while this decision is pending.
+The human directly replied “K6 reviewed and approved” on 2026-11-10 after
+reviewing this exact proposal. The approval covers Candidate K6 as written;
+it does not authorize another architectural or quota change.
+
+## Validated implementation
+
+The exact approved installation formulas and the planning reservation are
+implemented. Private source counters check every existing validation operand,
+short-circuit record probe and singleton lookup, with zero table reads before
+invalid-destination rejection. The cumulative scan proof uses distinct,
+in-range symbols established by the unchanged runtime validation.
+
+The final source passed 1,278 whole-crate checks with zero errors and
+`--no-cheating`; all 107 runtime tests passed. All 23 affected deliberate
+defects were rejected semantically after that unchanged-source positive.
+Exact source/tool/harness/transcript identities are recorded in
+`evidence/brotli-b3c-m1-k6.json`. This completes K6's named correction, not M1.

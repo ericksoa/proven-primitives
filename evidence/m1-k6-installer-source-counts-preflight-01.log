@@ -1,0 +1,45 @@
+note: verifying module brotli_prefix (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3263:9
+     |
+3263 |         while j < i
+     |         ^^^^^^^^^^^
+
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3280:13
+     |
+3280 |             assert(source_reads == (i as nat + 1) * (i as nat + 1)) by (nonlinear_arith)
+     |             ^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3252:5
+     |
+3252 |     while i < count
+     |     ^^^^^^^^^^^^^^^
+
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3339:13
+     |
+3339 |             assert(source_reads + k6_simple_probe_savings(symbols@, count as nat, symbol as nat + 1)
+     |             ^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3300:5
+     |
+3300 |     while symbol < alphabet_limit
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3182:1
+     |
+3182 | / pub(crate) fn install_simple_tree(
+3183 | |     workspace: &mut [u8],
+3184 | |     window_bytes: u32,
+3185 | |     region: TreeRegion,
+...    |
+3190 | |     symbols: [u16; 4],
+3191 | | ) -> (r: Result<TreeMetadata, WorkspaceError>)
+     | |_____________________________________________^
+
+verification results:: 6 verified, 0 errors (partial verification with `--verify-*`)

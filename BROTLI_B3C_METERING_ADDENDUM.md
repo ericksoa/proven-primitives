@@ -817,3 +817,35 @@ The executor-prefix prototype remains separate and unvalidated. K6 remains
 pending direct human approval and its quota correction is unimplemented.
 B3c/B3d/B4, independent human specification review and the supported-decoder
 release gate remain open.
+
+
+### Approved K6 simple-install accounting
+
+The human reviewed and approved K6 as written on 2026-11-10, superseding the
+pending status recorded at earlier checkpoints. Singleton installation now
+reserves seven units. Other simple installations reserve
+`(3 + c) * A + 5 + c * (c + 1) / 2`, including all existing validation and
+record-selection symbol-table operands. The planner forecasts this with scalar
+arithmetic and binds the exact term to its execution receipt before replay.
+Invalid destinations retain zero installation work and the existing guard order.
+
+Private source counters check the validation loops, each short-circuit probe,
+the singleton lookup and cumulative alphabet scan. The original installer and
+record-helper signatures, requirements, functional guarantees and runtime
+algorithms remain intact. No cross-module proof API was added. Workspace,
+5,696-action caps, 798/8,192 proof bounds, the 425-unit reset charge and F2 are
+unchanged. Resource thresholds change only as approved by K6.
+
+Final verification passed **1,278 whole-crate checks, zero errors**, with
+`--no-cheating`, and **107 runtime tests**. All **23 affected defects** were
+rejected semantically after that unchanged-source positive: twelve new K6,
+five arithmetic and six tree-plan/debit/frame controls. The original hand-counted
+three-step singleton test failed at 132 execution units before its approved
+quota correction; its output is retained. It now checks 134 execution units,
+58 planning units and the corresponding one-short reservation. New tests cover
+both symbol orders, all simple selectors, sparse maximum alphabets and both
+context-map kinds with exact/short reservations and complete workspace comparisons.
+
+Evidence is in `evidence/brotli-b3c-m1-k6.json`. K6 is complete; M1's full
+executor/failure trace, remaining source-ledger/control obligations and all
+remaining B3c/B3d/B4 and independent human review obligations remain open.

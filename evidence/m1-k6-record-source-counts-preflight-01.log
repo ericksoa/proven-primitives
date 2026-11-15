@@ -1,0 +1,14 @@
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3128:1
+     |
+3128 | / fn simple_record_exec(
+3129 | |     selector: u8,
+3130 | |     count: u8,
+3131 | |     symbols: &[u16; 4],
+3132 | |     symbol: u16,
+3133 | | ) -> (r: TreeRecord)
+     | |___________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

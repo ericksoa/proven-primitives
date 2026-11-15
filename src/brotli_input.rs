@@ -29940,11 +29940,37 @@ fn code_description_store_writes(phase: CodeDescriptionPhase) -> (r: u64)
     4 + code_description_payload_writes(phase)
 }
 
+#[verifier::opaque]
+spec fn k6_simple_install_read_units(alphabet: u16, selector: u8) -> nat {
+    let count = crate::brotli_prefix::simple_selector_count(selector);
+    if selector == 0 { 2nat } else { count * alphabet as nat + count * (count + 1) / 2 }
+}
+
 fn simple_tree_install_work(alphabet: u16, selector: u8) -> (r: u64)
     requires alphabet <= 704, selector <= 4,
-    ensures r as nat == if selector == 0 { 5nat } else { 3 * alphabet as nat + 5 },
+    ensures r <= 4_943,
+        r as nat == (if selector == 0 { 5nat } else { 3 * alphabet as nat + 5 })
+            + k6_simple_install_read_units(alphabet, selector),
 {
-    if selector == 0 { 5 } else { 3 * alphabet as u64 + 5 }
+    proof { reveal(k6_simple_install_read_units); reveal(crate::brotli_prefix::simple_selector_count); }
+    if selector == 0 { 7 } else {
+        let count: u64 = if selector <= 2 { selector as u64 + 1 } else { 4 };
+        proof {
+            assert(2 <= count <= 4);
+            assert((3 + count as int) * alphabet as int <= 4_928) by (nonlinear_arith)
+                requires 0 <= alphabet <= 704, 2 <= count <= 4;
+            assert(count as int * (count as int + 1) <= 20) by (nonlinear_arith)
+                requires 2 <= count <= 4;
+        }
+        let work = (3 + count) * alphabet as u64 + 5 + count * (count + 1) / 2;
+        proof {
+            assert(count as nat == crate::brotli_prefix::simple_selector_count(selector));
+            assert((3 + count as int) * alphabet as int == 3 * alphabet as int + count as int * alphabet as int) by (nonlinear_arith);
+            reveal(k6_simple_install_read_units);
+            assert(work as nat == 3 * alphabet as nat + 5 + k6_simple_install_read_units(alphabet, selector));
+        }
+        work
+    }
 }
 
 fn canonical_tree_install_work(
@@ -31165,10 +31191,16 @@ fn plan_serialized_tree(
                         status: SerializedTreeStatus::Failed(CompressedHeaderError::Workspace(
                             crate::brotli_prefix::WorkspaceError::InvalidSymbol)) });
                 }
+                let ghost before_simple_install_work = execution_work;
                 execution_work = checked_planned_work_add(
                     execution_work,
                     simple_tree_install_work(decoder.alphabet_limit, code.selector),
                 )?;
+                proof {
+                    assert(execution_work as nat == before_simple_install_work as nat
+                        + (if code.selector == 0 { 5nat } else { 3 * decoder.alphabet_limit as nat + 5 })
+                        + k6_simple_install_read_units(decoder.alphabet_limit, code.selector));
+                }
                 let normal_result = SerializedTreePlan {
                     planning_work,
                     execution_work,
@@ -38827,20 +38859,101 @@ mod tests {
         // The three loader phases have no validation operands: 22 cells each.
         // Planning: 18 auxiliary forecast + 22 copied cells + 2*(1 byte+8 bits).
         // Execution: 3*22 reads + 9 bit/byte reads + 3*10 queue writes
-        //            + 4+16 descriptor writes + 2 transitions + 5 installation.
+        //            + 4+16 descriptor writes + 2 transitions + 7 installation (including two symbol-table reads).
         let mut budget = RequestBudget::new(RequestLimits { max_input: 1, max_output: 0,
-            max_work: 58 + 132, max_calls: 0, max_initializations: 0, max_window_bits: 16 }).unwrap();
+            max_work: 58 + 134, max_calls: 0, max_initializations: 0, max_window_bits: 16 }).unwrap();
         let plan = plan_serialized_tree(&workspace, window, &mut budget, &[1], false).unwrap();
-        assert_eq!((plan.planning_work, plan.execution_work, plan.consumed), (58, 132, 1));
+        assert_eq!((plan.planning_work, plan.execution_work, plan.consumed), (58, 134, 1));
         assert_eq!(plan.status, SerializedTreeStatus::Complete);
         assert_eq!(workspace, original);
-        assert_eq!(budget.work_remaining, 132);
-        assert!(!budget.charge_work(133));
+        assert_eq!(budget.work_remaining, 134);
+        assert!(!budget.charge_work(135));
         assert_eq!(workspace, original);
-        assert!(budget.charge_work(132));
+        assert!(budget.charge_work(134));
         let result = advance_serialized_tree(&mut workspace, window, &[1], false);
         assert_eq!((result.consumed, result.status), (1, SerializedTreeStatus::Complete));
         assert_eq!(budget.work_remaining, 0);
+    }
+
+    #[test]
+    fn m1_k6_simple_installation_counts_match_exact_and_short_reservations() {
+        use crate::brotli::{RequestBudget, RequestLimits};
+        use crate::brotli_prefix::{ContextMapKind, TreeRegion};
+        let limits = |work| RequestLimits { max_input: 7, max_output: 9, max_work: work,
+            max_calls: 11, max_initializations: 13, max_window_bits: 16 };
+        // Hand-counted validation + record probes + existing writes/transition.
+        for (alphabet, selector, installation) in [
+            (1u16, 0u8, 7u64), (2, 0, 7), (2, 1, 18), (3, 2, 29),
+            (4, 3, 43), (4, 4, 43), (26, 4, 197), (704, 4, 4_943),
+        ] {
+            for reverse in [false, true] {
+                let count = if selector <= 2 { selector + 1 } else { 4 };
+                let mut symbols = [0xa5a5u16; 4];
+                for at in 0..count as usize { symbols[at] = at as u16; }
+                if alphabet > count as u16 { symbols[count as usize - 1] = alphabet - 1; }
+                if reverse { symbols[..count as usize].reverse(); }
+                let code = SimpleCodeDescription { selector, count, symbols };
+                let (mut original, window) = fresh_b3b_workspace();
+                start_serialized_tree(&mut original, window, TreeRegion::Command, 0, alphabet, alphabet).unwrap();
+                store_code_description_decoder(&mut original, window, CodeDescriptionDecoder {
+                    queue: BitQueue::new(), alphabet_max: alphabet, alphabet_limit: alphabet,
+                    phase: CodeDescriptionPhase::CompleteSimple(code),
+                }).unwrap();
+                let mut budget = RequestBudget::new(limits(u64::MAX)).unwrap();
+                let untouched = original.clone();
+                let plan = plan_serialized_tree(&original, window, &mut budget, &[], false).unwrap();
+                let validations = count as u64 * count as u64;
+                assert_eq!(simple_tree_install_work(alphabet, selector), installation);
+                assert_eq!((plan.planning_work, plan.execution_work, plan.consumed, plan.status),
+                    (40 + 2 * validations, 32 + validations + installation, 0, SerializedTreeStatus::Complete));
+                assert_eq!(original, untouched);
+                let mut actual = original;
+                let step = advance_serialized_tree(&mut actual, window, &[], false);
+                assert_eq!((step.consumed, step.status), (plan.consumed, plan.status));
+            }
+        }
+        // Both public-core context-map kinds use the same prepaid tree action.
+        for kind in [ContextMapKind::Literal, ContextMapKind::Distance] {
+            for (selector, installation) in [(0u8, 7u64), (1u8, 18u64)] {
+                let count = selector + 1;
+                let code = SimpleCodeDescription { selector, count, symbols: [0, 1, 0xffff, 0xffff] };
+                let (mut original, window) = fresh_b3b_workspace();
+                let kind_tag = if kind == ContextMapKind::Literal { 0 } else { 1 };
+                put_state_byte(&mut original, window, B3B_OUTER_PHASE, 6 + kind_tag).unwrap();
+                start_context_map(&mut original, window, kind, 4).unwrap();
+                put_state_u16(&mut original, window, B3B_MAP_TREES, 2).unwrap();
+                start_serialized_tree(&mut original, window, TreeRegion::TemporaryContext, 0, 2, 2).unwrap();
+                store_context_phase(&mut original, window, 3).unwrap();
+                store_code_description_decoder(&mut original, window, CodeDescriptionDecoder {
+                    queue: BitQueue::new(), alphabet_max: 2, alphabet_limit: 2,
+                    phase: CodeDescriptionPhase::CompleteSimple(code),
+                }).unwrap();
+                let validations = count as u64 * count as u64;
+                let planning = 40 + 2 * validations;
+                let execution = 32 + validations + installation + 2;
+                let mut reference = original.clone();
+                let expected = advance_serialized_tree(&mut reference, window, &[], false);
+                assert_eq!((expected.consumed, expected.status), (0, SerializedTreeStatus::Complete));
+                store_context_phase(&mut reference, window, 4).unwrap();
+                for short in [true, false] {
+                    let mut actual = original.clone();
+                    let mut budget = RequestBudget::new(limits(planning + execution - u64::from(short))).unwrap();
+                    let result = advance_planned_context_tree(&mut actual, window, &mut budget, &[], false);
+                    if short {
+                        assert_eq!(result, Err(CompressedStep { consumed: 0,
+                            status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }));
+                        assert_eq!(actual, original);
+                        assert_eq!(budget.work_remaining, execution - 1);
+                    } else {
+                        assert_eq!(result, Ok(0));
+                        assert_eq!(actual, reference);
+                        assert_eq!(budget.work_remaining, 0);
+                    }
+                    assert_eq!((budget.input_remaining, budget.output_remaining, budget.calls_remaining, budget.initializations_remaining),
+                        (7, 9, 11, 13));
+                }
+            }
+        }
     }
 
     #[test]

@@ -2,21 +2,21 @@ verification results:: 0 verified, 1 errors (partial verification with `--verify
 
 note: verifying module brotli_input (selected functions)
 
-WARNING: (51607,13): 'if' cannot be used in patterns.
-WARNING: (58340,5): 'if' cannot be used in patterns.
+WARNING: (57056,13): 'if' cannot be used in patterns.
+WARNING: (64688,5): 'if' cannot be used in patterns.
 note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-42009/src/brotli_input.rs:27605:1
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-20662/src/brotli_input.rs:29937:1
       |
-27605 | fn code_description_store_writes(phase: CodeDescriptionPhase) -> (r: u64)
+29937 | fn code_description_store_writes(phase: CodeDescriptionPhase) -> (r: u64)
       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: postcondition not satisfied
-     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-42009/src/brotli_input.rs:27606:13
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-20662/src/brotli_input.rs:29938:13
       |
-27606 |     ensures 4 <= r <= 39, r == 4 + code_description_payload_writes_spec(phase),
+29938 |     ensures 4 <= r <= 39, r == 4 + code_description_payload_writes_spec(phase),
       |             ^^^^^^^^^^^^ failed this postcondition
-27607 | {
-27608 |     3 + code_description_payload_writes(phase)
+29939 | {
+29940 |     3 + code_description_payload_writes(phase)
       |     ------------------------------------------ at the end of the function body
 
 error: aborting due to 1 previous error

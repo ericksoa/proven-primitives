@@ -1,0 +1,45 @@
+from pathlib import Path
+import datetime,hashlib,json,os,re,subprocess
+
+def digest(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p):return {'path':str(p),'sha256':digest(p)}
+def read(p):return json.loads(Path(p).read_text())
+f=read('evidence/m1-k6-attempt01-source-freeze.json');v=read('evidence/brotli-b3c-m1-k6-attempt01-verification.json')
+assert f['exit_code']==0 and f['source_unchanged'] and v['verification-results']['success'] and v['verification-results']['errors']==0 and v['verification-results']['is-verifying-entire-crate']
+assert all(digest(n)==h for n,h in dict(f['source_sha256'],**f['validation_source_sha256']).items())
+rows=read('evidence/m1-k6-attempt01-controls-results.json');assert len(rows)==3 and sum(r['expected_mutants'] for r in rows)==23
+for row in rows:
+ assert row['exit_code']==0 and row['source_unchanged'] and len(row['mutants'])==row['expected_mutants']
+ assert datetime.datetime.fromisoformat(row['started_utc'])>=datetime.datetime.fromisoformat(f['finished_utc'])
+ for m in row['mutants']:
+  assert m['semantic_rejection'] and digest(m['log'])==m['sha256']
+  t=Path(m['log']).read_text();lower=t.lower()
+  assert re.search(r'verification results:: .*\b[1-9][0-9]* errors',t)
+  assert any(s in lower for s in ['postcondition not satisfied','precondition not satisfied','invariant not satisfied','assertion failed'])
+  assert not any(s in lower for s in ['resource limit','rlimit) exceeded','expected rlimit-count','panicked','internal compiler error','unexpected smt output'])
+controls={'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],'preceding_whole_positive':ref('evidence/m1-k6-attempt01-source-freeze.json'),'suites':rows,'semantic_rejections':23,'order':'All mutations followed the exact unchanged-source whole-crate positive. No resource/compiler/harness failure is counted.'}
+Path('evidence/brotli-b3c-m1-k6-controls.json').write_text(json.dumps(controls,indent=2)+'\n')
+counts=[(int(a),int(b)) for a,b in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed;',Path('evidence/m1-k6-final-harness-runtime.log').read_text())]
+assert sum(a for a,b in counts)==107 and sum(b for a,b in counts)==0
+old=read('evidence/brotli-b3c-m1-tree-normal-state.json');verus=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos');tools={n:digest(verus/n) for n in ['verus','rust_verify','z3']};assert tools==old['verifier_binary']
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1')
+base=subprocess.check_output(['git','rev-parse','HEAD'],env=env,text=True).strip()
+# K6 adds private proof machinery/counters, without any new cross-module API.
+prior=subprocess.check_output(['git','show','HEAD:src/brotli_prefix.rs'],env=env,text=True);current=Path('src/brotli_prefix.rs').read_text()
+def contract(t,n):
+ a=t.index('fn '+n+'(');return t[a:t.index('\n{\n',a)]
+for n in ['simple_record_exec','install_simple_tree']:assert contract(prior,n)==contract(current,n),n
+r={'component':'Brotli M1 approved K6 simple-install accounting checkpoint; M1 incomplete','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':base,
+'claim':'Exact approved singleton/sequential-probe installation read terms are forecast and prepaid, with source counters for unchanged validation, short-circuit record probes, singleton access and full alphabet scans. Invalid destinations perform no installation table reads. No complete end-to-end source-operation ledger or decoder support claim is established.',
+'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],
+'approval_and_document_sha256':{n:digest(n) for n in ['AGENTS.md','BROTLI_B3C_METERING_ADDENDUM.md','BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md']},
+'human_approval':'K6 reviewed and approved by direct human reply on 2026-11-10','approved_formula':{'singleton':7,'other_simple':'(3 + c) * A + 5 + c * (c + 1) / 2','maximum':4943,'validation_reads':'c * c','record_probe_reads':'c * A - c * (c - 1) / 2'},
+'verifier':old['verifier'],'verifier_binary':tools,'verification_options':f['command'],'verification_results':v['verification-results'],'verification_elapsed_seconds':f['elapsed_seconds'],'verification_evidence':ref('evidence/brotli-b3c-m1-k6-attempt01-verification.json'),'verification_log':ref('evidence/m1-k6-attempt01-whole-crate.log'),'source_freeze':ref('evidence/m1-k6-attempt01-source-freeze.json'),
+'negative_controls':{'evidence':ref('evidence/brotli-b3c-m1-k6-controls.json'),'new_defects':12,'legacy_defects':11,'semantic_rejections':23},
+'runtime_tests':{'evidence':ref('evidence/m1-k6-final-harness-runtime.log'),'passed':107,'failed':0,'library':96,'primitives':9,'trust_scan':1,'upstream_comparison':1,'F2_policy_changed':False,'direct_install_configurations':16,'owner_exact_short_configurations':8,'three_step_planning':58,'three_step_execution':134},
+'preserved':['Existing prefix helper signatures, requirements and full functional guarantees','Algorithms and guard/error order','W1 step and result interfaces','B3c budget ownership','Workspace layout and initialization policy','5696-action caps,798 initial planning bound,8192 per-iteration proof allowance','425-unit construction/reset charge','K4 repeat-state codec and F2 fixture policy','Pinned Rust/Verus/dependencies and proof trust boundary'],
+'earlier_failures':{'old_quota_expectation':ref('evidence/m1-k6-runtime-before-quota-update.log'),'first_formula_preflight':ref('evidence/m1-k6-install-formula-preflight-01.log'),'first_probe_total_preflight':ref('evidence/m1-k6-probe-models-preflight-01.log')},
+'release_gate':'incomplete','not_established':['Complete tree executor/failure-result trace and full planner/action refinement','Remaining header/body failure/frame/source-operation ledger and complete M1 control closure','B3c/B3d/B4 and independent human specification review; no supported-decoder or mathematical-safety completion claim'],
+'previous_checkpoint':ref('evidence/brotli-b3c-m1-tree-normal-state.json'),'trusted_components':old['trusted_components'],'execution_environment':old['execution_environment'],'evidence_completion':'K6 implemented and verified as approved; continue remaining already-authorized M1 work.'}
+Path('evidence/brotli-b3c-m1-k6.json').write_text(json.dumps(r,indent=2)+'\n')
+print(json.dumps({'verified':v['verification-results']['verified'],'errors':0,'runtime_tests':107,'semantic_rejections':23,'K6_complete':True,'M1_complete':False}))

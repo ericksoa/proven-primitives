@@ -3111,8 +3111,8 @@ fn the_prover_rejects_five_b3c_tree_formula_undercharges() {
         (
             "brotli-b3c-simple-install-formula-undercharge",
             "simple_tree_install_work",
-            "    if selector == 0 { 5 } else { 3 * alphabet as u64 + 5 }",
-            "    if selector == 0 { 4 } else { 3 * alphabet as u64 + 5 }",
+            "if selector == 0 { 7 } else {",
+            "if selector == 0 { 6 } else {",
         ),
         (
             "brotli-b3c-canonical-install-formula-undercharge",
@@ -4817,6 +4817,137 @@ fn the_prover_rejects_twelve_m1_general_codec_defects() {
         assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
         fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
         let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        let lower = log.to_ascii_lowercase();
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(lower.contains("postcondition not satisfied") || lower.contains("precondition not satisfied")
+            || lower.contains("invariant not satisfied") || lower.contains("assertion failed"),
+            "expected a semantic proof rejection: {log}");
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count"), "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate source defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires an unchanged whole-crate positive and VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_twelve_k6_simple_install_metering_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-k6-install-canary-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    for (name, module, function, old, new) in [
+        (
+            "brotli-k6-singleton-reservation-restores-five",
+            "input",
+            "simple_tree_install_work",
+            "if selector == 0 { 7 } else {",
+            "if selector == 0 { 5 } else {",
+        ),
+        (
+            "brotli-k6-selector-four-uses-three-symbols",
+            "input",
+            "simple_tree_install_work",
+            "let count: u64 = if selector <= 2 { selector as u64 + 1 } else { 4 };",
+            "let count: u64 = if selector <= 2 { selector as u64 + 1 } else { 3 };",
+        ),
+        (
+            "brotli-k6-install-omits-validation-reads",
+            "input",
+            "simple_tree_install_work",
+            "        work\n",
+            "        if selector == 1 && alphabet == 2 { 14 } else { work }\n",
+        ),
+        (
+            "brotli-k6-install-omits-record-probes",
+            "input",
+            "simple_tree_install_work",
+            "        work\n",
+            "        if selector == 1 && alphabet == 2 { 15 } else { work }\n",
+        ),
+        (
+            "brotli-k6-triangular-correction-undercharged",
+            "input",
+            "simple_tree_install_work",
+            "let work = (3 + count) * alphabet as u64 + 5 + count * (count + 1) / 2;",
+            "let work = (3 + count) * alphabet as u64 + 5 + count * (count + 1) / 3;",
+        ),
+        (
+            "brotli-k6-first-record-probe-unpaid",
+            "prefix",
+            "simple_record_exec",
+            "if { proof { source_reads = source_reads + 1; } symbol == symbols[0] }",
+            "if { proof { source_reads = source_reads + 0; } symbol == symbols[0] }",
+        ),
+        (
+            "brotli-k6-fourth-record-probe-unpaid",
+            "prefix",
+            "simple_record_exec",
+            "count > 3 && { proof { source_reads = source_reads + 1; } symbol == symbols[3] }",
+            "count > 3 && { proof { source_reads = source_reads + 0; } symbol == symbols[3] }",
+        ),
+        (
+            "brotli-k6-range-validation-read-unpaid",
+            "prefix",
+            "install_simple_tree",
+            "proof { reveal(k6_simple_symbol_prefix); source_reads = source_reads + 1; }\n        if symbols[i as usize]",
+            "proof { reveal(k6_simple_symbol_prefix); source_reads = source_reads + 0; }\n        if symbols[i as usize]",
+        ),
+        (
+            "brotli-k6-distinctness-right-read-unpaid",
+            "prefix",
+            "install_simple_tree",
+            "proof { reveal(k6_simple_symbol_prefix); source_reads = source_reads + 2; }",
+            "proof { reveal(k6_simple_symbol_prefix); source_reads = source_reads + 1; }",
+        ),
+        (
+            "brotli-k6-singleton-final-read-unpaid",
+            "prefix",
+            "install_simple_tree",
+            "source_reads = source_reads + 1;\n            assert(source_reads == 2);",
+            "source_reads = source_reads + 0;\n            assert(source_reads == 2);",
+        ),
+        (
+            "brotli-k6-adapter-omits-installation-reservation",
+            "input",
+            "plan_serialized_tree",
+            "simple_tree_install_work(decoder.alphabet_limit, code.selector),",
+            "0,",
+        ),
+        (
+            "brotli-k6-installer-reads-before-destination-guard",
+            "prefix",
+            "install_simple_tree",
+            "let ghost mut source_reads: nat = 0;",
+            "let ghost mut source_reads: nat = 0;\n    let _observed_symbol = symbols[0];\n    proof { source_reads = source_reads + 1; }",
+        ),
+    ] {
+        let source_name = if module == "prefix" { "src/brotli_prefix.rs" } else { "src/brotli_input.rs" };
+        let path = temporary.join(source_name);
+        let original = fs::read_to_string(&path).unwrap();
+        let start = original.find(&format!("fn {function}(")).unwrap();
+        let end = start + original[start..].find("\n}\n").unwrap() + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").unwrap();
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let result = if module == "prefix" { check_brotli_prefix_function(&verus, &temporary, function) }
+            else { check_brotli_input_function(&verus, &temporary, function) };
         let log = transcript(&result);
         let lower = log.to_ascii_lowercase();
         fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();

@@ -163,12 +163,15 @@ tree loop's reload/field binding, with the original admitted requirements.
 This does not complete the plan/action tree trace, remaining source ledgers or
 M1. It grants no additional architectural authority.
 
-Candidate K6 in `BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md` is proposed,
-not approved or implemented. The source audit records installer symbol-table
-reads missing from the current simple-install reservation. Hold K6 formula,
-quota and related expectation changes until direct exact human approval.
-Independent M1 replay/state proofs may continue; this grants no architectural
-authority and does not complete M1.
+The human explicitly reviewed and approved Candidate K6 as written in
+`BROTLI_M1_SIMPLE_INSTALL_METERING_DECISION.md` on 2026-11-10. Charge the
+existing simple-installer symbol-table reads: seven total installation units
+for a singleton, and `(3 + c) * A + 5 + c * (c + 1) / 2` otherwise. Preserve
+helper signatures, algorithms, guard/error order, admitted inputs, W1 results,
+B3c ownership, workspace, 5,696-action caps, 798/8,192 proof bounds, the
+425-unit reset charge and F2. Add checked source counts and controls within
+existing modules; no new runtime or cross-module proof API is approved. Other
+architectural or quota changes still require exact direct human approval.
 
 The normal M1 tree-planning trace checkpoint is recorded in
 `evidence/brotli-b3c-m1-tree-normal-state.json`. It binds Complete/NeedInput
@@ -176,6 +179,11 @@ planner results and the initial builder image to checked replay traces. Its
 mathematical unit fold excludes installation. Failure-result traces, full
 executor refinement, remaining source ledgers and K6 remain open. No M1 or
 supported-decoder completion claim or additional architectural authority follows.
+
+The K6 implementation checkpoint is recorded in `evidence/brotli-b3c-m1-k6.json`.
+Its exact simple-install reservations, private source operand counters and
+prepayment term are checked. K6 is complete; it does not complete M1 or grant
+another architectural or quota decision. Continue remaining approved M1 work.
 
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,

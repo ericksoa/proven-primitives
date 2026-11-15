@@ -1,0 +1,32 @@
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3087:7
+     |
+3087 | proof fn k6_simple_probe_savings_start(symbols: Seq<u16>, count: nat)
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3094:7
+     |
+3094 | proof fn k6_simple_probe_savings_end(symbols: Seq<u16>, count: nat, alphabet: u16)
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+    --> src/brotli_prefix.rs:3096:13
+     |
+3096 |     ensures k6_simple_probe_savings(symbols, count, alphabet as nat) == count * ((count - 1) as nat) / 2,
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+3102 |     if count == 1 {} else if count == 2 {} else if count == 3 {} else {}
+     |     -------------------------------------------------------------------- at the end of the function body
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> src/brotli_prefix.rs:3105:7
+     |
+3105 | proof fn k6_simple_probe_step(symbols: Seq<u16>, count: nat, alphabet: u16, symbol: u16)
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+verification results:: 2 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+
