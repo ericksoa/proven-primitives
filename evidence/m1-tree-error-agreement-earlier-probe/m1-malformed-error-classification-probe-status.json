@@ -1,0 +1,23 @@
+{
+  "scope": "Unadopted independent proof candidate for later exact malformed-start error identity",
+  "source_sha256": "858beee1e5f89d00bb3a664180990e7b5fec26f41e55d86159f0165a97e41d99",
+  "loader_focused": {
+    "verified": 1,
+    "errors": 0
+  },
+  "planner_focused": {
+    "verified": 4,
+    "errors": 0
+  },
+  "caller_focused": {
+    "verified": 1,
+    "errors": 0
+  },
+  "executor_focused": {
+    "classification": "Explicitly interrupted to prioritize required main whole-crate rerun",
+    "exit_code": 130
+  },
+  "whole_verified": false,
+  "mutants_run": false,
+  "warning": "Candidate predates main canonical-status action extraction. Do not copy it over main; use its exact patch and reverify if continued."
+}

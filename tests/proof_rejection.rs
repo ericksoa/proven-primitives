@@ -5319,3 +5319,61 @@ fn the_prover_rejects_four_m1_invalid_start_defects() {
     fs::remove_dir_all(temporary).unwrap();
 }
 
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_five_m1_tree_error_identity_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-m1-tree-error-identity-canary-{}",
+        std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli_input.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for (name, function, old, new) in [
+        ("brotli-m1-saved-loader-spurious-unsupported-mode", "load_code_description_decoder", "    if alphabet_max == 0 || alphabet_max > 704\n        || alphabet_limit == 0 || alphabet_limit > alphabet_max {\n        return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::InternalState) };\n    }\n", "    if alphabet_max == 0 || alphabet_max > 704\n        || alphabet_limit == 0 || alphabet_limit > alphabet_max {\n        return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::UnsupportedMode) };\n    }\n"),
+        ("brotli-m1-malformed-region-executor-wrong-error", "advance_serialized_tree", "None => return SerializedTreeStep {\n            consumed: 0,\n            status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),\n        },", "None => return SerializedTreeStep {\n            consumed: 0,\n            status: SerializedTreeStatus::Failed(CompressedHeaderError::UnsupportedMode),\n        },"),
+        ("brotli-m1-malformed-region-planner-wrong-error", "plan_serialized_tree", "None => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,\n            status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) }),", "None => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,\n            status: SerializedTreeStatus::Failed(CompressedHeaderError::UnsupportedMode) }),"),
+        ("brotli-m1-malformed-descriptor-plan-wrong-error", "plan_serialized_tree", "    let mut decoder = match loaded_decoder {\n        Ok(value) => value,\n        Err(error) => return Ok(SerializedTreePlan { planning_work: initial_planning_work,\n            execution_work: loader_reads, consumed: 0,\n            status: SerializedTreeStatus::Failed(error) }),\n    };\n", "    let mut decoder = match loaded_decoder {\n        Ok(value) => value,\n        Err(error) => return Ok(SerializedTreePlan { planning_work: initial_planning_work,\n            execution_work: loader_reads, consumed: 0,\n            status: SerializedTreeStatus::Failed(CompressedHeaderError::UnsupportedMode) }),\n    };\n"),
+        ("brotli-m1-tree-caller-flags-equal-internal-errors", "advance_planned_context_tree", "(SerializedTreeStatus::Failed(CompressedHeaderError::InternalState), SerializedTreeStatus::Failed(CompressedHeaderError::InternalState)) => false,", "(SerializedTreeStatus::Failed(CompressedHeaderError::InternalState), SerializedTreeStatus::Failed(CompressedHeaderError::InternalState)) => true,"),
+    ] {
+        let start = original.find(&format!("fn {function}(")).expect("selected function exists");
+        let end = start + original[start..].find("\n}\n").expect("selected function ends") + 3;
+        let selected = &original[start..end];
+        let body = selected.find("\n{\n").expect("function body");
+        let (scope_start, scope_end) = (body, selected.len());
+        assert_eq!(selected[scope_start..scope_end].matches(old).count(), 1, "unique body mutation for {name}");
+        let replacement = format!("{}{}{}", &selected[..scope_start],
+            selected[scope_start..scope_end].replacen(old, new, 1), &selected[scope_end..]);
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged root contract");
+        let mutated = format!("{}{}{}", &original[..start], replacement, &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let result = check_brotli_input_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("assertion failed"),
+            "expected a proof rejection, not a tooling error: {log}");
+        let lower = log.to_ascii_lowercase();
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count") && !lower.contains("unexpected smt output"),
+            "tool/resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate executable defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+

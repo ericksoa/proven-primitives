@@ -1,0 +1,29 @@
+{
+  "base_commit": "95de38b2fdd93317e7b1aedfaa9b5de49e8d18dc",
+  "source_sha256": "8e3f39da4ea8153187d2e44492f3199216411c282cd8755b936b65804825ded1",
+  "source_derived_audit": true,
+  "functions": [
+    {
+      "function": "load_code_description_decoder",
+      "original_signature_and_requirements_unchanged": true,
+      "executable_body_unchanged_after_ghost_erasure": true
+    },
+    {
+      "function": "advance_serialized_tree",
+      "original_signature_and_requirements_unchanged": true,
+      "executable_body_unchanged_after_ghost_erasure": true
+    },
+    {
+      "function": "plan_serialized_tree",
+      "original_signature_and_requirements_unchanged": true,
+      "executable_body_unchanged_after_ghost_erasure": true
+    },
+    {
+      "function": "advance_planned_context_tree",
+      "original_signature_and_requirements_unchanged": true,
+      "executable_body_unchanged_after_ghost_erasure": true
+    }
+  ],
+  "models_and_existing_guarantees_preserved": true,
+  "authority": "Previously approved M1 exact plan/action result proof; all changes remain input-private; no executable, requirement, policy, workspace or architectural change"
+}

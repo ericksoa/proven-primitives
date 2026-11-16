@@ -1,0 +1,120 @@
+{
+  "source_sha256": "8e3f39da4ea8153187d2e44492f3199216411c282cd8755b936b65804825ded1",
+  "test_sha256": "d4cf894fb44f425979fcb84623651c505d64a358b2b38b1c4091440fd2bfb6b8",
+  "cases": [
+    {
+      "case": "brotli-m1-saved-loader-spurious-unsupported-mode",
+      "function": "load_code_description_decoder",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-malformed-region-executor-wrong-error",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-malformed-region-planner-wrong-error",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-malformed-descriptor-plan-wrong-error",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-caller-flags-equal-internal-errors",
+      "function": "advance_planned_context_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-invalid-region-consumes-input",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-invalid-region-mutates-descriptor",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-invalid-region-plan-consumes-input",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-invalid-descriptor-plan-consumes-input",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-simple-rejection-is-truncated",
+      "function": "m1_tree_complete_simple_status",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-canonical-rejection-is-internal",
+      "function": "m1_tree_complete_canonical_status",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-simple-plan-reports-invalid-tree",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-canonical-plan-loses-tree-priority",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-canonical-plan-loses-length-error",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-owner-flags-matching-workspace-error",
+      "function": "advance_planned_context_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-executor-simple-loses-consumption",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-executor-canonical-loses-consumption",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-executor-simple-false-need-input",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-executor-canonical-false-need-input",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    }
+  ]
+}

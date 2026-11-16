@@ -13389,6 +13389,8 @@ fn load_code_description_decoder(
 ) -> (r: Result<CodeDescriptionDecoder, CompressedHeaderError>)
     requires queue.valid(),
     ensures
+        b3b_workspace_shape(workspace@.len() as nat, window_bytes) && r.is_err()
+            ==> r == Err(CompressedHeaderError::InternalState),
         forall|expected: CodeDescriptionDecoder| #[trigger]
             m1_code_decoder_image(workspace@, window_bytes, queue, expected) ==> r == Ok(expected),
         r.is_ok() ==> m1_code_decoder_image(workspace@, window_bytes, queue, r.unwrap()),
@@ -16778,6 +16780,9 @@ fn advance_serialized_tree(
     end_of_input: bool,
 ) -> (r: SerializedTreeStep)
     ensures
+        b3b_workspace_shape(old(workspace)@.len() as nat, window_bytes)
+            && !m1_tree_has_decodable_start(old(workspace)@, window_bytes) ==>
+                r.status == SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),
         !m1_tree_has_decodable_start(old(workspace)@, window_bytes) ==> {
             &&& r.consumed == 0
             &&& matches!(r.status, SerializedTreeStatus::Failed(_))
@@ -17144,6 +17149,7 @@ fn advance_serialized_tree(
                 proof { reveal(code_store_frame); }
                 let simple_result = SerializedTreeStep { consumed, status };
                 proof {
+                    assert(simple_result.status == status);
                     let action = (before_field, field_after, step, started, started,
                         before_initialized, before_initialized, before_values, before_values);
                     m1_tree_trace_unspanned_action(before_field, field_after, step, started,
@@ -31626,6 +31632,9 @@ fn plan_serialized_tree(
 ) -> (r: Result<SerializedTreePlan, CoreFailure>)
     requires old(budget).valid(),
     ensures
+        r.is_ok() && b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+            && !m1_tree_has_decodable_start(workspace@, window_bytes) ==>
+                r.unwrap().status == SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),
         r.is_ok() && !m1_tree_has_decodable_start(workspace@, window_bytes) ==> {
             &&& r.unwrap().consumed == 0
             &&& matches!(r.unwrap().status, SerializedTreeStatus::Failed(_))
@@ -33992,7 +34001,14 @@ fn advance_planned_context_tree(
                 end_of_input && allowed == input.len(),
                 SerializedTreeStep { consumed: plan.consumed, status: plan.status }, step);
             assert(step.consumed == plan.consumed && step.status == plan.status);
+        } else {
+            reveal(b3c_workspace_shape); reveal(b3b_workspace_shape);
+            assert(b3b_workspace_shape(before_tree_action.len() as nat, window_bytes));
+            assert(step.consumed == 0 && plan.consumed == 0);
+            assert(step.status == SerializedTreeStatus::Failed(CompressedHeaderError::InternalState));
+            assert(plan.status == SerializedTreeStatus::Failed(CompressedHeaderError::InternalState));
         }
+        assert(step.consumed == plan.consumed && step.status == plan.status);
     }
     // Preserve the existing short-circuit comparison order. These are exactly
     // the equal scalar variants of the derived comparison used previously.
@@ -34028,7 +34044,7 @@ fn advance_planned_context_tree(
         assert(outcomes_disagree == (step.consumed != plan.consumed || step.status != plan.status));
     }
     if outcomes_disagree {
-        proof { assert(!m1_tree_has_decodable_start(before_tree_action, window_bytes)); }
+        proof { assert(false); }
         return Err(CompressedStep { consumed: step.consumed, status: CompressedStatus::Failed(core_state_failure()) });
     }
     if !budget.charge_input(step.consumed as u64) {

@@ -242,6 +242,18 @@ the existing per-function solver-isolation annotation with unchanged body,
 contract and limits. These are proof-engineering details, not additional
 architectural authority or M1 completion.
 
+The context-tree error-agreement continuation is recorded in
+`BROTLI_M1_TREE_ERROR_AGREEMENT_CHECKPOINT.md` and
+`evidence/brotli-b3c-m1-tree-error-agreement.json`. Under valid workspace shape,
+saved-description load failures are the existing InternalState, and malformed
+tree starts produce equal zero-consumption/internal-error plan and execution
+results. The context-tree adapter's mismatch branch is proved unreachable for
+all its admitted saved states after successful planning/reservation. All
+executable statements, requirements, models, policies and prior guarantees
+remain. Final exact-source checks passed 1,307/0, 109 runtime tests and 19
+semantic controls. Full M1 ledgers, byte frames, block/group composition and
+later release obligations remain open; no new architectural authority follows.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

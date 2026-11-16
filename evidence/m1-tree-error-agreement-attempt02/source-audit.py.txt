@@ -1,0 +1,23 @@
+from pathlib import Path
+import subprocess,os,re,json,hashlib
+root=Path.cwd();env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools');base='95de38b2fdd93317e7b1aedfaa9b5de49e8d18dc';old=subprocess.check_output(['git','show',base+':src/brotli_input.rs'],env=env,text=True);new=(root/'src/brotli_input.rs').read_text()
+def selected(s,n):
+ a=s.index('fn '+n+'(');b=s.index('\n}\n',a)+3;f=s[a:b];c=f.index('\n{\n');return f[:c],f[c:]
+def erase_proof(s):
+ while True:
+  m=re.search(r'\bproof\s*\{',s)
+  if not m:return re.sub(r'\s+','',s)
+  a=m.start();b=s.index('{',m.start())+1;depth=1
+  while depth:
+   if s[b]=='{':depth+=1
+   elif s[b]=='}':depth-=1
+   b+=1
+  s=s[:a]+s[b:]
+rows=[]
+for name in ['load_code_description_decoder','advance_serialized_tree','plan_serialized_tree','advance_planned_context_tree']:
+ oh,ob=selected(old,name);nh,nb=selected(new,name);assert oh.split('    ensures')[0]==nh.split('    ensures')[0],name;assert erase_proof(ob)==erase_proof(nb),name
+ if name in ['load_code_description_decoder','plan_serialized_tree']:assert ob==nb,name
+ rows.append({'function':name,'original_signature_and_requirements_unchanged':True,'executable_body_unchanged_after_ghost_erasure':True})
+r={'base_commit':base,'source_sha256':hashlib.sha256(new.encode()).hexdigest(),'source_derived_audit':True,'functions':rows,'models_and_existing_guarantees_preserved':True,'authority':'Previously approved M1 exact plan/action result proof; all changes remain input-private; no executable, requirement, policy, workspace or architectural change'}
+(root/'evidence/m1-tree-error-agreement-source-audit.json').write_text(json.dumps(r,indent=2)+'\n')
+print('Four original signatures/requirements and executable bodies preserved')

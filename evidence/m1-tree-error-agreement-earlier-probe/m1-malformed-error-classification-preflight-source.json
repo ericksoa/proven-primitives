@@ -1,0 +1,5 @@
+{
+  "main_input_sha256": "64a677a8c46960fc3bc350534793454d91dce58ca10c0c7645be5d2401bbe886",
+  "candidate_input_sha256": "2368e5f156c968e76d7840fb50b644d8ecdff47c9c82d24dbbd0ba058a801e85",
+  "scope": "Only conditional existing error classification in input-private saved decoder loader. Signature, requirements, body and prior guarantees unchanged. Main remains frozen for independent controls."
+}

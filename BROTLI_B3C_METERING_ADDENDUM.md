@@ -916,3 +916,24 @@ are in `BROTLI_M1_INVALID_START_CHECKPOINT.md`. Exact malformed-start error
 identity, the complete source-operation ledger, other outcome frames and full
 M1 control closure remain open, along with later B3 work and independent human
 specification review. This is not M1 or supported-decoder completion.
+
+
+### Context-tree agreement including malformed saved starts
+
+The existing input-private saved-description loader now guarantees its actual
+InternalState failure under valid workspace shape. The planner and executor
+state the same exact failure for starts outside the existing decodable-image
+domain. The context-tree adapter combines those results with its existing
+trace agreement, so plan/actual consumption and status agree for every admitted
+saved state after successful planning and reservation. Its defensive mismatch
+branch remains in runtime code and is proved unreachable under the original
+requirements. No executable statement, admission requirement or model changed.
+
+Final verification passed 1,307 whole-crate checks with zero errors, 109 runtime
+tests and nineteen semantic defect rejections after the exact-source positive.
+A resource-only earlier normal control is retained; a checked equality binds
+the actual returned simple status directly to the helper status. See
+`BROTLI_M1_TREE_ERROR_AGREEMENT_CHECKPOINT.md` and
+`evidence/brotli-b3c-m1-tree-error-agreement.json`. Complete source ledgers,
+outcome byte frames, block/group composition, full M1 controls, later B3 work
+and independent human specification review remain open.

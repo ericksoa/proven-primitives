@@ -1,0 +1,5 @@
+{
+  "main_sha256": "1bc96347ee04818d74a3bf2eb547919cc8df8c3060f2f90b431a492dd17cbca4",
+  "candidate_sha256": "cb6a2725d8798c41743db11b3f935010e4f734ae1da3f16bbc368630b092e73e",
+  "scope": "Only existing input-private error-result guarantees and caller ghost proof; all executable statements, requirements and models unchanged. Main remains frozen for prior checkpoint controls."
+}

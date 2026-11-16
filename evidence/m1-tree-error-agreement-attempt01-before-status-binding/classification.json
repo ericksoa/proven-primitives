@@ -1,0 +1,11 @@
+{
+  "whole_verified": 1307,
+  "whole_errors": 0,
+  "runtime_passed": 109,
+  "control_run_complete": false,
+  "failed_mutant": "brotli-m1-executor-simple-false-need-input",
+  "failure": "Loop resource limit exceeded; not a semantic rejection",
+  "confirmed_semantic_controls": 17,
+  "remaining_canonical_false_need_input": "Not run after preceding failure",
+  "repair": "Add checked direct equality between actual simple_result.status and original helper status before trace construction, preserving all headers and executable code"
+}

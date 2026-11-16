@@ -1,0 +1,26 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::load_code_description_decoder (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:13385:1
+      |
+13385 | / fn load_code_description_decoder(
+13386 | |     workspace: &[u8],
+13387 | |     window_bytes: u32,
+13388 | |     queue: BitQueue,
+13389 | | ) -> (r: Result<CodeDescriptionDecoder, CompressedHeaderError>)
+      | |______________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:13392:9
+      |
+13392 | / ...   b3b_workspace_shape(workspace@.len() as nat, window_bytes) && r.is_err()
+13393 | | ...       ==> r == Err(CompressedHeaderError::InternalState),
+      | |____________________________________________________________^ failed this postcondition
+...
+13455 |   ...   return { proof { assert(source_reads == loader_table_read_units(workspace@, window_bytes)); } Err(CompressedHeaderError::UnsupportedMode) };
+      |         ------------------------------------------------------------------------------------------------------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

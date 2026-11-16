@@ -1,0 +1,72 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:31761:5
+      |
+31761 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:31935:17
+      |
+31935 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:31810:5
+      |
+31810 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 41 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:31810:5
+      |
+31810 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:31810:5
+      |
+31810 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:31634:9
+      |
+31634 | /         r.is_ok() && b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+31635 | |             && !m1_tree_has_decodable_start(workspace@, window_bytes) ==>
+31636 | |                 r.unwrap().status == SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),
+      | |_______________________________________________________________________________________________________^ failed this postcondition
+...
+31680 |           None => return Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,
+      |  _________________-
+31681 | |             status: SerializedTreeStatus::Failed(CompressedHeaderError::UnsupportedMode) }),
+      | |___________________________________________________________________________________________- at this exit
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:31625:1
+      |
+31625 | / fn plan_serialized_tree(
+31626 | |     workspace: &[u8],
+31627 | |     window_bytes: u32,
+31628 | |     budget: &mut crate::brotli::RequestBudget,
+31629 | |     input: &[u8],
+31630 | |     end_of_input: bool,
+31631 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-4157/src/brotli_input.rs:31766:20
+      |
+31766 |                 == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+error: aborting due to 1 previous error
+

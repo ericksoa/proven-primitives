@@ -1,0 +1,16 @@
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> target/m1-malformed-error-classification/src/brotli_input.rs:31780:5
+      |
+31780 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 176 seconds
+     --> target/m1-malformed-error-classification/src/brotli_input.rs:31780:5
+      |
+31780 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+verification results:: 4 verified, 0 errors (partial verification with `--verify-*`)

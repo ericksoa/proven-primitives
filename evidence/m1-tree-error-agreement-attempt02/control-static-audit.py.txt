@@ -1,0 +1,12 @@
+from pathlib import Path
+import re,json,hashlib
+root=Path.cwd();source=(root/'src/brotli_input.rs').read_text();tests=(root/'tests/proof_rejection.rs').read_text();rows=[]
+for suite,count in [('the_prover_rejects_five_m1_tree_error_identity_defects',5),('the_prover_rejects_four_m1_invalid_start_defects',4),('the_prover_rejects_six_m1_tree_install_outcome_defects',6),('the_prover_rejects_four_m1_executor_normal_trace_defects',4)]:
+ a=tests.index('fn '+suite+'(');b=tests.index('\n}\n',a)+3;f=tests[a:b]
+ cases=re.findall(r'\("(brotli-[^"]+)", "([^"]+)",\s*("(?:[^"\\]|\\.)*"),\s*("(?:[^"\\]|\\.)*")\)',f);assert len(cases)==count,(suite,len(cases))
+ for name,func,old,new in cases:
+  a=source.index('fn '+func+'(');b=source.index('\n}\n',a)+3;target=source[a:b];body=target.index('\n{\n');old=json.loads(old);new=json.loads(new)
+  assert target[body:].count(old)==1,(name,target[body:].count(old));mutant=target[:body]+target[body:].replace(old,new,1);assert mutant[:body]==target[:body]
+  rows.append({'case':name,'function':func,'unique_actual_body_anchor':True,'root_signature_requirements_and_guarantees_unchanged':True})
+(root/'evidence/m1-tree-error-agreement-control-static-audit.json').write_text(json.dumps({'source_sha256':hashlib.sha256(source.encode()).hexdigest(),'test_sha256':hashlib.sha256(tests.encode()).hexdigest(),'cases':rows},indent=2)+'\n')
+print('All nineteen controls mutate unique actual body sites and preserve complete root contracts')
