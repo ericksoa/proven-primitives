@@ -216,6 +216,32 @@ accounting, outcome-specific byte frames and full M1 control closure remain
 open. This checkpoint grants no new architectural authority and does not
 complete M1, the decoder or independent human specification review.
 
+The malformed saved-tree start continuation is documented in
+`BROTLI_M1_INVALID_START_CHECKPOINT.md` and
+`evidence/brotli-b3c-m1-tree-invalid-start.json`. Under the existing predicate's
+complement, the executor must fail with zero consumed input and the entire
+workspace unchanged; every returned plan must likewise fail with zero
+consumption. The continuation adds proof guarantees, checked logical steps and
+proof invariants, plus the E2 input-private extraction of only the existing
+canonical result-to-status conversion. The original installer and its result
+remain at the original caller. Original requirements, signatures, models,
+operations and work accounting remain. Exact error identity
+outside the decodable-start domain and the other remaining M1 obligations are
+still open. This grants no additional architectural authority.
+
+The malformed-start checkpoint passed 1,307 whole-crate checks with zero
+errors, 109 runtime tests and 14 semantic defect controls on the exact same
+source. It does not complete the remaining M1 ledgers, frames or control
+closure.
+
+Keep the checked canonical current-state status theorem and its input-private
+proof handoff when maintaining this checkpoint. The tree root uses the
+existing builder definitions through checked helper contracts; the original
+definitions and installer bodies remain intact. The distance-table proof uses
+the existing per-function solver-isolation annotation with unchanged body,
+contract and limits. These are proof-engineering details, not additional
+architectural authority or M1 completion.
+
 P1's local standard-library evidence pipeline in `tools/pipeline.py` is
 approved. It records strict schemas, frozen closures, proof outcomes, coverage,
 and fail-closed release decisions. It may not weaken contracts, narrow admitted

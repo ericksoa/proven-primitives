@@ -1,0 +1,90 @@
+{
+  "source_sha256": "1bc96347ee04818d74a3bf2eb547919cc8df8c3060f2f90b431a492dd17cbca4",
+  "test_sha256": "29799cd3e1a2416761b3ce6154539b4b04533a0bb9447d21b1ed60ed5f8531eb",
+  "cases": [
+    {
+      "case": "brotli-m1-invalid-region-consumes-input",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-invalid-region-mutates-descriptor",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-invalid-region-plan-consumes-input",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-invalid-descriptor-plan-consumes-input",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-simple-rejection-is-truncated",
+      "function": "m1_tree_complete_simple_status",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-canonical-rejection-is-internal",
+      "function": "m1_tree_complete_canonical_status",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-simple-plan-reports-invalid-tree",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-canonical-plan-loses-tree-priority",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-canonical-plan-loses-length-error",
+      "function": "plan_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-tree-owner-flags-matching-workspace-error",
+      "function": "advance_planned_context_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-executor-simple-loses-consumption",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-executor-canonical-loses-consumption",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-executor-simple-false-need-input",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    },
+    {
+      "case": "brotli-m1-executor-canonical-false-need-input",
+      "function": "advance_serialized_tree",
+      "unique_actual_body_anchor": true,
+      "root_signature_requirements_and_guarantees_unchanged": true
+    }
+  ]
+}

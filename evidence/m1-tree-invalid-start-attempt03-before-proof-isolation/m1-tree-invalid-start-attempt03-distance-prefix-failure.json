@@ -1,0 +1,7 @@
+{
+  "diagnostic": "assertion failed at distance_lut_prefix_ok after adding a row in fill_serialized_distance_lut",
+  "function_byte_identical_to_signed_base": true,
+  "base_commit": "c419e6e5d5376c53f5006348feed36610b81ff85",
+  "classification": "Unresolved proof handoff in existing unchanged table builder; not a passing whole proof or evidence of a runtime repair",
+  "scope_of_required_repair": "Checked mathematical byte-encoding/prefix-preservation facts only; preserve executable algorithm, requirements, guarantees, tables, quotas and workspace"
+}

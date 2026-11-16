@@ -1,0 +1,133 @@
+{
+  "base_commit": "c419e6e5d5376c53f5006348feed36610b81ff85",
+  "input_sha256": "1bc96347ee04818d74a3bf2eb547919cc8df8c3060f2f90b431a492dd17cbca4",
+  "source_derived_audit": true,
+  "prefix_byte_identical": true,
+  "input_private_functions": [
+    {
+      "function": "load_code_description_decoder",
+      "original_executable_signature_and_requirements_unchanged": true,
+      "named_executable_calls_in_order": [
+        "state_u16",
+        "state_u16",
+        "state_byte",
+        "state_byte",
+        "state_byte",
+        "state_byte",
+        "state_byte",
+        "read_simple_symbols",
+        "state_byte",
+        "state_byte",
+        "state_byte",
+        "state_byte",
+        "read_aux_lengths",
+        "state_byte",
+        "state_u16",
+        "state_byte",
+        "state_byte",
+        "state_u32",
+        "state_u32",
+        "state_byte",
+        "state_byte",
+        "state_byte",
+        "state_byte",
+        "state_u16",
+        "state_byte",
+        "state_byte",
+        "decode_code_description_error",
+        "code_description_phase_valid_exec"
+      ],
+      "transitive_named_call_order_preserved": true
+    },
+    {
+      "function": "m1_tree_complete_canonical",
+      "original_executable_signature_and_requirements_unchanged": true,
+      "named_executable_calls_in_order": [
+        "state_u16"
+      ],
+      "transitive_named_call_order_preserved": true
+    },
+    {
+      "function": "advance_serialized_tree",
+      "original_executable_signature_and_requirements_unchanged": true,
+      "named_executable_calls_in_order": [
+        "state_byte",
+        "decode_tree_region",
+        "state_u16",
+        "load_b3b_queue",
+        "load_code_description_decoder",
+        "m1_tree_store_queue",
+        "drain_and_store_serialized_pending_span",
+        "m1_tree_complete_simple_status",
+        "m1_tree_complete_canonical",
+        "map_code_description_error",
+        "store_code_description_decoder"
+      ],
+      "transitive_named_call_order_preserved": true
+    },
+    {
+      "function": "plan_serialized_tree",
+      "original_executable_signature_and_requirements_unchanged": true,
+      "named_executable_calls_in_order": [
+        "state_byte",
+        "decode_tree_region",
+        "state_u16",
+        "load_b3b_queue",
+        "plan_saved_aux_load",
+        "plan_saved_loader_read_units",
+        "load_code_description_decoder",
+        "state_u16",
+        "core_state_failure",
+        "valid_code_loader_read_units",
+        "checked_planned_work_add",
+        "plan_code_description_field",
+        "checked_planned_work_add",
+        "plan_code_description_field",
+        "checked_planned_work_add",
+        "checked_planned_work_add",
+        "checked_planned_work_add",
+        "acknowledge_serialized_pending_span",
+        "core_state_failure",
+        "checked_planned_work_add",
+        "code_description_store_writes",
+        "checked_planned_work_add",
+        "simple_tree_install_work",
+        "plan_canonical_tree_install",
+        "checked_planned_work_add",
+        "checked_planned_work_add",
+        "map_code_description_error",
+        "checked_planned_work_add",
+        "code_description_store_writes",
+        "core_state_failure"
+      ],
+      "transitive_named_call_order_preserved": true
+    },
+    {
+      "function": "advance_planned_context_tree",
+      "original_executable_signature_and_requirements_unchanged": true,
+      "named_executable_calls_in_order": [
+        "plan_serialized_tree",
+        "context_tree_action_work",
+        "advance_serialized_tree",
+        "core_state_failure",
+        "store_terminal_error",
+        "core_state_failure",
+        "map_compressed_error",
+        "store_context_phase",
+        "core_state_failure"
+      ],
+      "transitive_named_call_order_preserved": true
+    }
+  ],
+  "extraction": {
+    "helper": "m1_tree_complete_canonical_status",
+    "original_installer_called_once_at_original_caller": true,
+    "converter_only_maps_existing_result": true,
+    "root_calls_converter_once": true,
+    "authority": "Approved E2 bounded input-private refactoring"
+  },
+  "distance_table_function_body_and_contract_byte_identical_to_base": true,
+  "distance_table_solver_isolation_only": true,
+  "proof_changes": "Malformed-start guarantees and checked predicate-introduction/invariant facts use existing models; no requirement narrowed or previous guarantee removed",
+  "scope": "Named existing executable-call audit; original installer remains at original caller and the extracted converter performs no workspace operations. This is source-derived evidence, not binary equivalence."
+}

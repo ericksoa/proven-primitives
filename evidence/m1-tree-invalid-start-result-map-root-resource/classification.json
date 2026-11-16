@@ -1,0 +1,18 @@
+{
+  "classification": "Healthy result-mapping-only root proof search exhausted verifier loop resource limit after818seconds",
+  "positive_claimed": false,
+  "semantic_mutant_rejection": false,
+  "mapper_focused": {
+    "verified": 1,
+    "errors": 0
+  },
+  "root_result": {
+    "verified": 1,
+    "errors": 1,
+    "resource_limit": true
+  },
+  "remaining_probes": [
+    "proof-only fold plus hidden definitions",
+    "explicit ghost Result cases and named actual canonical return"
+  ]
+}

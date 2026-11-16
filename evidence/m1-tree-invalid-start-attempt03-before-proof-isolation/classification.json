@@ -1,0 +1,9 @@
+{
+  "classification": "Whole check reported distance_lut_prefix_ok assertion failure in unchanged distance table function; interrupted with remaining main loop still searching",
+  "positive_claimed": false,
+  "focused_unchanged_distance_function": {
+    "verified": 2,
+    "errors": 0
+  },
+  "repair": "Existing per-function proof isolation for unchanged distance function; preserve complete pre-extraction canonical result/effect facts at new private action boundary"
+}

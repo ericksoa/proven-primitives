@@ -1,0 +1,6 @@
+{
+  "source_sha256": "3880d0b9d1d1fdcf1994f109e77f80555359a4e83363d18e5b5a32df758e3c13",
+  "candidate_snapshot": "target/m1-invalid-start-proof-isolation",
+  "candidate_sha256": "64a677a8c46960fc3bc350534793454d91dce58ca10c0c7645be5d2401bbe886",
+  "note": "Only checked introduction proof isolated from existing executor context; all root requirements and guarantees preserved"
+}

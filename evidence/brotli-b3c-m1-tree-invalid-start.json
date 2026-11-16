@@ -1,0 +1,288 @@
+{
+  "component": "Brotli M1 malformed saved-tree start atomic rejection; full M1 incomplete",
+  "generated_utc": "2026-11-16T00:49:10.916961+00:00",
+  "base_commit": "c419e6e5d5376c53f5006348feed36610b81ff85",
+  "claim": "When the original saved tree state has no decodable start under the existing predicate, the actual tree executor returns Failed with zero input consumed and the entire workspace unchanged. Every returned read-only tree plan for that domain also reports Failed with zero consumption; planning can still fail with resource exhaustion.",
+  "authority": "Previously human-approved M1 plan/action and exact-frame proof obligations plus E2 bounded input-private extraction of only canonical result-to-status conversion. Existing semantics, signatures, requirements, models, operations, effects and work accounting remain.",
+  "source_sha256": {
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "1bc96347ee04818d74a3bf2eb547919cc8df8c3060f2f90b431a492dd17cbca4",
+    "src/brotli_prefix.rs": "4af333bdaad60d789a99aa09c1bb6603e64d4aa95aecc8bdd8e9b7702f8574ad",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a"
+  },
+  "validation_source_sha256": {
+    "tests/fixtures/brotli/corpus/10x10y": "41bd4c895e9fb36d74bc97db5092872a24267e3b0455ff6152b0d262faa00d49",
+    "tests/fixtures/brotli/corpus/10x10y.compressed": "d666afc0f6c35d8d7796175aa9a68f16ba59afedee946d4bce9167f6c86e0b84",
+    "tests/fixtures/brotli/corpus/64x": "be4d3ed1fc5f5cfa00735b28605a975f3293fa235d23abb1d9dea380fba0fb87",
+    "tests/fixtures/brotli/corpus/64x.compressed": "f0273c38c6a55c1d9ccb047da04bacdc4bb07acc44ff83871e6b3490dfc2c313",
+    "tests/fixtures/brotli/corpus/compression": "d18f849bb8c5ffef9e1b9b8719e3bcbba35f100655be40f035aeace790dec16b",
+    "tests/fixtures/brotli/corpus/compression.compressed": "a87bcbc0f45a2f793c075b26baec65ff9cd551e057c8cdef508231004ba4abf5",
+    "tests/fixtures/brotli/corpus/empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/fixtures/brotli/corpus/empty.compressed": "67586e98fad27da0b9968bc039a1ef34c939b9b8e523a8bef89d478608c5ecf6",
+    "tests/fixtures/brotli/corpus/monkey": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99",
+    "tests/fixtures/brotli/corpus/monkey.compressed": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9",
+    "tests/fixtures/brotli/corpus/quickfox_repeated": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82",
+    "tests/fixtures/brotli/corpus/quickfox_repeated.compressed": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a",
+    "tests/fixtures/brotli/corpus/x": "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015",
+    "tests/fixtures/brotli/corpus/x.compressed": "cd094a625b695542a1d37b3a11ea849d8db9584a2f9df4e60cf6158bb39bbf61",
+    "tests/fixtures/brotli/corpus/xyzzy": "7609128715518308672067aab169e24944ead24e3d732aab8a8f0b7013a65564",
+    "tests/fixtures/brotli/corpus/xyzzy.compressed": "c3f042a6be42887f842324d0e39dabd0d873e1676cd3dd2d7e2824242b318f14",
+    "tests/fixtures/brotli/corpus/zeros": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+    "tests/fixtures/brotli/corpus/zeros.compressed": "d1236d7fdab24209a747aa471f1bf33765b27adfd676355d4b4b310195dca49f",
+    "tests/fixtures/brotli/reference/command.bin": "fdbc5d5f207a43d34b26441e29b7024f4f3d00be66502d8a73233bcbe9f6c1b4",
+    "tests/fixtures/brotli/reference/context.bin": "0e4abc034ef46244934d117f15876cd477d0fb2ac94a023093338e72e37f7ad9",
+    "tests/fixtures/brotli/reference/dictionary-meta.bin": "1bce8bd7b829f177214697683c3216e836ada1e254bde7582a9111316d9fd0b9",
+    "tests/fixtures/brotli/reference/dictionary.bin": "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70",
+    "tests/fixtures/brotli/reference/transforms.bin": "7682bbd9a2901334c2b47d83aaca99e6d9fc65a2921a7c88180dde12ec3cd6b6",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "29799cd3e1a2416761b3ce6154539b4b04533a0bb9447d21b1ed60ed5f8531eb",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39"
+  },
+  "verification_results": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 1307,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "verification_options": [
+    "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+    "src/lib.rs",
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "8",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "300",
+    "--trace",
+    "--time",
+    "--output-json"
+  ],
+  "verification_elapsed_seconds": 357.83383808299914,
+  "verifier_binary": {
+    "verus": "483703c79cf57530a9864de2e69326740ee69162dd98b853aedb8273c74a06f6",
+    "rust_verify": "261789c83d4f9949f2db4e6aa205987a22a5ed6f576b1f3663ca52b246a4bc7a",
+    "z3": "edae32f9e37ea4b5bb35310d72f0e352d0dc07626cac4e9e30bc1ea9a5bc8efb"
+  },
+  "verification_evidence": {
+    "path": "evidence/brotli-b3c-m1-tree-invalid-start-attempt04-verification.json",
+    "sha256": "678b849a661fbe31632ec7af2df1a3f802a59e837f7c45ecf3067bf670fff3fa"
+  },
+  "source_freeze": {
+    "path": "evidence/m1-tree-invalid-start-attempt04-source-freeze.json",
+    "sha256": "cb91ef30ec63b1e1a665f916d9ab4910881a690a1a952d5a5d2b4b6025ffdc58"
+  },
+  "whole_log": {
+    "path": "evidence/m1-tree-invalid-start-attempt04-whole-crate.log",
+    "sha256": "8f79a433b67b782fa49859b926683c954c878f4c60ce00fc1d79b2172204a598"
+  },
+  "runtime": {
+    "path": "evidence/m1-tree-invalid-start-attempt04-runtime.log",
+    "sha256": "97a4fc80aadf209278fae822ca7838c8fafdcf5b25c3a522b310a787ded47d83",
+    "passed": 109,
+    "failed": 0
+  },
+  "runtime_source_freeze": {
+    "path": "evidence/m1-tree-invalid-start-attempt04-runtime-freeze.json",
+    "sha256": "6cd8fd379cc1217ae684f85d3226a8057977a73be7daf7e393c00cac68aa56f3"
+  },
+  "canonical_proof_handoff": "Checked current-state status theorem; original models, installer and root contracts preserved. Large builder definitions remain checked in helpers without expanding inside tree loop.",
+  "distance_proof_isolation": "Existing per-function solver context; same body, contract, pinned tools and limits",
+  "controls": {
+    "new_invalid_start_defects": 4,
+    "affected_existing_outcome_trace_defects": 10,
+    "semantic_rejections": 14,
+    "all_after_exact_source_main_positive": true,
+    "snapshot_byte_identical_to_main": true,
+    "rows": [
+      {
+        "suite": "the_prover_rejects_four_m1_invalid_start_defects",
+        "expected_mutants": 4,
+        "exit_code": 0,
+        "started_utc": "2026-11-16T00:29:15.312487+00:00",
+        "seconds": 778.2823417920008,
+        "log": "evidence/m1-tree-invalid-start-attempt04/controls-the_prover_rejects_four_m1_invalid_start_defects.log",
+        "sha256": "db5b7039c46327053d9be96059eb5862812bb03af5e5056c3cb5c556e7b461b4",
+        "source_unchanged": true,
+        "mutants": [
+          {
+            "name": "brotli-m1-invalid-region-consumes-input",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-invalid-region-consumes-input.log",
+            "sha256": "5c8a13ec445067778ccc3fa609a8385850aeb35ee586463e71f05820a83cf5f9",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-invalid-region-mutates-descriptor",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-invalid-region-mutates-descriptor.log",
+            "sha256": "6615f601644abf19d17cc98833578780f2cad0f5190cc984b3c984b480f35456",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-invalid-region-plan-consumes-input",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-invalid-region-plan-consumes-input.log",
+            "sha256": "bf2303954ba808e216e016b6dad606bee0937fbfc9e98be50e2f81d062e4fbc1",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-invalid-descriptor-plan-consumes-input",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-invalid-descriptor-plan-consumes-input.log",
+            "sha256": "903f344e030f861e03c1536854a6e404d3af8cf73741aad717994b378bb09464",
+            "semantic_rejection": true
+          }
+        ]
+      },
+      {
+        "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+        "expected_mutants": 6,
+        "exit_code": 0,
+        "started_utc": "2026-11-16T00:29:15.312970+00:00",
+        "seconds": 103.34100591699826,
+        "log": "evidence/m1-tree-invalid-start-attempt04/controls-the_prover_rejects_six_m1_tree_install_outcome_defects.log",
+        "sha256": "e5af8d7e109802823df1c66dff1ebdfe8a1a08f2bd06bae5fb522629a44f0b09",
+        "source_unchanged": true,
+        "mutants": [
+          {
+            "name": "brotli-m1-tree-simple-rejection-is-truncated",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-tree-simple-rejection-is-truncated.log",
+            "sha256": "287074890ac39e86128830c3a1bf46a43ab89f3dac8100f7d75ba2c6dff74173",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-tree-canonical-rejection-is-internal",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-tree-canonical-rejection-is-internal.log",
+            "sha256": "1a0d00cd31e4032e7059539cd9ea639b7bbf3c6a9ef4882ec2391169dd5e4d2d",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-tree-simple-plan-reports-invalid-tree",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-tree-simple-plan-reports-invalid-tree.log",
+            "sha256": "490de54587f4c8dbfd0a1e62b21e4fcde14ec1aaeca70686ca80fa4bafddc5d2",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-tree-canonical-plan-loses-tree-priority",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-tree-canonical-plan-loses-tree-priority.log",
+            "sha256": "bc4cb866131e6c61464ab95a8a51658f317fe721c13c5359efeef3e14e0b1883",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-tree-canonical-plan-loses-length-error",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-tree-canonical-plan-loses-length-error.log",
+            "sha256": "edec1b200cdf161e89610bc9d826b128aa2241376ae6b1876a603a58bd508c2b",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-tree-owner-flags-matching-workspace-error",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-tree-owner-flags-matching-workspace-error.log",
+            "sha256": "321f7f045b965bf98bb3839709a62d9453e3e74aa111587a6a2aebfb22efa03e",
+            "semantic_rejection": true
+          }
+        ]
+      },
+      {
+        "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+        "expected_mutants": 4,
+        "exit_code": 0,
+        "started_utc": "2026-11-16T00:29:15.313096+00:00",
+        "seconds": 205.68372358299894,
+        "log": "evidence/m1-tree-invalid-start-attempt04/controls-the_prover_rejects_four_m1_executor_normal_trace_defects.log",
+        "sha256": "a44c1478182d9bc9e766a7a2bb3a7c17b4f1a1ed0e3d59245e86c50fb0fdae91",
+        "source_unchanged": true,
+        "mutants": [
+          {
+            "name": "brotli-m1-executor-simple-loses-consumption",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-executor-simple-loses-consumption.log",
+            "sha256": "67ad27d5879c5f50f24a3840eff8c6d98a23d0bd063edd922836d427470e34d4",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-executor-canonical-loses-consumption",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-executor-canonical-loses-consumption.log",
+            "sha256": "75b069da7096344b70414ad333c6152103747faf13473077b713cd833f073aa6",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-executor-simple-false-need-input",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-executor-simple-false-need-input.log",
+            "sha256": "a095cdb5b18e63138ecb2b33c5711e968d8596e6c755c0070356495040f21918",
+            "semantic_rejection": true
+          },
+          {
+            "name": "brotli-m1-executor-canonical-false-need-input",
+            "log": "evidence/m1-tree-invalid-start-attempt04/canary-brotli-m1-executor-canonical-false-need-input.log",
+            "sha256": "b577efb7987e7cd9d5468b5a7019f4f859085c2b518a512430096066b07dae0c",
+            "semantic_rejection": true
+          }
+        ]
+      }
+    ]
+  },
+  "source_audit": {
+    "path": "evidence/m1-tree-invalid-start-source-audit.json",
+    "sha256": "c26e3947cd3d4b152a6bf898a891b76097a9bfa39fd221bf77531171cab6c33f"
+  },
+  "control_static_audit": {
+    "path": "evidence/m1-tree-invalid-start-control-static-audit.json",
+    "sha256": "ee687e40af6f12d16302518fdcb337b09ebcb711788040675ea21eddd07e739d"
+  },
+  "preserved": [
+    "All original executable signatures, admitted requirements and previous guarantees; same parser/storage operations and status mapping through E2 extraction",
+    "Existing mathematical models and specifications",
+    "Prefix source, W1 interface, B3c budget ownership, workspace, K4 codec and F2 policy",
+    "K6 formulas,5696 caps,798/8192 proof bounds,425 reset charge",
+    "Pinned tools/dependencies and proof trust boundary"
+  ],
+  "retained_attempt01": {
+    "whole_verified": 1305,
+    "whole_errors": 0,
+    "runtime_passed": 109,
+    "control_closure": false,
+    "failure": "Canonical error-mapping mutant hit loop resource limit; not a semantic rejection",
+    "recovery": "Existing actual canonical status mapping extracted under E2 into a checked private action; all root contracts preserved"
+  },
+  "retained_attempt02": {
+    "positive_claimed": false,
+    "diagnostic": "NeedInput postcondition not satisfied at canonical return because extracted helper contract omitted existing completion/failure classification",
+    "repair": "Expose the checked actual result variants in the private helper; no runtime or root contract change"
+  },
+  "retained_attempt03": {
+    "positive_claimed": false,
+    "diagnostic": "Existing unchanged distance-table prefix assertion failed in shared solver context; unchanged focused check passed 2/0",
+    "repair": "Existing per-function solver isolation for same body, contract and limits; retain the original installer and Result at the original caller; extract only the scalar conversion"
+  },
+  "result_conversion": {
+    "original_installer_and_result_remain_at_original_caller": true,
+    "converter_has_no_workspace_parameter": true,
+    "converter_guarantees_exact_original_mapping": true,
+    "authority": "Approved E2 bounded input-private refactoring"
+  },
+  "remaining": [
+    "Exact error-identity agreement outside the decodable-start domain",
+    "Complete source-operation ledger, outcome-specific frames and M1 control closure",
+    "Remaining B3c/B3d/B4 and independent human specification review"
+  ],
+  "trusted_components": [
+    "Mathematical specifications and interpretation",
+    "Pinned Verus/Z3/vstd",
+    "Rust/LLVM and Apple build tools",
+    "Machine and operating environment"
+  ],
+  "not_claimed": "Complete M1, supported decoder, universal caller composition, side-channel resistance or source-to-binary correctness",
+  "release_gate": "incomplete"
+}

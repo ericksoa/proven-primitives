@@ -1,0 +1,28 @@
+error[E0428]: the name `m1_tree_iterations_agree` is defined multiple times
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-invalid-start-result-map-fold/src/brotli_input.rs:15900:7
+      |
+15881 |   proof fn m1_tree_iterations_agree(left: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDe...
+      |  _______-
+15882 | |     region: crate::brotli_prefix::TreeRegion, tree: u16)
+15883 | |     requires m1_tree_iteration_holds(left, input, end), m1_tree_iteration_holds(right, input, end),
+15884 | |         m1_code_states_agree(left.0, right.0), left.5 == right.5, left.7 == right.7,
+...     |
+15896 | |     reveal(code_field_total_read_units);
+15897 | | }
+      | |_- previous definition of the value `m1_tree_iterations_agree` here
+...
+15900 |   proof fn m1_tree_iterations_agree(left: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDe...
+      |  _______^
+15901 | |     region: crate::brotli_prefix::TreeRegion, tree: u16)
+15902 | |     requires m1_tree_iteration_holds(left, input, end), m1_tree_iteration_holds(right, input, end),
+15903 | |         m1_code_states_agree(left.0, right.0), left.5 == right.5, left.7 == right.7,
+...     |
+15915 | |     reveal(code_field_total_read_units);
+15916 | | }
+      | |_^ `m1_tree_iterations_agree` redefined here
+      |
+      = note: `m1_tree_iterations_agree` must be defined only once in the value namespace of this module
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0428`.

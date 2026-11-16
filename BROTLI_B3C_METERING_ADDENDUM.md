@@ -891,3 +891,28 @@ in `evidence/brotli-b3c-m1-tree-total.json`; scope and limitations are in
 source-operation accounting, outcome-specific byte frames, full M1 control
 closure, later B3 work and independent human specification review remain open.
 All existing runtime interfaces, storage, quotas, K4 and F2 remain fixed.
+
+
+### Malformed saved-tree start rejection
+
+The next continuation adds a checked rejection guarantee for the complement of
+the existing decodable-start domain. The executor must return failure, consume
+zero input and preserve the entire workspace. Every returned read-only plan
+for that domain must also fail with zero consumption. Budget exhaustion during
+planning remains possible. A checked introduction lemma isolates existing
+decoder/queue/region witnesses from the large loop proof; it adds no model or
+runtime behavior. Only the existing canonical result-to-status conversion is
+isolated under approved E2 after a resource-only mutant failure. The original
+installer, result and complete guarantees remain at the original caller,
+preserving operations, effects and work accounting.
+Original signatures, requirements and previous guarantees remain.
+
+Final verification passed 1,307 whole-crate checks with zero errors, 109 runtime
+tests and 14 semantic defect rejections after the exact-source whole positive.
+The first 1,305-check run's resource-only mutant failure and subsequent proof
+recovery outputs are retained. Final evidence is recorded in
+`evidence/brotli-b3c-m1-tree-invalid-start.json`; scope and trusted components
+are in `BROTLI_M1_INVALID_START_CHECKPOINT.md`. Exact malformed-start error
+identity, the complete source-operation ledger, other outcome frames and full
+M1 control closure remain open, along with later B3 work and independent human
+specification review. This is not M1 or supported-decoder completion.

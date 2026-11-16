@@ -1,0 +1,24 @@
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-invalid-start-canonical-result-map/src/brotli_input.rs:16868:5
+      |
+16868 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 818 seconds
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-invalid-start-canonical-result-map/src/brotli_input.rs:16868:5
+      |
+16868 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+error: while loop: Resource limit (rlimit) exceeded; consider rerunning with --profile for more details
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-invalid-start-canonical-result-map/src/brotli_input.rs:16868:5
+      |
+16868 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+

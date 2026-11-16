@@ -1,0 +1,7 @@
+{
+  "classification": "Whole proof found a concrete missing contract fact after E2 extraction; no positive result claimed",
+  "diagnostic": "postcondition not satisfied: NeedInput implies !end_of_input and consumed==input.len(), at canonical-status return",
+  "repair": "Expose the existing actual wrapper result classification: Complete or Failed, never NeedInput. Preserve all root guarantees and runtime bodies.",
+  "actual_verifier_exit_code": -2,
+  "source_unchanged_during_run": false
+}

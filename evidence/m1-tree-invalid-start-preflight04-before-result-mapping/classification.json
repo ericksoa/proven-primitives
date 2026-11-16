@@ -1,0 +1,8 @@
+{
+  "classification": "Unfinished proof searches stopped before narrowing the E2 extraction to result mapping only",
+  "positive_claimed": false,
+  "reason": "Keep original installer Result and complete original contracts directly visible at original caller; extract only the existing conversion operation",
+  "pure_same_current_status_lemma_verified": 1,
+  "pure_same_current_status_lemma_errors": 0,
+  "no_runtime_or_root_guarantee_weakening": true
+}

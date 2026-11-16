@@ -1,0 +1,16 @@
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-invalid-start-result-map-fold/src/brotli_input.rs:16879:5
+      |
+16879 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 430 seconds
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-invalid-start-result-map-fold/src/brotli_input.rs:16879:5
+      |
+16879 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+verification results:: 2 verified, 0 errors (partial verification with `--verify-*`)

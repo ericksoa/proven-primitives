@@ -15871,6 +15871,15 @@ spec fn m1_tree_iteration_parsing_units(a: (CodeDescriptionDecoder, CodeDescript
         }
 }
 
+proof fn m1_tree_canonical_status_same_current(left: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), right: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>),
+    region: crate::brotli_prefix::TreeRegion, tree: u16)
+    requires matches!(left.3.phase, CodeDescriptionPhase::CompleteComplex { .. }),
+        left.3 == right.3, left.5 == right.5, left.7 == right.7,
+    ensures m1_tree_iteration_status(left, region, tree) == m1_tree_iteration_status(right, region, tree),
+{ reveal(m1_tree_iteration_status); }
+
+
+
 proof fn m1_tree_iterations_agree(left: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), right: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>, end: bool,
     region: crate::brotli_prefix::TreeRegion, tree: u16)
     requires m1_tree_iteration_holds(left, input, end), m1_tree_iteration_holds(right, input, end),
@@ -16669,6 +16678,23 @@ fn m1_tree_complete_canonical(workspace: &mut [u8], window_bytes: u32,
     }
 }
 
+// The existing canonical installation status mapping, kept input-private.
+fn m1_tree_complete_canonical_status(installed: Result<(), CompressedHeaderError>)
+    -> (status: SerializedTreeStatus)
+    ensures
+        status == match installed {
+            Ok(()) => SerializedTreeStatus::Complete,
+            Err(error) => SerializedTreeStatus::Failed(error),
+        },
+        matches!(status, SerializedTreeStatus::Complete | SerializedTreeStatus::Failed(_)),
+{
+    match installed {
+        Ok(()) => SerializedTreeStatus::Complete,
+        Err(error) => SerializedTreeStatus::Failed(error),
+    }
+}
+
+
 #[verifier::opaque]
 spec fn m1_tree_has_decodable_start(workspace: Seq<u8>, window_bytes: u32) -> bool {
     exists|decoder: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion| {
@@ -16676,6 +16702,16 @@ spec fn m1_tree_has_decodable_start(workspace: Seq<u8>, window_bytes: u32) -> bo
         &&& serialized_b3b_queue(workspace, window_bytes, decoder.queue)
         &&& b3b_scalar_byte_at(workspace, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region)
     }
+}
+
+proof fn m1_tree_decodable_start_intro(workspace: Seq<u8>, window_bytes: u32,
+    decoder: CodeDescriptionDecoder, region: crate::brotli_prefix::TreeRegion)
+    requires m1_code_decoder_image(workspace, window_bytes, decoder.queue, decoder),
+        serialized_b3b_queue(workspace, window_bytes, decoder.queue),
+        b3b_scalar_byte_at(workspace, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region),
+    ensures m1_tree_has_decodable_start(workspace, window_bytes),
+{
+    reveal(m1_tree_has_decodable_start);
 }
 
 proof fn m1_tree_decodable_start_facts(workspace: Seq<u8>, window_bytes: u32)
@@ -16742,6 +16778,11 @@ fn advance_serialized_tree(
     end_of_input: bool,
 ) -> (r: SerializedTreeStep)
     ensures
+        !m1_tree_has_decodable_start(old(workspace)@, window_bytes) ==> {
+            &&& r.consumed == 0
+            &&& matches!(r.status, SerializedTreeStatus::Failed(_))
+            &&& final(workspace)@ == old(workspace)@
+        },
         m1_tree_has_decodable_start(old(workspace)@, window_bytes) ==>
             m1_tree_result_has_trace(old(workspace)@, window_bytes, input@, end_of_input, r),
         !matches!(r.status, SerializedTreeStatus::Failed(_)) ==>
@@ -16785,6 +16826,8 @@ fn advance_serialized_tree(
         r.status == SerializedTreeStatus::Complete ==>
             active_tree_metadata_complete(final(workspace)@, window_bytes),
 {
+    hide(crate::brotli_prefix::valid_builder_lengths);
+    hide(crate::brotli_prefix::builder_length_sequence);
     hide(code_field_step_refines);
     hide(code_transition_holds);
     hide(b3b_queue_encoding_valid);
@@ -16835,6 +16878,7 @@ fn advance_serialized_tree(
     let ghost mut actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)> = Seq::empty();
     while work < 5_696
         invariant consumed <= input.len(), work <= 5_696,
+            work > 0 ==> m1_tree_has_decodable_start(original, window_bytes),
             initial_initialized == b3b_scalar_u16_at(original, window_bytes, B3B_BUILDER_INITIALIZED) as u16,
             initial_values == m1_tree_builder_values(original, window_bytes, loop_limit, initial_initialized),
             actions.len() == work as nat,
@@ -16932,6 +16976,11 @@ fn advance_serialized_tree(
             Ok(value) => value,
             Err(error) => return SerializedTreeStep { consumed, status: SerializedTreeStatus::Failed(error) },
         };
+        proof {
+            if work == 0 {
+                m1_tree_decodable_start_intro(original, window_bytes, decoder, region);
+            }
+        }
         let ghost reloaded_decoder = previous_decoder;
         proof { previous_decoder = None; }
         proof {
@@ -17111,18 +17160,18 @@ fn advance_serialized_tree(
             CodeDescriptionPhase::CompleteComplex { .. } => {
                 let ghost before_canonical = workspace@;
                 let installed = m1_tree_complete_canonical(workspace, window_bytes, region, tree, decoder);
-                let status = match installed {
-                    Ok(()) => SerializedTreeStatus::Complete,
-                    Err(error) => SerializedTreeStatus::Failed(error),
-                };
+                let status = m1_tree_complete_canonical_status(installed);
                 proof {
                     let action = (before_field, field_after, step, started, started,
                         before_initialized, before_initialized, before_values, before_values);
                     m1_tree_trace_unspanned_action(before_field, field_after, step, started,
                         before_initialized, before_values, input@.skip(before_consumed as int), end_of_input);
-                    assert(m1_tree_iteration_status(action, region, tree) == Some(status)) by {
-                        reveal(m1_tree_iteration_status);
-                    }
+                    let initialized = b3b_scalar_u16_at(before_canonical, window_bytes, B3B_BUILDER_INITIALIZED) as u16;
+                    let values = m1_tree_builder_values(before_canonical, window_bytes, decoder.alphabet_limit, initialized);
+                    let helper_action = (decoder, decoder, CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::Progress },
+                        decoder, decoder, initialized, initialized, values, values);
+                    m1_tree_canonical_status_same_current(action, helper_action, region, tree);
+                    assert(m1_tree_iteration_status(action, region, tree) == Some(status));
                     m1_tree_record_finished_trace(original, window_bytes, input@, end_of_input,
                         initial_decoder.unwrap(), region, tree, initial_initialized, initial_values,
                         actions, action, before_consumed as nat, SerializedTreeStep { consumed, status });
@@ -27228,6 +27277,8 @@ pub(crate) open spec fn distance_lut_prefix_ok(
     }
 }
 
+// Check this existing table proof in its own solver context.
+#[verifier::spinoff_prover]
 fn fill_serialized_distance_lut(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -31575,6 +31626,10 @@ fn plan_serialized_tree(
 ) -> (r: Result<SerializedTreePlan, CoreFailure>)
     requires old(budget).valid(),
     ensures
+        r.is_ok() && !m1_tree_has_decodable_start(workspace@, window_bytes) ==> {
+            &&& r.unwrap().consumed == 0
+            &&& matches!(r.unwrap().status, SerializedTreeStatus::Failed(_))
+        },
         r.is_ok() && m1_tree_has_decodable_start(workspace@, window_bytes) ==>
             m1_tree_result_has_trace(workspace@, window_bytes, input@, end_of_input,
                 SerializedTreeStep { consumed: r.unwrap().consumed, status: r.unwrap().status }),
@@ -31670,6 +31725,17 @@ fn plan_serialized_tree(
     };
     proof { code_phase_rank_is_bounded(decoder); }
     let ghost initial_rank = code_phase_rank(decoder.phase, decoder.alphabet_limit);
+    proof {
+        reveal(m1_tree_has_decodable_start);
+        assert(m1_code_decoder_image(workspace@, window_bytes, decoder.queue, decoder));
+        assert(serialized_b3b_queue(workspace@, window_bytes, decoder.queue));
+        assert(exists|initial: CodeDescriptionDecoder, initial_region: crate::brotli_prefix::TreeRegion| {
+            &&& m1_code_decoder_image(workspace@, window_bytes, initial.queue, initial)
+            &&& serialized_b3b_queue(workspace@, window_bytes, initial.queue)
+            &&& b3b_scalar_byte_at(workspace@, window_bytes, B3B_ACTIVE_REGION)
+                == tree_region_tag_spec(initial_region)
+        });
+    }
     let mut builder_initialized = match state_u16(
         workspace,
         window_bytes,
@@ -31686,6 +31752,7 @@ fn plan_serialized_tree(
     let mut copied = 0u16;
     while copied < copy_len
         invariant
+            m1_tree_has_decodable_start(workspace@, window_bytes),
             copied <= copy_len <= decoder.alphabet_limit <= 704,
             forall|i: int| 0 <= i < copied ==> #[trigger] lengths@[i]
                 == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
@@ -31734,6 +31801,7 @@ fn plan_serialized_tree(
     let mut iterations = 0u16;
     while iterations < 5_696
         invariant
+            m1_tree_has_decodable_start(workspace@, window_bytes),
             matches!(SIMPLE_DESTINATION_ERROR, crate::brotli_prefix::WorkspaceError::InvalidSymbol),
             matches!(CANONICAL_TREE_ERROR, crate::brotli_prefix::WorkspaceError::InvalidTree),
             matches!(CANONICAL_LENGTH_ERROR, crate::brotli_prefix::WorkspaceError::InvalidCodeLength),

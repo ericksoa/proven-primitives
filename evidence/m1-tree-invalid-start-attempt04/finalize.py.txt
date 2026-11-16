@@ -1,0 +1,62 @@
+from pathlib import Path
+import datetime,gzip,hashlib,json,re,shutil
+root=Path.cwd();ev=root/'evidence';prefix='m1-tree-invalid-start-attempt04';stage=ev/prefix;snap=root/'target/m1-tree-invalid-start-controls04'
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+load=lambda p:json.loads(p.read_text())
+f=load(ev/(prefix+'-source-freeze.json'));v=load(ev/('brotli-b3c-'+prefix+'-verification.json'))
+assert f['exit_code']==0 and f['source_unchanged'] and '--no-cheating' in f['command']
+assert v['verification-results']['success'] and v['verification-results']['errors']==0 and v['verification-results']['is-verifying-entire-crate']
+for n,d in dict(f['source_sha256'],**f['validation_source_sha256']).items():assert h(root/n)==h(snap/n)==d,n
+audit=load(ev/'m1-tree-invalid-start-control-static-audit.json')
+assert audit['source_sha256']==h(root/'src/brotli_input.rs') and audit['test_sha256']==h(root/'tests/proof_rejection.rs')
+assert len(audit['cases'])==14 and all(row['unique_actual_body_anchor'] and row['root_signature_requirements_and_guarantees_unchanged'] for row in audit['cases'])
+runtime_freeze=load(ev/(prefix+'-runtime-freeze.json'))
+assert runtime_freeze['exit_code']==0 and runtime_freeze['source_unchanged'] and runtime_freeze['passed']==109
+for name,digest in dict(f['source_sha256'],**f['validation_source_sha256']).items():assert runtime_freeze['source_sha256'][name]==digest,name
+rows=load(snap/'evidence'/(prefix+'-controls-results.json'))
+assert sum(r['expected_mutants'] for r in rows)==14
+assert all(r['exit_code']==0 and r['source_unchanged'] and len(r['mutants'])==r['expected_mutants'] and all(m['semantic_rejection'] for m in r['mutants']) for r in rows)
+assert sum(map(int,re.findall(r'test result: ok\. (\d+) passed; 0 failed',(ev/(prefix+'-runtime.log')).read_text())))==109
+stage.mkdir(exist_ok=True)
+for p in (snap/'evidence').rglob('*'):
+ if p.is_file() and ('canary-' in p.name or 'controls-' in p.name):shutil.copy2(p,stage/p.name)
+for row in rows:
+ row['log']=str((stage/Path(row['log']).name).relative_to(root));assert h(root/row['log'])==row['sha256']
+ for m in row['mutants']:
+  m['log']=str((stage/Path(m['log']).name).relative_to(root));assert h(root/m['log'])==m['sha256']
+for n in ['src/brotli_input.rs','tests/proof_rejection.rs']:(stage/('source-'+Path(n).name+'.gz')).write_bytes(gzip.compress((root/n).read_bytes(),mtime=0))
+for n in ['verification','controls']:shutil.copy2(root/('target/m1-tree-invalid-start-'+n+'-driver.py'),stage/(n+'-driver.py.txt'))
+shutil.copy2(root/'target/m1-tree-invalid-start-finalize.py',stage/'finalize.py.txt')
+shutil.copy2(root/'target/m1-tree-invalid-start-source-audit.py',stage/'source-audit.py.txt')
+shutil.copy2(root/'target/m1-tree-invalid-start-control-static-audit.py',stage/'control-static-audit.py.txt')
+evidence=lambda p:{'path':str(p.relative_to(root)),'sha256':h(p)}
+prior=load(ev/'brotli-b3c-m1-tree-total.json');tool=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+binaries={n:h(tool/n) for n in ['verus','rust_verify','z3']};assert binaries==prior['verifier_binary']
+r={
+ 'component':'Brotli M1 malformed saved-tree start atomic rejection; full M1 incomplete',
+ 'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+ 'base_commit':'c419e6e5d5376c53f5006348feed36610b81ff85',
+ 'claim':'When the original saved tree state has no decodable start under the existing predicate, the actual tree executor returns Failed with zero input consumed and the entire workspace unchanged. Every returned read-only tree plan for that domain also reports Failed with zero consumption; planning can still fail with resource exhaustion.',
+ 'authority':'Previously human-approved M1 plan/action and exact-frame proof obligations plus E2 bounded input-private extraction of only canonical result-to-status conversion. Existing semantics, signatures, requirements, models, operations, effects and work accounting remain.',
+ 'source_sha256':f['source_sha256'],'validation_source_sha256':f['validation_source_sha256'],
+ 'verification_results':v['verification-results'],'verification_options':f['command'],'verification_elapsed_seconds':f['elapsed_seconds'],'verifier_binary':binaries,
+ 'verification_evidence':evidence(ev/('brotli-b3c-'+prefix+'-verification.json')),'source_freeze':evidence(ev/(prefix+'-source-freeze.json')),'whole_log':evidence(ev/(prefix+'-whole-crate.log')),
+ 'runtime':dict(evidence(ev/(prefix+'-runtime.log')),passed=109,failed=0),
+ 'runtime_source_freeze':evidence(ev/(prefix+'-runtime-freeze.json')),
+ 'canonical_proof_handoff':'Checked current-state status theorem; original models, installer and root contracts preserved. Large builder definitions remain checked in helpers without expanding inside tree loop.',
+ 'distance_proof_isolation':'Existing per-function solver context; same body, contract, pinned tools and limits',
+ 'controls':{'new_invalid_start_defects':4,'affected_existing_outcome_trace_defects':10,'semantic_rejections':14,'all_after_exact_source_main_positive':True,'snapshot_byte_identical_to_main':True,'rows':rows},
+ 'source_audit':evidence(ev/'m1-tree-invalid-start-source-audit.json'),
+ 'control_static_audit':evidence(ev/'m1-tree-invalid-start-control-static-audit.json'),
+ 'preserved':['All original executable signatures, admitted requirements and previous guarantees; same parser/storage operations and status mapping through E2 extraction','Existing mathematical models and specifications','Prefix source, W1 interface, B3c budget ownership, workspace, K4 codec and F2 policy','K6 formulas,5696 caps,798/8192 proof bounds,425 reset charge','Pinned tools/dependencies and proof trust boundary'],
+ 'retained_attempt01':{'whole_verified':1305,'whole_errors':0,'runtime_passed':109,'control_closure':False,'failure':'Canonical error-mapping mutant hit loop resource limit; not a semantic rejection','recovery':'Existing actual canonical status mapping extracted under E2 into a checked private action; all root contracts preserved'},
+ 'retained_attempt02':{'positive_claimed':False,'diagnostic':'NeedInput postcondition not satisfied at canonical return because extracted helper contract omitted existing completion/failure classification','repair':'Expose the checked actual result variants in the private helper; no runtime or root contract change'},
+ 'retained_attempt03':{'positive_claimed':False,'diagnostic':'Existing unchanged distance-table prefix assertion failed in shared solver context; unchanged focused check passed 2/0','repair':'Existing per-function solver isolation for same body, contract and limits; retain the original installer and Result at the original caller; extract only the scalar conversion'},
+ 'result_conversion':{'original_installer_and_result_remain_at_original_caller':True,'converter_has_no_workspace_parameter':True,'converter_guarantees_exact_original_mapping':True,'authority':'Approved E2 bounded input-private refactoring'},
+ 'remaining':['Exact error-identity agreement outside the decodable-start domain','Complete source-operation ledger, outcome-specific frames and M1 control closure','Remaining B3c/B3d/B4 and independent human specification review'],
+ 'trusted_components':prior['trusted_components'],
+ 'not_claimed':'Complete M1, supported decoder, universal caller composition, side-channel resistance or source-to-binary correctness',
+ 'release_gate':'incomplete'
+}
+(ev/'brotli-b3c-m1-tree-invalid-start.json').write_text(json.dumps(r,indent=2)+'\n')
+print(json.dumps({'verified':v['verification-results']['verified'],'errors':0,'runtime':109,'semantic_rejections':14,'receipt':'evidence/brotli-b3c-m1-tree-invalid-start.json'}))

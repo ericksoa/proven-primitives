@@ -1,0 +1,6 @@
+{
+  "classification": "Probe-generation compiler error E0428: proof extraction accidentally included next existing function twice",
+  "semantic_rejection": false,
+  "positive_proof": false,
+  "fix": "Remove only identical duplicated proof function; main source unaffected"
+}

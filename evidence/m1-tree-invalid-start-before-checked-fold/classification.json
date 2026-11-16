@@ -1,0 +1,10 @@
+{
+  "classification": "Adopted checked folded proof candidate08; unused alternative probes stopped with no positive claim",
+  "focused_current_state_status_lemma": {
+    "verified": 1,
+    "errors": 0
+  },
+  "focused_tree_executor": "See executor-preflight-08.log; entire selected function passed",
+  "new_source_sha256": "1bc96347ee04818d74a3bf2eb547919cc8df8c3060f2f90b431a492dd17cbca4",
+  "runtime_effects": "Only proof lemma, checked handoff and scoped definition hiding differ from previous result-only mapping source; executable statements unchanged"
+}

@@ -1,0 +1,10 @@
+{
+  "whole_verified": 1305,
+  "whole_errors": 0,
+  "runtime_passed": 109,
+  "control_run_complete": false,
+  "failed_mutant": "brotli-m1-tree-canonical-rejection-is-internal",
+  "failure_classification": "Resource limit (rlimit) exceeded in actual large executor loop; not a semantic rejection",
+  "remaining_running_controls": "Explicitly terminated before canonical status action extraction; no result inferred",
+  "next_recovery": "Move existing canonical Result-to-status mapping into E2 input-private action helper, preserving root contracts and all semantics"
+}

@@ -1,0 +1,42 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-75300/src/brotli_input.rs:16851:5
+      |
+16851 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 521 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-75300/src/brotli_input.rs:16851:5
+      |
+16851 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+error: while loop: Resource limit (rlimit) exceeded; consider rerunning with --profile for more details
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-75300/src/brotli_input.rs:16851:5
+      |
+16851 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-75300/src/brotli_input.rs:16851:5
+      |
+16851 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-75300/src/brotli_input.rs:16748:1
+      |
+16748 | / fn advance_serialized_tree(
+16749 | |     workspace: &mut [u8],
+16750 | |     window_bytes: u32,
+16751 | |     input: &[u8],
+16752 | |     end_of_input: bool,
+16753 | | ) -> (r: SerializedTreeStep)
+      | |___________________________^
+
+error: aborting due to 1 previous error
+

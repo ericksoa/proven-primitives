@@ -1,0 +1,23 @@
+from pathlib import Path
+import hashlib,json,re,subprocess,os
+root=Path.cwd();env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools');base='c419e6e5d5376c53f5006348feed36610b81ff85'
+old=subprocess.check_output(['git','show',base+':src/brotli_input.rs'],env=env,text=True);new=(root/'src/brotli_input.rs').read_text()
+def selected(s,n):
+ a=s.index('fn '+n+'(');b=s.index('\n}\n',a)+3;f=s[a:b];c=f.index('\n{\n');return f[:c],f[c:]
+names=set(re.findall(r'^fn (\w+)\(',old,re.M))
+def calls(s):return [n for n in re.findall(r'\b(\w+)\s*\(',s) if n in names]
+rows=[]
+for name in ['load_code_description_decoder','m1_tree_complete_canonical','advance_serialized_tree','plan_serialized_tree','advance_planned_context_tree']:
+ oh,ob=selected(old,name);nh,nb=selected(new,name);assert oh.split('    ensures')[0]==nh.split('    ensures')[0],name
+ if name=='advance_serialized_tree':
+  assert nb.count('m1_tree_complete_canonical_status(')==1
+  _,hb=selected(new,'m1_tree_complete_canonical_status');assert calls(hb)==[]
+  assert nb.count('m1_tree_complete_canonical(')==1
+ assert calls(ob)==calls(nb),(name,calls(ob),calls(nb))
+ rows.append({'function':name,'original_executable_signature_and_requirements_unchanged':True,'named_executable_calls_in_order':calls(ob),'transitive_named_call_order_preserved':True})
+oh,ob=selected(old,'fill_serialized_distance_lut');nh,nb=selected(new,'fill_serialized_distance_lut');assert oh==nh and ob==nb
+assert (root/'src/brotli_prefix.rs').read_bytes()==subprocess.check_output(['git','show',base+':src/brotli_prefix.rs'],env=env)
+r={'base_commit':base,'input_sha256':hashlib.sha256(new.encode()).hexdigest(),'source_derived_audit':True,'prefix_byte_identical':True,'input_private_functions':rows,'extraction':{'helper':'m1_tree_complete_canonical_status','original_installer_called_once_at_original_caller':True,'converter_only_maps_existing_result':True,'root_calls_converter_once':True,'authority':'Approved E2 bounded input-private refactoring'},'distance_table_function_body_and_contract_byte_identical_to_base':True,'distance_table_solver_isolation_only':True,'proof_changes':'Malformed-start guarantees and checked predicate-introduction/invariant facts use existing models; no requirement narrowed or previous guarantee removed','scope':'Named existing executable-call audit; original installer remains at original caller and the extracted converter performs no workspace operations. This is source-derived evidence, not binary equivalence.'}
+(root/'evidence/m1-tree-invalid-start-source-audit.json').write_text(json.dumps(r,indent=2)+'\n')
+(root/'evidence/m1-tree-invalid-start-candidate.patch').write_bytes(subprocess.check_output(['git','diff','--','src/brotli_input.rs','tests/proof_rejection.rs'],env=env))
+print('Five original function signatures/requirements and transitive operation sequences preserved; prefix identical')

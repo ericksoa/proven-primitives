@@ -1,0 +1,9 @@
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_tree (selected functions)
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> target/m1-invalid-start-result-map-cases/src/brotli_input.rs:16868:5
+      |
+16868 |     while work < 5_696
+      |     ^^^^^^^^^^^^^^^^^^
+

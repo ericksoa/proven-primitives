@@ -1,0 +1,10 @@
+{
+  "classification": "Interrupted proof search after equivalent isolated-helper candidate passed; no semantic failure or positive proof claimed for this first attempt",
+  "original_source_sha256": "3880d0b9d1d1fdcf1994f109e77f80555359a4e83363d18e5b5a32df758e3c13",
+  "selected_successor": "evidence/m1-tree-invalid-start-executor-preflight-02.log",
+  "successor_verified": 2,
+  "successor_errors": 0,
+  "intro_helper_verified": 3,
+  "intro_helper_errors": 0,
+  "exit_code": 130
+}
