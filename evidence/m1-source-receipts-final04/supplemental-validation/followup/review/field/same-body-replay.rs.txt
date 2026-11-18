@@ -1,0 +1,686 @@
+impl CodeDescriptionDecoder {
+    #[verifier::rlimit(500)]
+    #[verifier::spinoff_prover]
+    fn r_triage_field_truncation_replay(
+        &mut self,
+        input: &[u8],
+        end_of_input: bool,
+    ) -> (r: (CodeDescriptionStep, Ghost<nat>))
+        requires old(self).valid(),
+            old(self).phase == CodeDescriptionPhase::Selector,
+            old(self).alphabet_max == 1,
+            old(self).alphabet_limit == 1,
+            old(self).queue.pending == [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+            old(self).queue.len == 0,
+            old(self).queue.offset == 0,
+            input.len() == 0,
+            end_of_input,
+        ensures r.0.status == CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),
+            r.0.consumed == 0,
+            r.1@ == 0,
+            final(self).phase == CodeDescriptionPhase::Failed(CodeDescriptionError::Truncated),
+            final(self).queue.len == 0,
+            final(self).queue.offset == 0,
+            final(self).valid(), r.0.consumed <= input.len(),
+            code_field_step_refines(*old(self), input@, end_of_input, *final(self), r.0),
+            final(self).alphabet_max == old(self).alphabet_max,
+            final(self).alphabet_limit == old(self).alphabet_limit,
+            match old(self).phase {
+                CodeDescriptionPhase::CompleteSimple(code) => {
+                    &&& r.0 == (CodeDescriptionStep {
+                        consumed: 0,
+                        status: CodeDescriptionStatus::Simple(code),
+                    })
+                    &&& *final(self) == *old(self)
+                },
+                CodeDescriptionPhase::CompleteComplex { decoded_symbols: symbols, .. } => {
+                    &&& r.0 == (CodeDescriptionStep {
+                        consumed: 0,
+                        status: CodeDescriptionStatus::ComplexComplete { symbols },
+                    })
+                    &&& *final(self) == *old(self)
+                },
+                CodeDescriptionPhase::Failed(error) => {
+                    &&& r.0 == (CodeDescriptionStep {
+                        consumed: 0,
+                        status: CodeDescriptionStatus::Failed(error),
+                    })
+                    &&& *final(self) == *old(self)
+                },
+                _ => true,
+            },
+            r.0.status == CodeDescriptionStatus::NeedInput ==> {
+                &&& final(self).phase == old(self).phase
+                &&& code_phase_width(old(self).phase, old(self).alphabet_max) > 0
+                &&& !end_of_input
+                &&& r.0.consumed == input.len()
+            },
+            match r.0.status {
+                CodeDescriptionStatus::Simple(code) => {
+                    &&& code.valid(final(self).alphabet_limit)
+                    &&& final(self).phase == CodeDescriptionPhase::CompleteSimple(code)
+                },
+                CodeDescriptionStatus::ComplexAlphabet(code) => {
+                    &&& code.valid()
+                    &&& final(self).phase == CodeDescriptionPhase::CompleteComplexAlphabet(code)
+                },
+                CodeDescriptionStatus::ComplexComplete { symbols } => match final(self).phase {
+                    CodeDescriptionPhase::CompleteComplex {
+                        decoded_symbols: final_symbols,
+                        ..
+                    } => {
+                        &&& final_symbols == symbols
+                    },
+                    _ => false,
+                },
+                CodeDescriptionStatus::Failed(error) =>
+                    final(self).phase == CodeDescriptionPhase::Failed(error),
+                _ => true,
+            },
+            !code_phase_terminal(old(self).phase) ==> {
+                let width = code_phase_width(old(self).phase, old(self).alphabet_max);
+                let available = old(self).queue.bits()
+                    + bytes_bits(input@.take(r.0.consumed as int));
+                &&& available.len() >= width ==> code_transition_holds(
+                    old(self).phase,
+                    bits_value(available.take(width as int)),
+                    old(self).alphabet_max,
+                    old(self).alphabet_limit,
+                    final(self).phase,
+                    r.0.status,
+                )
+            },
+        r.1@ == code_field_total_read_units(*old(self), input@, r.0.consumed),
+    {
+        hide(CodeDescriptionDecoder::valid);
+        hide(ComplexCodeLengthAlphabet::valid);
+        hide(active_symbols_distinct);
+        hide(code_field_total_read_units);
+        hide(code_field_step_refines);
+        hide(auxiliary_count_prefix);
+        let ghost before_field = *self;
+        proof { r_m1_field_valid_components(before_field); }
+        let ghost mut source_reads: nat = 0;
+        let ghost mut table_reads: nat = 0;
+        let phase = self.phase;
+        match phase {
+            CodeDescriptionPhase::CompleteSimple(code) => {
+                proof {
+                    r_m1_field_terminal_step_refinement(before_field, input@, end_of_input, CodeDescriptionStatus::Simple(code));
+                    r_m1_field_no_bit_read_units(before_field, input@);
+                    assert(source_reads == code_field_total_read_units(before_field, input@, 0));
+                }
+                proof { assert(false); }
+                return (CodeDescriptionStep {
+                    consumed: 0,
+                    status: CodeDescriptionStatus::Simple(code),
+                }, Ghost(source_reads));
+            }
+            CodeDescriptionPhase::CompleteComplex { decoded_symbols: symbols, .. } => {
+                proof {
+                    r_m1_field_terminal_step_refinement(before_field, input@, end_of_input, CodeDescriptionStatus::ComplexComplete { symbols });
+                    r_m1_field_no_bit_read_units(before_field, input@);
+                    assert(source_reads == code_field_total_read_units(before_field, input@, 0));
+                }
+                proof { assert(false); }
+                return (CodeDescriptionStep {
+                    consumed: 0,
+                    status: CodeDescriptionStatus::ComplexComplete { symbols },
+                }, Ghost(source_reads));
+            }
+            CodeDescriptionPhase::Failed(error) => {
+                proof {
+                    r_m1_field_terminal_step_refinement(before_field, input@, end_of_input, CodeDescriptionStatus::Failed(error));
+                    r_m1_field_no_bit_read_units(before_field, input@);
+                    assert(source_reads == code_field_total_read_units(before_field, input@, 0));
+                }
+                proof { assert(false); }
+                return (CodeDescriptionStep {
+                    consumed: 0,
+                    status: CodeDescriptionStatus::Failed(error),
+                }, Ghost(source_reads));
+            }
+            _ => {}
+        }
+
+        if let CodeDescriptionPhase::ComplexPendingSpan { after, .. } = phase {
+            self.phase = match after {
+                ComplexAfterSpan::Symbol(progress) => CodeDescriptionPhase::ComplexSymbol(progress),
+                ComplexAfterSpan::TrailingZeros { code, start } => {
+                    let count = self.alphabet_limit - start;
+                    CodeDescriptionPhase::ComplexPendingSpan {
+                        start,
+                        span_count: count,
+                        length: 0,
+                        after: ComplexAfterSpan::Complete {
+                            code,
+                            symbols: self.alphabet_limit,
+                        },
+                    }
+                }
+                ComplexAfterSpan::Complete { code, symbols } =>
+                    CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: symbols },
+            };
+            assert(match self.phase {
+                CodeDescriptionPhase::ComplexSymbol(progress) =>
+                    progress.valid(self.alphabet_limit),
+                CodeDescriptionPhase::ComplexPendingSpan {
+                    start, span_count: count, length, after,
+                } => {
+                    &&& count > 0
+                    &&& length <= 15
+                    &&& start as nat + count as nat <= self.alphabet_limit
+                    &&& after.valid(self.alphabet_limit)
+                },
+                CodeDescriptionPhase::CompleteComplex { code, decoded_symbols: symbols } =>
+                    code.valid() && symbols == self.alphabet_limit,
+                _ => false,
+            });
+            let status = match self.phase {
+                CodeDescriptionPhase::CompleteComplex { decoded_symbols: symbols, .. } =>
+                    CodeDescriptionStatus::ComplexComplete { symbols },
+                _ => CodeDescriptionStatus::Progress,
+            };
+            proof { r_m1_field_valid_from_components(*self); }
+            proof {
+                assert(pending_span_transition_holds(after, self.alphabet_limit, self.phase, status));
+                assert(code_transition_holds(before_field.phase, 0, self.alphabet_max,
+                    self.alphabet_limit, self.phase, status));
+                r_m1_field_zero_bit_step_refinement(before_field, input@, end_of_input, *self, status);
+            }
+            proof {
+                    r_m1_field_no_bit_read_units(before_field, input@);
+                    assert(source_reads == code_field_total_read_units(before_field, input@, 0));
+                }
+                proof { assert(false); }
+                return (CodeDescriptionStep { consumed: 0, status }, Ghost(source_reads));
+        }
+
+        if let CodeDescriptionPhase::CompleteComplexAlphabet(code) = phase {
+            let (progress, Ghost(progress_reads)) = start_complex_symbol_progress(code, self.alphabet_limit);
+            proof { source_reads = source_reads + progress_reads; table_reads = table_reads + progress_reads; }
+            self.phase = CodeDescriptionPhase::ComplexSymbol(progress);
+            let status = CodeDescriptionStatus::Progress;
+            proof { r_m1_field_valid_from_components(*self); }
+            proof {
+                assert(code_transition_holds(before_field.phase, 0, self.alphabet_max,
+                    self.alphabet_limit, self.phase, status));
+                r_m1_field_zero_bit_step_refinement(before_field, input@, end_of_input, *self, status);
+            }
+            proof {
+                    r_m1_field_no_bit_read_units(before_field, input@);
+                    assert(source_reads == code_field_total_read_units(before_field, input@, 0));
+                }
+                proof { assert(false); }
+                return (CodeDescriptionStep { consumed: 0, status }, Ghost(source_reads));
+        }
+
+        let width: usize = match phase {
+            CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize
+            | CodeDescriptionPhase::ComplexPrefix2(_) => 2,
+            CodeDescriptionPhase::SimpleSymbols { width, .. } => width as usize,
+            CodeDescriptionPhase::SimpleShape { .. }
+            | CodeDescriptionPhase::ComplexPrefix3(_)
+            | CodeDescriptionPhase::ComplexPrefix4(_) => 1,
+            CodeDescriptionPhase::ComplexSymbol(progress) => {
+                if progress.singleton < 18 { 0 } else { 1 }
+            }
+            CodeDescriptionPhase::ComplexRepeat { extra_bits, .. } => extra_bits as usize,
+            CodeDescriptionPhase::CompleteSimple(_)
+            | CodeDescriptionPhase::CompleteComplexAlphabet(_)
+            | CodeDescriptionPhase::ComplexPendingSpan { .. }
+            | CodeDescriptionPhase::CompleteComplex { .. }
+            | CodeDescriptionPhase::Failed(_) => {
+                proof { assert(false); }
+                0
+            }
+        };
+        proof {
+            assert(width as nat == code_phase_width(phase, self.alphabet_max));
+        }
+        let ghost queue_before = self.queue.bits();
+        let (read, Ghost(queue_reads)) = self.queue.read_bits(width, input, end_of_input);
+        let ghost after_queue_read = self.queue;
+        proof {
+            assert(bit_read_exact_step(before_field.queue, input@, end_of_input,
+                code_phase_width(before_field.phase, before_field.alphabet_max),
+                read.consumed, after_queue_read, read.status));
+        }
+        proof { source_reads = source_reads + queue_reads; }
+        proof {
+            assert(width == 2);
+            assert(input@ == Seq::<u8>::empty());
+            assert(read.consumed == 0);
+            assert(before_field.queue.bits().len() == 0) by {
+                reveal(BitQueue::valid); reveal(BitQueue::bits);
+            }
+            bytes_bits_len(input@);
+            assert(input@.take(read.consumed as int) == input@);
+            match read.status {
+                BitReadStatus::Value(_) => { assert(false); },
+                BitReadStatus::NeedInput => { assert(false); },
+                BitReadStatus::Truncated => {},
+            }
+            assert(read.status == BitReadStatus::Truncated);
+            assert(queue_reads == 0 && source_reads == 0);
+        }
+        let field = match read.status {
+            BitReadStatus::Value(value) => value,
+            BitReadStatus::NeedInput => {
+                proof {
+                    r_m1_field_read_step_refinement(before_field, input@, end_of_input, read,
+                        *self, CodeDescriptionStatus::NeedInput);
+                    r_m1_field_queue_update_valid(before_field, *self);
+                }
+                proof {
+                    assert(source_reads == queue_reads + table_reads);
+                    r_m1_field_read_units_fold(before_field, input@, end_of_input,
+                        read, after_queue_read, queue_reads, table_reads);
+                }
+                proof { assert(false); }
+                return (CodeDescriptionStep {
+                    consumed: read.consumed,
+                    status: CodeDescriptionStatus::NeedInput,
+                }, Ghost(source_reads));
+            }
+            BitReadStatus::Truncated => {
+                proof { }
+                self.phase = CodeDescriptionPhase::Failed(CodeDescriptionError::Truncated);
+                proof {
+                    r_m1_field_read_step_refinement(before_field, input@, end_of_input, read,
+                        *self, CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated));
+                    r_m1_field_failed_state_valid(*self);
+                }
+                proof {
+                    assert(source_reads == queue_reads + table_reads);
+                    r_m1_field_read_units_fold(before_field, input@, end_of_input,
+                        read, after_queue_read, queue_reads, table_reads);
+                }
+                proof {
+                    assert(read.status == BitReadStatus::Truncated);
+                    assert(read.consumed == 0 && source_reads == 0);
+                    assert(self.phase == CodeDescriptionPhase::Failed(CodeDescriptionError::Truncated));
+                    reveal(bit_queue_read_image);
+                    assert(self.queue.len == 0 && self.queue.offset == 0);
+                    r_triage_field_truncation_model_mapping(before_field, *self,
+                        CodeDescriptionStep { consumed: read.consumed,
+                            status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated) });
+                    assert(!code_field_step_refines(before_field, input@, end_of_input, *self,
+                        CodeDescriptionStep { consumed: read.consumed, status: CodeDescriptionStatus::NeedInput }));
+                }
+                return (CodeDescriptionStep {
+                    consumed: read.consumed,
+                    status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),
+                }, Ghost(source_reads));
+            }
+        };
+        proof {
+            lemma2_to64();
+            assert((field as nat) < pow2(width as nat));
+        }
+
+        let mut status = CodeDescriptionStatus::Progress;
+        match phase {
+            CodeDescriptionPhase::Selector => {
+                assert(width == 2);
+                assert(field < 4);
+                if field == 1 {
+                    self.phase = CodeDescriptionPhase::SimpleSize;
+                } else {
+                    let skip = field as u8;
+                    assert(skip == 0 || skip == 2 || skip == 3);
+                    self.phase = CodeDescriptionPhase::ComplexPrefix2(ComplexProgress {
+                        skip,
+                        index: skip,
+                        lengths: [0u8; 18],
+                        space: 32,
+                        nonzero: 0,
+                    });
+                }
+            }
+            CodeDescriptionPhase::SimpleSize => {
+                assert(width == 2);
+                assert(field < 4);
+                let selector = field as u8;
+                let count = selector + 1;
+                let width = alphabet_bit_width(self.alphabet_max);
+                self.phase = CodeDescriptionPhase::SimpleSymbols {
+                    selector,
+                    count,
+                    index: 0,
+                    width,
+                    symbols: [0u16; 4],
+                };
+                proof {
+                    if let CodeDescriptionPhase::SimpleSymbols { symbols, .. } = self.phase {
+                        r_m1_field_distinct_empty(symbols@);
+                    }
+                }
+            }
+            CodeDescriptionPhase::SimpleSymbols {
+                selector, count, index, width: symbol_width, mut symbols,
+            } => {
+                if field >= self.alphabet_limit as u64 {
+                    self.phase = CodeDescriptionPhase::Failed(CodeDescriptionError::InvalidAlphabet);
+                    status = CodeDescriptionStatus::Failed(CodeDescriptionError::InvalidAlphabet);
+                    proof { r_m1_field_table_simple_case(before_field, field, table_reads, false); }
+                } else {
+                    assert(field < 704);
+                    let symbol = field as u16;
+                    let mut duplicate = false;
+                    let mut i: usize = 0;
+                    while i < index as usize
+                        invariant i <= index <= count <= 4,
+                            source_reads == queue_reads + i as nat,
+                            table_reads == i as nat,
+                            queue_reads == read.consumed as nat + width as nat,
+                            !duplicate ==> forall|j: int| 0 <= j < i
+                                ==> symbols@[j] != symbol,
+                            duplicate ==> exists|j: int| 0 <= j < i && symbols@[j] == symbol,
+                        decreases index as usize - i,
+                    {
+                        proof { source_reads = source_reads + 1; table_reads = table_reads + 1; }
+                        if symbols[i] == symbol {
+                            duplicate = true;
+                        }
+                        i = i + 1;
+                    }
+                    proof { assert(duplicate == simple_prefix_contains(symbols@, index as nat, symbol)); }
+                    if duplicate {
+                        self.phase = CodeDescriptionPhase::Failed(
+                            CodeDescriptionError::DuplicateSimpleSymbol,
+                        );
+                        status = CodeDescriptionStatus::Failed(
+                            CodeDescriptionError::DuplicateSimpleSymbol,
+                        );
+                    } else {
+                        let ghost symbols_before_update = symbols@;
+                        proof {
+                            assert(active_symbols_distinct(symbols_before_update, index as nat));
+                            assert(!simple_prefix_contains(symbols_before_update, index as nat, symbol));
+                        }
+                        symbols[index as usize] = symbol;
+                        proof {
+                            r_m1_field_distinct_update(symbols_before_update, index as nat, symbol);
+                            assert(symbols@ == symbols_before_update.update(index as int, symbol));
+                            assert(active_symbols_distinct(symbols@, index as nat + 1));
+                        }
+                        if index + 1 < count {
+                            self.phase = CodeDescriptionPhase::SimpleSymbols {
+                                selector,
+                                count,
+                                index: index + 1,
+                                width: symbol_width,
+                                symbols,
+                            };
+                        } else if selector == 3 {
+                            assert(count == 4);
+                            let (_distinct, Ghost(distinct_reads)) = simple_symbols_distinct(&symbols, 4);
+                            proof { simple_distinct_small_read_bounds(symbols@, 4 as nat); source_reads = source_reads + distinct_reads; table_reads = table_reads + distinct_reads; }
+                            assert(_distinct);
+                            self.phase = CodeDescriptionPhase::SimpleShape { symbols };
+                        } else {
+                            let (_distinct, Ghost(distinct_reads)) = simple_symbols_distinct(&symbols, count);
+                            proof { simple_distinct_small_read_bounds(symbols@, count as nat); source_reads = source_reads + distinct_reads; table_reads = table_reads + distinct_reads; }
+                            assert(_distinct);
+                            let code = SimpleCodeDescription {
+                                selector,
+                                count,
+                                symbols,
+                            };
+                            self.phase = CodeDescriptionPhase::CompleteSimple(code);
+                            status = CodeDescriptionStatus::Simple(code);
+                        }
+                    }
+                    proof { r_m1_field_table_simple_case(before_field, field, table_reads, duplicate); }
+                }
+            }
+            CodeDescriptionPhase::SimpleShape { symbols } => {
+                assert(width == 1);
+                assert(field < 2);
+                let selector = 3 + field as u8;
+                let code = SimpleCodeDescription {
+                    selector,
+                    count: 4,
+                    symbols,
+                };
+                self.phase = CodeDescriptionPhase::CompleteSimple(code);
+                status = CodeDescriptionStatus::Simple(code);
+            }
+            CodeDescriptionPhase::ComplexPrefix2(progress) => {
+                assert(width == 2);
+                assert(field < 4);
+                self.phase = if field == 0 {
+                    { let (next_phase, Ghost(order_reads)) = process_complex_code_length(progress, 0); proof { source_reads = source_reads + order_reads; table_reads = table_reads + order_reads; } next_phase }
+                } else if field == 1 {
+                    { let (next_phase, Ghost(order_reads)) = process_complex_code_length(progress, 4); proof { source_reads = source_reads + order_reads; table_reads = table_reads + order_reads; } next_phase }
+                } else if field == 2 {
+                    { let (next_phase, Ghost(order_reads)) = process_complex_code_length(progress, 3); proof { source_reads = source_reads + order_reads; table_reads = table_reads + order_reads; } next_phase }
+                } else {
+                    CodeDescriptionPhase::ComplexPrefix3(progress)
+                };
+            }
+            CodeDescriptionPhase::ComplexPrefix3(progress) => {
+                assert(width == 1);
+                assert(field < 2);
+                self.phase = if field == 0 {
+                    { let (next_phase, Ghost(order_reads)) = process_complex_code_length(progress, 2); proof { source_reads = source_reads + order_reads; table_reads = table_reads + order_reads; } next_phase }
+                } else {
+                    CodeDescriptionPhase::ComplexPrefix4(progress)
+                };
+            }
+            CodeDescriptionPhase::ComplexPrefix4(progress) => {
+                assert(width == 1);
+                assert(field < 2);
+                self.phase = if field == 0 {
+                    { let (next_phase, Ghost(order_reads)) = process_complex_code_length(progress, 1); proof { source_reads = source_reads + order_reads; table_reads = table_reads + order_reads; } next_phase }
+                } else {
+                    { let (next_phase, Ghost(order_reads)) = process_complex_code_length(progress, 5); proof { source_reads = source_reads + order_reads; table_reads = table_reads + order_reads; } next_phase }
+                };
+            }
+            CodeDescriptionPhase::ComplexSymbol(mut progress) => {
+                let ghost started_progress = progress;
+                if progress.singleton < 18 {
+                    assert(width == 0);
+                    assert(field == 0);
+                    let symbol = progress.singleton;
+                    if symbol < 16 {
+                        self.phase = process_direct_symbol_length(
+                            progress,
+                            symbol,
+                            self.alphabet_limit,
+                        );
+                    } else {
+                        let (length, extra_bits) = if symbol == 16 {
+                            (progress.prev_code_len, 2u8)
+                        } else {
+                            (0u8, 3u8)
+                        };
+                        assert(progress.valid(self.alphabet_limit));
+                        self.phase = CodeDescriptionPhase::ComplexRepeat {
+                            progress,
+                            length,
+                            extra_bits,
+                        };
+                    }
+                } else {
+                assert(width == 1);
+                assert(field < 2);
+                let bit = field as u8;
+                proof {
+                    append_auxiliary_bit_bound(
+                        progress.prefix_bits,
+                        progress.prefix_width,
+                        bit,
+                    );
+                }
+                let next_bits = progress.prefix_bits | (bit << progress.prefix_width);
+                let next_width = progress.prefix_width + 1;
+                let (selected_symbol, Ghost(symbol_reads)) = decode_auxiliary_symbol(&progress.code, next_bits, next_width);
+                proof {
+                    auxiliary_selected_scan_stop(progress.code, next_bits, next_width, selected_symbol);
+                    source_reads = source_reads + symbol_reads; table_reads = table_reads + symbol_reads;
+                    r_m1_field_table_symbol_case(before_field, field, table_reads, selected_symbol);
+                }
+                match selected_symbol {
+                    Some(symbol) => {
+                        assert(auxiliary_symbol_match(
+                            started_progress.code,
+                            next_bits,
+                            next_width,
+                            symbol,
+                        ));
+                        if symbol < 16 {
+                            self.phase = process_direct_symbol_length(
+                                progress,
+                                symbol,
+                                self.alphabet_limit,
+                            );
+                        } else {
+                            let (length, extra_bits) = if symbol == 16 {
+                                (progress.prev_code_len, 2u8)
+                            } else {
+                                (0u8, 3u8)
+                            };
+                            progress.prefix_width = 0;
+                            progress.prefix_bits = 0;
+                            assert(progress.singleton == 18);
+                            proof {
+                                assert(0u8 < (1u8 << 0)) by (bit_vector);
+                            }
+                            assert(progress.valid(self.alphabet_limit));
+                            self.phase = CodeDescriptionPhase::ComplexRepeat {
+                                progress,
+                                length,
+                                extra_bits,
+                            };
+                        }
+                    }
+                    None => {
+                        assert(!exists|symbol: u8| auxiliary_symbol_match(
+                            started_progress.code,
+                            next_bits,
+                            next_width,
+                            symbol,
+                        ));
+                        if next_width == 5 {
+                            self.phase = CodeDescriptionPhase::Failed(
+                                CodeDescriptionError::CodeLengthSpace,
+                            );
+                        } else {
+                            progress.prefix_width = next_width;
+                            progress.prefix_bits = next_bits;
+                            self.phase = CodeDescriptionPhase::ComplexSymbol(progress);
+                        }
+                    }
+                }
+                }
+                status = match self.phase {
+                    CodeDescriptionPhase::Failed(error) => CodeDescriptionStatus::Failed(error),
+                    _ => CodeDescriptionStatus::Progress,
+                };
+                assert(complex_symbol_transition_holds(
+                    started_progress,
+                    field as nat,
+                    self.alphabet_limit,
+                    self.phase,
+                    status,
+                ));
+            }
+            CodeDescriptionPhase::ComplexRepeat {
+                progress,
+                length,
+                extra_bits,
+            } => {
+                assert(width == extra_bits as usize);
+                assert(field < 8);
+                proof { pow2_matches_small_shift(extra_bits); }
+                let next = process_repeated_symbol_length(
+                    progress,
+                    length,
+                    extra_bits,
+                    field as u8,
+                    self.alphabet_limit,
+                );
+                status = match next {
+                    CodeDescriptionPhase::Failed(error) => CodeDescriptionStatus::Failed(error),
+                    _ => CodeDescriptionStatus::Progress,
+                };
+                assert(repeated_symbol_transition_holds(
+                    progress,
+                    length,
+                    extra_bits,
+                    field as u8,
+                    self.alphabet_limit,
+                    next,
+                    status,
+                ));
+                self.phase = next;
+            }
+            CodeDescriptionPhase::CompleteSimple(_)
+            | CodeDescriptionPhase::CompleteComplexAlphabet(_)
+            | CodeDescriptionPhase::ComplexPendingSpan { .. }
+            | CodeDescriptionPhase::CompleteComplex { .. }
+            | CodeDescriptionPhase::Failed(_) => {
+                proof { assert(false); }
+            }
+        }
+
+        match self.phase {
+            CodeDescriptionPhase::CompleteComplexAlphabet(code) => {
+                status = CodeDescriptionStatus::ComplexAlphabet(code);
+            }
+            CodeDescriptionPhase::CompleteComplex { decoded_symbols: symbols, .. } => {
+                status = CodeDescriptionStatus::ComplexComplete { symbols };
+            }
+            CodeDescriptionPhase::Failed(error) => {
+                status = CodeDescriptionStatus::Failed(error);
+            }
+            _ => {}
+        }
+        assert(code_transition_holds(
+            phase,
+            field as nat,
+            self.alphabet_max,
+            self.alphabet_limit,
+            self.phase,
+            status,
+        ));
+        assert(self.queue.valid());
+        assert(1 <= self.alphabet_limit <= self.alphabet_max <= 704);
+        proof { match self.phase {
+            CodeDescriptionPhase::ComplexSymbol(progress) => {
+                assert(progress.valid(self.alphabet_limit));
+            },
+            CodeDescriptionPhase::ComplexRepeat { progress, length, extra_bits } => {
+                assert(progress.valid(self.alphabet_limit));
+                assert(length == 0 || 1 <= length <= 15);
+                assert((length == 0 && extra_bits == 3)
+                    || (length != 0 && extra_bits == 2));
+            },
+            CodeDescriptionPhase::ComplexPendingSpan {
+                start, span_count: count, length, after,
+            } => {
+                assert(count > 0);
+                assert(length <= 15);
+                assert(start as nat + count as nat <= self.alphabet_limit);
+                assert(after.valid(self.alphabet_limit));
+            },
+            _ => {},
+        } }
+        proof { r_m1_field_valid_from_components(*self); }
+        proof {
+            assert(source_reads == queue_reads + table_reads);
+            match before_field.phase {
+                CodeDescriptionPhase::SimpleSymbols { .. } => {},
+                CodeDescriptionPhase::ComplexSymbol(p) if p.singleton >= 18 => {},
+                _ => { r_m1_field_table_small_case(before_field, field, table_reads); },
+            }
+            assert(r_m1_field_table_receipt(before_field, field, table_reads));
+            r_m1_field_fold_from_table_receipt(before_field, input@, end_of_input,
+                read, after_queue_read, queue_reads, table_reads);
+            r_m1_field_read_step_refinement(before_field, input@, end_of_input, read, *self, status);
+        }
+        (CodeDescriptionStep { consumed: read.consumed, status }, Ghost(source_reads))
+    }
+}

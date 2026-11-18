@@ -1,0 +1,190 @@
+{
+  "created_utc": "2026-11-18T02:44:50.229336+00:00",
+  "status": "CHECKED pre-reservation fallback witness and same-old-owner debit necessity; terminal/byte175 extension is separate",
+  "admitted_image": "UNCHANGED m1_suffix_fallback_image: window1024, outer3, lengthsubphase2, MTF63, all other bytes0; existing is_admitted theorem ensures original workspace/state preconditions.",
+  "valid_budget_exists": {
+    "work_remaining": 5,
+    "max_work": 5,
+    "input_remaining": 0,
+    "output_remaining": 0,
+    "calls_remaining": 1,
+    "initializations_remaining": 0,
+    "max_window_bits": 10,
+    "private_owning_module_proof_only": true
+  },
+  "prefix_replay": {
+    "input": "empty",
+    "end_of_input": false,
+    "success_marker_checked": true,
+    "stops_immediately_before_original_charge_work": "4 + 1",
+    "same_workspace_image": true,
+    "same_full_budget_at5": true,
+    "no_earlier_debit": true,
+    "actual_ledger": 0,
+    "checked_unreachable_exit_adapters": 28,
+    "every_original_return_expression_and_helper_call_retained": true,
+    "prefix_noncomment_tokens_including_proof_and_ghost": 3950,
+    "all_original_prefix_bytes_reconstructed_after_undo_adapters_and_added_entry_proof": true
+  },
+  "necessary_debit_consequence": {
+    "old_model": "m1_bad_initial_suffix_owner_effect, with original validation_reads and execution definitions unchanged",
+    "image_validation_reads": 0,
+    "old_required_execution_debit": 5,
+    "old_owner_before_work": 5,
+    "old_owner_required_after_work": 0,
+    "existing_immediate_source_assertion": "For this image and fallback_work5, budget.work_remaining==0 immediately after reservation.",
+    "existing_charge_work_ensures": "For affordable amount, returns true and after.work=before.work-amount. Both exact old5 and conditional fault4or5 are affordable here.",
+    "no_later_budget_change_on_fallback_path": "Original remaining store_terminal_error receives no budget; no later budget operation appears.",
+    "checked_conclusion": "actual amount==5 is necessary to preserve unchanged owner effect on this admitted reached path.",
+    "proof_theorem_premises_are_existing_obligations_not_new_product_requires": true
+  },
+  "checked_components": {
+    "budget01": {
+      "result_path": "target/m1-r-suffix-fallback-witness/attempts/budget01/result.json",
+      "result_sha256": "4ec1e88a720e8f84d08bd6f0439c002bf990cf39c19517a8197694a140256886",
+      "command_path": "target/m1-r-suffix-fallback-witness/attempts/budget01/command.json",
+      "command_sha256": "ba84070cd05496722126928ce5d3718b698b11f925c8f44384056ca5b28339b5",
+      "log_path": "target/m1-r-suffix-fallback-witness/attempts/budget01/verifier.log",
+      "log_sha256": "6a830bbfd561b620631787b421400e8b5265732b942c01647409d3c048f5243c",
+      "actual": {
+        "selector": "r_triage_suffix_fallback_budget_witness",
+        "exit_code": 0,
+        "seconds": 16.9220396669989,
+        "verification": {
+          "verified": 1,
+          "errors": 0
+        },
+        "command_record_sha256": "ba84070cd05496722126928ce5d3718b698b11f925c8f44384056ca5b28339b5",
+        "source_sha256": {
+          "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "brotli.rs": "53df69b317072db951cf0b05aa77bf737db20c4060b07cc609e7ba8c77b102e1",
+          "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+          "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+          "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+          "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+        },
+        "sources_unchanged": true,
+        "log_sha256": "6a830bbfd561b620631787b421400e8b5265732b942c01647409d3c048f5243c",
+        "counts_as_control_or_full_gate": false
+      },
+      "counts_as_control_or_full_gate": false
+    },
+    "prefix01": {
+      "result_path": "target/m1-r-suffix-fallback-witness/attempts/prefix01/result.json",
+      "result_sha256": "9604422ef99fe0f1de1301afdc7d2de7b76254ab2e22de9c5bac7d780143d150",
+      "command_path": "target/m1-r-suffix-fallback-witness/attempts/prefix01/command.json",
+      "command_sha256": "9386d41cb53f401a40839bd733907dd1782484d33d224fbd6f23c022246c1f72",
+      "log_path": "target/m1-r-suffix-fallback-witness/attempts/prefix01/verifier.log",
+      "log_sha256": "af9d327859aaa525700156d3853643f308c7d9781af0b73f1f7ece912a3ba700",
+      "actual": {
+        "selector": "r_triage_suffix_fallback_prefix_replay",
+        "exit_code": 0,
+        "seconds": 17.29376037500333,
+        "verification": {
+          "verified": 1,
+          "errors": 0
+        },
+        "command_record_sha256": "9386d41cb53f401a40839bd733907dd1782484d33d224fbd6f23c022246c1f72",
+        "source_sha256": {
+          "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "brotli.rs": "53df69b317072db951cf0b05aa77bf737db20c4060b07cc609e7ba8c77b102e1",
+          "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+          "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "brotli_input.rs": "0f188d81ffb99607f993649856913b9e81476b85fd3b083ce0dffefea9f91eef",
+          "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+          "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+        },
+        "sources_unchanged": true,
+        "log_sha256": "af9d327859aaa525700156d3853643f308c7d9781af0b73f1f7ece912a3ba700",
+        "counts_as_control_or_full_gate": false
+      },
+      "counts_as_control_or_full_gate": false
+    },
+    "criterion01": {
+      "result_path": "target/m1-r-suffix-fallback-witness/attempts/criterion01/result.json",
+      "result_sha256": "4056f97cccadc2480c2cb8c7e91bc9c1a75a67b335cca59d8003544e5504b17e",
+      "command_path": "target/m1-r-suffix-fallback-witness/attempts/criterion01/command.json",
+      "command_sha256": "353d8f2c71abdb6a975ffa3e5aa52da6fbad5c2a11401c215eade83b25c03a1b",
+      "log_path": "target/m1-r-suffix-fallback-witness/attempts/criterion01/verifier.log",
+      "log_sha256": "0fd7b5decafd75aa7c692ed3c761dccaedcb6f3e71bac8181c350c52d42eb88c",
+      "actual": {
+        "selector": "r_triage_suffix_fallback_required_debit",
+        "exit_code": 0,
+        "seconds": 16.821462207997683,
+        "verification": {
+          "verified": 1,
+          "errors": 0
+        },
+        "command_record_sha256": "353d8f2c71abdb6a975ffa3e5aa52da6fbad5c2a11401c215eade83b25c03a1b",
+        "source_sha256": {
+          "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "brotli.rs": "53df69b317072db951cf0b05aa77bf737db20c4060b07cc609e7ba8c77b102e1",
+          "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+          "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "brotli_input.rs": "89ae099b6caca55cce3ea89bbaa61292cbeb1871938125e83329354bc9f24248",
+          "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+          "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+        },
+        "sources_unchanged": true,
+        "log_sha256": "0fd7b5decafd75aa7c692ed3c761dccaedcb6f3e71bac8181c350c52d42eb88c",
+        "counts_as_control_or_full_gate": false
+      },
+      "counts_as_control_or_full_gate": false
+    }
+  },
+  "static_correspondence": {
+    "path": "target/m1-r-suffix-fallback-witness/prefix-correspondence.json",
+    "sha256": "6bd50734bc9d4e041802549f4e65471c211ee79c6f975bf982411216cc64ac8a",
+    "reproducible_auditor_path": "target/m1-r-suffix-fallback-witness/audit_prefix.py",
+    "reproducible_auditor_sha256": "92ebb07f38a8a874515cbd758fe0478ccd19b5810a6571ede2e18da1026d2c53"
+  },
+  "independent_technical_audit": {
+    "path": "target/m1-r-suffix-fallback-independent-audit/source-ledger-review.json",
+    "sha256": "697d00d50e112a8db6b9e0e7aadef021af543b1a74a82a530def7929d4b94fb5",
+    "human_architectural_approval_inferred": false
+  },
+  "preservation": {
+    "all_original_production_declarations_models_assertions_contracts_ABI_unchanged": true,
+    "only_private_target_validation_entries_or_proof_theorems_added": true,
+    "no_helper_body_inlining_contract_gap_assumption_or_visibility_change": true,
+    "budget_and_input_module_removal_audited_exact_to_baseline": true,
+    "source_sha256": {
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+    },
+    "shared_writes_by_this_agent": 0
+  },
+  "settings": "OriginalSP/function1000/global1000/ME0/defaultseed,no-cheating,numthreads1,triggerssilent",
+  "supplemental_witness_checker_invocations": 3,
+  "witness_negative_control_invocations": 0,
+  "separate_computed_debit_control_directory": "target/m1-r-suffix-fallback-computed-debit-diagnostic",
+  "counts_as_full_gate": false,
+  "limits": [
+    "No native/source-to-binary/full-gate claim.",
+    "Early computed rejection need not execute negative-body SMT.",
+    "Byte175 reach/frame extension is separately pending and not justified by only this precharge packet.",
+    "Technical validation is not human architectural approval."
+  ]
+}

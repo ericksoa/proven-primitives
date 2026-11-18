@@ -1,0 +1,115 @@
+{
+  "created_utc": "2026-11-18T03:17:23.355241+00:00",
+  "status": "QUALIFIED actual normalized healthy1/0 plus sole root-authorized exact byte175 computedfalse negative under unchanged1c98",
+  "positive_result_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive-normalized/result.json",
+  "positive_result_sha256": "b65cfd78953d7bdc3fc25038b99bc88d57f4eb5f2ea5164faa3c073216a1c692",
+  "positive_actual": {
+    "selector": "advance_planned_compressed_action",
+    "exit_code": 0,
+    "seconds": 57.987844292016234,
+    "verification": {
+      "verified": 1,
+      "errors": 0
+    },
+    "command_record_sha256": "592be51e6788870d8a37c229f4b83cf6d56329f3657f082d4200ae56ad7e84c5",
+    "source_sha256": {
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "brotli_input.rs": "1ffeaee26397ae7944efa5a2af040b923b15acecd6b4dbc7dd9f14675b147331",
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+    },
+    "sources_unchanged": true,
+    "log_sha256": "69bdb700ed8f3f43a7d880cc8a6226b4ac141ca88847fb8ed1bf1bdd889e6995",
+    "scope": "Root-authorized normalized full selected true positive only; no byte175 negative authorized."
+  },
+  "negative_result_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/bad-byte175/result.json",
+  "negative_result_sha256": "44823e6b5e294e4e4cb70ff3d2f205911b30279cca9acc98c83e06f906f56e05",
+  "negative_actual": {
+    "selector": "advance_planned_compressed_action",
+    "exit_code": 1,
+    "seconds": 13.74369316699449,
+    "verification": null,
+    "command_record_sha256": "79e727a76785cff1cfcfef8c12b003c39b40943dd8eec51f5a309c91e5125b98",
+    "source_sha256": {
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "brotli_input.rs": "0ca6d8ffb1b2e85a01c09a4d14c0a42fa045baff6532ad76f29c15b44ba4daf7",
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+    },
+    "sources_unchanged": true,
+    "log_sha256": "2005414e78572246d6e08b0b6296b6331b862024489f1d18ec67f89562444112",
+    "negative_runs": 1
+  },
+  "negative_classification_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/negative-classification.json",
+  "negative_classification_sha256": "732e70a75a4e10a1e9ca821ba08ac4b17b1ae90a018433848b82eed452b3d223",
+  "technical_witness_and_independent_review": [
+    {
+      "kind": "terminal_witness",
+      "path": "target/m1-r-suffix-fallback-witness/terminal-witness-result.json",
+      "sha256": "01f4a2d6dbb10a8d54eaa0f5c5293dc90dda87b1ac7637cf16656a653a3c7865"
+    },
+    {
+      "kind": "terminal_artifact_manifest",
+      "path": "target/m1-r-suffix-fallback-witness/terminal-artifact-sha256.json",
+      "sha256": "3e5ebc651187d27cdf128b3a61f20e96e1717e115ef70f8021e2c79c95794a61"
+    },
+    {
+      "kind": "independent_byte175_audit",
+      "path": "target/m1-r-suffix-fallback-independent-audit/byte175-review.json",
+      "sha256": "b17052533322bb206eeaca63f4c1a2636e8538acb3402cee489378c75f624e76"
+    }
+  ],
+  "source_binding": {
+    "healthy0": "Normalized actual CHECKED post-store byte0 and original-model byte0 carried by unchanged terminal frame; healthy code adds no write.",
+    "expected0": "Unchanged old terminal_error_frame and original concrete owner byte175zero assertion.",
+    "negative1": "Parsed EXACT actual original extra put_state_byte(...175,1) literal, sameu8type.",
+    "saved_initial_outer3_guard": "Checked reached witness activates original guard; no-write else remains unchanged.",
+    "old_fault_hash_after_proof_removal": "60a6ba6ef4d2490e6f43a3dbc0ff23d9671995bdeb6c94f80c6da1f01aec61c5",
+    "all_old_models_helpers_contracts_assertions_returns_Ghost_ABI_preserved": true
+  },
+  "failed_raw_model_index_positive_retained_unqualified": {
+    "path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive/result.json",
+    "sha256": "f12885f594845c8213cf3504da8995c3b1d19d22d9870df261f3aedd794d2337",
+    "source_sha256": "7e61ca5d5275fa6445edbf595b5b2349dcb2f4f4a7930896ef9a4261b1f44cff",
+    "reason": "compute_only did not unfold opaque model sequence index; no model/opacity/flag change was made."
+  },
+  "candidate_positive_checker_invocations": 2,
+  "candidate_successful_normalized_positive_runs": 1,
+  "candidate_retained_failed_raw_model_positive_runs": 1,
+  "candidate_authorized_negative_runs": 1,
+  "candidate_extra_verifier_runs": 0,
+  "combined_family_patch": {
+    "path": "target/m1-r-suffix-family-computed-controls-final/combined-main-test.patch",
+    "sha256": "5dc0d801c8003f2d815cd52dba92da1521f10936f83588493bd6ca5cd2fabf82",
+    "replay_path": "target/m1-r-suffix-family-computed-controls-final/replay-and-patch.json",
+    "replay_sha256": "63d206c8e74388ee931aa9620af968c1a72357f51574d55281b371ef9436d82d",
+    "all_four_actual_source_hashes_replayed": true,
+    "native_harness_run_by_this_agent": false,
+    "all_original_case_tuples_sites_and_diagnostic_arms_retained": true,
+    "single_semantic_predicate_text_extended_only_two_case_names": true,
+    "old_Rust_assertion_text_byte_identical": false,
+    "original_resource_exclusions_and_strict_classifier_unchanged": true
+  },
+  "settings": "OriginalSP/function1000/global1000/ME0/defaultseed,no-cheating,numthreads1,triggerssilent",
+  "shared_edits_by_this_agent": 0,
+  "all318_controls_remain_required": true,
+  "limits": [
+    "No native/source-to-binary/full48/318 gate completion claimed.",
+    "Early computed rejection need not run negative-body SMT.",
+    "Technical review is not human architectural approval."
+  ]
+}

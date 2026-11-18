@@ -1,0 +1,28 @@
+{
+  "published_base": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+  "runtime_repro": "plan None, execution SomeFailedInternal for admitted last-literal tree with invalid next-command count",
+  "isolated_fix": "Mirror existing W1 rejection and existing terminal5 cost; preserve valid88 cost",
+  "isolated_runtime_cases": [
+    0,
+    257,
+    65535,
+    1,
+    256
+  ],
+  "isolated_runtime_result": "All five match actual status; exact/one-short budgets pass",
+  "admission_theorem": {
+    "verified": 1,
+    "errors": 0,
+    "command_count_requirement": "unrestricted"
+  },
+  "trace_start_theorem": {
+    "verified": 1,
+    "errors": 0
+  },
+  "planner_functional_and_existing_budget_contract": {
+    "verified": 1,
+    "errors": 0
+  },
+  "main_implementation_changed": false,
+  "remaining": "Integrate only targeted planner branch, proof helper/admission witness and regression without overwriting later main proofs; run fresh whole crate and deliberate controls before publication"
+}

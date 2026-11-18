@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-92873/src/brotli_input.rs:28729:1
+      |
+28729 | fn block_count_value_execution_work(read_work: u64, raw: u16) -> (r: u64)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-92873/src/brotli_input.rs:28731:13
+      |
+28731 |       ensures r == read_work + 10 + 2 + 1
+      |  _____________^
+28732 | |         + if raw == 0 { 7 + 1 } else { 2 + 77 + 1 + 1 },
+      | |_______________________________________________________^ failed this postcondition
+...
+28735 | /     if raw == 0 {
+28736 | |         base + 7
+28737 | |     } else {
+28738 | |         base + 2 + 77 + 1 + 1
+28739 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,213 @@
+{
+  "status": "PASS independent READ-ONLY final integrated04 preservation audit; NOT a native/verifier/gate result",
+  "created_utc": "2026-11-18T03:43:42.480603+00:00",
+  "baseline_final02_tests_sha256": "74cec7fcc319568dc86cc2493df527db6a92423b2e89f4d8584770b7c1d3998e",
+  "historical33f_proof_generation_base_sha256": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+  "reviewed_frozen_integrated04_tests_sha256": "557a1cb1c8607c35ac3bce21f55b72985967fbb5ea5bc30d497c78abc687b77e",
+  "scope": "Inputs inspected while owner runs fixed tests. Only this separate target report is written; no verifier/native invocation, source/test/gate/evidence/canary/supplement edit, or gate completion inference.",
+  "exact_patch_integration": {
+    "all_three_immutable_patch_hashes_verified": true,
+    "all_patch_hunks_applied_in_memory_against_historical33f": true,
+    "reproduces_exact_integrated557a": true,
+    "patches": [
+      {
+        "path": "target/m1-r-suffix-family-computed-controls-final/combined-main-test.patch",
+        "sha256": "5dc0d801c8003f2d815cd52dba92da1521f10936f83588493bd6ca5cd2fabf82"
+      },
+      {
+        "path": "target/m1-r-field-truncation-computed-multiline-diagnostic/minimal-main-test.patch",
+        "sha256": "f397c2f0864e65f4e24930fed4cabc4b4c48fda9dcdf0524697da6e90353ff12"
+      },
+      {
+        "path": "target/m1-r-cursor-computed-receipt-diagnostic/minimal-harness.patch",
+        "sha256": "3c1d71cfdc11e94f123f9763fe8c995327b2b20b8a13a4a821dddfde515fafa6"
+      }
+    ]
+  },
+  "inventory": {
+    "suites": 48,
+    "cases": 318,
+    "all_case_names_suites_arities_selectors_and_module_routes_preserved_from_final02": true,
+    "all318_entire_case_tuples_old_new_literals_byte_exact_to_historical33f": true,
+    "all_effective_original_anchors_unique_in_original_harness_scope": true,
+    "tuple_repairs_relative74c_previously_reviewed": 7,
+    "data_file": "all318-identity-anchor-check.json",
+    "data_sha256": "e60dc42a046ef82a64bf0f2768415a9bb56b70f2b46e302ea79e4b8c3dff7ddc"
+  },
+  "native_assertion_preservation": {
+    "original_final02_sites": 243,
+    "integrated04_sites": 274,
+    "all_original_sites_retained": true,
+    "original_assertion_texts_exact": 239,
+    "intentionally_extended_predicates_total": 4,
+    "extensions": [
+      "cap",
+      "field-truncation",
+      "suffix-family two exact names sharing one predicate",
+      "cursor"
+    ],
+    "all_original_diagnostic_arms_prefix_exact_and_original_messages_retained": true,
+    "new_checked_assertion_sites": 31,
+    "existing_three_tree_result_recognizer_entire_suite_byte_exact": true,
+    "existing_recognizer_not_miscounted_as_new": true,
+    "all_assert_text_byte_exact_claim": false,
+    "data_file": "native-predicate-extensions.json",
+    "data_sha256": "1f418a585704a91f43198297ba00184f99095871229d851090d6cee3760de366"
+  },
+  "production_preservation": {
+    "all_source_build_toolchain_and_fixture_files_except_intentionally_changed_tests_byte_exact_to_final02": {
+      "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+      "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+      "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+      "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+      "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "src/brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+      "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+      "tests/fixtures/brotli/corpus/10x10y": "41bd4c895e9fb36d74bc97db5092872a24267e3b0455ff6152b0d262faa00d49",
+      "tests/fixtures/brotli/corpus/10x10y.compressed": "d666afc0f6c35d8d7796175aa9a68f16ba59afedee946d4bce9167f6c86e0b84",
+      "tests/fixtures/brotli/corpus/64x": "be4d3ed1fc5f5cfa00735b28605a975f3293fa235d23abb1d9dea380fba0fb87",
+      "tests/fixtures/brotli/corpus/64x.compressed": "f0273c38c6a55c1d9ccb047da04bacdc4bb07acc44ff83871e6b3490dfc2c313",
+      "tests/fixtures/brotli/corpus/compression": "d18f849bb8c5ffef9e1b9b8719e3bcbba35f100655be40f035aeace790dec16b",
+      "tests/fixtures/brotli/corpus/compression.compressed": "a87bcbc0f45a2f793c075b26baec65ff9cd551e057c8cdef508231004ba4abf5",
+      "tests/fixtures/brotli/corpus/empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests/fixtures/brotli/corpus/empty.compressed": "67586e98fad27da0b9968bc039a1ef34c939b9b8e523a8bef89d478608c5ecf6",
+      "tests/fixtures/brotli/corpus/monkey": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99",
+      "tests/fixtures/brotli/corpus/monkey.compressed": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9",
+      "tests/fixtures/brotli/corpus/quickfox_repeated": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82",
+      "tests/fixtures/brotli/corpus/quickfox_repeated.compressed": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a",
+      "tests/fixtures/brotli/corpus/x": "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015",
+      "tests/fixtures/brotli/corpus/x.compressed": "cd094a625b695542a1d37b3a11ea849d8db9584a2f9df4e60cf6158bb39bbf61",
+      "tests/fixtures/brotli/corpus/xyzzy": "7609128715518308672067aab169e24944ead24e3d732aab8a8f0b7013a65564",
+      "tests/fixtures/brotli/corpus/xyzzy.compressed": "c3f042a6be42887f842324d0e39dabd0d873e1676cd3dd2d7e2824242b318f14",
+      "tests/fixtures/brotli/corpus/zeros": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+      "tests/fixtures/brotli/corpus/zeros.compressed": "d1236d7fdab24209a747aa471f1bf33765b27adfd676355d4b4b310195dca49f",
+      "tests/fixtures/brotli/reference/command.bin": "fdbc5d5f207a43d34b26441e29b7024f4f3d00be66502d8a73233bcbe9f6c1b4",
+      "tests/fixtures/brotli/reference/context.bin": "0e4abc034ef46244934d117f15876cd477d0fb2ac94a023093338e72e37f7ad9",
+      "tests/fixtures/brotli/reference/dictionary-meta.bin": "1bce8bd7b829f177214697683c3216e836ada1e254bde7582a9111316d9fd0b9",
+      "tests/fixtures/brotli/reference/dictionary.bin": "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70",
+      "tests/fixtures/brotli/reference/transforms.bin": "7682bbd9a2901334c2b47d83aaca99e6d9fc65a2921a7c88180dde12ec3cd6b6",
+      "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+      "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+      "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+      "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39"
+    },
+    "all_models_contracts_guarantees_assertions_runtime_code_ABI_unit_policy_and_production_allowances_unchanged": true,
+    "production_field500SP_retained": true,
+    "all_existing_input_prefix_declarations": 1136,
+    "all_native_checker_helper_definitions_byte_exact": [
+      "check_brotli_prefix_function",
+      "check_brotli_input_function",
+      "check_brotli_block_function",
+      "check_brotli_function",
+      "check_brotli_data_function",
+      "check_brotli_data_function_high"
+    ],
+    "strict_gate_driver_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+    "strict_gate_byte_exact_final02": true,
+    "all_original_mixed_resource_tool_type_exclusions_retained": true
+  },
+  "generated_sources": {
+    "five_pairs_including_preexisting_cap": "All integrated generation replayed in memory against current frozen3e; exact byte equality with ten immutable actually checked source snapshots.",
+    "pairs": [
+      {
+        "case": "brotli-m1-planner-restores-too-small-cap",
+        "positive_sha256": "8ed98823e7a68454600fa9a746b8d9d38cc50856d5969a40bc78792fc28a3fd0",
+        "negative_sha256": "3d8831d9b413743c78b9a7dbed5afb95ab9e4cfba887a03004e82a9daf4639f0",
+        "positive_immutable_source": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/positive/src/brotli_input.rs",
+        "negative_immutable_source": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/bad-cap/src/brotli_input.rs",
+        "qualified_packet": {
+          "path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/coupled-diagnostic-result.json",
+          "sha256": "21d791b361bdd9b51afac6024e80523d40cf3b9d3465cfb1d8550c5a0b467a61"
+        },
+        "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+      },
+      {
+        "case": "brotli-b3b-tree-field-truncation-needs-input",
+        "positive_sha256": "666cc26857ef99009471d3b583dc6f267a37539ee8c1004714022fcd65b65252",
+        "negative_sha256": "53ec53efed6262524cce5fab519c7cf4e301f08847756e97388aa63fe3b41bc2",
+        "positive_immutable_source": "target/m1-r-field-truncation-computed-multiline-diagnostic/positive/src/brotli_input.rs",
+        "negative_immutable_source": "target/m1-r-field-truncation-computed-multiline-diagnostic/negative/src/brotli_input.rs",
+        "qualified_packet": {
+          "path": "target/m1-r-field-truncation-computed-multiline-diagnostic/coupled-diagnostic-result.json",
+          "sha256": "698e973584c8f949142e6121d19d468d991555f42647fadd30aef440b86a97ee"
+        },
+        "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+      },
+      {
+        "case": "brotli-m1-malformed-suffix-fallback-undercharge",
+        "positive_sha256": "15fc4ed779bd2e4d293eeaa38590169024ef6999e3247f69e8662333feb9bbd0",
+        "negative_sha256": "55e8c5e0e6fc5862588afced12f245181c7cec64bacd1bada7ffeaf2a236205d",
+        "positive_immutable_source": "target/m1-r-suffix-fallback-computed-debit-diagnostic/positive/src/brotli_input.rs",
+        "negative_immutable_source": "target/m1-r-suffix-fallback-computed-debit-diagnostic/bad-undercharge/src/brotli_input.rs",
+        "qualified_packet": {
+          "path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/coupled-diagnostic-result.json",
+          "sha256": "a3b49025ca52d48310b6a7a3d5f4320bf3f8c4ed4a1faa8feb1f88274123b983"
+        },
+        "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+      },
+      {
+        "case": "brotli-m1-malformed-suffix-fallback-writes-byte175",
+        "positive_sha256": "1ffeaee26397ae7944efa5a2af040b923b15acecd6b4dbc7dd9f14675b147331",
+        "negative_sha256": "0ca6d8ffb1b2e85a01c09a4d14c0a42fa045baff6532ad76f29c15b44ba4daf7",
+        "positive_immutable_source": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive-normalized/src/brotli_input.rs",
+        "negative_immutable_source": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/bad-byte175/src/brotli_input.rs",
+        "qualified_packet": {
+          "path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/coupled-diagnostic-result.json",
+          "sha256": "3ea7139a3edb79daaf6c4892d95d7545cf6f3d0460e6a3d3477aac15d0e27651"
+        },
+        "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+      },
+      {
+        "case": "brotli-m1-cursor-context-owner-skips-terminal-action",
+        "positive_sha256": "153dd3a1ea9f7b32ebb41fa4af9e1dc4963ef01d9fece2a42e8c8055c1e18c6e",
+        "negative_sha256": "b0c03a308a0177a9c438b80f114640256aecef5e500f514694b7094085b5d1a1",
+        "positive_immutable_source": "target/m1-r-cursor-computed-receipt-diagnostic/positive/src/brotli_input.rs",
+        "negative_immutable_source": "target/m1-r-cursor-computed-receipt-diagnostic/negative/src/brotli_input.rs",
+        "qualified_packet": {
+          "path": "target/m1-r-cursor-computed-receipt-diagnostic/qualified-case-result.json",
+          "sha256": "5bec4a0de70c3c65d83b4a0ba93103afbf90c3ce58164724d63c5272b6d9804a"
+        },
+        "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+      }
+    ],
+    "data_file": "generated-pair-source-bindings.json",
+    "data_sha256": "346b48aa998899dc4bd9d1f3a4cdc16922b1af6d358c9d3214defe80c8f13fee",
+    "no_expected_model_change_or_actual_fault_domain_narrowing": true,
+    "case_tuple_faults_unchanged_from33f": true,
+    "new_checks_are_witnessed_necessary_consequences_of_same_old_contracts": true,
+    "field_exception": "Only named field control copy uses500->1000 for BOTH positive/negative, SP and global/default flags unchanged; original production500 persists. Other new cases use their original allowances/flags.",
+    "cap": "Same3caps5696/2000 with original<=5695 once; no duplicate invariant.",
+    "field": "Computed and actual return status both sourced from unchanged old/new literals; fixedexpectedFailedTruncated; read.consumed/currentGhost retained.",
+    "suffix_debit": "Exact original conditional runtime amount retained; computed operand specializes only witnessed initial_outer3; expected5 fromoldowner effect/charge contract.",
+    "suffix_byte175": "Same guarded actualextra put175value1; computedoperand parsedfrom that literal,expected0 fromoldframe/reachedbyte; healthyadds no write.",
+    "cursor": "Original faulty Err/Ghost0 stub exact; computed0 parsedfrom that actualconstructor; realhealthycall/capturedreceipt/fold retained; expected5 fromoldcombinedeffect/conservation/actualfold."
+  },
+  "immutable_supplements": {
+    "m1-r-final-supplement": {
+      "manifest_sha256": "89734c8f58d911da782ae47adea4169eb15f963855ba450680804fae6667b8d8",
+      "artifact_map_sha256": "d51f4f1eea22e82ccbfa0e06100e2b759c1c9ae8237360894488cca09b291fa3",
+      "all_staged_file_hashes_match": true
+    },
+    "m1-r-final-followup-supplement": {
+      "manifest_sha256": "3b78e258d53b94b1ed90418237a0182ddfe12c9c8ae33aaa1e28a98780207792",
+      "artifact_map_sha256": "2ef82a6640b9fa4dd55729bc2e150b574d730d120eefb5a5b927fcd167271a17",
+      "all_staged_file_hashes_match": true
+    }
+  },
+  "explicit_limits": [
+    "Static preservation/source-replay audit only; not actual native suite or current04 gate evidence.",
+    "No native execution/2000-action trace, negative-loop/body SMT completion, compiler/source-to-binary theorem or M1 completion claimed.",
+    "This binds reviewed test input557a; actual04 execution and completion receipt alone establish test closure.",
+    "Technical validation is not human architecture approval."
+  ],
+  "new_verifier_or_native_runs": 0,
+  "shared_source_tests_gate_evidence_canary_supplement_edits": 0
+}

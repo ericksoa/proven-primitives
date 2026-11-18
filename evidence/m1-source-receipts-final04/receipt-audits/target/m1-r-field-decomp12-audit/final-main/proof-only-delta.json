@@ -1,0 +1,169 @@
+{
+  "added_declarations": [
+    {
+      "attributes": [],
+      "body_sha256": "d1fcde3b523bbdb5c5aa66ebeed56dd9d8db0a536185333b329f6d5bff7e0f36",
+      "header_sha256": "8d9a4f5db18f11ce1e06e0673ff79d17fe2f66cc0af405554eca7b6f54a9cb48",
+      "id": "brotli_input::r_m1_field_distinct_empty",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "4bdae932337867e1b0b8a5a6b2afc86adc43951c1ee8eca2e0aa1521636fae02",
+      "header_sha256": "473e8f9c526c84b031e888a123280ba1eea9e9be0788fcdaa9c95cf7bb497142",
+      "id": "brotli_input::r_m1_field_distinct_update",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "3993102612c40db6a84fc5f44ee5bcc0699786793b026c40bf66a5a48ccd7b45",
+      "header_sha256": "e09cf70dc35780c8672e7ccb045b452605c0e024ac3f52db4c3df81ec03227fe",
+      "id": "brotli_input::r_m1_field_failed_state_valid",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "5cb1b53c33a836cbf6b9e61c426ca4a17ed6c7f72a3f4aa963ea822ac0746377",
+      "header_sha256": "b5cda6fcdc3a667c984ac6db2a96f628e52e6e9228ff92cf6c7a0a01f34534f8",
+      "id": "brotli_input::r_m1_field_fold_from_table_receipt",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "2148704405c50c9cf4a8adaea070078d72c47c1697c4a918b771c1d28648383d",
+      "header_sha256": "360abb74eebef80a3f5f5e24595a78f9fef8618f9cd978db399aa8a10bacc89e",
+      "id": "brotli_input::r_m1_field_no_bit_read_units",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "3993102612c40db6a84fc5f44ee5bcc0699786793b026c40bf66a5a48ccd7b45",
+      "header_sha256": "e73c564a1dc4d30f49f638da2c4ccf3287b380832972e12c9ba0f5187182c4e5",
+      "id": "brotli_input::r_m1_field_queue_update_valid",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "2540a5e09bc2ad35b72ecfa3bc288d5edbb0ee277c2b595a510f13e908c65e0f",
+      "header_sha256": "99d50c9a2f37549fd2b60233edd4be7dad652dacc4c5fa296f7f60742c5b4eb6",
+      "id": "brotli_input::r_m1_field_read_step_refinement",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "9a26de7e0c71c20f406ed408933d5f307b5cd34e2c3557278e8812914409cf9f",
+      "header_sha256": "18ef6f0fc80abdcd5bdf50bf0df49ec0f54a87d9e456a94d3b3a97aab6d899ff",
+      "id": "brotli_input::r_m1_field_read_units_fold",
+      "kind": "proof"
+    },
+    {
+      "attributes": [
+        "#[verifier::opaque]"
+      ],
+      "body_sha256": "cf6ffe2a467740f43e2334e953037e8b9fac4daf5883885a782c9b344d16bce6",
+      "header_sha256": "6a9f2e7eac67c210fc25a8ebe341505cdc8e5e3af068e17e3b82f4142b472718",
+      "id": "brotli_input::r_m1_field_table_receipt",
+      "kind": "spec"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "0b6f7298d6eae128566b2d9f94772a98edfeb9884f41c4e59a1917547590c9ef",
+      "header_sha256": "641446ad831f2bbb4d00a3481cbf310760965fa663d1b372f7cee41622680195",
+      "id": "brotli_input::r_m1_field_table_simple_case",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "8b38ba83971e8f3576525f29420ba92da879c7f6d82865151b6c7444c25f9a02",
+      "header_sha256": "11aeece7cf2d9c01114cbfdc98e91a138b878aaac652730938c75c4a8ea117e4",
+      "id": "brotli_input::r_m1_field_table_small_case",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "2d4b44044461c15151246e888a2dc4cc3948fe20855264cee8f47d1b22b7d0ca",
+      "header_sha256": "4d006e0f28666a5501d5d227f8fa0440dda7a3d9808a6ae74be33b57d8b4586f",
+      "id": "brotli_input::r_m1_field_table_symbol_case",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "8cab61438aedb953d90b9f9013d9a80a8ac8f1aa38bbe0b5e77178c65105b7f4",
+      "header_sha256": "bbcb578d89f7703d41a759471ac7c816a55fafefdfbeb4a745bddae33fd939a8",
+      "id": "brotli_input::r_m1_field_terminal_step_refinement",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "3993102612c40db6a84fc5f44ee5bcc0699786793b026c40bf66a5a48ccd7b45",
+      "header_sha256": "89cea05785815ebcb50c642b914a3678aa3bf56693797670ba33a836aca7d613",
+      "id": "brotli_input::r_m1_field_valid_components",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "3993102612c40db6a84fc5f44ee5bcc0699786793b026c40bf66a5a48ccd7b45",
+      "header_sha256": "20c3a204efc6287bdb5c2da9a694dc653a6533463e4694be81b8b36fd2a6b329",
+      "id": "brotli_input::r_m1_field_valid_from_components",
+      "kind": "proof"
+    },
+    {
+      "attributes": [],
+      "body_sha256": "c417382a491db2fc300c64679f9f8b1e3ec3e6fefb1a248ec81d909e176bc42e",
+      "header_sha256": "4e2b5beca5d27326742f133fb7182b27cf4ba5424e236ea3266d3932c1a72d1e",
+      "id": "brotli_input::r_m1_field_zero_bit_step_refinement",
+      "kind": "proof"
+    }
+  ],
+  "all_actual_receipt_origin_signatures_unchanged": true,
+  "changed_existing_execs": [
+    {
+      "body_exact": false,
+      "header_exact": true,
+      "id": "brotli_input::CodeDescriptionDecoder::advance_field",
+      "new_attributes": [
+        "#[verifier::rlimit(500)]",
+        "#[verifier::spinoff_prover]"
+      ],
+      "old_attributes": [
+        "#[verifier::rlimit(500)]",
+        "#[verifier::spinoff_prover]"
+      ]
+    },
+    {
+      "body_exact": true,
+      "header_exact": true,
+      "id": "brotli_input::CompressedMetaBlockDecoder::apply_block_count_value",
+      "new_attributes": [
+        "#[verifier::spinoff_prover]"
+      ],
+      "old_attributes": []
+    },
+    {
+      "body_exact": true,
+      "header_exact": true,
+      "id": "brotli_input::store_complex_code_description_payload",
+      "new_attributes": [
+        "#[verifier::spinoff_prover]"
+      ],
+      "old_attributes": []
+    }
+  ],
+  "field_literal_header_exact": true,
+  "field_runtime_projection_token_count": 2456,
+  "field_runtime_projection_tokens_equal": true,
+  "new_helper_mutable_counter_channels": 0,
+  "new_private_opaque_table_spec": {
+    "attributes": [
+      "#[verifier::opaque]"
+    ],
+    "body_sha256": "cf6ffe2a467740f43e2334e953037e8b9fac4daf5883885a782c9b344d16bce6",
+    "header_sha256": "6a9f2e7eac67c210fc25a8ebe341505cdc8e5e3af068e17e3b82f4142b472718",
+    "id": "brotli_input::r_m1_field_table_receipt",
+    "kind": "spec"
+  },
+  "new_table_subtotal_is_nonreturned_proof_counter": true,
+  "new_trust_bypass_tokens": 0,
+  "no_new_ordinary_execs": true,
+  "projection_rule": "Exactly byte audit tokens(), including replacing new proof-validity invocation by equivalent old Verus assert before proof erasure; static only, not compiler/source-to-binary equivalence."
+}

@@ -1,0 +1,25 @@
+--- f1a/brotli_input::advance_planned_context_bits
++++ e10/brotli_input::advance_planned_context_bits
+@@ -1,9 +1,22 @@
+ {
++     
+     let allowed = if budget.input_remaining > usize::MAX as u64 { input.len() }
+         else { input.len().min(budget.input_remaining as usize) };
+     let plan = match plan_context_bits_action(workspace, window_bytes, budget, &input[..allowed],
+         end_of_input && allowed == input.len()) {
+         Ok(value) => value,
++        Err(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) => {
++            let phase = match state_byte(workspace, window_bytes, B3B_OUTER_PHASE) {
++                Ok(6) => CompressedOuterPhase::LiteralContextMap,
++                Ok(7) => CompressedOuterPhase::DistanceContextMap,
++                _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
++            };
++            let failed_plan = CompressedActionPlan { planning_work: 0, execution_work: 5,
++                consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
++            
++            return execute_fixed_compressed_plan(workspace, window_bytes, budget, phase,
++                &input[..allowed], end_of_input && allowed == input.len(), allowed < input.len(), failed_plan);
++        },
+         Err(error) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+     };
+     execute_planned_context_bits(workspace, window_bytes, budget, &input[..allowed],

@@ -1,0 +1,71 @@
+{
+  "status": "complete read-only scope/lineage audit; no approval conclusion; no source mutation or proof/test/mutant execution",
+  "identities": {
+    "proposal_frozen_input": "f1a37362e128944c9c0ca49f00f30c172270677140e60027d3d655c46d831eef",
+    "actual_preimplementation_input": "e10c61b1354c5b1debef9e76aa55b412d06e35de210cb8949a73ef33b912da23",
+    "both_prefix": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03",
+    "actual_approved_baseline_matches_review05_files": 43
+  },
+  "exact_source_location": "review02/source-and-tests-before-control-repairs.tar.gz contains exact proposal frozen pair; review01 contains same input but an earlier different prefix, so review02 is retained frozen pair",
+  "changed_files": [
+    "src/brotli_input.rs",
+    "tests/proof_rejection.rs"
+  ],
+  "ordinary_preservation": {
+    "existing_exec_ids": 322,
+    "new_exec_ids": 0,
+    "removed_exec_ids": 0,
+    "arguments_returns_requirements_all_old_guarantees_preserved": true,
+    "strengthened_exec_contracts": 13,
+    "runtime_bodies_changed": [
+      "advance_planned_context_tree_count",
+      "advance_planned_context_bits"
+    ],
+    "extra_proof_visibility_only_body": "plan_context_mode_action",
+    "extra_solver_attribute_only": "install_completed_simple_tree adds spinoff_prover"
+  },
+  "mathematical_preservation": {
+    "old_spec_definitions_unchanged": 416,
+    "old_proof_functions_unchanged": 313,
+    "added_private_spec_definitions": 8,
+    "added_private_proof_functions": 4,
+    "count_criterion": "All anchored executable/spec/proof fn declarations before cfg(test) in input+prefix, including pub/open spec fn; exact ID catalogs retained."
+  },
+  "runtime_delta": "Two existing B3c owners now route classified StateEncoding plan errors through existing exact terminal5 reservation and original W1 terminal action. At sufficient credit, four terminal bytes latch InternalState and five work units are debited. Below five, ResourceLimit leaves workspace and budget unchanged. Ordinary input consumption remains zero. No new executable helper node/type/status/unit/representation or ownership boundary is introduced. Six call edges are added to existing input-private helpers.",
+  "prior_repair_not_R": {
+    "prior_source_sha256": "14bb55b2ca1baa065ed8bc98396d17f27738e7ef0378258a30553ac2e8b4f2d8",
+    "historical_finished_utc": "2026-11-17T03:38:19.026999+00:00",
+    "historical_cases": 400,
+    "historical_mismatches_before": 400,
+    "historical_mismatches_after": 0,
+    "hashes_reverified": true,
+    "R_explicit_pair_count_in_both_frozen_and_baseline": 0
+  },
+  "test_delta": {
+    "existing_proof_suites_modified": 5,
+    "existing_control_literal_changes": 9,
+    "new_proof_suites": 2,
+    "new_control_literals": 9,
+    "native_test_added": [
+      "m1_context_cursor_failures_match_w1_and_prepay_terminal"
+    ],
+    "all_old_native_module_text_retained": true
+  },
+  "policy_observation": "The two-owner behavior repairs an admitted-state discrepancy against existing W1/E1 permanent InternalState and M1 B3c-owned exact reservation-before-mutation policy. Existing documents already identify terminal action as four writes plus one transition. No new policy definition is present in f1a\u2192e10 delta; this observation does not establish that any human approval covers the source mismatch.",
+  "authority_boundary": "Proposal frozen f1a and actual pre-R e10 remain separately identified. No proposal or baseline rewritten, no human approval inferred, no architectural implementation decision made.",
+  "artifacts": [
+    "retained-source-manifest.json",
+    "changed-files.json",
+    "scope-comparison.json",
+    "ordinary-interface-preservation.json",
+    "preexisting-model-body-audit.json",
+    "preexisting-helper-ids.json",
+    "f1a-exec-graph.json",
+    "e10c-exec-graph.json",
+    "test-changes.json",
+    "policy-and-earlier-repair-lineage.json",
+    "review05-vs-actual-approved-baseline.json",
+    "diffs/src/brotli_input.rs.diff",
+    "diffs/tests/proof_rejection.rs.diff"
+  ]
+}

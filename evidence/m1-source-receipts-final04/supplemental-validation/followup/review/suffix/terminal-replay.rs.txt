@@ -1,0 +1,588 @@
+#[verifier::spinoff_prover]
+#[verifier::rlimit(1000)]
+fn r_triage_suffix_fallback_terminal_replay(
+    workspace: &mut [u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: (bool, Ghost<nat>))
+    requires
+        old(budget).valid(), old(budget).work_remaining == 5,
+        window_bytes == 1024, old(workspace)@ == m1_suffix_fallback_image(),
+        input.len() == 0, !end_of_input,
+    ensures
+        r.0,
+        r.1@ == 5,
+        final(budget).valid(), final(budget).work_remaining == 0,
+        final(budget).limits == old(budget).limits,
+        final(budget).input_remaining == old(budget).input_remaining,
+        final(budget).output_remaining == old(budget).output_remaining,
+        final(budget).calls_remaining == old(budget).calls_remaining,
+        final(budget).initializations_remaining == old(budget).initializations_remaining,
+        r.1@ + final(budget).work_remaining as nat == old(budget).work_remaining as nat,
+        final(workspace)@.len() == old(workspace)@.len(),
+        final(workspace)@[b3b_scalar_base(1024) + 175] == 0,
+        serialized_terminal_error(final(workspace)@, 1024, CompressedHeaderError::InternalState),
+{
+    hide(serialized_mtf_state_ok);
+    hide(serialized_context_state_ok);
+    hide(tree_group_payload_ok);
+    proof {
+        m1_suffix_fallback_image_is_admitted();
+        assert(workspace@ == m1_suffix_fallback_image());
+        assert(b3c_workspace_shape(workspace@.len(), window_bytes));
+        assert(compressed_decoder_state_ok(workspace@, window_bytes));
+    }
+    let ghost mut r_header_action_source_units: nat = 0;
+    proof { reveal(m1_context_bad_saved_cursor); }
+    proof {
+        reveal(context_mode_bad_count_plan_valid); reveal(context_mode_handoff_plan_valid);
+        reveal(fixed_outer_bad_cursor); reveal(fixed_bad_cursor_plan_valid);
+    }
+    proof { reveal(m1_input_prefix_len); }
+    proof { m1_initial_suffix_domain_partition(workspace@, window_bytes); }
+    let initial_allowed = if budget.input_remaining > usize::MAX as u64 {
+        input.len()
+    } else {
+        input.len().min(budget.input_remaining as usize)
+    };
+    let initial_outer = match state_byte(workspace, window_bytes, B3B_OUTER_PHASE) {
+        Ok(value) => value,
+        Err(_) => {
+            { let _r_terminal_exit_0: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()),
+            }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+    };
+    let initial_block_subphase = if initial_outer == 3 {
+        match state_byte(workspace, window_bytes, B3B_BLOCK_LENGTH_PHASE) {
+            Ok(value) => value,
+            Err(_) => {
+                { let _r_terminal_exit_1: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                    consumed: 0,
+                    status: CompressedStatus::Failed(core_state_failure()),
+                }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            }
+        }
+    } else {
+        255
+    };
+    let initial_context_phase = if initial_outer == 6 || initial_outer == 7 {
+        match state_byte(workspace, window_bytes, B3B_CONTEXT_PHASE) {
+            Ok(value) => value,
+            Err(_) => {
+                { let _r_terminal_exit_2: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                    consumed: 0,
+                    status: CompressedStatus::Failed(core_state_failure()),
+                }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            }
+        }
+    } else {
+        255
+    };
+    let mut already_consumed = 0usize;
+    if initial_outer == 0 {
+        proof {
+            reveal(compressed_outer_phase_tag_spec);
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_OUTER_PHASE,
+            ) == compressed_outer_phase_tag_spec(CompressedOuterPhase::BlockCount));
+        }
+        let planning_work = match block_count_planning_work(
+            workspace,
+            window_bytes,
+            initial_allowed,
+        ) {
+            Ok(value) => value,
+            Err(_) => {
+                let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
+                proof {
+                    assert(failure_plan.execution_work == 5);
+                    assert(fixed_bad_cursor_plan_valid(workspace@, window_bytes,
+                        CompressedOuterPhase::BlockCount, failure_plan));
+                }
+                { let _r_terminal_exit_3: (Result<usize, CompressedStep>, Ghost<nat>) = ({ let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(workspace, window_bytes, budget,
+                    CompressedOuterPhase::BlockCount, &input[..initial_allowed],
+                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result }, Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            }
+        };
+        if !budget.charge_work(planning_work) {
+            { let _r_terminal_exit_4: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
+            }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+        let plan = match { let (r_child_result, Ghost(r_child_units)) = plan_block_count_action(
+            workspace,
+            window_bytes,
+            &input[..initial_allowed],
+            end_of_input && initial_allowed == input.len(),
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(value) => value,
+            Err(_) => {
+                { let _r_terminal_exit_5: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                    consumed: 0,
+                    status: CompressedStatus::Failed(core_state_failure()),
+                }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            }
+        };
+        proof {
+            reveal(block_count_plan_valid);
+            block_count_planning_reads_agree(workspace@, window_bytes, initial_allowed as nat,
+                planning_work, plan.planning_work);
+        }
+        if plan.planning_work != planning_work {
+            { let _r_terminal_exit_6: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()) }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+        match { let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(
+            workspace,
+            window_bytes,
+            budget,
+            CompressedOuterPhase::BlockCount,
+            &input[..initial_allowed],
+            end_of_input && initial_allowed == input.len(),
+            initial_allowed < input.len(),
+            plan,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_7: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if initial_outer == 1 || initial_outer == 2 {
+        let phase = if initial_outer == 1 {
+            CompressedOuterPhase::BlockTypeTree
+        } else {
+            CompressedOuterPhase::BlockLengthTree
+        };
+        proof {
+            reveal(compressed_outer_phase_tag_spec);
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_OUTER_PHASE,
+            ) == compressed_outer_phase_tag_spec(phase));
+        }
+        match { let (r_child_result, Ghost(r_child_units)) = advance_planned_block_tree(
+            workspace,
+            window_bytes,
+            budget,
+            phase,
+            input,
+            end_of_input,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_8: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if initial_outer == 3 && initial_block_subphase == 0 {
+        proof {
+            reveal(compressed_outer_phase_tag_spec);
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_OUTER_PHASE,
+            ) == compressed_outer_phase_tag_spec(
+                CompressedOuterPhase::InitialBlockLength,
+            ));
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_BLOCK_LENGTH_PHASE,
+            ) == 0);
+        }
+        match { let (r_child_result, Ghost(r_child_units)) = advance_planned_initial_symbol(
+            workspace,
+            window_bytes,
+            budget,
+            input,
+            end_of_input,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_9: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if initial_outer == 3 && initial_block_subphase == 1 {
+        proof {
+            reveal(compressed_outer_phase_tag_spec);
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_OUTER_PHASE,
+            ) == compressed_outer_phase_tag_spec(
+                CompressedOuterPhase::InitialBlockLength,
+            ));
+        }
+        let ghost suffix_owner_before = workspace@;
+        let ghost suffix_owner_work = budget.work_remaining;
+        proof {
+            assert(suffix_owner_before == old(workspace)@);
+            assert(suffix_owner_work == old(budget).work_remaining);
+        }
+        let plan = match { let (r_child_result, Ghost(r_child_units)) = plan_initial_suffix_action(workspace, window_bytes, budget,
+            &input[..initial_allowed], end_of_input && initial_allowed == input.len()); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(value) => value,
+            Err(error) => {
+                proof {
+                    if m1_bad_initial_suffix(suffix_owner_before, window_bytes) {
+                        assert(error == CoreFailure::ResourceLimit);
+                        assert(*budget == *old(budget));
+                        m1_bad_initial_suffix_owner_without_plan(suffix_owner_before, window_bytes, *old(budget));
+                    }
+                    if initial_suffix_read_domain(suffix_owner_before, window_bytes) {
+                        establish_initial_suffix_owner_effect(suffix_owner_before, workspace@, window_bytes,
+                            *old(budget), *budget, input@, end_of_input,
+                            Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+                            CompressedActionPlan { planning_work: 0, execution_work: 0, consumed: 0, status: None });
+                    }
+                }
+                { let _r_terminal_exit_10: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            },
+        };
+        proof {
+            if initial_suffix_read_domain(workspace@, window_bytes) {
+                initial_suffix_plan_units_agree(workspace@, window_bytes, input@.take(initial_allowed as int),
+                    end_of_input && initial_allowed == input.len(), plan);
+            }
+        }
+        let ghost suffix_execution_credit = budget.work_remaining;
+        let result = { let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(
+            workspace,
+            window_bytes,
+            budget,
+            CompressedOuterPhase::InitialBlockLength,
+            &input[..initial_allowed],
+            end_of_input && initial_allowed == input.len(),
+            initial_allowed < input.len(),
+            plan,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result };
+        proof {
+            if initial_suffix_read_domain(suffix_owner_before, window_bytes) {
+                let allowed = m1_input_prefix_len(input@.len(), old(budget).input_remaining);
+                let end = end_of_input && allowed == input@.len();
+                let planning = initial_suffix_planning_units(suffix_owner_before, window_bytes, allowed);
+                let execution = initial_suffix_execution_units(suffix_owner_before, window_bytes, allowed, end);
+                assert(initial_allowed as nat == allowed);
+                assert(plan.planning_work as nat == planning);
+                assert(plan.execution_work as nat == execution);
+                assert(budget.output_remaining == old(budget).output_remaining);
+                assert(budget.calls_remaining == old(budget).calls_remaining);
+                assert(budget.initializations_remaining == old(budget).initializations_remaining);
+                assert(suffix_execution_credit as nat + planning == suffix_owner_work as nat);
+                if suffix_owner_work as nat >= planning + execution {
+                    assert(suffix_execution_credit >= plan.execution_work);
+                    assert(initial_suffix_result_matches(plan, allowed < input@.len(), result));
+                    assert(initial_suffix_plan_valid(suffix_owner_before, window_bytes, input@.take(allowed as int), end, plan));
+                    assert(initial_suffix_phase_refines(suffix_owner_before, workspace@, window_bytes,
+                        input@.take(allowed as int), end, plan.consumed, plan.status));
+                    assert(initial_suffix_action_frame(suffix_owner_before, workspace@, window_bytes, plan.status));
+                    assert(budget.input_remaining == old(budget).input_remaining - plan.consumed as u64);
+                    assert(budget.work_remaining as nat + planning + execution == suffix_owner_work as nat);
+                } else {
+                    assert(suffix_execution_credit < plan.execution_work);
+                    assert(result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }));
+                    assert(workspace@ == suffix_owner_before);
+                    assert(budget.input_remaining == old(budget).input_remaining);
+                    assert(budget.work_remaining as nat + planning == suffix_owner_work as nat);
+                }
+                assert(budget.input_remaining <= old(budget).input_remaining);
+            }
+        }
+        proof {
+            if m1_bad_initial_suffix(suffix_owner_before, window_bytes) {
+                reveal(m1_bad_initial_suffix_plan);
+                assert(suffix_execution_credit as nat + plan.planning_work as nat == old(budget).work_remaining as nat);
+                if suffix_execution_credit >= plan.execution_work {
+                    assert(result == Err(CompressedStep { consumed: 0,
+                        status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) }));
+                    assert(budget.work_remaining as nat + plan.execution_work as nat == suffix_execution_credit as nat);
+                } else {
+                    assert(result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }));
+                    assert(workspace@ == suffix_owner_before);
+                    assert(budget.work_remaining == suffix_execution_credit);
+                }
+                m1_bad_initial_suffix_owner_from_execution(suffix_owner_before, workspace@, window_bytes,
+                    *old(budget), *budget, plan, suffix_execution_credit, result);
+            }
+            if initial_suffix_read_domain(suffix_owner_before, window_bytes) {
+                establish_initial_suffix_owner_effect(suffix_owner_before, workspace@, window_bytes,
+                    *old(budget), *budget, input@, end_of_input, result, plan);
+            }
+        }
+        { let _r_terminal_exit_11: (Result<usize, CompressedStep>, Ghost<nat>) = (result, Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+    } else if initial_outer == 4 {
+        proof {
+            reveal(compressed_outer_phase_tag_spec);
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_OUTER_PHASE,
+            ) == compressed_outer_phase_tag_spec(
+                CompressedOuterPhase::DistanceParameters,
+            ));
+        }
+        let planning_work = match distance_planning_work(
+            workspace,
+            window_bytes,
+            initial_allowed,
+        ) {
+            Ok(value) => value,
+            Err(_) => {
+                let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
+                { let _r_terminal_exit_12: (Result<usize, CompressedStep>, Ghost<nat>) = ({ let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(workspace, window_bytes, budget,
+                    CompressedOuterPhase::DistanceParameters, &input[..initial_allowed],
+                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result }, Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            }
+        };
+        if !budget.charge_work(planning_work) {
+            { let _r_terminal_exit_13: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
+            }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+        let plan = match { let (r_child_result, Ghost(r_child_units)) = plan_distance_action(
+            workspace,
+            window_bytes,
+            &input[..initial_allowed],
+            end_of_input && initial_allowed == input.len(),
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(value) => value,
+            Err(_) => {
+                { let _r_terminal_exit_14: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                    consumed: 0,
+                    status: CompressedStatus::Failed(core_state_failure()),
+                }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            }
+        };
+        proof {
+            reveal(distance_plan_valid);
+            distance_planning_reads_agree(workspace@, window_bytes, initial_allowed as nat,
+                planning_work, plan.planning_work);
+        }
+        if plan.planning_work != planning_work {
+            { let _r_terminal_exit_15: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()) }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+        match { let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(
+            workspace,
+            window_bytes,
+            budget,
+            CompressedOuterPhase::DistanceParameters,
+            &input[..initial_allowed],
+            end_of_input && initial_allowed == input.len(),
+            initial_allowed < input.len(),
+            plan,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_16: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if initial_outer == 5 {
+        proof {
+            reveal(compressed_outer_phase_tag_spec);
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_OUTER_PHASE,
+            ) == compressed_outer_phase_tag_spec(CompressedOuterPhase::ContextModes));
+        }
+        let planning_work = match context_mode_planning_work(
+            workspace,
+            window_bytes,
+            initial_allowed,
+        ) {
+            Ok(value) => value,
+            Err(_) => {
+                let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,
+                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
+                { let _r_terminal_exit_17: (Result<usize, CompressedStep>, Ghost<nat>) = ({ let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(workspace, window_bytes, budget,
+                    CompressedOuterPhase::ContextModes, &input[..initial_allowed],
+                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result }, Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            }
+        };
+        if !budget.charge_work(planning_work) {
+            { let _r_terminal_exit_18: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::ResourceLimit),
+            }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+        let plan = match { let (r_child_result, Ghost(r_child_units)) = plan_context_mode_action(
+            workspace,
+            window_bytes,
+            &input[..initial_allowed],
+            end_of_input && initial_allowed == input.len(),
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(value) => value,
+            Err(_) => {
+                { let _r_terminal_exit_19: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep {
+                    consumed: 0,
+                    status: CompressedStatus::Failed(core_state_failure()),
+                }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+            }
+        };
+        proof {
+            if context_mode_pending(workspace@, window_bytes) {
+                reveal(context_mode_plan_valid);
+                context_mode_planning_reads_agree(workspace@, window_bytes, initial_allowed as nat,
+                    planning_work, plan.planning_work);
+            }
+        }
+        if plan.planning_work != planning_work {
+            { let _r_terminal_exit_20: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()) }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+        match { let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(
+            workspace,
+            window_bytes,
+            budget,
+            CompressedOuterPhase::ContextModes,
+            &input[..initial_allowed],
+            end_of_input && initial_allowed == input.len(),
+            initial_allowed < input.len(),
+            plan,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_21: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if (initial_outer == 6 || initial_outer == 7) && initial_context_phase == 0 {
+        proof {
+            assert(6 <= b3b_scalar_byte_at(
+                workspace@, window_bytes, B3B_OUTER_PHASE,
+            ) <= 7);
+        }
+        match { let (r_child_result, Ghost(r_child_units)) = advance_planned_context_tree_count(
+            workspace, window_bytes, budget, input, end_of_input,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_22: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if (initial_outer == 6 || initial_outer == 7)
+        && (initial_context_phase == 1 || initial_context_phase == 2
+            || initial_context_phase == 5 || initial_context_phase == 6)
+    {
+        match { let (r_child_result, Ghost(r_child_units)) = advance_planned_context_bits(workspace, window_bytes, budget, input, end_of_input); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_23: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if (initial_outer == 6 || initial_outer == 7) && initial_context_phase == 3 {
+        match { let (r_child_result, Ghost(r_child_units)) = advance_planned_context_tree(workspace, window_bytes, budget, input, end_of_input); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_24: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if (initial_outer == 6 || initial_outer == 7) && initial_context_phase == 4 {
+        match { let (r_child_result, Ghost(r_child_units)) = advance_planned_context_symbol(workspace, window_bytes, budget, input, end_of_input); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_25: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if (initial_outer == 6 || initial_outer == 7)
+        && 7 <= initial_context_phase && initial_context_phase <= 9
+    {
+        let phase = if initial_outer == 6 {
+            CompressedOuterPhase::LiteralContextMap
+        } else {
+            CompressedOuterPhase::DistanceContextMap
+        };
+        proof {
+            reveal(compressed_outer_phase_tag_spec);
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_OUTER_PHASE,
+            ) == compressed_outer_phase_tag_spec(phase));
+            assert(7 <= b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_CONTEXT_PHASE,
+            ) <= 9);
+        }
+        match { let (r_child_result, Ghost(r_child_units)) = advance_planned_context_map_tail(
+            workspace,
+            window_bytes,
+            budget,
+            phase,
+            input,
+            end_of_input,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_26: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if initial_outer == 8 || initial_outer == 9 || initial_outer == 10 {
+        let phase = if initial_outer == 8 {
+            CompressedOuterPhase::LiteralTreeGroup
+        } else if initial_outer == 9 {
+            CompressedOuterPhase::CommandTreeGroup
+        } else {
+            CompressedOuterPhase::DistanceTreeGroup
+        };
+        proof {
+            reveal(compressed_outer_phase_tag_spec);
+            assert(b3b_scalar_byte_at(
+                workspace@,
+                window_bytes,
+                B3B_OUTER_PHASE,
+            ) == compressed_outer_phase_tag_spec(phase));
+        }
+        match { let (r_child_result, Ghost(r_child_units)) = advance_planned_tree_group(
+            workspace,
+            window_bytes,
+            budget,
+            phase,
+            input,
+            end_of_input,
+        ); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result } {
+            Ok(used) => already_consumed = used,
+            Err(step) => { let _r_terminal_exit_27: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(step), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); },
+        }
+    } else if initial_outer < 11 {
+        // W1 rejects unknown initial-length/context subphases without reading
+        // input. Preserve that terminal action and prepay its four writes.
+        let ghost fallback_before = workspace@;
+        let ghost fallback_work = budget.work_remaining;
+        proof { m1_suffix_fallback_image_is_admitted(); }
+        proof {
+            assert(initial_outer == 3 && initial_block_subphase == 2);
+            assert(workspace@ == m1_suffix_fallback_image());
+            assert(budget.work_remaining == 5 && fallback_work == 5);
+            assert(*budget == *old(budget));
+            assert(r_header_action_source_units == 0);
+        }
+        if !budget.charge_work(4 + 1) {
+            proof {
+                if initial_outer == 3 && m1_bad_initial_suffix(old(workspace)@, window_bytes) {
+                    reveal(m1_bad_initial_suffix_validation_reads); reveal(m1_bad_initial_suffix_owner_effect);
+                    assert(m1_bad_initial_suffix_validation_reads(old(workspace)@, window_bytes) == 0);
+                    assert(m1_bad_initial_suffix_owner_effect(old(workspace)@, workspace@, window_bytes,
+                        *old(budget), *budget,
+                        Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })));
+                }
+            }
+            { let _r_terminal_exit_28: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+        proof {
+            if window_bytes == 1024 && fallback_before == m1_suffix_fallback_image() && fallback_work == 5 {
+                assert(budget.work_remaining == 0);
+            }
+        }
+        proof { r_header_action_source_units = r_header_action_source_units + 1; }
+        if { let (r_child_result, Ghost(r_child_units)) = store_terminal_error(workspace, window_bytes, CompressedHeaderError::InternalState); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result }.is_err() {
+            { let _r_terminal_exit_29: (Result<usize, CompressedStep>, Ghost<nat>) = (Err(CompressedStep { consumed: 0,
+                status: CompressedStatus::Failed(core_state_failure()) }), Ghost(r_header_action_source_units)); proof { assert(false); } return (false, Ghost(r_header_action_source_units)); };
+        }
+        proof {
+            if window_bytes == 1024 && fallback_before == m1_suffix_fallback_image() && fallback_work == 5 {
+                assert(workspace@[b3b_scalar_base(1024) + 175] == 0);
+            }
+        }
+        proof {
+            assert(initial_outer == 3 && initial_block_subphase == 2);
+            assert(fallback_before == m1_suffix_fallback_image() && fallback_work == 5);
+            assert(budget.work_remaining == 0);
+            assert(r_header_action_source_units == 5);
+            assert(workspace@[b3b_scalar_base(1024) + 175] == 0);
+            assert(serialized_terminal_error(workspace@, 1024, CompressedHeaderError::InternalState));
+        }
+        return (true, Ghost(r_header_action_source_units));
+    }
+    proof { assert(false); }
+    (false, Ghost(r_header_action_source_units))
+}

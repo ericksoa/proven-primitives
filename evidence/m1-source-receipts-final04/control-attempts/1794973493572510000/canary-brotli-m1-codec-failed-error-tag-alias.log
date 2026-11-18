@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:13177:1
+      |
+13177 | fn code_description_error_tag(error: CodeDescriptionError) -> (r: u8)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:13178:26
+      |
+13178 |       ensures 1 <= r <= 5, r == m1_code_error_tag(error),
+      |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+13181 | /     match error {
+13182 | |         CodeDescriptionError::MetaBlockNotCompressed => 1,
+13183 | |         CodeDescriptionError::InvalidAlphabet => 3,
+13184 | |         CodeDescriptionError::DuplicateSimpleSymbol => 3,
+13185 | |         CodeDescriptionError::CodeLengthSpace => 4,
+13186 | |         CodeDescriptionError::Truncated => 5,
+13187 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

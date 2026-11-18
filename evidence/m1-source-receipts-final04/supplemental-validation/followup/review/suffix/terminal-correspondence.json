@@ -1,0 +1,17 @@
+{
+  "status": "PASS exact original terminal-prefix/return/call correspondence",
+  "original_noncomment_tokens_including_proof_and_ghost": 4257,
+  "all_original_prefix_bytes_and_tokens_restored_after_undo_checked_adapters": true,
+  "all_original_return_expressions_and_nested_helper_calls_retained": 30,
+  "all_30_exit_adapters_checked_unreachable": true,
+  "all_old_assertions_and_actual_Ghost_ledger_updates_retained": true,
+  "no_fake_literal5_ledger_assignment": true,
+  "actual_terminal_replay_ledger5_budget0_byte175zero_checked": true,
+  "only_old_proof_code_between_original_extra_write_insertion_point_and_marker": true,
+  "same_saved_initial_outer3_guard_checked_at_reached_insertion_point": true,
+  "no_original_helper_inlining_contract_gap_or_API_change": true,
+  "all_original_production_declarations_byte_exact_after_validation_entries_removed": true,
+  "old_frame_written_value_zero_necessity_checked": true,
+  "byte175_negative_authorized_or_run": false,
+  "counts_as_control_or_full_gate": false
+}

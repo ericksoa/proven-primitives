@@ -1,0 +1,58 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_five_m1_tree_error_identity_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T05:18:27.717949+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 313.18423345799965,
+  "finished_utc": "2026-11-17T05:23:40.906651+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_five_m1_tree_error_identity_defects.log",
+  "log_sha256": "6298646acdefd0483128b2b9c0633957568249e8c4226dfbe8438a3c163cd4b7",
+  "suite": "the_prover_rejects_five_m1_tree_error_identity_defects",
+  "expected_mutants": 5,
+  "mutants": [
+    {
+      "name": "brotli-m1-saved-loader-spurious-unsupported-mode",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-saved-loader-spurious-unsupported-mode.log",
+      "sha256": "1eab58d269597d10fbca38fc0cbb0ee44d782e2eb969f9d67372282a25a88f93",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-malformed-region-executor-wrong-error",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-malformed-region-executor-wrong-error.log",
+      "sha256": "b522019c6010b58e65605531ab6b543ca8a2860f458da6b2082db29ed444b8da",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-malformed-region-planner-wrong-error",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-malformed-region-planner-wrong-error.log",
+      "sha256": "5e3398b5af976cfeb9698f3fcb1b1ec4216aa4e04146d1a92f6ec7e54a957ae9",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-malformed-descriptor-plan-wrong-error",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-malformed-descriptor-plan-wrong-error.log",
+      "sha256": "4f50774e737e062c497c7be1ebcaefc3dd70e9e669b6aeac6d7cdf08257cd1fd",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-tree-caller-flags-equal-internal-errors",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-tree-caller-flags-equal-internal-errors.log",
+      "sha256": "2519b7a3e5e6f3412afbe0413af54f068b968636a83e2abefb9b5d6cd67a3413",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

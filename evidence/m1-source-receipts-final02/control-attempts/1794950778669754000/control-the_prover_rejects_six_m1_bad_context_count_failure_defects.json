@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 235.73921041598078,
+  "executed_once": false,
+  "exit_code": 101,
+  "expected_mutants": 6,
+  "finished_utc": "2026-11-17T22:09:39.185598+00:00",
+  "log": "controls-the_prover_rejects_six_m1_bad_context_count_failure_defects.log",
+  "log_sha256": "9e8194c3641173bfa324c26a18f68689320a1c8561b02f1299e4b010bc38fbb1",
+  "mutants": [],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794953143443622000,
+  "started_utc": "2026-11-17T22:05:43.443631+00:00",
+  "suite": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+  "suite_source_sha256": "4d942568ecc26bd7f92b1e4b5a5f8d189de1781cab0b144ae82266b2bbb50206",
+  "validation_errors": []
+}

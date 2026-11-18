@@ -1,0 +1,16 @@
+{
+  "suite": "the_prover_rejects_six_k7_k8_result_contract_defects",
+  "case": "brotli-k7-multi-install-spurious-error",
+  "module": "prefix",
+  "function": "install_simple_tree",
+  "checker_selector": "install_simple_tree",
+  "old": "let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {",
+  "previous_new": "if selector == 1 && alphabet_limit == 2 { return Err(WorkspaceError::InvalidCodeLength); }\n    let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {",
+  "new": "if selector == 1 && alphabet_limit == 2 { return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_reads + source_writes)); }\n    let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {",
+  "fault_preserved": "same selector==1 &&alphabet_limit==2 guard, same InvalidCodeLength, same before-canonical-constructor insertion point; valid nonsingleton is still rejected spuriously",
+  "receipt_origin": "source_reads+source_writes is the CURRENT reached source-operation counter sum already in lexical scope. Validation reads have occurred; no writes occur yet. Do not use Ghost0,2,4 or a reservation/model formula.",
+  "selector_and_old_anchor_unchanged": true,
+  "all_assertions_models_rootcontracts_unchanged": true,
+  "new_scope_changes": false,
+  "extra_mutants_run": 0
+}

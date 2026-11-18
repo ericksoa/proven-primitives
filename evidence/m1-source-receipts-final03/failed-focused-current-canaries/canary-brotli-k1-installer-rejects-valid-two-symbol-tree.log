@@ -1,0 +1,48 @@
+verification results:: 11 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-4886/src/brotli_prefix.rs:5153:1
+     |
+5153 | / pub(crate) fn install_builder_canonical_tree(
+5154 | |     workspace: &mut [u8],
+5155 | |     window_bytes: u32,
+5156 | |     lengths_initialized: u16,
+...    |
+5159 | |     meta: &mut TreeMetadata,
+5160 | | ) -> (r: (Result<(), WorkspaceError>, Ghost<nat>))
+     | |_________________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-4886/src/brotli_prefix.rs:5168:9
+     |
+5168 | /         r.0 == Err(WorkspaceError::InvalidCodeLength) ==> {
+5169 | |             let lengths = builder_length_sequence(old(workspace)@, window_bytes, old(meta).symbols);
+5170 | |             let visits = r.1@;
+5171 | |             let index = (visits - 1) as nat;
+...    |
+5180 | |                         || used_space(lengths.take(index as int)) + code_weight(lengths[index as int]) > 32768)))
+5181 | |         },
+     | |_________^ failed this postcondition
+...
+5296 |       if symbols == 2 { return (Err(WorkspaceError::InvalidCodeLeng...ource_record_reads + source_record_writes)); }
+     |                         -------------------------------------------...------------------------------------------- at this exit
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-4886/src/brotli_prefix.rs:5191:9
+     |
+5191 | /         window_bytes <= 16_777_216
+5192 | |             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+5193 | |             && (tree as nat) < tree_region_count(region)
+5194 | |             && old(meta).storage == (TreeStorageState::Canonical { initialized: 0 })
+...    |
+5204 | |             })
+5205 | |         },
+     | |_________^ failed this postcondition
+...
+5296 |       if symbols == 2 { return (Err(WorkspaceError::InvalidCodeLeng...ource_record_reads + source_record_writes)); }
+     |                         -------------------------------------------...------------------------------------------- at this exit
+
+error: aborting due to 2 previous errors
+

@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-72906/src/brotli_input.rs:35237:1
+      |
+35237 | / fn context_bits_execution_work(read_work: u64, phase: u8, status: BitReadStatus,
+35238 | |     repeat: u32, remaining: u16) -> (r: u64)
+      | |___________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-72906/src/brotli_input.rs:35240:13
+      |
+35240 |       ensures r as nat == context_bits_work_spec(read_work as nat, phase, status,
+      |  _____________^
+35241 | |         repeat as nat, remaining as nat), r <= 131_148,
+      | |________________________________________^ failed this postcondition
+...
+35244 | /     base + match status {
+35245 | |         BitReadStatus::NeedInput => 0,
+35246 | |         BitReadStatus::Truncated => 4,
+35247 | |         BitReadStatus::Value(value) => {
+...     |
+35253 | |         },
+35254 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

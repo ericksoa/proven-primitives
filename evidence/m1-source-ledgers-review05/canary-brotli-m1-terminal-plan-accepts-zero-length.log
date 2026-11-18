@@ -1,0 +1,33 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:34798:5
+      |
+34798 |     while i < 3
+      |     ^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:34783:1
+      |
+34783 | / fn plan_terminal_header_work(workspace: &[u8], window_bytes: u32,
+34784 | |     outer: u8) -> (r: Result<u64, CoreFailure>)
+      | |______________________________________________^
+
+error: invariant not satisfied at end of loop body
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:34800:13
+      |
+34800 | /             failed == ((i > 0 && (b3b_scalar_u16_at(workspace@, window_bytes, B3B_BLOCK_COUNTS) == 0
+34801 | |                     || b3b_scalar_u16_at(workspace@, window_bytes, B3B_BLOCK_COUNTS) > 256
+34802 | |                     || b3b_scalar_u32_at(workspace@, window_bytes, B3B_INITIAL_LENGTHS) == 0))
+34803 | |                 || (i > 1 && (b3b_scalar_u16_at(workspace@, window_bytes, (B3B_BLOCK_COUNTS + 2) as u16) == 0
+...     |
+34807 | |                     || b3b_scalar_u16_at(workspace@, window_bytes, (B3B_BLOCK_COUNTS + 4) as u16) > 256
+34808 | |                     || b3b_scalar_u32_at(workspace@, window_bytes, (B3B_INITIAL_LENGTHS + 8) as u16) == 0))),
+      | |____________________________________________________________________________________________________________^
+
+error: aborting due to 1 previous error
+

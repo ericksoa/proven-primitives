@@ -1,0 +1,28 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:2563:5
+     |
+2563 |     while width < length
+     |     ^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:2537:1
+     |
+2537 | / fn auxiliary_first_code_metered(lengths: &[u8; 18], length: u8,
+2538 | |     budget: &mut crate::brotli::RequestBudget,
+2539 | | ) -> (r: (Result<(u32, u64), CoreFailure>, Ghost<nat>))
+     | |______________________________________________________^
+
+error: invariant not satisfied at end of loop body
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:2565:13
+     |
+2565 |             r_metered_source_reads == 18 * (width as nat - 1),
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

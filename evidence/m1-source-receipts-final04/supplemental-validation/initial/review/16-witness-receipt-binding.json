@@ -1,0 +1,84 @@
+{
+  "checked_utc": "2026-11-18T01:39:51.242677+00:00",
+  "receipts": [
+    {
+      "component": "domain_witness",
+      "path": "target/m1-r-concrete-cap-rank-witness/witness-result.json",
+      "sha256": "22bfa50596424342e2878b589bb9777ab3b000851aec1c23ccf5783fd98719ac"
+    },
+    {
+      "component": "witness_artifact_manifest",
+      "path": "target/m1-r-concrete-cap-rank-witness/artifact-sha256.json",
+      "sha256": "392ca911988a99184b9acb12af232357a3a29678fa927f74f5c78f1643526d77"
+    },
+    {
+      "component": "startup_correspondence",
+      "path": "target/m1-r-concrete-cap-rank-witness/startup-token-correspondence-final.json",
+      "sha256": "c1df1a6df7641bdfdaa03b2a0274663fd7d93d37f8df3f112a468e3c222c05a9"
+    },
+    {
+      "component": "independent_technical_audit",
+      "path": "target/m1-r-independent-cap-rank-audit/audit.json",
+      "sha256": "6e329613520b02649cf12c1482d403effa175bfb9df52383734c6801362d5140"
+    },
+    {
+      "component": "audit_artifact_manifest",
+      "path": "target/m1-r-independent-cap-rank-audit/artifact-sha256.json",
+      "sha256": "571bd061ccc1a3ef56c07b3f1a86f98b8c6ea55a185da2998f009d22a4a4e9d9"
+    }
+  ],
+  "supplemental_checked_components": [
+    {
+      "component": "image",
+      "path": "target/m1-r-concrete-cap-rank-witness/attempts/image03/result.json",
+      "sha256": "961e057e14077cc2c9610e8b5a885bd3afdbbf8868c67d3045b1dba1832d2b24",
+      "verification": {
+        "verified": 2,
+        "errors": 0
+      },
+      "counts_as_cap_control_or_full_gate": false
+    },
+    {
+      "component": "budget",
+      "path": "target/m1-r-concrete-cap-rank-witness/attempts/budget01/result.json",
+      "sha256": "87d4b513a32b805bf5e5d541120cfc2724b46e26106aa6f875c01b22da0d21ca",
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      },
+      "counts_as_cap_control_or_full_gate": false
+    },
+    {
+      "component": "model_costs",
+      "path": "target/m1-r-concrete-cap-rank-witness/attempts/costs01/result.json",
+      "sha256": "13f5bf90aafd43254553dd3591e7f31f1f45c67941e11c81454a0ad9c9feae4d",
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      },
+      "counts_as_cap_control_or_full_gate": false
+    },
+    {
+      "component": "startup_replay",
+      "path": "target/m1-r-concrete-cap-rank-witness/attempts/startup02/result.json",
+      "sha256": "422a769c4a94e36958f6c3dc9232b953e6e21ef6c7ebd8ee5b7672d9dece1468",
+      "verification": {
+        "verified": 3,
+        "errors": 0
+      },
+      "counts_as_cap_control_or_full_gate": false
+    }
+  ],
+  "admitted_reached_rank": 5695,
+  "phase": "Selector",
+  "alphabet_limit": 704,
+  "startup_work": {
+    "starting": 64,
+    "source_units": 40,
+    "remaining": 24
+  },
+  "root_reviewed_bridge_and_independent_audit": true,
+  "audit_scope": "Independent domain/criterion audit binds raw927f positive and aa739 startup bridge; Boolean identity connects normalized predicate to exactly the same criterion. No audit of native/source-to-binary/2000-action/full-gate behavior inferred.",
+  "boolean_identity": "For every Boolean P: (if P { true } else { false }) == P. P is unchanged rank(Selector,704)<cap.",
+  "counts_as_full_gate": false
+}

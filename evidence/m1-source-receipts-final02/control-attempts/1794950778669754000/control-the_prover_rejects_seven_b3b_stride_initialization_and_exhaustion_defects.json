@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 276.0073340420204,
+  "executed_once": false,
+  "exit_code": 101,
+  "expected_mutants": 7,
+  "finished_utc": "2026-11-17T21:56:41.841907+00:00",
+  "log": "controls-the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects.log",
+  "log_sha256": "82362d2700e6647c7f2b5a21390e61ed75fbc290c9a613a8272b082e92f26399",
+  "mutants": [],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794952325833641000,
+  "started_utc": "2026-11-17T21:52:05.833651+00:00",
+  "suite": "the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects",
+  "suite_source_sha256": "08a9d1d04ae1a223afd787cbaf34a30dcecced581041d2f899bce017abf44c49",
+  "validation_errors": []
+}

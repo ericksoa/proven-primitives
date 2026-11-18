@@ -1,0 +1,46 @@
+--- a/tests/proof_rejection.rs
++++ b/tests/proof_rejection.rs
+@@ -2042,7 +2042,30 @@
+             1,
+             "unique mutation anchor for {name}"
+         );
+-        fs::write(&path, original.replacen(old, new, 1)).unwrap();
++        let mutated = if name == "brotli-b3b-tree-field-truncation-needs-input" {
++            // The instrumented positive and negative copies use the same checker effort.
++            // Production advance_field retains its original allowance of 500.
++            let declaration = "    #[verifier::rlimit(500)]\n    #[verifier::spinoff_prover]\n    fn advance_field(";
++            let checked_declaration = "    #[verifier::rlimit(1000)]\n    #[verifier::spinoff_prover]\n    fn advance_field(";
++            assert_eq!(original.matches(declaration).count(), 1, "unique selected field annotation");
++            let checked_original = original.replacen(declaration, checked_declaration, 1);
++            assert_eq!(old.matches("status: ").count(), 1, "unique healthy returned status");
++            assert_eq!(new.matches("status: ").count(), 1, "unique faulty returned status");
++            let healthy_status = old.split_once("status: ").unwrap().1.split_once(",\n").unwrap().0;
++            let faulty_status = new.split_once("status: ").unwrap().1.split_once(",\n").unwrap().0;
++            let expected_status = "CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)";
++            assert_eq!(healthy_status, expected_status);
++            assert_eq!(faulty_status, "CodeDescriptionStatus::NeedInput");
++            let healthy_site = format!("proof {{\n                    assert(if matches!(\n                        {healthy_status},\n                        {expected_status}\n                    ) {{ true }} else {{ false }}) by (compute_only);\n                }}\n                {old}");
++            let faulty_site = format!("proof {{\n                    assert(if matches!(\n                        {faulty_status},\n                        {expected_status}\n                    ) {{ true }} else {{ false }}) by (compute_only);\n                }}\n                {new}");
++            fs::write(&path, checked_original.replacen(old, &healthy_site, 1)).unwrap();
++            let positive = check_brotli_input_function(&verus, &temporary, function);
++            assert!(positive.status.success(), "unmodified same-setting field root failed: {}", transcript(&positive));
++            checked_original.replacen(old, &faulty_site, 1)
++        } else {
++            original.replacen(old, new, 1)
++        };
++        fs::write(&path, mutated).unwrap();
+         let result = check_brotli_input_function(&verus, &temporary, function);
+         let log = transcript(&result);
+         fs::write(
+@@ -2055,7 +2078,10 @@
+             log.contains("postcondition not satisfied")
+                 || log.contains("precondition not satisfied")
+                 || log.contains("invariant not satisfied")
+-                || log.contains("assertion failed"),
++                || log.contains("assertion failed")
++                || (name == "brotli-b3b-tree-field-truncation-needs-input"
++                    && log.contains("error: expression simplifies to false")
++                    && log.contains("by (compute_only)")),
+             "expected a proof rejection, not a tooling error: {log}"
+         );
+         println!("REJECTED {name}: deliberately wrong implementation, unchanged specification");

@@ -1,0 +1,32 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-receipt-canaries-41708/src/brotli_input.rs:40418:5
+      |
+40418 |     while transitions < 100_000
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-receipt-canaries-41708/src/brotli_input.rs:40395:1
+      |
+40395 | / pub(crate) fn advance_serialized_compressed_header(
+40396 | |     workspace: &mut [u8],
+40397 | |     window_bytes: u32,
+40398 | |     budget: &mut crate::brotli::RequestBudget,
+40399 | |     input: &[u8],
+40400 | |     end_of_input: bool,
+40401 | | ) -> (r: CompressedStep)
+      | |_______________________^
+
+error: invariant not satisfied at end of loop body
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-receipt-canaries-41708/src/brotli_input.rs:40420:13
+      |
+40420 |             r_header_driver_source_units + budget.work_remaining as nat == old(budget).work_remaining as nat,
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

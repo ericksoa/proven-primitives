@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T01:54:48.590475+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 154.64423529199848,
+  "finished_utc": "2026-11-17T01:57:23.237053+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects.log",
+  "log_sha256": "f52a274917ed0f9cd8d19651c2a04037a444cf3163c76ce329eb308870200960",
+  "suite": "the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-m1-tree-plan-omits-saved-load-planning",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-tree-plan-omits-saved-load-planning.log",
+      "sha256": "6094bb266caeaaa2a8df507e284e61f04f4ca3e6f054626e4226a29aecd87473",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-block-tree-plan-omits-planning-debit",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-block-tree-plan-omits-planning-debit.log",
+      "sha256": "9577b090ae859507b5d4d73c5ad8c99a74cdbfefeba7283424e30ad30178cc22",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-group-tree-plan-omits-planning-debit",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-group-tree-plan-omits-planning-debit.log",
+      "sha256": "4b24d3ccf2bd1568506f00b74576c638575b5028ba1035b762000620f3617c0b",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-pending-span-writes-wrong-length",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-pending-span-writes-wrong-length.log",
+      "sha256": "4d10105c1287a6d9bab749f59127963f032b285466e9470d16bebc89d84657c1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-descriptor-store-writes-unrelated-byte",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-descriptor-store-writes-unrelated-byte.log",
+      "sha256": "888d89f45aa666460200c81193a46a9c15d481b146aa4224838ba248f7fb25e3",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-inconsistent-span-mutates-decoder",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-inconsistent-span-mutates-decoder.log",
+      "sha256": "a51a17463183b585b0397703e76c0f31eb7f7d5f03361f2af2ee3d8b15fa304b",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T04:54:41.267849+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 70.562497040999,
+  "finished_utc": "2026-11-17T04:55:51.831366+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_four_b3c_context_mode_metering_undercharges.log",
+  "log_sha256": "0d6e9cb9a490bf699b877666101873c198f964a03bbe3142f0d1f4308f41c5ee",
+  "suite": "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-b3c-context-mode-complete-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-context-mode-complete-undercharge.log",
+      "sha256": "5a326dba99e8aeb77179c93d75e21c7226b08d8c2ffe7e86090fdc16150fc926",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-mode-queue-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-context-mode-queue-undercharge.log",
+      "sha256": "7a94b607c06a510edca95eb451a4b510a9b36735d5f39c76d4a796e3a95d99f7",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-mode-terminal-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-context-mode-terminal-undercharge.log",
+      "sha256": "96bda8f5ebe764052d2c61df4799a2e6697f5db26405e71657c54b5440de9d59",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-mode-value-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-context-mode-value-undercharge.log",
+      "sha256": "8b667d1d376a9c25b1adab67222503c6ffac223ea5c93fec7a66efcb1f074256",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

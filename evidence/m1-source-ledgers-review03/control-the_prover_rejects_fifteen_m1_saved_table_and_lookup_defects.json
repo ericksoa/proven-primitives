@@ -1,0 +1,116 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:49:41.323694+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 275.2005755840073,
+  "finished_utc": "2026-11-17T02:54:16.523290+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects.log",
+  "log_sha256": "611365ba1ef50d57dea6f2007f4761f02a33a83e4a0001b9addbe9685e05bc4f",
+  "suite": "the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects",
+  "expected_mutants": 15,
+  "mutants": [
+    {
+      "name": "brotli-m1-aux-count-read-not-charged",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-aux-count-read-not-charged.log",
+      "sha256": "2a80bebb85308b706c3c0e243e770e5e5ae3d417eb3e23622d55506c3fe4069b",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-aux-first-code-skips-last-length",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-aux-first-code-skips-last-length.log",
+      "sha256": "8ad8d04068e4bd2fafca1d09f816d8c262e065f12462fff0a8800d54e89ce2cd",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-aux-canonical-length-read-not-charged",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-aux-canonical-length-read-not-charged.log",
+      "sha256": "f9c345f7293ae3b4fd2f4c5d5a98acd6c61681faa0a09f3248ab1d117042e729",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-aux-candidate-read-not-charged",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-aux-candidate-read-not-charged.log",
+      "sha256": "8f1bd2b2a5e1f3dfb124412db6dddcd1a607510afae591842646cce2bd651057",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-aux-singleton-skips-last-length",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-aux-singleton-skips-last-length.log",
+      "sha256": "dd0dfc4e6d6da8f122b8b773452b492a58042b0141611b64d66dcb007f9ea384",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-simple-pair-second-read-not-charged",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-simple-pair-second-read-not-charged.log",
+      "sha256": "44a26799f65e531151b277a208ea9dc371a02be5c0beb6509bc2f11667772a76",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-simple-validation-skips-last-pair",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-simple-validation-skips-last-pair.log",
+      "sha256": "b1cd9bb1bb873801578ce5855eb5ff63b81ba8bdb219a82cad8b7f3b37566a18",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-field-planning-replay-not-charged",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-field-planning-replay-not-charged.log",
+      "sha256": "694cabfb04f6ec2c896c7e9c94d71b6b383156c6fa4b54a2e23c3ef16b9e68dd",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-saved-aux-load-not-charged",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-saved-aux-load-not-charged.log",
+      "sha256": "8c5d5be259cdd3a55ee7bc93d68df575a3a6ff611493b4bdd2b2460d1c22e963",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-saved-aux-wrong-partial-count",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-saved-aux-wrong-partial-count.log",
+      "sha256": "08f9681718883a0d333de5068ca1d26053a424b984e7d819a71cab3ba0b9f21e",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-saved-aux-skips-last-copy",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-saved-aux-skips-last-copy.log",
+      "sha256": "f14ce8dfbcad30ee3c1ab7e4f775707c3c15fca0d4a581c3789290944adfc25d",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-saved-aux-accepts-invalid-length",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-saved-aux-accepts-invalid-length.log",
+      "sha256": "a2cdcc0f89f74378bc147fa42212f91e4a06cbbb579da7072c77a511b8268a66",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-canonical-validation-read-not-charged",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-canonical-validation-read-not-charged.log",
+      "sha256": "8d2415096044922190bfa1829162d1bc05a3cfe98413a0bd6ea9835a343a7f4d",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-canonical-accepts-invalid-length",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-canonical-accepts-invalid-length.log",
+      "sha256": "768691e6cd3e48896a6bb3d258e4ec3cf19b83e3ee425d8fb3e0e0bb530d6fbe",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-canonical-accepts-incomplete-space",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-canonical-accepts-incomplete-space.log",
+      "sha256": "5645246761ef8384d8ed007a0230fb186a71ac06f8811284bc85aa40423dba60",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

@@ -1,0 +1,52 @@
+{
+  "archive": {
+    "all_members_individually_hash_verified": true,
+    "byte_reproducibility_verified": true,
+    "bytes": 32425286,
+    "metadata": "Sorted original repository-relative paths; tar PAX, uid/gid0, uname/gname empty, mode0644,mtime0; gzip filename empty,mtime0,level6",
+    "original_relative_file_count": 910,
+    "path": "m1-checked-witness-supplement.tar.gz",
+    "reproduction": "A second streamed build from the original files reproduced the exact recorded compressed byte count and SHA-256.",
+    "sha256": "8fa5afa5df21927c6bd0a1d736a49f03ad6ee5e84c55b1262fb2b75a9c6d1be0",
+    "uncompressed_file_bytes": 321487245
+  },
+  "explicit_nonclaims": [
+    "Full M1 gate completion",
+    "Native2000-action execution or trace",
+    "Negative-loop SMT completion",
+    "Compiler or source-to-binary proof",
+    "Human architectural approval"
+  ],
+  "frozen_core_and_immutable_positive03": {
+    "evidence/m1-source-receipts-final03/positive.json": "03c4b1ddbd3238dba9b8a3fc1ee903ea6ec6ccad3e10629b8034d883b8c92ce3",
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+    "target/m1-r-final-gate/driver.py": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+    "tests/proof_rejection.rs": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e"
+  },
+  "history": "All requested cap variants and failed attempts retained; every variant except final normalized isolated pair remains unqualified as a cap control. Static-only proposals unprobed. Withdrawn good-plan/bad-copy proposal is not used; actual mutable-same-variable repair retained.",
+  "internal_handoff_journal_published": false,
+  "new_checker_runs": 0,
+  "normalized_pair": {
+    "negative": "genuine literal computed-false; unchanged strict classifier accepted; no negative-loop SMT completion claimed",
+    "negative_source_sha256": "3d8831d9b413743c78b9a7dbed5afb95ab9e4cfba887a03004e82a9daf4639f0",
+    "positive": "4 verified,0 errors",
+    "positive_source_sha256": "8ed98823e7a68454600fa9a746b8d9d38cc50856d5969a40bc78792fc28a3fd0",
+    "settings": "original600/SP/global1000/ME0/default seed and loop isolation"
+  },
+  "publication_boundary": "Root must review/copy and bind this manifest in a completion receipt only after the full required gate. This supplement does not copy live control/canary output.",
+  "recognized_secret_patterns_found": false,
+  "review_copies": 25,
+  "schema": "m1-r-supplement-v1",
+  "scope": "Supplementary checked witness justification, isolated normalized pair and full requested diagnostic/repair provenance; NOT the full M1 gate.",
+  "shared_source_test_gate_evidence_canary_edits": 0,
+  "source_or_evidence_omitted_for_size": false,
+  "top_level_index_hashes": {
+    "README.txt": "b5931287b3f342cd49d7a288dd800cf190dfd21bef1da7f0aeed9d496c4eb05a",
+    "archive-files.json": "f0ddac5d6216b38893435acd132bdc701f7a6844bad8fbdd5fb04c6d4834834f",
+    "rebuild_archive.py": "ebfd24aa77b735c8b9de96525c24da28b774ea736198f17b09c35015bb390d62",
+    "review-index.json": "836be1fd0ad80f324eb174266b06b2d2785c6be63daedee6b3ad938241971ce8",
+    "status-index.json": "b33f21f35c8bda9c1b5687bec2b9f4c7b5bac336b21aa65a4095c0e74aeddbe2"
+  },
+  "witness": "Original-domain startup actually reaches Selector704 rank5695;18+0+22=40 source work,valid64->24; all17mapped exits checked unreachable. Same existing uniform certificate adequacy criterion."
+}

@@ -1,0 +1,28 @@
+{
+  "suite": "the_prover_rejects_six_k7_k8_result_contract_defects",
+  "exit_code": 101,
+  "fresh_case_logs": [
+    {
+      "name": "brotli-k7-canonical-constructor-spurious-error",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_k7_k8_result_contract_defects/canary-brotli-k7-canonical-constructor-spurious-error.log",
+      "sha256": "d525b1a1dba6016345f5819e3fc143663a88671cb417e77d057bbfc6df8e539d"
+    },
+    {
+      "name": "brotli-k8-single-constructor-spurious-error",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_k7_k8_result_contract_defects/canary-brotli-k8-single-constructor-spurious-error.log",
+      "sha256": "a588b218773e55c4f4fa2ec4d22734122bffb547eca858a8534ce3b3c89c63a1"
+    },
+    {
+      "name": "brotli-k7-singleton-install-spurious-error",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_k7_k8_result_contract_defects/canary-brotli-k7-singleton-install-spurious-error.log",
+      "sha256": "ed2ad08a49599c483938bb31f57bcdfedd4ec16f4a3e9b5261df44ea94ece69c"
+    },
+    {
+      "name": "brotli-k7-multi-install-spurious-error",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_k7_k8_result_contract_defects/canary-brotli-k7-multi-install-spurious-error.log",
+      "sha256": "912448aa0763276be97eac8a86d67262b8eeef02a048935b0ec80fecedd30db7"
+    }
+  ],
+  "source_at_failure_bundles": [],
+  "not_semantic_closure": true
+}

@@ -1,0 +1,58 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::advance_planned_compressed_action (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-8209/src/brotli_input.rs:39745:1
+      |
+39745 | / fn advance_planned_compressed_action(
+39746 | |     workspace: &mut [u8],
+39747 | |     window_bytes: u32,
+39748 | |     budget: &mut crate::brotli::RequestBudget,
+39749 | |     input: &[u8],
+39750 | |     end_of_input: bool,
+39751 | | ) -> (r: (Result<usize, CompressedStep>, Ghost<nat>))
+      | |____________________________________________________^
+
+note: function body check finished in 96 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-8209/src/brotli_input.rs:39745:1
+      |
+39745 | / fn advance_planned_compressed_action(
+39746 | |     workspace: &mut [u8],
+39747 | |     window_bytes: u32,
+39748 | |     budget: &mut crate::brotli::RequestBudget,
+39749 | |     input: &[u8],
+39750 | |     end_of_input: bool,
+39751 | | ) -> (r: (Result<usize, CompressedStep>, Ghost<nat>))
+      | |____________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-8209/src/brotli_input.rs:39788:9
+      |
+39788 | /         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 5
+39789 | |             && context_mode_handoff_domain(old(workspace)@, window_bytes) ==> {
+39790 | |                 &&& final(budget).input_remaining == old(budget).input_remaining
+39791 | |                 &&& if old(budget).work_remaining >= 18 {
+...     |
+39800 | |             },
+      | |_____________^ failed this postcondition
+...
+40241 | /             return (Err::<usize, CompressedStep>(CompressedStep { consumed: 0,
+40242 | |                 status: CompressedStatus::Failed(core_state_failure()) }), Ghost(r_header_action_source_units));
+      | |_______________________________________________________________________________________________________________- at this exit
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-8209/src/brotli_input.rs:39745:1
+      |
+39745 | / fn advance_planned_compressed_action(
+39746 | |     workspace: &mut [u8],
+39747 | |     window_bytes: u32,
+39748 | |     budget: &mut crate::brotli::RequestBudget,
+39749 | |     input: &[u8],
+39750 | |     end_of_input: bool,
+39751 | | ) -> (r: (Result<usize, CompressedStep>, Ghost<nat>))
+      | |____________________________________________________^
+
+error: aborting due to 1 previous error
+

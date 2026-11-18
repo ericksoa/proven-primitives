@@ -1,0 +1,30 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-51952/src/brotli_input.rs:18709:1
+      |
+18709 | / fn m1_tree_complete_canonical_status(installed: Result<(), CompressedHeaderError>)
+18710 | |     -> (status: SerializedTreeStatus)
+      | |____________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-install-outcome-canary-51952/src/brotli_input.rs:18712:9
+      |
+18712 | /         status == match installed {
+18713 | |             Ok(()) => SerializedTreeStatus::Complete,
+18714 | |             Err(error) => SerializedTreeStatus::Failed(error),
+18715 | |         },
+      | |_________^ failed this postcondition
+...
+18718 | /     match installed {
+18719 | |         Ok(()) => SerializedTreeStatus::Complete,
+18720 | |         Err(_error) => SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),
+18721 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

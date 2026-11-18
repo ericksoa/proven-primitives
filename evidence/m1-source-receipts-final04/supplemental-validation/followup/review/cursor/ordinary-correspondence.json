@@ -1,0 +1,33 @@
+{
+  "status": "PASS: unchanged ordinary owner body/calls and original proof contracts retained in witnessed validation entry",
+  "ordinary_tokens": 2600,
+  "ordinary_tokens_equal": true,
+  "tokens_sha256": "a801f804e4bacbe5d55166628995b718f74c8902974a5b566d690a78057ad437",
+  "one_normalization": {
+    "old": "            Ok(value) => value,",
+    "new": "            Ok(value) => { proof { assert(false); } value },",
+    "scope": "Only context_mode_planning_work match Ok arm",
+    "meaning": "Same value with a checked proof-only false assertion, proving the planner must return Err on this witnessed malformed queue."
+  },
+  "all_original_input_prefix_declarations_exact": 1136,
+  "original_args_return_requirements_guarantees_and_attributes_retained": true,
+  "actual_target_executor_call_byte_exact": "execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::ContextModes, &input[..initial_allowed],\n                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan)",
+  "actual_call_receipt5_derived_not_assigned": true,
+  "original_child_accumulation_unchanged": true,
+  "planner_Ok_arm_checked_unreachable": true,
+  "image_pass": {
+    "path": "target/m1-r-cursor-context-witness/attempts/image01/result.json",
+    "sha256": "10c822c84c92de711765255dc8d55a445d151f020376c3556ff431ea061c3eb2"
+  },
+  "owner_call_pass": {
+    "path": "target/m1-r-cursor-context-witness/attempts/owner01/result.json",
+    "sha256": "cd5c83995b1a1647d9017c1c7dbee15d0987fb4d5d0846bbd69988a7a96145c6"
+  },
+  "budget5_actual_pass": {
+    "path": "target/m1-r-suffix-fallback-witness/attempts/budget01/result.json",
+    "sha256": "4ec1e88a720e8f84d08bd6f0439c002bf990cf39c19517a8197694a140256886"
+  },
+  "removing_only_temp_additions_restores_original_input_and_budget_modules": true,
+  "new_public_or_cross_module_API": false,
+  "new_cursor_negative_runs": 0
+}

@@ -1,0 +1,48 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-71113/src/brotli_prefix.rs:2471:1
+     |
+2471 | / pub(crate) fn read_tree_metadata(
+2472 | |     workspace: &[u8],
+2473 | |     window_bytes: u32,
+2474 | |     region: TreeRegion,
+2475 | |     initialized_prefix: u16,
+2476 | |     tree: u16,
+2477 | | ) -> (r: Result<TreeMetadata, MetadataReadError>)
+     | |________________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-71113/src/brotli_prefix.rs:2479:9
+     |
+2479 | /         window_bytes <= 16_777_216
+2480 | |             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+2481 | |             && initialized_prefix <= tree_region_count(region)
+2482 | |             && tree < tree_region_count(region)
+...    |
+2485 | |                 WorkspaceError::UninitializedRecord,
+2486 | |             )),
+     | |______________^ failed this postcondition
+...
+2564 |               return Err(MetadataReadError::InvalidEncoding);
+     |               ---------------------------------------------- at this exit
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-71113/src/brotli_prefix.rs:2479:9
+     |
+2479 | /         window_bytes <= 16_777_216
+2480 | |             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+2481 | |             && initialized_prefix <= tree_region_count(region)
+2482 | |             && tree < tree_region_count(region)
+...    |
+2485 | |                 WorkspaceError::UninitializedRecord,
+2486 | |             )),
+     | |______________^ failed this postcondition
+...
+2573 |               return Err(MetadataReadError::InvalidEncoding);
+     |               ---------------------------------------------- at this exit
+
+error: aborting due to 2 previous errors
+

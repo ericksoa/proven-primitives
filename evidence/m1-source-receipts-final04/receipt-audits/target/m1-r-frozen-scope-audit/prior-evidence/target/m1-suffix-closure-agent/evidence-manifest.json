@@ -1,0 +1,109 @@
+{
+  "scope": "Input-private total malformed nonzero initial-suffix guard/plan/action/owner proofs; no main changes, whole-crate or mutants claimed",
+  "baseline_input_sha256": "208ed12f8512933e26dee925f809421b63d9a6627587efffe48e9477b483eb58",
+  "source_input_sha256": "28505721d7699d2403125fc59f19b715ac36999867408f52270b25fba820521c",
+  "patch_sha256": "c20159fbcd106c22ba902a9b307a4e27a38d550596ad6d133198cc2ad5fb6421",
+  "focused_options": [
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "300",
+    "--verify-only-module",
+    "brotli_input",
+    "--verify-function",
+    "NAME"
+  ],
+  "notes": [
+    "Existing per-function solver annotations retained.",
+    "All 8 affected/added functions passed focused checks. Root final function/model/contract text is unchanged from the135-second owner pass; the last edit only relocated a proof assertion in the actual suffix helper, which was rechecked.",
+    "Planner/W1/outer/executor layers and two owner fold lemmas passed on retained staged sources. Parent integration whole/controls remain required.",
+    "Preservation audit checks all343 original mathematical definitions,362 original runtime signatures/requirements and original guarantees. Runtime body textual projection matches after removing proof/hide/reveal statements."
+  ],
+  "logs": [
+    {
+      "path": "target/m1-suffix-closure-agent/positive-advance_initial_block_length_phase.log",
+      "sha256": "77ad51052071c2a5a21ee54578575581f9ce5713979243a7d6e79df978764961",
+      "summaries": [
+        [
+          "1",
+          "0"
+        ]
+      ]
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/positive-advance_outer_phase_once.log",
+      "sha256": "666e8e1f2e5491884e41d715bb7a8fb497b681b0382e947c4caa3091afe7ec96",
+      "summaries": [
+        [
+          "1",
+          "0"
+        ]
+      ]
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/positive-advance_planned_compressed_action.log",
+      "sha256": "a7bf2dca24946660e802f085e25488989e906121845a955e1e1cab4e4e86e2af",
+      "summaries": [
+        [
+          "1",
+          "0"
+        ]
+      ]
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/positive-execute_fixed_compressed_plan.log",
+      "sha256": "e90feae53705e9740c50cec94d06892021a2de8ae047ef3af303d7eb91e1fe86",
+      "summaries": [
+        [
+          "1",
+          "0"
+        ]
+      ]
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/positive-m1_bad_initial_suffix_owner_from_execution.log",
+      "sha256": "666e8e1f2e5491884e41d715bb7a8fb497b681b0382e947c4caa3091afe7ec96",
+      "summaries": [
+        [
+          "1",
+          "0"
+        ]
+      ]
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/positive-m1_bad_initial_suffix_owner_without_plan.log",
+      "sha256": "666e8e1f2e5491884e41d715bb7a8fb497b681b0382e947c4caa3091afe7ec96",
+      "summaries": [
+        [
+          "1",
+          "0"
+        ]
+      ]
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/positive-m1_initial_suffix_domain_partition.log",
+      "sha256": "666e8e1f2e5491884e41d715bb7a8fb497b681b0382e947c4caa3091afe7ec96",
+      "summaries": [
+        [
+          "1",
+          "0"
+        ]
+      ]
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/positive-plan_initial_suffix_action.log",
+      "sha256": "666e8e1f2e5491884e41d715bb7a8fb497b681b0382e947c4caa3091afe7ec96",
+      "summaries": [
+        [
+          "1",
+          "0"
+        ]
+      ]
+    }
+  ]
+}

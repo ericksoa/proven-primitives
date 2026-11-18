@@ -1,0 +1,98 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_twelve_k6_simple_install_metering_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T03:02:54.577658+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 195.50461570899643,
+  "finished_utc": "2026-11-17T03:06:10.081553+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_twelve_k6_simple_install_metering_defects.log",
+  "log_sha256": "14bed29af6857479259a0884612e276e1c9d9a11dc655a8b4f0fcec17f5a1587",
+  "suite": "the_prover_rejects_twelve_k6_simple_install_metering_defects",
+  "expected_mutants": 12,
+  "mutants": [
+    {
+      "name": "brotli-k6-singleton-reservation-restores-five",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-singleton-reservation-restores-five.log",
+      "sha256": "89ed0a74ad505bdfccbbea85551e27c589f56f64ae2ae6fa5830f79199045be0",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-selector-four-uses-three-symbols",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-selector-four-uses-three-symbols.log",
+      "sha256": "f7c58133e3454a0b4221600c5c60c39678830cd6942638a97bc85732d5d9b5de",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-install-omits-validation-reads",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-install-omits-validation-reads.log",
+      "sha256": "927986c767c39c0ef6398e07bf1eaceffb81aad96e637075f1385ffd0b9afcb1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-install-omits-record-probes",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-install-omits-record-probes.log",
+      "sha256": "613037b2275283e6d85cb354a2d98a9e128ea74548748cb64fde5ed006faecdc",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-triangular-correction-undercharged",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-triangular-correction-undercharged.log",
+      "sha256": "43588de385ecbc14dcb1bfeb64cbb362a1e9079e9b2d86fe6f00d8749fea0b15",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-first-record-probe-unpaid",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-first-record-probe-unpaid.log",
+      "sha256": "5cd2ef08604dc9f583f8ea3acab721f51dc99ce7b28aeb5566a7249490801cf2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-fourth-record-probe-unpaid",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-fourth-record-probe-unpaid.log",
+      "sha256": "5cd2ef08604dc9f583f8ea3acab721f51dc99ce7b28aeb5566a7249490801cf2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-range-validation-read-unpaid",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-range-validation-read-unpaid.log",
+      "sha256": "6e450ef2c0fcac6eed1dbb0fc8dc1a814bfa37c7cf5892d993125fdd406b8d65",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-distinctness-right-read-unpaid",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-distinctness-right-read-unpaid.log",
+      "sha256": "de7bdf2d36ecb3b0cbd001e956a6e027398c9b39ee7d4dab5abeac9a58e3b0a6",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-singleton-final-read-unpaid",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-singleton-final-read-unpaid.log",
+      "sha256": "304bde5c1f7d8441161a672490ba3d26c1a3a596756bcc40439d4622c447241b",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-adapter-omits-installation-reservation",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-adapter-omits-installation-reservation.log",
+      "sha256": "ed9b9a5aef305190871195fdfa6a70c59de4c55a960e9aa3a236a57449e3920e",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k6-installer-reads-before-destination-guard",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k6-installer-reads-before-destination-guard.log",
+      "sha256": "fd2452aa0e340e6c5a5c76fc9c9eed027e68073f9fec068d5acecf823fa4bed5",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

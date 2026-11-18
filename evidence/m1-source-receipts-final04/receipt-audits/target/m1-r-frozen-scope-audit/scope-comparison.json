@@ -1,0 +1,325 @@
+{
+  "status": "read-only exact-byte comparison, not human approval or a new validation run",
+  "frozen_proposal_input_sha256": "f1a37362e128944c9c0ca49f00f30c172270677140e60027d3d655c46d831eef",
+  "actual_pre_R_baseline_input_sha256": "e10c61b1354c5b1debef9e76aa55b412d06e35de210cb8949a73ef33b912da23",
+  "proposal_prefix_and_both_archived_prefix_sha256": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03",
+  "core_counts": {
+    "f1a": {
+      "spec": 416,
+      "proof": 313,
+      "exec": 322
+    },
+    "e10c": {
+      "spec": 424,
+      "proof": 317,
+      "exec": 322
+    }
+  },
+  "preexisting_exec_helpers": 322,
+  "removed_declarations": [],
+  "new_declarations": [
+    {
+      "id": "brotli_input::m1_bad_initial_suffix",
+      "kind": "spec",
+      "e10c_line": 23017,
+      "attributes": [
+        "#[verifier::opaque]"
+      ]
+    },
+    {
+      "id": "brotli_input::m1_bad_initial_suffix_owner_effect",
+      "kind": "spec",
+      "e10c_line": 23056,
+      "attributes": [
+        "#[verifier::opaque]"
+      ]
+    },
+    {
+      "id": "brotli_input::m1_bad_initial_suffix_owner_from_execution",
+      "kind": "proof",
+      "e10c_line": 23091,
+      "attributes": []
+    },
+    {
+      "id": "brotli_input::m1_bad_initial_suffix_owner_without_plan",
+      "kind": "proof",
+      "e10c_line": 23082,
+      "attributes": []
+    },
+    {
+      "id": "brotli_input::m1_bad_initial_suffix_plan",
+      "kind": "spec",
+      "e10c_line": 23036,
+      "attributes": [
+        "#[verifier::opaque]"
+      ]
+    },
+    {
+      "id": "brotli_input::m1_bad_initial_suffix_validation_reads",
+      "kind": "spec",
+      "e10c_line": 23029,
+      "attributes": [
+        "#[verifier::opaque]"
+      ]
+    },
+    {
+      "id": "brotli_input::m1_context_bad_saved_cursor",
+      "kind": "spec",
+      "e10c_line": 23218,
+      "attributes": [
+        "#[verifier::opaque]"
+      ]
+    },
+    {
+      "id": "brotli_input::m1_context_cursor_failure_plan",
+      "kind": "spec",
+      "e10c_line": 23227,
+      "attributes": [
+        "#[verifier::opaque]"
+      ]
+    },
+    {
+      "id": "brotli_input::m1_context_cursor_owner_effect",
+      "kind": "spec",
+      "e10c_line": 23234,
+      "attributes": [
+        "#[verifier::opaque]"
+      ]
+    },
+    {
+      "id": "brotli_input::m1_initial_suffix_domain_partition",
+      "kind": "proof",
+      "e10c_line": 23044,
+      "attributes": []
+    },
+    {
+      "id": "brotli_input::m1_suffix_fallback_image",
+      "kind": "spec",
+      "e10c_line": 23119,
+      "attributes": [
+        "#[verifier::opaque]"
+      ]
+    },
+    {
+      "id": "brotli_input::m1_suffix_fallback_image_is_admitted",
+      "kind": "proof",
+      "e10c_line": 23129,
+      "attributes": []
+    }
+  ],
+  "changed_existing_spec_definitions": [],
+  "changed_existing_proof_functions": [],
+  "ordinary_arguments_requires_return_and_old_guarantees_preservation": true,
+  "ordinary_interface_preservation_violations": [],
+  "changed_existing_exec_declarations": [
+    {
+      "id": "brotli_input::CompressedMetaBlockDecoder::advance_context_maps_phase",
+      "f1a_line": 25293,
+      "e10c_line": 25490,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": false,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::CompressedMetaBlockDecoder::advance_initial_block_length_phase",
+      "f1a_line": 24721,
+      "e10c_line": 24908,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::CompressedMetaBlockDecoder::advance_outer_phase_once",
+      "f1a_line": 25771,
+      "e10c_line": 25972,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": false,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::advance_context_bits_phase",
+      "f1a_line": 20329,
+      "e10c_line": 20330,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::advance_context_map",
+      "f1a_line": 21623,
+      "e10c_line": 21634,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [
+        "#[verifier::rlimit(500)]"
+      ],
+      "e10c_attributes": [
+        "#[verifier::rlimit(500)]"
+      ]
+    },
+    {
+      "id": "brotli_input::advance_context_tree_count_phase",
+      "f1a_line": 21053,
+      "e10c_line": 21059,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::advance_planned_compressed_action",
+      "f1a_line": 36741,
+      "e10c_line": 37056,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [
+        "#[verifier::spinoff_prover]",
+        "#[verifier::rlimit(1000)]"
+      ],
+      "e10c_attributes": [
+        "#[verifier::spinoff_prover]",
+        "#[verifier::rlimit(1000)]"
+      ]
+    },
+    {
+      "id": "brotli_input::advance_planned_context_bits",
+      "f1a_line": 35628,
+      "e10c_line": 35926,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": true,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::advance_planned_context_tree_count",
+      "f1a_line": 35175,
+      "e10c_line": 35442,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": true,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::execute_fixed_compressed_plan",
+      "f1a_line": 34209,
+      "e10c_line": 34437,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::install_completed_simple_tree",
+      "f1a_line": 15451,
+      "e10c_line": 15452,
+      "contract_changed": false,
+      "proof_or_runtime_body_changed": false,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": [
+        "#[verifier::spinoff_prover]"
+      ]
+    },
+    {
+      "id": "brotli_input::plan_context_bits_action",
+      "f1a_line": 35298,
+      "e10c_line": 35582,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::plan_context_mode_action",
+      "f1a_line": 29390,
+      "e10c_line": 29602,
+      "contract_changed": false,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::plan_context_tree_count_action",
+      "f1a_line": 34726,
+      "e10c_line": 34979,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    },
+    {
+      "id": "brotli_input::plan_initial_suffix_action",
+      "f1a_line": 29670,
+      "e10c_line": 29888,
+      "contract_changed": true,
+      "proof_or_runtime_body_changed": true,
+      "projected_runtime_body_changed": false,
+      "f1a_attributes": [],
+      "e10c_attributes": []
+    }
+  ],
+  "changed_projected_runtime_functions": [
+    "brotli_input::advance_planned_context_bits",
+    "brotli_input::advance_planned_context_tree_count"
+  ],
+  "runtime_projection_limit": "Explicit proof blocks, ghost/tracked declarations, reveal/hide calls, loop invariants/decreases, comments and whitespace are removed only for static comparison. No compiler erasure or semantic equivalence check was run.",
+  "helper_graph": {
+    "exec_ids_unchanged": true,
+    "old_edge_pairs": 753,
+    "new_edge_pairs": 759,
+    "added_edges": [
+      {
+        "caller": "brotli_input::advance_planned_context_bits",
+        "callee": "brotli_input::core_state_failure"
+      },
+      {
+        "caller": "brotli_input::advance_planned_context_bits",
+        "callee": "brotli_input::execute_fixed_compressed_plan"
+      },
+      {
+        "caller": "brotli_input::advance_planned_context_bits",
+        "callee": "brotli_input::state_byte"
+      },
+      {
+        "caller": "brotli_input::advance_planned_context_tree_count",
+        "callee": "brotli_input::core_state_failure"
+      },
+      {
+        "caller": "brotli_input::advance_planned_context_tree_count",
+        "callee": "brotli_input::execute_fixed_compressed_plan"
+      },
+      {
+        "caller": "brotli_input::advance_planned_context_tree_count",
+        "callee": "brotli_input::state_byte"
+      }
+    ],
+    "removed_edges": [],
+    "limit": "Exec-name call graph from exact complete function bodies; one preexisting reset receiver ambiguity is retained in both graphs."
+  },
+  "observations": [
+    "f1a and e10c are distinct retained pre-R source states; neither archive contains explicit Approach R return pairs.",
+    "The only ordinary runtime body changes are two existing B3c context-cursor owners. Their StateEncoding planner rejection now selects existing Literal/DistanceContextMap phase, builds existing CompressedActionPlan terminal5, and invokes existing execute_fixed_compressed_plan/W1. Before: direct error, no terminal image or work debit. After: exact five-unit reservation before terminal writes, or ResourceLimit with unchanged workspace/budget on short credit.",
+    "No ordinary function node is added/removed. Ordinary arguments, return types, requirements and all previous guarantees are retained across322 helpers. Thirteen existing exec contracts gain guarantees; one additional exec body changes only proof visibility; install_completed_simple_tree gains spinoff_prover.",
+    "Eight input-private spec definitions and four proof functions are added for malformed suffix/context domains and owner effects. All416 existing spec definitions and all313 existing proof functions retain exact normalized bodies/signatures under this declaration scanner. These additions are not Approach R receipt carriers.",
+    "Across43 archived source/test/config files, only input.rs and proof_rejection.rs differ. Prefix, all other modules, dependencies, toolchain configs, fixture data and workspace representations are byte-identical.",
+    "The runtime call graph changes within existing input-private helpers. The changed owners use the existing B3c reservation owner, existing terminal plan representation and existing W1 mutator. No new cross-module boundary, module, runtime/dependency, signature, representation, unit constant, reset charge or public/W1 interface appears in this delta.",
+    "Whether an actual source mismatch is covered by a human approval is not decided here. The proposal's f1a frozen scope and the actual e10c preimplementation baseline remain separately identified; this evidence does not rewrite either or confer approval."
+  ]
+}

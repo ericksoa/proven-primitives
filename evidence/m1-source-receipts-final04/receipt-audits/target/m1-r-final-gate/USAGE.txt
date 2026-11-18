@@ -1,0 +1,35 @@
+Target-only P1 final R gate. No checks have been executed by preparing this bundle.
+
+Before running:
+- Finish the real tree executor proof and source-bound receipt audits.
+- Apply the combined R control adaptations, baseline-five repairs and new R suite.
+- Retain frozen-scope-audit.json as separate lineage evidence. Its proposal input
+  f1a373... and actual preimplementation input e10c61... are distinct identities.
+  This driver binds both; it does not infer human approval or assert byte equality.
+- Freeze source/tests/build inputs, this driver, all bundled inputs and pinned tools.
+
+From the final repository/candidate root, using a fresh evidence tag:
+
+python3 /ABSOLUTE/PATH/target/m1-r-final-gate/driver.py positive --tag TAG
+python3 /ABSOLUTE/PATH/target/m1-r-final-gate/driver.py controls --tag TAG
+
+Positive commands/flags are the original four runtime checks and the entire-crate
+Verus --no-cheating check, eight threads, silent triggers and rlimit300. Per-function
+source annotations remain untouched. Control concurrency remains three.
+
+The mandatory manifest is the union of the exact prior37, all affected suites,
+the baseline-five suites, and every newly added Brotli defect suite discovered
+against the complete preexisting suite-name inventory. At least one new Brotli
+suite is required; absence fails before runtime/prover/control commands.
+
+--suite NAME remains available for diagnostics only. A subset never produces a
+full-control completion claim. Each attempt has an immutable subdirectory, exact
+one executed test per suite, fresh case logs and frozen identity/source/tool hashes.
+Syntax, type, resource and panic failures cannot count as semantic rejection.
+
+Only a full successful attempt produces controls-complete.json and the hash-bound
+evidence-package.json plus frozen-source.tar.gz. These are validation artifacts,
+not an M1/decoder completion or architectural-approval attestation.
+
+After controls, follow RESTORE_CANARIES.txt and canary-restoration-manifest.json.
+Preserve tagged evidence first; never blindly restore the whole evidence folder.

@@ -1,0 +1,319 @@
+{
+  "status": "QUALIFIED ISOLATED LITERAL REPAIR; UNAPPLIED; NOT FULL CONTROL CLOSURE",
+  "suite": "the_prover_rejects_six_b3b_cross_call_state_defects",
+  "case": "brotli-b3b-step-bypasses-sticky-failure-helper",
+  "case_ordinal": 4,
+  "literal_update": {
+    "name": "brotli-b3b-step-bypasses-sticky-failure-helper",
+    "function": "CompressedMetaBlockDecoder::step_with_receipt",
+    "old": "                    return (self.repeat_terminal_failure(error), Ghost(r_w1_step_source_units));",
+    "original_new": "                    return (CompressedHeaderStep { consumed: input.len(), status: CompressedHeaderStatus::Failed(error) }, Ghost(r_w1_step_source_units));",
+    "new": "                    if input.len() == 1 {\n                        return (CompressedHeaderStep { consumed: input.len(), status: CompressedHeaderStatus::Failed(error) }, Ghost(r_w1_step_source_units));\n                    } else {\n                        return (CompressedHeaderStep { consumed: input.len(), status: CompressedHeaderStatus::Failed(error) }, Ghost(r_w1_step_source_units));\n                    }",
+    "change_scope": "Replace only this existing tuple new-mutation literal. Name, function selector, production anchor and all acceptance assertions remain unchanged."
+  },
+  "positive_preflight_requirement": {
+    "selected_function": "CompressedMetaBlockDecoder::step_with_receipt",
+    "observed": {
+      "name": "positive",
+      "command": [
+        "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+        "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-cross-call-split-triage/positive/src/lib.rs",
+        "--crate-type",
+        "lib",
+        "--verify-only-module",
+        "brotli_input",
+        "--verify-function",
+        "CompressedMetaBlockDecoder::step_with_receipt",
+        "--no-cheating",
+        "--num-threads",
+        "1",
+        "--triggers-mode",
+        "silent",
+        "--rlimit",
+        "1000",
+        "--multiple-errors",
+        "0"
+      ],
+      "cwd": "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-cross-call-split-triage/positive",
+      "environment": {
+        "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+        "RUSTUP_TOOLCHAIN": "1.99.1"
+      },
+      "started_ns": 1794956548544343000,
+      "elapsed_seconds": 25.07570829099859,
+      "exit_code": 0,
+      "verification": {
+        "verified": 2,
+        "errors": 0
+      },
+      "actual_positive_pass": true,
+      "semantic_diagnostic_present": false,
+      "resource_or_tool_failure": false,
+      "qualified_semantic_rejection": false,
+      "log": {
+        "path": "target/m1-r-cross-call-split-triage/positive/verifier.log",
+        "sha256": "8dc4d151dd193a3f9d76865a63af2aab52e2e77b1bc1627a4e4097739e667eea"
+      },
+      "source_files": {
+        "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+        "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+        "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+        "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+        "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+        "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+        "brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+        "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+        "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+        "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+        "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+      },
+      "counts_as_full_gate": false
+    },
+    "ordinary_step_wrapper_is_not_substitute": true,
+    "full_suite_must_check_same_selected_unmutated_root_before_this_mutant": true,
+    "existing_positive_checks_need_not_be_removed": true
+  },
+  "negative_diagnostic": {
+    "name": "split-mutant",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-cross-call-split-triage/split-mutant/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "CompressedMetaBlockDecoder::step_with_receipt",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "cwd": "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-cross-call-split-triage/split-mutant",
+    "environment": {
+      "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+      "RUSTUP_TOOLCHAIN": "1.99.1"
+    },
+    "started_ns": 1794956573633379000,
+    "elapsed_seconds": 58.99767199999769,
+    "exit_code": 1,
+    "verification": {
+      "verified": 1,
+      "errors": 1
+    },
+    "actual_positive_pass": false,
+    "semantic_diagnostic_present": true,
+    "resource_or_tool_failure": false,
+    "qualified_semantic_rejection": true,
+    "log": {
+      "path": "target/m1-r-cross-call-split-triage/split-mutant/verifier.log",
+      "sha256": "1b3a108dab367392c730856071c022fd88e7eaa224270f27d27ecc8f25c1013f"
+    },
+    "source_files": {
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_input.rs": "7fa7b6583bb04964b44300b7bdb288aa9f8bafad6a763709c703cafdaf94ef51",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+    },
+    "counts_as_full_gate": false
+  },
+  "semantic_rejection": {
+    "kind": "postcondition not satisfied",
+    "unchanged_old_binding": "b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_OUTER_PHASE) >= 11 ==> r.0.consumed == 0",
+    "postcondition_line": 28012,
+    "split_return_line": 28111,
+    "loop_check_seconds": 38,
+    "resource_or_tool_failure": false
+  },
+  "equivalence": {
+    "basis": "Both exhaustive input.len()==1 branches are textually identical to the full original fault: consumed=input.len(), status=Failed(error), Ghost(current source counter).",
+    "branch_statements_identical": true,
+    "all_input_lengths_preserved": true,
+    "wrong_result_for_input_len_gt_1_retained": true,
+    "zero_length_behavior_unchanged": true,
+    "no_admitted_domain_narrowing": true,
+    "no_error_guard_or_call_order_change_before_return": true,
+    "extra_scalar_comparison_units": 0,
+    "existing_unit_policy_unchanged": true,
+    "new_checked_equivalence_lemma_claimed": false,
+    "static_preservation_audit": {
+      "path": "target/m1-r-cross-call-split-triage/preservation-audit.json",
+      "sha256": "28ed884667f506fdbc1a8de17222e34379b4edcc55c2ebaa853d2e61a74a374b"
+    }
+  },
+  "source_bindings": {
+    "root_arguments_requirements_guarantees_models_assertions_invariants_decreases_and_flags_unchanged": true,
+    "current_Ghost_counter_and_updates_unchanged": true,
+    "all_existing_attributes_unchanged": true,
+    "new_proof_hint_or_helper": false,
+    "main_core_after": {
+      "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15"
+    },
+    "tests_snapshot_during_diagnostic": "445cfdf67eebcffa341136900217862b7fedfa8e7245204fc13d6c41960dbca3",
+    "reference_whole_positive": {
+      "path": "evidence/m1-source-receipts-final02/positive.json",
+      "sha256": "86d4e79af18845dc26949de1b75c6627a683242b78aeb22a0e23b932466f172f"
+    }
+  },
+  "original_stall": {
+    "classification": "Interrupted unresolved; not semantic rejection and no reported rlimit result",
+    "retained_original_mutant": {
+      "path": "target/m1-r-cross-call-split-triage/retained-original-mutant.rs.txt",
+      "sha256": "5359506cb569f8d66c94d725186be56abceae7b49f0867f814d14f9d736eeabd"
+    },
+    "interruption": {
+      "path": "target/m1-r-cross-call-stall02/interruption.json",
+      "sha256": "f875944327c3fe2a0afa56fdf7e3e4bdc1d5e033d05ba786671babf2a29dd69f"
+    },
+    "orphan_solver_interruption": {
+      "path": "target/m1-r-cross-call-stall02/orphan-solver-interruption.json",
+      "sha256": "042ca6eacf96e6a6f7e2c4db6510b50c38203e0edb0000c7169070791cb826ff"
+    },
+    "source_archive": {
+      "path": "target/m1-r-cross-call-stall02/stalled-mutant-source.tar.gz",
+      "sha256": "3ca9f0ef798023ac06fbd0bc0a3bf6bb91167e22ef03312b3491218b3a396d7c"
+    },
+    "selected_process_lines": [
+      "  PID  PPID     ELAPSED      TIME COMMAND",
+      "48649 48648    01:01:33   0:00.04 /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/release/deps/proof_rejection-3aa537053cca6f16 the_prover_rejects_six_b3b_cross_call_state_defects --ignored --exact --nocapture",
+      "49820 48649       58:31   0:17.54 /Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/rust_verify /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-48649/src/lib.rs --crate-type lib --verify-only-module brotli_input --verify-function CompressedMetaBlockDecoder::step_with_receipt --no-cheating --num-threads 1 --triggers-mode silent --rlimit 1000 --multiple-errors 0",
+      "49917 49820       58:13  57:43.35 /Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/./z3 -smt2 -in"
+    ],
+    "source_archive_original_hash_matches_record": true,
+    "original_suite_log": {
+      "path": "evidence/m1-source-receipts-final02/control-attempts/1794950778669754000/controls-the_prover_rejects_six_b3b_cross_call_state_defects.log",
+      "sha256": "33bb04b45ef9e45b79295772383b33d41d273f4433b2b6d153d504018a1ab634"
+    },
+    "original_suite_row": {
+      "path": "evidence/m1-source-receipts-final02/control-attempts/1794950778669754000/control-the_prover_rejects_six_b3b_cross_call_state_defects.json",
+      "sha256": "8a9f681487055f89de014bb0daad1c121b2de4c8542eb79a439ff980b99d120f"
+    }
+  },
+  "R_expansion_causality": {
+    "established": false,
+    "source_comparison": {
+      "path": "target/m1-r-cross-call-split-triage/source-delta.json",
+      "sha256": "6f73cc0d215a177ee1a811241ec0fd3201fd190b865ded61539bbc1dfbf19d3b"
+    },
+    "diff": {
+      "path": "target/m1-r-cross-call-split-triage/original-root-vs-R.diff",
+      "sha256": "c3de274b710733c2ff7837ffaee3d6f4ef6fb32303215d10a510a3f9ca55750c"
+    },
+    "findings": "Root body grew 4071 to5242 bytes and child advance_outer_phase_once header grew8411 to11275 bytes through receipt propagation. Existing terminal/state models, load_outer_phase and repeat_terminal_failure are byte-exact. No exact-base mutant comparison or solver profile was run.",
+    "diagnostic_implication": "The identical-fault branch split obtains a semantic rejection under the original current root and flags, without changing source proofs or contracts. It does not establish which R term caused the original solver stall."
+  },
+  "original_suite_partial_evidence": [
+    {
+      "case": "brotli-b3b-pending-span-is-not-drained",
+      "ordinal": 1,
+      "executed_in_original_suite": true,
+      "eligible_as_semantic_partial_evidence": true,
+      "log": {
+        "path": "target/m1-r-cross-call-split-triage/retained-canaries/canary-brotli-b3b-pending-span-is-not-drained.log",
+        "sha256": "ac4c93da3ed50c5025d5904b89911b81fa5146b492c5dec6c7233e6bbd554959"
+      },
+      "fresh_after_suite_start": true
+    },
+    {
+      "case": "brotli-b3b-sticky-failure-consumes-one-byte",
+      "ordinal": 2,
+      "executed_in_original_suite": true,
+      "eligible_as_semantic_partial_evidence": true,
+      "log": {
+        "path": "target/m1-r-cross-call-split-triage/retained-canaries/canary-brotli-b3b-sticky-failure-consumes-one-byte.log",
+        "sha256": "dea78840413fde52c756aa3352716df66e239e5dbb8015871341da12efa2a94f"
+      },
+      "fresh_after_suite_start": true
+    },
+    {
+      "case": "brotli-b3b-sticky-failure-becomes-need-input",
+      "ordinal": 3,
+      "executed_in_original_suite": true,
+      "eligible_as_semantic_partial_evidence": true,
+      "log": {
+        "path": "target/m1-r-cross-call-split-triage/retained-canaries/canary-brotli-b3b-sticky-failure-becomes-need-input.log",
+        "sha256": "fabe2d28b85fe5e023b2c361156cb2c1178579de65bc25a6968dadd33887dff9"
+      },
+      "fresh_after_suite_start": true
+    },
+    {
+      "case": "brotli-b3b-step-bypasses-sticky-failure-helper",
+      "ordinal": 4,
+      "executed_in_original_suite": true,
+      "eligible_as_semantic_partial_evidence": false,
+      "log": {
+        "path": "target/m1-r-cross-call-split-triage/retained-canaries/canary-brotli-b3b-step-bypasses-sticky-failure-helper.log",
+        "sha256": "2f03e62a4ee13df8741cbe6d6f22d20304484c03276246b6ae98ff30e619c060"
+      },
+      "fresh_after_suite_start": true,
+      "status": "interrupted unresolved; no semantic diagnostic or verifier final counts"
+    },
+    {
+      "case": "brotli-b3b-context-progress-leaves-stale-initialized-length",
+      "ordinal": 5,
+      "executed_in_original_suite": false,
+      "eligible_as_semantic_partial_evidence": false,
+      "status": "not reached; any existing global log excluded regardless of age"
+    },
+    {
+      "case": "brotli-b3b-context-mtf-leaves-stale-reuse-bound",
+      "ordinal": 6,
+      "executed_in_original_suite": false,
+      "eligible_as_semantic_partial_evidence": false,
+      "status": "not reached; any existing global log excluded regardless of age"
+    }
+  ],
+  "references": {
+    "preparation": {
+      "path": "target/m1-r-cross-call-split-triage/preparation.json",
+      "sha256": "6897ea61914ea80bb6ae29caf7fb2e8cae219db73962644dcd89a987932a3e22"
+    },
+    "comparison": {
+      "path": "target/m1-r-cross-call-split-triage/comparison-result.json",
+      "sha256": "19ac4eed317d07f6dcb13c110eec686ebbf0b813341d515ef3a1e570d7bc508e"
+    },
+    "runner": {
+      "path": "target/m1-r-cross-call-split-triage/run.py",
+      "sha256": "ecfb9e670ad376ecba58c3561c61241e7eb4416d6e250f1f86bbc5b656bd6bf3"
+    }
+  },
+  "counts": {
+    "new_checker_invocations": 2,
+    "positive": {
+      "verified": 2,
+      "errors": 0
+    },
+    "negative": {
+      "verified": 1,
+      "errors": 1
+    },
+    "original_fresh_semantic_cases": 3,
+    "original_interrupted_cases": 1,
+    "original_unreached_cases": 2,
+    "full_suites_satisfied_by_diagnostic": 0
+  },
+  "disposition": {
+    "applied": false,
+    "main_source_edits": 0,
+    "test_edits": 0,
+    "gate_edits": 0,
+    "root_canary_writes": 0,
+    "additional_checks": 0,
+    "counts_as_full_gate": false,
+    "fresh_whole_positive_and_full_controls_required_after_collective_fixes": true,
+    "next_step_owner": "Parent"
+  }
+}

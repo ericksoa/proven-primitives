@@ -1,0 +1,21 @@
+verification results:: 4 verified, 2 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: invariant not satisfied before loop
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-82032/src/brotli_prefix.rs:3289:17
+     |
+3289 |                 source_reads == i as nat * i as nat + 1 + 2 * j as nat,
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-82032/src/brotli_prefix.rs:3411:16
+     |
+3411 |           assert(count as nat * count as nat
+     |  ________________^
+3412 | |             == count as nat * ((count as nat - 1) as nat) / 2
+3413 | |                 + count as nat * (count as nat + 1) / 2) by {
+     | |_______________________________________________________^ assertion failed
+
+error: aborting due to 2 previous errors
+

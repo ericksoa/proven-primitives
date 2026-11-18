@@ -1,0 +1,67 @@
+--- a/tests/proof_rejection.rs
++++ b/tests/proof_rejection.rs
+@@ -5642,9 +5642,50 @@
+         let indent = original[..start].rsplit('\n').next().unwrap().len();
+         let closing = format!("\n{}}}\n", " ".repeat(indent));
+         let end = start + original[start..].find(&closing).expect("selected function ends") + closing.len();
+-        let selected = &original[start..end];
++        let mut selected = original[start..end].to_string();
+         let opening = format!("\n{}{{\n", " ".repeat(indent));
+         let body = selected.find(&opening).expect("function body");
++        if name == "brotli-m1-malformed-suffix-fallback-undercharge" {
++            // The admitted outer=3/subphase=2 witness reaches this reservation
++            // with five units. The unchanged owner debit requires zero left.
++            assert_eq!(old, "        if !budget.charge_work(4 + 1) {");
++            assert_eq!(new, "        if !budget.charge_work( if initial_outer == 3 { 4 } else { 4 + 1 } ) {");
++            let receipt = "        proof { assert(if (4 + 1) == 5u64 { true } else { false }) by (compute_only); }\n";
++            let bad_receipt = "        proof { assert(if (if 3u8 == 3 { 4 } else { 4 + 1 }) == 5u64 { true } else { false }) by (compute_only); }\n";
++            assert_eq!(selected[body..].matches(old).count(), 1);
++            selected = selected.replacen(old, &format!("{receipt}{old}"), 1);
++            fs::write(&path, format!("{}{}{}", &original[..start], selected, &original[end..])).unwrap();
++            let positive = check_brotli_input_function(&verus, &temporary, function);
++            fs::write(project.join("evidence/positive-brotli-m1-malformed-suffix-fallback-debit.log"), transcript(&positive)).unwrap();
++            assert!(positive.status.success(), "unchanged fallback debit positive failed: {}", transcript(&positive));
++            assert_eq!(selected[body..].matches(receipt).count(), 1);
++            selected = selected.replacen(receipt, bad_receipt, 1);
++            let preview = selected.replacen(old, new, 1);
++            assert_eq!(preview[body..].matches(bad_receipt).count(), 1);
++            assert_eq!(preview[body..].matches(new).count(), 1);
++        } else if name == "brotli-m1-malformed-suffix-fallback-writes-byte175" {
++            // The checked original frame carries the model byte zero to this
++            // reached point. Keep the healthy body free of an extra write.
++            let actual_put_value: u8 = new.strip_prefix(old)
++                .and_then(|tail| tail.strip_prefix("\n        if initial_outer == 3 {\n            let _ = put_state_byte(workspace, window_bytes, 175, "))
++                .and_then(|tail| tail.strip_suffix(");\n        }"))
++                .expect("unchanged extra-write guard and target")
++                .parse().expect("literal extra-write value");
++            assert_eq!(actual_put_value, 1);
++            let receipt = "\n        proof { assert(if 0u8 == 0u8 { true } else { false }) by (compute_only); }";
++            let bad_receipt = format!("\n        proof {{ assert(if {actual_put_value}u8 == 0u8 {{ true }} else {{ false }}) by (compute_only); }}");
++            assert_eq!(selected[body..].matches(old).count(), 1);
++            selected = selected.replacen(old, &format!("{old}{receipt}"), 1);
++            fs::write(&path, format!("{}{}{}", &original[..start], selected, &original[end..])).unwrap();
++            let positive = check_brotli_input_function(&verus, &temporary, function);
++            fs::write(project.join("evidence/positive-brotli-m1-malformed-suffix-fallback-byte175.log"), transcript(&positive)).unwrap();
++            assert!(positive.status.success(), "unchanged fallback byte positive failed: {}", transcript(&positive));
++            assert_eq!(selected[body..].matches(receipt).count(), 1);
++            selected = selected.replacen(receipt, bad_receipt.as_str(), 1);
++            let preview = selected.replacen(old, new, 1);
++            assert_eq!(preview[body..].matches(bad_receipt.as_str()).count(), 1);
++            assert_eq!(preview[body..].matches(new).count(), 1);
++        }
+         let (scope_start, scope_end) = (body, selected.len());
+         assert_eq!(selected[scope_start..scope_end].matches(old).count(), 1, "unique body mutation for {name}");
+         let replacement = format!("{}{}{}", &selected[..scope_start],
+@@ -5660,7 +5701,11 @@
+             || log.contains("precondition not satisfied")
+             || log.contains("requires not satisfied")
+             || log.contains("invariant not satisfied")
+-            || log.contains("assertion failed"),
++            || log.contains("assertion failed")
++            || ((name == "brotli-m1-malformed-suffix-fallback-undercharge"
++                || name == "brotli-m1-malformed-suffix-fallback-writes-byte175")
++                && log.contains("error: expression simplifies to false")
++                && log.contains("by (compute_only)")),
+             "expected a proof rejection, not a tooling error: {log}");
+         let lower = log.to_ascii_lowercase();
+         assert!(!lower.contains("resource limit") && !lower.contains("panicked")

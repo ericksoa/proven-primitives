@@ -1,0 +1,161 @@
+{
+  "entries_checked": 579,
+  "first_supplement_verified_immutable": {
+    "archive_sha256": "8fa5afa5df21927c6bd0a1d736a49f03ad6ee5e84c55b1262fb2b75a9c6d1be0",
+    "artifact_map_sha256": "d51f4f1eea22e82ccbfa0e06100e2b759c1c9ae8237360894488cca09b291fa3",
+    "manifest_sha256": "89734c8f58d911da782ae47adea4169eb15f963855ba450680804fae6667b8d8"
+  },
+  "historical_subset_resolutions_count": 3,
+  "maps": [
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 39,
+      "historical_subset_resolutions": [],
+      "map_sha256": "29aab2af7bf4b13a9764a7779ed3a527949339205e76ceb3d1ce46fe29bb3ead",
+      "original_map": "target/m1-r-field-truncation-split-diagnostic/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 6,
+      "historical_subset_resolutions": [
+        {
+          "map_entry": "canary-brotli-m1-malformed-suffix-fallback-undercharge.log",
+          "reason": "Historical broad failed03 map copied into a field-only subset; other exact siblings are retained in the included canonical immutable failure directory.",
+          "resolved_original_path": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000/canary-brotli-m1-malformed-suffix-fallback-undercharge.log",
+          "sha256": "d985e3eafc521e5419db8530609e64f473e0af867214838f38eb5038b57709ed"
+        },
+        {
+          "map_entry": "control-the_prover_rejects_five_m1_malformed_suffix_defects.json",
+          "reason": "Historical broad failed03 map copied into a field-only subset; other exact siblings are retained in the included canonical immutable failure directory.",
+          "resolved_original_path": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000/control-the_prover_rejects_five_m1_malformed_suffix_defects.json",
+          "sha256": "d8700e0b256d66947e962bb3a2d91d423ea54fd889e2b517d79c3c16eac5dbf5"
+        },
+        {
+          "map_entry": "controls-the_prover_rejects_five_m1_malformed_suffix_defects.log",
+          "reason": "Historical broad failed03 map copied into a field-only subset; other exact siblings are retained in the included canonical immutable failure directory.",
+          "resolved_original_path": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000/controls-the_prover_rejects_five_m1_malformed_suffix_defects.log",
+          "sha256": "3ce33a1257f4b81b06cac0aba9c2b2b3f91cc2ce7b4303ff2bc761a5d300de0f"
+        }
+      ],
+      "map_sha256": "e624da58d57e99eb2e4c90a323193eac10f0bd1a360b7dcca9970bca6a8c1160",
+      "original_map": "target/m1-r-field-truncation-split-diagnostic/retained-failed03/file-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 63,
+      "historical_subset_resolutions": [],
+      "map_sha256": "5a23355dbf03c568a11803008aa301eae9f699d9dff16cea5449617ad74a1984",
+      "original_map": "target/m1-r-field-truncation-witness/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 18,
+      "historical_subset_resolutions": [],
+      "map_sha256": "b6f2b0a6b014b8708230d2864a3528a65a5b77c3f44108dffe1d1ea1f1693981",
+      "original_map": "target/m1-r-field-truncation-computed-diagnostic/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 36,
+      "historical_subset_resolutions": [],
+      "map_sha256": "72d2b9c3c94183713efa6768e18e741a19274483049a05b0748d9844757de1fd",
+      "original_map": "target/m1-r-field-truncation-computed-effort1000-diagnostic/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 41,
+      "historical_subset_resolutions": [],
+      "map_sha256": "a2f42ea7914a4f8fce8914afd2a35c4170927cf9737d9d6902b6f3262a9c7af4",
+      "original_map": "target/m1-r-field-truncation-computed-multiline-diagnostic/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 45,
+      "historical_subset_resolutions": [],
+      "map_sha256": "601eb112305a00c228108cf9654d99d786478ebf98082d05c76e3d5312c0c01e",
+      "original_map": "target/m1-r-suffix-fallback-distributed-charge-diagnostic/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 51,
+      "historical_subset_resolutions": [],
+      "map_sha256": "29daf20465db671e8c316499e14b2da1315471035b975d6807fd60ffc4925bd3",
+      "original_map": "target/m1-r-suffix-fallback-witness/precharge-artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 35,
+      "historical_subset_resolutions": [],
+      "map_sha256": "3e5ebc651187d27cdf128b3a61f20e96e1717e115ef70f8021e2c79c95794a61",
+      "original_map": "target/m1-r-suffix-fallback-witness/terminal-artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 35,
+      "historical_subset_resolutions": [],
+      "map_sha256": "1c36ee736acdcf205f93b6c0f83f133d9a1409b92c4d1e4a99424db29c34ecd6",
+      "original_map": "target/m1-r-suffix-fallback-computed-debit-diagnostic/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 47,
+      "historical_subset_resolutions": [],
+      "map_sha256": "90b1aa1616279343a9d0d96229332651b65cb6a4dec2c51a60f3a2b75e361550",
+      "original_map": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 4,
+      "historical_subset_resolutions": [],
+      "map_sha256": "df63a5b18f38e54835ef7a9286d4a1410f8ec5fa42406e1326b82f88274792b1",
+      "original_map": "target/m1-r-suffix-family-computed-controls-final/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 26,
+      "historical_subset_resolutions": [],
+      "map_sha256": "997ed8ab2fe198891ddda3869dec260bbf65a0ca4f831797d70288c43500b3c3",
+      "original_map": "target/m1-r-cursor-owner-branch-diagnostic/file-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 52,
+      "historical_subset_resolutions": [],
+      "map_sha256": "1f74cdbe4f505a4147bce79af4a19006df2667e557b5100f663247876f14fe2e",
+      "original_map": "target/m1-r-cursor-context-witness/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 29,
+      "historical_subset_resolutions": [],
+      "map_sha256": "aca66a9486f476ef25b3c2f9c38274a5035ea82a6e3f6a7e301fcb14915a9946",
+      "original_map": "target/m1-r-cursor-required-receipt-proof/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 37,
+      "historical_subset_resolutions": [],
+      "map_sha256": "ca8a6b3610e7d098b24929bfe46e2afffd3bf9bd87c2adf2e70a1c4238d51907",
+      "original_map": "target/m1-r-cursor-computed-receipt-diagnostic/artifact-sha256.json"
+    },
+    {
+      "all_hashes_verified": true,
+      "entries_checked": 15,
+      "historical_subset_resolutions": [],
+      "map_sha256": "c04dec0827bdb4e9b17a61a0093cf6c2b8a61739d79847dcdf8488a64de45196",
+      "original_map": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000/file-sha256.json"
+    }
+  ],
+  "maps_checked": 17,
+  "new_checker_runs": 0,
+  "original_maps_not_modified": true,
+  "sealed_confirmations": "Cursor and suffix-family packet owners explicitly confirmed no further writes before this archive.",
+  "sealed_manifest_hashes": {
+    "target/m1-r-cursor-computed-receipt-diagnostic/artifact-sha256.json": "ca8a6b3610e7d098b24929bfe46e2afffd3bf9bd87c2adf2e70a1c4238d51907",
+    "target/m1-r-cursor-context-witness/artifact-sha256.json": "1f74cdbe4f505a4147bce79af4a19006df2667e557b5100f663247876f14fe2e",
+    "target/m1-r-cursor-required-receipt-proof/artifact-sha256.json": "aca66a9486f476ef25b3c2f9c38274a5035ea82a6e3f6a7e301fcb14915a9946",
+    "target/m1-r-suffix-fallback-computed-byte175-diagnostic/artifact-sha256.json": "90b1aa1616279343a9d0d96229332651b65cb6a4dec2c51a60f3a2b75e361550",
+    "target/m1-r-suffix-fallback-computed-debit-diagnostic/artifact-sha256.json": "1c36ee736acdcf205f93b6c0f83f133d9a1409b92c4d1e4a99424db29c34ecd6",
+    "target/m1-r-suffix-family-computed-controls-final/artifact-sha256.json": "df63a5b18f38e54835ef7a9286d4a1410f8ec5fa42406e1326b82f88274792b1"
+  }
+}

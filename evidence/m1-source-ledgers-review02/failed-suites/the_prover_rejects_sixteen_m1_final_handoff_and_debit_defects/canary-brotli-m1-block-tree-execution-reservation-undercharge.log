@@ -1,0 +1,26 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-86081/src/brotli_input.rs:33652:1
+      |
+33652 | / fn advance_planned_block_tree(
+33653 | |     workspace: &mut [u8],
+33654 | |     window_bytes: u32,
+33655 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+33658 | |     end_of_input: bool,
+33659 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: possible arithmetic underflow/overflow
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-86081/src/brotli_input.rs:33711:28
+      |
+33711 |     if !budget.charge_work(plan.execution_work - 1) {
+      |                            ^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

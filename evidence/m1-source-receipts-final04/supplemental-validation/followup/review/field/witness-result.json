@@ -1,0 +1,109 @@
+{
+  "status": "CHECKED admitted witness + original-model status consequence2/0 + SAME-BODY reached-return replay3/0; proposed computed control NOT authorized or run",
+  "witness": {
+    "phase": "Selector",
+    "alphabet_max": 1,
+    "alphabet_limit": 1,
+    "queue_pending": "eight zero bytes",
+    "queue_len": 0,
+    "queue_offset": 0,
+    "valid_under_original_requires": true,
+    "input": "empty",
+    "end_of_input": true,
+    "actual_width": 2,
+    "actual_read_status": "Truncated",
+    "consumed": 0,
+    "source_units": 0,
+    "actual_reached_return_status": "Failed(Truncated)",
+    "actual_final_phase": "Failed(Truncated)"
+  },
+  "checks": {
+    "admission-model01": {
+      "path": "target/m1-r-field-truncation-witness/attempts/admission-model01/result.json",
+      "result_sha256": "5435e9f364c886f35a5cb73ff488a038153ccba107684cf67f73a90e61bed890",
+      "log_sha256": "366c077e564ab75f4340c5c8dcc6eb33c34fa15583e7efe39c856fd37e34f2f6",
+      "source_sha256": "26cb7693ce3c377c5830b91d40980a71eaa4a23263077ec828a1328931a05b90",
+      "verification": null,
+      "exit_code": 1,
+      "strict_classifier": {
+        "semantic_rejection": false,
+        "tool_or_resource_failure": false,
+        "syntax_or_type_failure": true,
+        "computed_false": false,
+        "checked_semantic_error": false
+      }
+    },
+    "admission-model02": {
+      "path": "target/m1-r-field-truncation-witness/attempts/admission-model02/result.json",
+      "result_sha256": "143dc8ec9010d3dc3a186d0cee444707acbb47f8ab36f38a6a2244320d5e0cba",
+      "log_sha256": "346bb21a10f96eb1b79bedd08f9b4eba14be7877a60f92b540a762df451e67bc",
+      "source_sha256": "1511399deecd60babade4b0337842d824b29f4cc55f71433192bef811e63ba98",
+      "verification": {
+        "verified": 2,
+        "errors": 0
+      },
+      "exit_code": 0,
+      "strict_classifier": {
+        "semantic_rejection": false,
+        "tool_or_resource_failure": false,
+        "syntax_or_type_failure": false,
+        "computed_false": false,
+        "checked_semantic_error": false
+      }
+    },
+    "replay01": {
+      "path": "target/m1-r-field-truncation-witness/attempts/replay01/result.json",
+      "result_sha256": "381e9f0873f31d0e17af2e13701a9c2a2ccf98f5f97584f53fec777fd08d94c9",
+      "log_sha256": "6b25059dd2a1310409b8ab3ac68543b5e57b43585c3d584bbd7937164ec4b761",
+      "source_sha256": "a8f2489deffc3dbc98739a14475222f0c81734ae0ae9cb4f1dd522f7bcd69159",
+      "verification": {
+        "verified": 3,
+        "errors": 0
+      },
+      "exit_code": 0,
+      "strict_classifier": {
+        "semantic_rejection": false,
+        "tool_or_resource_failure": false,
+        "syntax_or_type_failure": false,
+        "computed_false": false,
+        "checked_semantic_error": false
+      }
+    }
+  },
+  "model_consequence": "For ANY after/step satisfying unchanged code_field_step_refines for this admitted empty-queue Selector start on empty input/endtrue, step.consumed=0 and step.status=Failed(Truncated); NeedInput cannot refine.",
+  "contract_gap": "None. Existing read_bits contract rules out Value because available0<width2 and NeedInput because endtrue; no inline or original helper/API/contract/model edits needed.",
+  "reach_evidence": "Full original field body and return expressions retained in temporary validation method. Six other prefix exits have checked assert(false), read.status is checked Truncated from original read_bits contract before original match, exact target return retained; all later field paths cannot be reached.",
+  "source_token_audit": {
+    "path": "source-token-audit.json",
+    "sha256": "f83440625a243809e07fd0d61b075d22d599d975cd4ec185ce94726d2264670b",
+    "ordinary_tokens_sha256": "21d378dd827460728ef460eefd7f00b29afae5000ae3b054c88812fa3eaa11af"
+  },
+  "same_original_fault_obligation": true,
+  "proposal": {
+    "path": "computed-return-proposal.json",
+    "sha256": "c61263ca75aef7304897920c7d73d4abd840fe7b7a900289c408822485a506c9",
+    "status": "UNRUN/UNAPPROVED; requires root+independent review"
+  },
+  "settings": "original500/SP,global1000/ME0,no-cheating,numthreads1,triggerssilent,defaultseed/defaultisolation",
+  "frozen_core_sha256": {
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+    "tests/proof_rejection.rs": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+    "target/m1-r-final-gate/driver.py": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46"
+  },
+  "immutable_supplement_manifest_sha256": "89734c8f58d911da782ae47adea4169eb15f963855ba450680804fae6667b8d8",
+  "original_unchanged_field_positive": {
+    "path": "target/m1-r-field-truncation-split-diagnostic/positive/result.json",
+    "verification": "3/0",
+    "source_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e"
+  },
+  "new_negative_control_runs": 0,
+  "coupled_computed_positive_runs": 0,
+  "shared_source_test_gate_evidence_canary_supplement_edits": 0,
+  "limits": [
+    "No full gate completion or resource-failure repair is established.",
+    "No native execution or source-to-binary proof is claimed.",
+    "No future negative-loop/body SMT completion is implied by possible computed-false rejection.",
+    "Temporary validation is technical evidence, not human architectural approval."
+  ]
+}

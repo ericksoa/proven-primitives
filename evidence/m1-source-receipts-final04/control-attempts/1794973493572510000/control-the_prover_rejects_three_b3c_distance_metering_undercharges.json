@@ -1,0 +1,63 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_three_b3c_distance_metering_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 58.7461552080058,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 3,
+  "finished_utc": "2026-11-18T04:58:12.798794+00:00",
+  "log": "controls-the_prover_rejects_three_b3c_distance_metering_undercharges.log",
+  "log_sha256": "68618899f4e605232f5b48670119e959ccc63e7c2c7b5c73b66fe0c0dbce65ee",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "bb59c6fcbd82479efedc0cb8a2fb6b86175e8f72399b3ac919f4571502075383",
+      "log": "canary-brotli-b3c-distance-queue-write-undercharge.log",
+      "name": "brotli-b3c-distance-queue-write-undercharge",
+      "semantic_rejection": true,
+      "sha256": "9b664c3f13073610cc1e4a08a71097aaf7c294338ffd8454619cdb1316c6d75c",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "42773e9c5e897c915a7642560dc69756897c7313b91125ee8a7d7bea577bf645",
+      "log": "canary-brotli-b3c-distance-terminal-undercharge.log",
+      "name": "brotli-b3c-distance-terminal-undercharge",
+      "semantic_rejection": true,
+      "sha256": "ccc20dc8a0ca8a12f0f2c5e026764df712dd0a5a3690d4a1949bc61eacbe70d8",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "b17cd65ec675b41364d024212b502bb4722d10388b808e3e19c9495f54ec9afa",
+      "log": "canary-brotli-b3c-distance-value-undercharge.log",
+      "name": "brotli-b3c-distance-value-undercharge",
+      "semantic_rejection": true,
+      "sha256": "07a7abbf255514d7af04a5a25d4d2b98da5201bca6f022a86ee5ce943d8eb279",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794977834052612000,
+  "started_utc": "2026-11-18T04:57:14.052619+00:00",
+  "suite": "the_prover_rejects_three_b3c_distance_metering_undercharges",
+  "suite_source_sha256": "5d1a49d314408f32ac0e338e0db726d7db406d8a6829504e845a366187fe444e",
+  "validation_errors": []
+}

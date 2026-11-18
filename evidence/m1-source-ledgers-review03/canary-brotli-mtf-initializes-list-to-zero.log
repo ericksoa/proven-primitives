@@ -1,0 +1,42 @@
+verification results:: 2 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-92874/src/brotli_prefix.rs:4471:5
+     |
+4471 |     while init < init_limit
+     |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+error: precondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-92874/src/brotli_prefix.rs:4507:13
+     |
+4042 |           after == before.update(at, value),
+     |           --------------------------------- failed precondition
+...
+4507 | /             mtf_region_frame_after_update(
+4508 | |                 original_workspace,
+4509 | |                 before_init_write,
+4510 | |                 workspace@,
+...    |
+4513 | |                 (init - 1) as u8,
+4514 | |             );
+     | |_____________^
+
+error: precondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-92874/src/brotli_prefix.rs:4515:13
+     |
+4068 |           after == before.update(at, value),
+     |           --------------------------------- failed precondition
+...
+4515 | /             mtf_workspace_frame_after_update(
+4516 | |                 original_workspace,
+4517 | |                 before_init_write,
+4518 | |                 workspace@,
+...    |
+4523 | |                 (init - 1) as u8,
+4524 | |             );
+     | |_____________^
+
+error: aborting due to 2 previous errors
+

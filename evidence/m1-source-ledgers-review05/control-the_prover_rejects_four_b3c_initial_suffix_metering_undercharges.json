@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T04:55:10.976417+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 71.18568716698792,
+  "finished_utc": "2026-11-17T04:56:22.163131+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_four_b3c_initial_suffix_metering_undercharges.log",
+  "log_sha256": "3217d74e753136c9861aa3664964dad2b07a30156078a87398d3a187b2df5808",
+  "suite": "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-b3c-initial-suffix-planning-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-initial-suffix-planning-undercharge.log",
+      "sha256": "8fbaa31a3af9b867e05a4ceaa2c1f1f336f044f8b6cca1c72b04fcb84065902a",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-queue-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-initial-suffix-queue-undercharge.log",
+      "sha256": "150b400500dfebb9ff5b8284e0832866599a3da6c04e40126680041a248a73ad",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-terminal-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-initial-suffix-terminal-undercharge.log",
+      "sha256": "e12267e8873306537e1884c458c4af86316bfe78e8e3a628c789f80c9504b134",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-value-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-initial-suffix-value-undercharge.log",
+      "sha256": "10034aa5b366b3cce04a16c341d174be1119e763ffefaa4e0b103e23d6fbd061",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

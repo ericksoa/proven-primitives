@@ -1,0 +1,230 @@
+[
+  {
+    "suite": "the_prover_rejects_six_b3a_builder_storage_defects",
+    "adapted_cases": [
+      "brotli-builder-code-length-reads-uninitialized-entry",
+      "brotli-builder-count-write-swaps-low-byte",
+      "brotli-builder-next-code-writes-wrong-third-byte"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_b3b_metadata_map_and_coverage_defects",
+    "adapted_cases": [
+      "brotli-context-map-reads-first-uninitialized-entry"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_two_b3b_distance_and_exhaustion_defects",
+    "adapted_cases": [
+      "brotli-varuint-final-exhaustion-needs-more-input"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_b3a_code_description_defects",
+    "adapted_cases": [
+      "brotli-complex-code-misclassifies-space-overflow"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_b3b_block_count_and_category_defects",
+    "adapted_cases": [
+      "brotli-b3b-one-type-initial-length-is-short"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_thirteen_b3b_context_map_defects",
+    "adapted_cases": [
+      "brotli-b3b-context-zero-mtf-flag-routes-to-mtf",
+      "brotli-b3b-context-symbol-uses-literal-tree-region"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_b3b_tree_group_defects",
+    "adapted_cases": [
+      "brotli-b3b-completed-simple-tree-writes-unused-metadata",
+      "brotli-b3b-active-command-tree-starts-at-one"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects",
+    "adapted_cases": [
+      "brotli-b3b-distance-context-row-stride-is-three",
+      "brotli-b3b-context-tree-starts-in-literal-region"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_b3b_serialization_and_error_defects",
+    "adapted_cases": [
+      "brotli-b3b-u16-writes-low-byte-twice",
+      "brotli-b3b-tag-accepts-first-invalid-value"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+    "adapted_cases": [
+      "brotli-b3c-context-count-execution-reserved-after-writes",
+      "brotli-b3c-context-count-progress-writes-map-size"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_seventeen_b3c_context_bits_defects",
+    "adapted_cases": [
+      "brotli-b3c-context-bits-execution-reserved-after-writes",
+      "brotli-b3c-context-bits-reads-wrong-width"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_nine_m1_source_refinement_and_debit_defects",
+    "adapted_cases": [
+      "brotli-m1-auxiliary-wrong-symbol"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects",
+    "adapted_cases": [
+      "brotli-m1-simple-pair-second-read-not-charged",
+      "brotli-m1-saved-aux-wrong-partial-count",
+      "brotli-m1-canonical-accepts-invalid-length",
+      "brotli-m1-simple-validation-skips-last-pair"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects",
+    "adapted_cases": [
+      "brotli-m1-inconsistent-span-mutates-decoder"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+    "adapted_cases": [
+      "brotli-m1-context-bad-count-owner-skips-action"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_k1_k3_success_and_preservation_defects",
+    "adapted_cases": [
+      "brotli-k1-invalid-length-changes-metadata",
+      "brotli-k1-invalid-length-changes-builder",
+      "brotli-k1-installer-rejects-valid-two-symbol-tree",
+      "brotli-k3-rejects-valid-symbol-and-suffix"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_context_mode_handoff_defects",
+    "adapted_cases": [
+      "brotli-m1-handoff-reset-writes-wrong-pending-run",
+      "brotli-m1-handoff-action-skips-literal-map",
+      "brotli-m1-handoff-reset-writes-padding"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+    "adapted_cases": [
+      "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "brotli-m1-cursor-context-owner-skips-terminal-action"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_k4_repeat_codec_defects",
+    "adapted_cases": [
+      "brotli-k4-repeat-store-overwrites-history"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_fourteen_k5_loader_accounting_defects",
+    "adapted_cases": [
+      "brotli-k5-prefix-validation-scan-undercharge",
+      "brotli-k5-selected-singleton-read-unpaid",
+      "brotli-k5-simple-right-comparison-operand-unpaid",
+      "brotli-k5-simple-omits-right-operand-receipt",
+      "brotli-k5-invalid-last-auxiliary-misclassified-valid",
+      "brotli-k5-invalid-alphabet-misclassified-valid"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_twelve_m1_general_codec_defects",
+    "adapted_cases": [
+      "brotli-m1-codec-simple-index-erased",
+      "brotli-m1-codec-shape-selector-lost",
+      "brotli-m1-codec-prefix-nonzero-erased",
+      "brotli-m1-codec-simple-write-undercharge",
+      "brotli-m1-codec-complex-write-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+    "adapted_cases": [
+      "brotli-m1-executor-canonical-loses-consumption",
+      "brotli-m1-executor-canonical-false-need-input"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "adapted_cases": [
+      "brotli-m1-executor-bad-span-error-replaced",
+      "brotli-m1-pending-span-wrong-failure-reason",
+      "brotli-m1-executor-empty-input-fabricates-error"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_invalid_start_defects",
+    "adapted_cases": [
+      "brotli-m1-invalid-region-consumes-input",
+      "brotli-m1-invalid-region-mutates-descriptor",
+      "brotli-m1-invalid-region-plan-consumes-input"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_m1_tree_error_identity_defects",
+    "adapted_cases": [
+      "brotli-m1-saved-loader-spurious-unsupported-mode",
+      "brotli-m1-malformed-region-executor-wrong-error",
+      "brotli-m1-malformed-region-planner-wrong-error",
+      "brotli-m1-malformed-descriptor-plan-wrong-error"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_m1_literal_handoff_defects",
+    "adapted_cases": [
+      "brotli-m1-literal-handoff-terminal-work-undercharge",
+      "brotli-m1-literal-handoff-loses-error"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects",
+    "adapted_cases": [
+      "brotli-m1-handoff-first-map-read-not-prepaid",
+      "brotli-m1-handoff-second-map-read-not-prepaid",
+      "brotli-m1-map-tail-replay-consumption-corrupted",
+      "brotli-m1-map-tail-replay-coverage-error-corrupted"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_context_cursor_terminal_defects",
+    "adapted_cases": [
+      "brotli-m1-context-count-cursor-skips-terminal-action"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_m1_malformed_suffix_defects",
+    "adapted_cases": [
+      "brotli-m1-malformed-suffix-invalid-fields-undercharge",
+      "brotli-m1-malformed-suffix-wrong-width-undercharge",
+      "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+      "brotli-m1-malformed-suffix-fallback-undercharge",
+      "brotli-m1-malformed-suffix-fallback-writes-byte175"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_b3b_cross_call_state_defects",
+    "adapted_cases": [
+      "brotli-b3b-step-bypasses-sticky-failure-helper"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_block_count_relation_and_debit_defects",
+    "adapted_cases": [
+      "brotli-m1-block-count-value-writes-padding"
+    ]
+  }
+]

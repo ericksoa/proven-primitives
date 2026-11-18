@@ -1,0 +1,70 @@
+{
+  "created_utc": "2026-11-18T02:34:17.769975+00:00",
+  "status": "PASS independent technical assessment; no checker/control invocation or architectural approval",
+  "bound_receipts": [
+    {
+      "path": "target/m1-r-field-truncation-witness/witness-result.json",
+      "sha256": "9018e0842373ce193473eafcb73443e37ffb3704d90a0bc0a2f5764133053a22"
+    },
+    {
+      "path": "target/m1-r-field-truncation-witness/source-token-audit.json",
+      "sha256": "f83440625a243809e07fd0d61b075d22d599d975cd4ec185ce94726d2264670b"
+    },
+    {
+      "path": "target/m1-r-field-truncation-witness/computed-return-proposal.json",
+      "sha256": "c61263ca75aef7304897920c7d73d4abd840fe7b7a900289c408822485a506c9"
+    }
+  ],
+  "checked_components_verified": [
+    {
+      "path": "target/m1-r-field-truncation-witness/attempts/admission-model02/result.json",
+      "sha256": "143dc8ec9010d3dc3a186d0cee444707acbb47f8ab36f38a6a2244320d5e0cba",
+      "verification": {
+        "verified": 2,
+        "errors": 0
+      },
+      "source_sha256": "1511399deecd60babade4b0337842d824b29f4cc55f71433192bef811e63ba98",
+      "log_sha256": "346bb21a10f96eb1b79bedd08f9b4eba14be7877a60f92b540a762df451e67bc"
+    },
+    {
+      "path": "target/m1-r-field-truncation-witness/attempts/replay01/result.json",
+      "sha256": "381e9f0873f31d0e17af2e13701a9c2a2ccf98f5f97584f53fec777fd08d94c9",
+      "verification": {
+        "verified": 3,
+        "errors": 0
+      },
+      "source_sha256": "a8f2489deffc3dbc98739a14475222f0c81734ae0ae9cb4f1dd522f7bcd69159",
+      "log_sha256": "6b25059dd2a1310409b8ab3ac68543b5e57b43585c3d584bbd7937164ec4b761"
+    }
+  ],
+  "independent_static_checks": {
+    "constructive_admission_without_requires": true,
+    "read_bits_contract_forces_Truncated_for_width2_empty_endtrue": true,
+    "unchanged_refinement_forces_consumed0_FailedTruncated_and_excludes_NeedInput": true,
+    "same_body_checked_replay_reaches_exact_original_return_nonvacuously": true,
+    "all_original_method_body_lines_exact_in_order": true,
+    "method_body_differences_only_checked_proof_blocks": true,
+    "lexical_tokens_after_erasing_proof_blocks_identical": true,
+    "all_original_method_postconditions_token_identical_suffix": true,
+    "original_whole_input_module_exact_except_appended_validation_declarations": true,
+    "other10_modules_byte_identical": true,
+    "no_trust_bypass_contract_API_helper_or_model_change": true
+  },
+  "necessary_consequence": "The constructed valid Selector1 empty-queue start actually reaches this Truncated return on empty input/endtrue. Original refinement requires Failed(Truncated). Comparing the ACTUAL returned status literal with that fixed required pattern is a necessary instance of the same existing returned-status obligation.",
+  "exact_coupling": "Proposal changes only actual returned status literal and that same literal under matches! to NeedInput together. Expected Failed(Truncated) pattern, read.consumed, Ghost(source_reads), original return scope and full original fault domain remain unchanged. No witness-only runtime guard or narrowed production requires.",
+  "ordinary_token_metric": "2341 is the bound byte audit metric; independent whole-body line preservation and proof-erasure token equality confirm ordinary operation preservation without relying only on that metric.",
+  "source_anchor_unique": true,
+  "positive_or_negative_control_qualification_yet": false,
+  "required_next_checks": [
+    "Actual full selected coupled positive at original500/SP/global1000/ME0/default settings.",
+    "Separately authorized single coupled negative accepted by unchanged strict classifier without tool/resource/type failure."
+  ],
+  "native_harness_gap": "Known seven-case semantic assertion needs a separately authorized case-only literal-false AND by(compute_only) arm; retain all old sites/arms and unchanged strict gate exclusions.",
+  "limits": [
+    "Technical validation only; no human architectural approval.",
+    "No native/source-to-binary/full-gate claim.",
+    "Possible early compute rejection does not imply negative-body SMT completion."
+  ],
+  "checker_invocations": 0,
+  "shared_edits": 0
+}

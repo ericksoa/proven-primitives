@@ -1,0 +1,26 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-receipt-canaries-41708/src/brotli_input.rs:36939:1
+      |
+36939 | / fn execute_fixed_compressed_plan(
+36940 | |     workspace: &mut [u8],
+36941 | |     window_bytes: u32,
+36942 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+36947 | |     plan: CompressedActionPlan,
+36948 | | ) -> (r: (Result<usize, CompressedStep>, Ghost<nat>))
+      | |____________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-receipt-canaries-41708/src/brotli_input.rs:37259:20
+      |
+37259 |             assert(r_fixed_owner_source_units == plan.execution_work as nat);
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

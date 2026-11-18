@@ -1,0 +1,19 @@
+
+error[E0308]: mismatched types
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-stride-init-exhaustion-canaries-46647/src/brotli_input.rs:16852:24
+      |
+16852 |     let result = { let (r_child_1, Ghost(r_child_units_1)) = Ok(()); proof { r_source_units = r_source_units + r_child_units_1; }...
+      |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   ------ this expression has type `std::result::Result<(), _>`
+      |                        |
+      |                        expected `Result<(), _>`, found `(_, _)`
+      |
+      = note: expected enum `std::result::Result<(), _>`
+                found tuple `(_, _)`
+help: try wrapping the pattern in `Err`
+      |
+16852 |     let result = { let Err((r_child_1, Ghost(r_child_units_1))) = Ok(()); proof { r_source_units = r_source_units + r_child_units_1; } r_child_1 };
+      |                        ++++                                   +
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.

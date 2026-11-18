@@ -1,0 +1,21 @@
+verification results:: 11 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-39199/src/brotli_prefix.rs:5191:9
+     |
+5191 | /         window_bytes <= 16_777_216
+5192 | |             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+5193 | |             && (tree as nat) < tree_region_count(region)
+5194 | |             && old(meta).storage == (TreeStorageState::Canonical { initialized: 0 })
+...    |
+5204 | |             })
+5205 | |         },
+     | |_________^ failed this postcondition
+...
+5380 |                meta.symbols = 0; return (Err(WorkspaceError::InvalidCodeLeng...ource_record_reads + source_record_writes));
+     |                                  -------------------------------------------...------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

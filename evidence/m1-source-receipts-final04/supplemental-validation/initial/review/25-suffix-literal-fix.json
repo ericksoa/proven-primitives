@@ -1,0 +1,114 @@
+{
+  "status": "IMMUTABLE STATIC LITERAL FIX; UNAPPLIED; one isolated semantic diagnostic only",
+  "name": "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+  "function": "advance_initial_block_length_phase",
+  "old_anchor": "                        return ({ let (r_child_1, Ghost(r_child_units_1)) = self.fail_phase(consumed, CompressedHeaderError::InternalState); proof { r_source_units = r_source_units + r_child_units_1; } r_child_1 }, Ghost(r_source_units));",
+  "old_anchor_sha256": "da455563715935330f4c00b37ee9c9ff6227993dd3260218f67f4b3b0f4a6a51",
+  "original_new_mutation": "                         let malformed_error = match state_byte(self.workspace, self.window_bytes, B3B_BLOCK_LENGTH_PHASE) {\n                            Ok(1) => CompressedHeaderError::Truncated,\n                            _ => CompressedHeaderError::InternalState,\n                        }; return ({ let (r_child_1, Ghost(r_child_units_1)) = self.fail_phase(consumed, malformed_error); proof { r_source_units = r_source_units + r_child_units_1; } r_child_1 }, Ghost(r_source_units));",
+  "original_new_mutation_sha256": "3607e6108d524f841fc3fb91a55f2ddacbe0e849fb3676c8350c4d634134abd3",
+  "equivalent_new_mutation": "                        match state_byte(self.workspace, self.window_bytes, B3B_BLOCK_LENGTH_PHASE) {\n                            Ok(1) => {\n                                return ({ let (r_child_1, Ghost(r_child_units_1)) = self.fail_phase(consumed, CompressedHeaderError::Truncated); proof { r_source_units = r_source_units + r_child_units_1; } r_child_1 }, Ghost(r_source_units));\n                            },\n                            _ => {\n                                return ({ let (r_child_1, Ghost(r_child_units_1)) = self.fail_phase(consumed, CompressedHeaderError::InternalState); proof { r_source_units = r_source_units + r_child_units_1; } r_child_1 }, Ghost(r_source_units));\n                            },\n                        }",
+  "equivalent_new_mutation_sha256": "da322b16acac1ac98a69466c10cc95f92447ce8067877ebf3e9215e55b16bc06",
+  "only_allowed_test_edit": "Replace ONLY the original new-mutation string literal with equivalent_new_mutation. Preserve old anchor, selector, suite, contracts and every assertion.",
+  "old_anchor_unchanged": true,
+  "selector_unchanged": true,
+  "assertions_unchanged": true,
+  "production_source_change": false,
+  "production_hint_required": false,
+  "exact_fault": "At top kind>=3 guard, one state_byte(BLOCK_LENGTH_PHASE) read selects Truncated onlyforOk1, otherwiseInternalState; one fail_phase call with actual receipt5. Distributed branches preserve same selection/read/call/frame/units for all Result variants.",
+  "direct_Truncated_replacement_rejected": "Would broadenfault to admitted phase0/2. The site precedes ordinary subphase branching.",
+  "original_guarantee_violated": "m1_bad_initial_suffix(before,w) => result0==(0,SomeFailedInternalState) and terminal_error_frame and serialized_terminal_error(after,w,InternalState)",
+  "fault_class": "wrong permanent error identity; not an undercharge",
+  "pure_proofs": {
+    "admitted_phase_witnesses": {
+      "log": "admitted-phase-witnesses-positive.log",
+      "verified": 2,
+      "errors": 0,
+      "domain": "all phase:u8; phase1 andphase2 are admitted atkind3/outer3/window1024/MTFupper63"
+    },
+    "selector_result_dispatch_equivalence": {
+      "log": "selector-dispatch-equivalence-positive.log",
+      "verified": 1,
+      "errors": 0,
+      "domain": "all Result<u8,CompressedHeaderError> values"
+    },
+    "definitions": "pure-equivalence-witness-definitions.json"
+  },
+  "diagnostic": {
+    "case": "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+    "kind": "ONLY authorized isolated single-case equivalent-fault diagnostic",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-suffix-control-triage/dispatch-equivalent-single-case/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "advance_initial_block_length_phase",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "exit_code": 1,
+    "seconds": 186.48739516700152,
+    "mutant_input_sha256": "0dc699df74e682c73420edbdd1e458204e32c43159dc4cf4df6d95b62c176bb4",
+    "reference_positive": "evidence/m1-source-receipts-final02/positive.json",
+    "reference_core": {
+      "input": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "prefix": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "tests": "74cec7fcc319568dc86cc2493df527db6a92423b2e89f4d8584770b7c1d3998e"
+    },
+    "semantic_rejection": true,
+    "resource_or_tool_failure": false,
+    "log": "diagnostic-semantic.log",
+    "log_sha256": "5a5b0945edfe9e7f1c2ed4a64542d8a29165f86cd6ba0253b86565f47b6a153d",
+    "root_canary_writes": 0,
+    "production_hint_included": false,
+    "not_full_gate": true,
+    "source": "diagnostic-source.rs.txt",
+    "main_canary_log_used_as_new_evidence": false,
+    "counts_as_full_gate_rejection": false
+  },
+  "original_resource_failure": {
+    "log": "original-resource.log",
+    "seconds_reported": 104,
+    "rlimit": 1000,
+    "function_attributes": [],
+    "semantic_rejection": false
+  },
+  "reference_unchanged_positive": {
+    "path": "evidence/m1-source-receipts-final02/positive.json",
+    "sha256": "86d4e79af18845dc26949de1b75c6627a683242b78aeb22a0e23b932466f172f",
+    "verification": {
+      "encountered-error": false,
+      "encountered-vir-error": false,
+      "errors": 0,
+      "is-verifying-entire-crate": true,
+      "success": true,
+      "verified": 1397
+    },
+    "runtime_passed": 116,
+    "core_and_test_hashes": {
+      "input": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "prefix": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "tests": "74cec7fcc319568dc86cc2493df527db6a92423b2e89f4d8584770b7c1d3998e"
+    }
+  },
+  "application_preconditions": [
+    "Wait until fullattempt02collects andis archived",
+    "Apply test-only literalfix collectivelywith other validated fixes",
+    "Fresh unchanged whole-positive on final source/tests/tools/gate inputs",
+    "Fresh full48suite/318case semantic-control gate; diagnostic isnever counted as that gate"
+  ],
+  "source_edits": 0,
+  "gate_edits": 0,
+  "test_edits": 0,
+  "root_canary_writes": 0,
+  "extra_probes": 0
+}

@@ -1,0 +1,129 @@
+{
+  "status": "FINAL STATIC HARNESS PRESERVATION REVIEW PASSED - rebound final02/74c to frozen33f; no fresh gate-completion claim",
+  "created_utc": "2026-11-18T01:42:48.864487+00:00",
+  "scope": "Read-only rebind, writing only this target report. No checker runs, source/test/gate/evidence/canary edits, or new architectural approval.",
+  "baseline_tests": {
+    "path": "target/m1-r-field-decomp12-control-audit/final-main-snapshot/tests/proof_rejection.rs",
+    "sha256": "74cec7fcc319568dc86cc2493df527db6a92423b2e89f4d8584770b7c1d3998e"
+  },
+  "reviewed_tests": {
+    "path": "tests/proof_rejection.rs",
+    "sha256": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e"
+  },
+  "inventory": {
+    "suites": 48,
+    "cases": 318,
+    "all_names_suites_tuple_arities_module_routes_selectors_preserved": true,
+    "all_318_effective_anchors_unique_in_original_harness_scope": true,
+    "tuple_repairs": [
+      "brotli-k3-rejects-valid-symbol-and-suffix",
+      "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+      "brotli-b3b-serialized-tree-skips-builder-reset",
+      "brotli-b3b-step-bypasses-sticky-failure-helper",
+      "brotli-k7-multi-install-spurious-error",
+      "brotli-m1-context-bad-count-owner-skips-action",
+      "brotli-m1-cursor-block-forecast-omits-terminal-work"
+    ],
+    "original_faults_or_exact_R_carriers_preserved": "Same seven exact tuples independently reviewed in preservation01; all original source assertions remain in each mutated root. Cap tuple itself is unchanged; its test-only assembly is rebound below."
+  },
+  "production_preservation": {
+    "all_production_source_files_match_final02_positive_byte_for_byte": {
+      "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "src/brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+      "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+    },
+    "all_original_models_requirements_guarantees_assertions_loop_clauses_attrs_apis_runtime_operations_preserved": true,
+    "existing_input_prefix_declarations": 1136,
+    "checker_helper_exact_to_final02": true,
+    "strict_gate_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+    "strict_gate_byte_identical_to_final02": true,
+    "mixed_resource_tool_type_failures_remain_unresolved": true
+  },
+  "native_assertion_preservation": {
+    "baseline_sites": 243,
+    "current_sites": 252,
+    "original_sites_retained": 243,
+    "original_assertion_texts_exact": 242,
+    "intentionally_extended_predicate_sites": 1,
+    "original_diagnostic_OR_arms_retained_in_order": true,
+    "original_failure_message_retained": true,
+    "extension_scope": "Only brotli-m1-planner-restores-too-small-cap; requires literal error: expression simplifies to false AND by (compute_only), matching the existing strict gate computed-false arm.",
+    "all_old_assert_text_byte_exact_claim": false,
+    "exact_old_assertion": "assert!(\n            log.contains(\"postcondition not satisfied\")\n                || log.contains(\"precondition not satisfied\")\n                || log.contains(\"requires not satisfied\")\n                || log.contains(\"assertion failed\")\n                || log.contains(\"invariant not satisfied\"),\n            \"expected semantic proof rejection: {log}\"\n        )",
+    "exact_extended_assertion": "assert!(\n            log.contains(\"postcondition not satisfied\")\n                || log.contains(\"precondition not satisfied\")\n                || log.contains(\"requires not satisfied\")\n                || log.contains(\"assertion failed\")\n                || log.contains(\"invariant not satisfied\")\n                || (name == \"brotli-m1-planner-restores-too-small-cap\"\n                    && log.contains(\"error: expression simplifies to false\")\n                    && log.contains(\"by (compute_only)\")),\n            \"expected semantic proof rejection: {log}\"\n        )",
+    "other_new_checked_assertions": 9
+  },
+  "cap_harness_assembly": {
+    "current_test_branch_reproduces_exact_actual_positive_sha256": "8ed98823e7a68454600fa9a746b8d9d38cc50856d5969a40bc78792fc28a3fd0",
+    "current_test_branch_reproduces_exact_actual_negative_sha256": "3d8831d9b413743c78b9a7dbed5afb95ab9e4cfba887a03004e82a9daf4639f0",
+    "binding_sites": [
+      "symbolic initial_rank<CAPnat",
+      "if code_phase_rank(Selector,704)<CAPnat {true}else{false} by(compute_only)",
+      "actual executable while iterations<CAP"
+    ],
+    "positive_CAP": 5696,
+    "negative_CAP": 2000,
+    "sole_original_initial_rank_le5695_retained": true,
+    "duplicate_or_tagged_invariant_added": false,
+    "all_original_source_obligations_text_retained": true,
+    "positive": {
+      "result_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/positive-result.json",
+      "result_sha256": "2e7e4e26e7e60c5e4e0edd8945c277c02c527a0d9fb9016785ba20b3612b24ca",
+      "log_sha256": "937f23e0806a8bec52150b67188a00a4e781ad39f7f5bdd2ed4c1d477b069882",
+      "actual_verification": "4 verified,0 errors",
+      "original_attrs": [
+        "#[verifier::rlimit(600)]",
+        "#[verifier::spinoff_prover]"
+      ],
+      "global_rlimit": 1000
+    },
+    "negative": {
+      "result_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/negative-result.json",
+      "result_sha256": "51854a393afc83699744a4872dfc1ce4a362e0c096b0ecaa9ddb571fbd9a07f0",
+      "log_sha256": "7fc084ce383df8302ab9141225ab9c2b2d5d9a316e73f94629b404eb500aa97c",
+      "actual_primary_error": "error: expression simplifies to false",
+      "independently_recomputed_unchanged_strict_classifier": {
+        "semantic_rejection": true,
+        "tool_or_resource_failure": false,
+        "syntax_or_type_failure": false,
+        "computed_false": true,
+        "checked_semantic_error": false
+      },
+      "verification_summary_present": false,
+      "negative_loop_smt_completion_claimed": false
+    }
+  },
+  "witness_audit_rebind": {
+    "independent_audit_path": "target/m1-r-independent-cap-rank-audit/audit.json",
+    "independent_audit_sha256": "6e329613520b02649cf12c1482d403effa175bfb9df52383734c6801362d5140",
+    "binding_record_sha256": "d04bf8aad5aa39e7b1f34b2e2c1d107862269c6929c670c31b769f474e9e65fc",
+    "identity": "For every Boolean P, if P {true}else{false} equals P. The rank predicate and three cap values are unchanged.",
+    "raw_positive_to_normalized_is_exact_one_line_boolean_identity": true,
+    "same_existing_uniform_rank_certificate_adequacy_criterion": true,
+    "admitted_actual_startup_rank": 5695,
+    "checked_startup_work": "18+0+22=40 units, valid64 to24; no original startup operation changed."
+  },
+  "previous_repairs_retained": {
+    "RLE_same_setting_healthy_preflight_then_original_fault": true,
+    "RLE_all_existing_invariants_decreases_assertions_guarantees_retained": true,
+    "step_actual_root_positive_added_alongside_original_step": true,
+    "context_owner_full_match_identical_fault_both_arms": true,
+    "fixed_cursor_same_actual_failure_plan_set0_before_original_assertions_and_same_call_argument": true,
+    "late_reservation_R_wrapper_anchors_same_actual_call_and_ordering_fault": true
+  },
+  "explicit_limits": [
+    "Review does not establish fresh main positive03 or full318 gate completion; those runs belong to root.",
+    "No native2000-action trace, source-to-binary theorem, runtime failure or negative-loop SMT-complete claim.",
+    "Technical validation is not human architectural approval."
+  ],
+  "auditor_new_checker_runs": 0,
+  "auditor_shared_source_test_gate_evidence_canary_edits": 0
+}

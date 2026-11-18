@@ -1,0 +1,74 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_eight_m1_context_mode_relation_and_frame_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:57:03.440717+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 168.37241450000147,
+  "finished_utc": "2026-11-17T02:59:51.812518+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_eight_m1_context_mode_relation_and_frame_defects.log",
+  "log_sha256": "5b2a0e0ea87ba1881038b9e19cd669f37d4828e2c73ad300fde4db05168d2b24",
+  "suite": "the_prover_rejects_eight_m1_context_mode_relation_and_frame_defects",
+  "expected_mutants": 8,
+  "mutants": [
+    {
+      "name": "brotli-m1-context-mode-prepass-omits-read-work",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-mode-prepass-omits-read-work.log",
+      "sha256": "86740a247cf525e14089b63d27f76785ac251e37b8039823c70f1853771e84d6",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-mode-plan-loses-need-input",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-mode-plan-loses-need-input.log",
+      "sha256": "54b69a0076bb9c9eafc65299271e52aecb845cd1dfe28d90811c53a5456ae93d",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-mode-plan-loses-consumption",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-mode-plan-loses-consumption.log",
+      "sha256": "f57229047b51b4e9279c9e5a95992c40bdd3ba01ff70e0a1b5cfc6d8fc8910b4",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-mode-plan-omits-value-writes",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-mode-plan-omits-value-writes.log",
+      "sha256": "bfd07128322171aadae2145466891126d2c828ec3e63dfe55eef8c0605e13095",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-mode-action-writes-wrong-value",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-mode-action-writes-wrong-value.log",
+      "sha256": "bcd9bb58e111875868f29a2b2b754b7f89d605b415b4ee7fde85280e0430d14c",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-mode-action-loses-initialized-count",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-mode-action-loses-initialized-count.log",
+      "sha256": "433796bd0b4cf308746b332918308b9c04bd6432410303289bfe5a48c0e2d143",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-mode-executor-omits-input-debit",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-mode-executor-omits-input-debit.log",
+      "sha256": "e36932bb6453f45c8fc5d3dcd64113da4421393a66ef3b91fe117e6adf6bf52f",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-mode-limited-input-is-retryable",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-mode-limited-input-is-retryable.log",
+      "sha256": "4704ea781c99690e654fd8a7646c4baaa9a737638c372b869949cfcd18f85804",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

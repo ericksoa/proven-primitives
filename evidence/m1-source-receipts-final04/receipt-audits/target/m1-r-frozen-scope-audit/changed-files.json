@@ -1,0 +1,32 @@
+[
+  {
+    "path": "src/brotli_input.rs",
+    "old": {
+      "member": "src/brotli_input.rs",
+      "sha256": "f1a37362e128944c9c0ca49f00f30c172270677140e60027d3d655c46d831eef",
+      "bytes": 2090532,
+      "tar_mtime_utc": "2026-11-17T01:31:49.309370+00:00"
+    },
+    "new": {
+      "member": "src/brotli_input.rs",
+      "sha256": "e10c61b1354c5b1debef9e76aa55b412d06e35de210cb8949a73ef33b912da23",
+      "bytes": 2120506,
+      "tar_mtime_utc": "2026-11-17T04:43:41.122485+00:00"
+    }
+  },
+  {
+    "path": "tests/proof_rejection.rs",
+    "old": {
+      "member": "tests/proof_rejection.rs",
+      "sha256": "27c1e2bd0487017c6a2ad8cb663d13c88ff01f6650ce61244b2bea687d4815ae",
+      "bytes": 267371,
+      "tar_mtime_utc": "2026-11-17T01:38:47.224058+00:00"
+    },
+    "new": {
+      "member": "tests/proof_rejection.rs",
+      "sha256": "71acb612aff23fb488946b8a32fc96dfe3692991382aba4f1bf2884c36a6504c",
+      "bytes": 280143,
+      "tar_mtime_utc": "2026-11-17T04:44:32.639720+00:00"
+    }
+  }
+]

@@ -1,0 +1,21 @@
+verification results:: 6 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k7-k8-result-canary-51799/src/brotli_prefix.rs:3334:9
+     |
+3334 | /         window_bytes <= 16_777_216
+3335 | |             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+3336 | |             && 1 <= alphabet_limit <= 704 && selector <= 4
+3337 | |             && count as nat == simple_selector_count(selector)
+...    |
+3343 | |                 &&& (!destination_valid ==> r.0 == Err(WorkspaceError::InvalidSymbol))
+3344 | |             },
+     | |_____________^ failed this postcondition
+...
+3449 |           return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_reads + source_writes));
+     |           ------------------------------------------------------------------------------------ at this exit
+
+error: aborting due to 1 previous error
+

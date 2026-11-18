@@ -1,0 +1,36 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-95877/src/brotli_input.rs:36037:1
+      |
+36037 | / fn execute_planned_context_symbol(workspace: &mut [u8], window_bytes: u32,
+36038 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end: bool,
+36039 | |     input_was_limited: bool, plan: ContextSymbolPlan, planning_work: u64,
+36040 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-95877/src/brotli_input.rs:36054:9
+      |
+36054 | /         old(budget).work_remaining < plan.execution_work ==> {
+36055 | |             &&& final(workspace)@ == old(workspace)@
+36056 | |             &&& *final(budget) == *old(budget)
+36057 | |             &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+36058 | |         },
+      | |_________^ failed this postcondition
+...
+36095 | /     match status {
+36096 | |         Some(ContextAdvanceStatus::Failed(error)) => {
+36097 | |             let stored = store_terminal_error(workspace, window_bytes, error);
+36098 | |             proof {
+...     |
+36112 | |         _ => Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) }),
+36113 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

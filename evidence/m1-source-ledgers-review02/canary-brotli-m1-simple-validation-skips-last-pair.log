@@ -1,0 +1,39 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-74287/src/brotli_input.rs:4339:9
+     |
+4339 |         assert(work == count as u64 * (count as u64 - 1)) by (nonlinear_arith)
+     |         ^^^^^^
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-74287/src/brotli_input.rs:4311:1
+     |
+4311 | / fn simple_distinct_validation_metered(symbols: &[u16; 4], count: u8,
+4312 | |     budget: &mut crate::brotli::RequestBudget,
+4313 | | ) -> (r: Result<u64, CoreFailure>)
+     | |_________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-74287/src/brotli_input.rs:4323:9
+     |
+4323 |           r.is_ok() == (old(budget).work_remaining >= count as u64 * (count as u64 - 1)),
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+4329 | / {
+4330 | |     let work = match count { 1 => 0u64, 2 => 2u64, 3 => 6u64, _ => 12u64 };
+4331 | |     proof {
+4332 | |         match count {
+...    |
+4361 | |     Ok(work)
+4362 | | }
+     | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

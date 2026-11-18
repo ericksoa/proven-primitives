@@ -1,0 +1,35 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-50154/src/brotli_input.rs:9480:1
+     |
+9480 | / fn b3b_state_address(
+9481 | |     workspace_len: usize,
+9482 | |     window_bytes: u32,
+9483 | |     relative: u16,
+9484 | |     width: u8,
+9485 | | ) -> (r: Result<usize, crate::brotli_prefix::WorkspaceError>)
+     | |____________________________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-50154/src/brotli_input.rs:9487:13
+     |
+9487 |       ensures r.is_ok() ==> {
+     |  _____________^
+9488 | |         &&& b3b_workspace_shape(workspace_len as nat, window_bytes)
+9489 | |         &&& relative as nat + width as nat <= B3B_SCALAR_BYTES
+9490 | |         &&& r.unwrap() as nat
+9491 | |             == window_bytes as nat + B3B_SCALAR_OFFSET as nat + relative as nat
+9492 | |         &&& r.unwrap() as nat + width as nat <= workspace_len
+9493 | |     },
+     | |_____^ failed this postcondition
+...
+9525 |       Ok(at)
+     |       ------ at the end of the function body
+
+error: aborting due to 1 previous error
+

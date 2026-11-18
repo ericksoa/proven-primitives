@@ -1,0 +1,116 @@
+{
+  "status": "IMMUTABLE STATIC HARNESS LITERAL UPDATES; UNAPPLIED; NO PROBES",
+  "reference_positive": {
+    "path": "evidence/m1-source-receipts-final02/positive.json",
+    "sha256": "86d4e79af18845dc26949de1b75c6627a683242b78aeb22a0e23b932466f172f",
+    "verification": {
+      "encountered-error": false,
+      "encountered-vir-error": false,
+      "errors": 0,
+      "is-verifying-entire-crate": true,
+      "success": true,
+      "verified": 1397
+    },
+    "runtime_passed": 116,
+    "source_hashes": {
+      "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "tests/proof_rejection.rs": "74cec7fcc319568dc86cc2493df527db6a92423b2e89f4d8584770b7c1d3998e"
+    }
+  },
+  "cases": [
+    {
+      "name": "brotli-b3c-context-bits-execution-reserved-after-writes",
+      "suite": "the_prover_rejects_seventeen_b3c_context_bits_defects",
+      "function_selector": "execute_planned_context_bits",
+      "only_allowed_edit": "Replace only this special harness let-call Rust string literal; leave case tuple and assertions untouched",
+      "old_harness_call_literal": "    let (used, status) = advance_context_bits_phase(workspace, window_bytes, plan.phase,\n        kind_tag, kind, active_len, input, end_of_input);",
+      "new_harness_call_literal": "    let (used, status) = { let (r_child_result, Ghost(r_child_units)) = advance_context_bits_phase(workspace, window_bytes, plan.phase,\n        kind_tag, kind, active_len, input, end_of_input); proof { r_context_owner_source_units = r_context_owner_source_units + r_child_units; } r_child_result };",
+      "old_harness_call_literal_sha256": "a232cdbae8721129a5356517fd859fa257116fe54b4ce15531c1db4bb0b6bb41",
+      "new_harness_call_literal_sha256": "ebcc60c80024d903b321db4e92868d01ff2c6506ee787afa3885ad3c37317fba",
+      "harness_literal_line": 3275,
+      "case_tuple_unchanged": {
+        "name": "brotli-b3c-context-bits-execution-reserved-after-writes",
+        "function": "execute_planned_context_bits",
+        "old": "    if !budget.charge_work(plan.execution_work) {\n        return (Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }), Ghost(r_context_owner_source_units));\n    }",
+        "new": "    "
+      },
+      "selector_unchanged": true,
+      "assertions_unchanged": true,
+      "root_contract_unchanged": true,
+      "new_requirements": false,
+      "unit_policy_changed": false,
+      "static_validation": {
+        "old_execution_needle_matches": 0,
+        "new_execution_needle_matches": 1,
+        "reservation_removal_anchor_matches": 1,
+        "in_memory_relocation_balanced": true,
+        "reservation_after_actual_action_and_child_receipt_addition": true,
+        "work_reservation_sites_after_relocation": 1,
+        "mutated_selected_body_sha256": "e37dfc64ea5b852a8aa5c5aa5e9fe057719145240afcee411361be8fed95184b",
+        "mutant_written_to_source": false,
+        "mutant_executed": false
+      },
+      "preserved_fault": "Remove the same exact up-front execution reservation block and reinsert the identical block immediately after the first mutating phase action. The R child receipt is accumulated before late credit rejection, preserving truthful reached work. Only erased receipt scaffolding lies between the helper return and reinsertion point.",
+      "failure_class": "Auxiliary harness insertion needle stale under R return wrapping; not a semantic rejection",
+      "evidence": [
+        {
+          "path": "evidence/m1-source-receipts-final02/control-attempts/1794950778669754000/controls-the_prover_rejects_seventeen_b3c_context_bits_defects.log",
+          "sha256": "11f008e806e67a369650e2d5011b14c923edd899776b1c58fc627c6b4f70dbb4",
+          "unique_execution_site_failed": true,
+          "verifier_run_for_late_case": false
+        }
+      ]
+    },
+    {
+      "name": "brotli-b3c-context-count-execution-reserved-after-writes",
+      "suite": "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+      "function_selector": "execute_planned_context_tree_count",
+      "only_allowed_edit": "Replace only this special harness let-call Rust string literal; leave case tuple and assertions untouched",
+      "old_harness_call_literal": "    let (used, status) = advance_context_tree_count_phase(\n        workspace, window_bytes, kind_tag, kind, active_len, input, end_of_input,\n    );",
+      "new_harness_call_literal": "    let (used, status) = { let (r_child_result, Ghost(r_child_units)) = advance_context_tree_count_phase(\n        workspace, window_bytes, kind_tag, kind, active_len, input, end_of_input,\n    ); proof { r_context_owner_source_units = r_context_owner_source_units + r_child_units; } r_child_result };",
+      "old_harness_call_literal_sha256": "6e3e6d10d127c9c11014736534f4b37ddc0f719a684b76f754fdf61732c7f5a7",
+      "new_harness_call_literal_sha256": "8980a9882797271a5f8d863268726a1d086f6a5fda7fd5b27687d6dd574d4225",
+      "harness_literal_line": 3208,
+      "case_tuple_unchanged": {
+        "name": "brotli-b3c-context-count-execution-reserved-after-writes",
+        "function": "execute_planned_context_tree_count",
+        "old": "    if !budget.charge_work(plan.execution_work) {\n        return (Err(CompressedStep {\n            consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit),\n        }), Ghost(r_context_owner_source_units));\n    }",
+        "new": "    "
+      },
+      "selector_unchanged": true,
+      "assertions_unchanged": true,
+      "root_contract_unchanged": true,
+      "new_requirements": false,
+      "unit_policy_changed": false,
+      "static_validation": {
+        "old_execution_needle_matches": 0,
+        "new_execution_needle_matches": 1,
+        "reservation_removal_anchor_matches": 1,
+        "in_memory_relocation_balanced": true,
+        "reservation_after_actual_action_and_child_receipt_addition": true,
+        "work_reservation_sites_after_relocation": 1,
+        "mutated_selected_body_sha256": "13aa8c1f0483597a38e1f19c31a7e24ae77286f9b9bef0284a730d4354764544",
+        "mutant_written_to_source": false,
+        "mutant_executed": false
+      },
+      "preserved_fault": "Remove the same exact up-front execution reservation block and reinsert the identical block immediately after the first mutating phase action. The R child receipt is accumulated before late credit rejection, preserving truthful reached work. Only erased receipt scaffolding lies between the helper return and reinsertion point.",
+      "failure_class": "Auxiliary harness insertion needle stale under R return wrapping; not a semantic rejection",
+      "evidence": []
+    }
+  ],
+  "all_assertions_selectors_case_tuples_and_other_harness_text_unchanged": true,
+  "candidate_test_sha256_if_applied_alone": "fbd83dbd18cb039ce58c9af416e5743248390d6d23ff59bf561234b8e8ea906d",
+  "main_source_edits": 0,
+  "main_test_edits": 0,
+  "gate_edits": 0,
+  "root_canary_writes": 0,
+  "mutant_runs": 0,
+  "source_delta_required": false,
+  "application_preconditions": [
+    "Retain complete failed attempt02 source/log archive",
+    "Apply collectively with other validated test-only migrations",
+    "Fresh same-source whole-positive after final test changes",
+    "Fresh full48suite/318case control gate; no static result counts as a rejection"
+  ]
+}

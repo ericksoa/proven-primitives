@@ -1,0 +1,23 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::plan_block_count_action (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-33654/src/brotli_input.rs:29136:1
+      |
+29136 | / fn plan_block_count_action(
+29137 | |     workspace: &[u8],
+29138 | |     window_bytes: u32,
+29139 | |     input: &[u8],
+29140 | |     end_of_input: bool,
+29141 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+      | |____________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-33654/src/brotli_input.rs:29217:16
+      |
+29217 |         assert(plan.status == block_count_status_for_var(step.status));
+      |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

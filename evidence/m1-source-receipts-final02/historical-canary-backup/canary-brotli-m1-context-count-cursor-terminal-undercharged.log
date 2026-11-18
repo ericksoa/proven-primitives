@@ -1,0 +1,26 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-cursor-terminal-canary-27783/src/brotli_input.rs:35442:1
+      |
+35442 | / fn advance_planned_context_tree_count(
+35443 | |     workspace: &mut [u8],
+35444 | |     window_bytes: u32,
+35445 | |     budget: &mut crate::brotli::RequestBudget,
+35446 | |     input: &[u8],
+35447 | |     end_of_input: bool,
+35448 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-cursor-terminal-canary-27783/src/brotli_input.rs:35493:28
+      |
+35493 |             proof { assert(m1_context_cursor_failure_plan(workspace@, window_bytes, failed_plan)); }
+      |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,60 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-77397/src/brotli_input.rs:34209:1
+      |
+34209 | / fn execute_fixed_compressed_plan(
+34210 | |     workspace: &mut [u8],
+34211 | |     window_bytes: u32,
+34212 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+34217 | |     plan: CompressedActionPlan,
+34218 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+note: function body check finished in 8 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-77397/src/brotli_input.rs:34209:1
+      |
+34209 | / fn execute_fixed_compressed_plan(
+34210 | |     workspace: &mut [u8],
+34211 | |     window_bytes: u32,
+34212 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+34217 | |     plan: CompressedActionPlan,
+34218 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-77397/src/brotli_input.rs:34264:9
+      |
+34264 | /         phase == CompressedOuterPhase::InitialBlockLength
+34265 | |             && initial_suffix_plan_valid(old(workspace)@, window_bytes, input@, end_of_input, plan)
+34266 | |             && old(budget).input_remaining >= plan.consumed as u64
+34267 | |             && old(budget).work_remaining >= plan.execution_work ==> {
+...     |
+34273 | |                 &&& match r { Ok(used) => used == plan.consumed, Err(step) => step.consumed == plan.consumed }
+34274 | |             },
+      | |_____________^ failed this postcondition
+...
+34499 |           return Err(CompressedStep { consumed: used, status });
+      |           ----------------------------------------------------- at this exit
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-77397/src/brotli_input.rs:34209:1
+      |
+34209 | / fn execute_fixed_compressed_plan(
+34210 | |     workspace: &mut [u8],
+34211 | |     window_bytes: u32,
+34212 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+34217 | |     plan: CompressedActionPlan,
+34218 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: aborting due to 1 previous error
+

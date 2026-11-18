@@ -1,0 +1,287 @@
+{
+  "files": [
+    {
+      "bytes": 4758,
+      "original_path": "target/m1-r-controls03-updates/focused03-execution-result.json",
+      "review_path": "review/focused03/execution-result.json",
+      "sha256": "7343c077183c2ee91901f4c02d122653b999e7252345900e366d7ab0f0fda4f1"
+    },
+    {
+      "bytes": 1958,
+      "original_path": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000/file-sha256.json",
+      "review_path": "review/focused03/failure-file-map.json",
+      "sha256": "c04dec0827bdb4e9b17a61a0093cf6c2b8a61739d79847dcdf8488a64de45196"
+    },
+    {
+      "bytes": 3121,
+      "original_path": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000/canary-brotli-b3b-tree-field-truncation-needs-input.log",
+      "review_path": "review/focused03/field-original-resource.log",
+      "sha256": "9677e8c7328fc55816c2222a979137a95ea11d41ae0a94dc6e1ea466a60652b6"
+    },
+    {
+      "bytes": 2741,
+      "original_path": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000/canary-brotli-m1-malformed-suffix-fallback-undercharge.log",
+      "review_path": "review/focused03/suffix-undercharge-original-resource.log",
+      "sha256": "d985e3eafc521e5419db8530609e64f473e0af867214838f38eb5038b57709ed"
+    },
+    {
+      "bytes": 2741,
+      "original_path": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000/canary-brotli-m1-cursor-context-owner-skips-terminal-action.log",
+      "review_path": "review/focused03/cursor-original-resource.log",
+      "sha256": "cc0009a0011391085446e8502e50d9fe488c2ced05967e468b1a5226afa1b042"
+    },
+    {
+      "bytes": 10749,
+      "original_path": "target/m1-r-field-truncation-computed-multiline-diagnostic/coupled-diagnostic-result.json",
+      "review_path": "review/field/qualified-pair.json",
+      "sha256": "698e973584c8f949142e6121d19d468d991555f42647fadd30aef440b86a97ee"
+    },
+    {
+      "bytes": 3462,
+      "original_path": "target/m1-r-field-truncation-computed-multiline-diagnostic/minimal-main-test.patch",
+      "review_path": "review/field/minimal-main-test.patch",
+      "sha256": "f397c2f0864e65f4e24930fed4cabc4b4c48fda9dcdf0524697da6e90353ff12"
+    },
+    {
+      "bytes": 1825,
+      "original_path": "target/m1-r-field-truncation-computed-multiline-diagnostic/minimal-patch-provenance.json",
+      "review_path": "review/field/patch-provenance.json",
+      "sha256": "393ecac5b0e78abfd1a68c09f1d5494b6fcef6e9d2fe035024fb2f766423b8d9"
+    },
+    {
+      "bytes": 5403,
+      "original_path": "target/m1-r-field-truncation-witness/witness-result.json",
+      "review_path": "review/field/witness-result.json",
+      "sha256": "9018e0842373ce193473eafcb73443e37ffb3704d90a0bc0a2f5764133053a22"
+    },
+    {
+      "bytes": 1070,
+      "original_path": "target/m1-r-field-truncation-witness/admission-proof.rs.txt",
+      "review_path": "review/field/admission-proof.rs.txt",
+      "sha256": "e2f817780fbc01a168a2a1a02ff7abaa7453f261d7501f84cfbbdcab19648261"
+    },
+    {
+      "bytes": 1365,
+      "original_path": "target/m1-r-field-truncation-witness/model-mapping-proof.rs.txt",
+      "review_path": "review/field/model-mapping-proof.rs.txt",
+      "sha256": "bb26e6be8b4c9ec8c499f85f66555e5cb60489f735ca24a287300f50050eef10"
+    },
+    {
+      "bytes": 33880,
+      "original_path": "target/m1-r-field-truncation-witness/replay-entry.rs.txt",
+      "review_path": "review/field/same-body-replay.rs.txt",
+      "sha256": "9e088125c17ac0e067d263358cb706a388c9cdc81c40edd19dacf98f5b52b850"
+    },
+    {
+      "bytes": 2056,
+      "original_path": "target/m1-r-field-truncation-witness/source-token-audit.json",
+      "review_path": "review/field/source-token-audit.json",
+      "sha256": "f83440625a243809e07fd0d61b075d22d599d975cd4ec185ce94726d2264670b"
+    },
+    {
+      "bytes": 4150,
+      "original_path": "target/m1-r-independent-field-truncation-audit/audit.json",
+      "review_path": "review/field/independent-audit.json",
+      "sha256": "9f9a4cc50b603bbf07d1031f4e6a9fb871932f5ea1610d9c9b798ef15709cf76"
+    },
+    {
+      "bytes": 4239,
+      "original_path": "target/m1-r-field-truncation-computed-multiline-diagnostic/source-manifest.json",
+      "review_path": "review/field/test-copy-setting-and-format-manifest.json",
+      "sha256": "a9c0120982f7862cc57867ef0e135236e6abf2d12edd7c56f7228e99778b0629"
+    },
+    {
+      "bytes": 1865,
+      "original_path": "target/m1-r-suffix-family-computed-controls-final/family-result.json",
+      "review_path": "review/suffix/family-result.json",
+      "sha256": "a2f694bc93135eab1f1c882259c576fd55d092e7b5d2f37e29434c1106b9f2bc"
+    },
+    {
+      "bytes": 5164,
+      "original_path": "target/m1-r-suffix-family-computed-controls-final/combined-main-test.patch",
+      "review_path": "review/suffix/combined-main-test.patch",
+      "sha256": "5dc0d801c8003f2d815cd52dba92da1521f10936f83588493bd6ca5cd2fabf82"
+    },
+    {
+      "bytes": 1458,
+      "original_path": "target/m1-r-suffix-family-computed-controls-final/replay-and-patch.json",
+      "review_path": "review/suffix/patch-source-replay.json",
+      "sha256": "63d206c8e74388ee931aa9620af968c1a72357f51574d55281b371ef9436d82d"
+    },
+    {
+      "bytes": 7336,
+      "original_path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/coupled-diagnostic-result.json",
+      "review_path": "review/suffix/debit-qualified-pair.json",
+      "sha256": "a3b49025ca52d48310b6a7a3d5f4320bf3f8c4ed4a1faa8feb1f88274123b983"
+    },
+    {
+      "bytes": 7060,
+      "original_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/coupled-diagnostic-result.json",
+      "review_path": "review/suffix/byte175-qualified-pair.json",
+      "sha256": "3ea7139a3edb79daaf6c4892d95d7545cf6f3d0460e6a3d3477aac15d0e27651"
+    },
+    {
+      "bytes": 11530,
+      "original_path": "target/m1-r-suffix-fallback-witness/witness-result.json",
+      "review_path": "review/suffix/precharge-witness.json",
+      "sha256": "6d7c57e87ebe1b5e173208d1db6b6e4f665e0a8303a2fa494704f32e0d79a55e"
+    },
+    {
+      "bytes": 10018,
+      "original_path": "target/m1-r-suffix-fallback-witness/terminal-witness-result.json",
+      "review_path": "review/suffix/terminal-witness.json",
+      "sha256": "01f4a2d6dbb10a8d54eaa0f5c5293dc90dda87b1ac7637cf16656a653a3c7865"
+    },
+    {
+      "bytes": 1152,
+      "original_path": "target/m1-r-suffix-fallback-witness/required-debit.rs.txt",
+      "review_path": "review/suffix/required-debit.rs.txt",
+      "sha256": "e8d40e77ccc51c4b79a792b4d79c5c131e6b6355af18988809335afad3e3591c"
+    },
+    {
+      "bytes": 997,
+      "original_path": "target/m1-r-suffix-fallback-witness/required-byte-value.rs.txt",
+      "review_path": "review/suffix/required-byte-value.rs.txt",
+      "sha256": "34f9ba0e6cfd72050e625bd6fd56e09c4363f8ff16d0c2f8cc7a77793835106f"
+    },
+    {
+      "bytes": 31571,
+      "original_path": "target/m1-r-suffix-fallback-witness/prefix-replay.rs.txt",
+      "review_path": "review/suffix/prefix-replay.rs.txt",
+      "sha256": "1a9bc8190a34021ea1ef0bf1eedf56a46f7b07d96c7d9fb6020259be2e3121b3"
+    },
+    {
+      "bytes": 34614,
+      "original_path": "target/m1-r-suffix-fallback-witness/terminal-replay.rs.txt",
+      "review_path": "review/suffix/terminal-replay.rs.txt",
+      "sha256": "6151b68ceede65c722eb559175c417c3c814d7253b2c9a8d6ad3f918c5f3861c"
+    },
+    {
+      "bytes": 1155,
+      "original_path": "target/m1-r-suffix-fallback-witness/prefix-correspondence.json",
+      "review_path": "review/suffix/prefix-correspondence.json",
+      "sha256": "6bd50734bc9d4e041802549f4e65471c211ee79c6f975bf982411216cc64ac8a"
+    },
+    {
+      "bytes": 1014,
+      "original_path": "target/m1-r-suffix-fallback-witness/terminal-correspondence.json",
+      "review_path": "review/suffix/terminal-correspondence.json",
+      "sha256": "53cba85fce4a1e52a75313671cce79ca981a6fe0439b6a19a0fd2d46e16a1150"
+    },
+    {
+      "bytes": 3240,
+      "original_path": "target/m1-r-suffix-fallback-independent-audit/source-ledger-review.json",
+      "review_path": "review/suffix/debit-independent-audit.json",
+      "sha256": "697d00d50e112a8db6b9e0e7aadef021af543b1a74a82a530def7929d4b94fb5"
+    },
+    {
+      "bytes": 4914,
+      "original_path": "target/m1-r-suffix-fallback-independent-audit/byte175-review.json",
+      "review_path": "review/suffix/byte175-independent-audit.json",
+      "sha256": "b17052533322bb206eeaca63f4c1a2636e8538acb3402cee489378c75f624e76"
+    },
+    {
+      "bytes": 7504,
+      "original_path": "target/m1-r-cursor-computed-receipt-diagnostic/qualified-case-result.json",
+      "review_path": "review/cursor/qualified-pair.json",
+      "sha256": "5bec4a0de70c3c65d83b4a0ba93103afbf90c3ce58164724d63c5272b6d9804a"
+    },
+    {
+      "bytes": 2658,
+      "original_path": "target/m1-r-cursor-computed-receipt-diagnostic/minimal-harness.patch",
+      "review_path": "review/cursor/minimal-harness.patch",
+      "sha256": "3c1d71cfdc11e94f123f9763fe8c995327b2b20b8a13a4a821dddfde515fafa6"
+    },
+    {
+      "bytes": 2716,
+      "original_path": "target/m1-r-cursor-computed-receipt-diagnostic/harness-static-validation.json",
+      "review_path": "review/cursor/harness-source-replay.json",
+      "sha256": "d68860bc695ff78622a7b148119f90aa2dc73e8d5a717c38e52a4d8aa6b2c1ca"
+    },
+    {
+      "bytes": 6557,
+      "original_path": "target/m1-r-cursor-context-witness/witness-result.json",
+      "review_path": "review/cursor/context-witness.json",
+      "sha256": "53a2e7e7a9ef84a8552ed4d46bc4204ef25adaeab229619ad6e84b42f94f3c8a"
+    },
+    {
+      "bytes": 3639,
+      "original_path": "target/m1-r-cursor-context-witness/computed-receipt-source-coupling.json",
+      "review_path": "review/cursor/receipt-source-coupling.json",
+      "sha256": "32c0483b68fcfba874372e563c1b5693223eef65ab7c49dbf1d47939512fc789"
+    },
+    {
+      "bytes": 1945,
+      "original_path": "target/m1-r-cursor-context-witness/ordinary-correspondence.json",
+      "review_path": "review/cursor/ordinary-correspondence.json",
+      "sha256": "882c35a2a16b224318dd9594774ffdf3712a386c3dec2d7cfe9c362bb32c167b"
+    },
+    {
+      "bytes": 2548,
+      "original_path": "target/m1-r-cursor-required-receipt-proof/required-receipt.rs.txt",
+      "review_path": "review/cursor/required-receipt-proof.rs.txt",
+      "sha256": "95aa59f953a98c575f326f7e58c9a9cc278b0df265e0e0624624d40bfeed1023"
+    },
+    {
+      "bytes": 3400,
+      "original_path": "target/m1-r-cursor-required-receipt-proof/criterion-binding.json",
+      "review_path": "review/cursor/criterion-binding.json",
+      "sha256": "2cb69c7c70ded839f3b4b91b59efc97462011cc964857b94bf98a3a51573680c"
+    },
+    {
+      "bytes": 5273,
+      "original_path": "target/m1-r-independent-cursor-receipt-audit/audit.json",
+      "review_path": "review/cursor/independent-audit.json",
+      "sha256": "6991d6a86b86925df24b0b76fe91cbb1d53d595c1ef8fdc6eb9cbc2377f19410"
+    },
+    {
+      "bytes": 36998,
+      "original_path": "target/m1-r-cursor-context-witness/owner-validation-entry.rs.txt",
+      "review_path": "review/cursor/owner-validation.rs.txt",
+      "sha256": "42e790c1d87ef65e401f44518141b91c9a170a8e2fbf51e545e9dee3983641c8"
+    },
+    {
+      "bytes": 2559,
+      "original_path": "target/m1-r-cursor-context-witness/image-lemma.rs.txt",
+      "review_path": "review/cursor/image-proof.rs.txt",
+      "sha256": "e2ff5d2ce5c0fe96d6c50cf47f5fc674909a05b8331a42786d0eb9b557782412"
+    },
+    {
+      "bytes": 6629,
+      "original_path": "target/m1-r-field-truncation-split-diagnostic/diagnostic-result.json",
+      "review_path": "review/history/field-split-resource-result.json",
+      "sha256": "f35db714460f5fb63d4d06109886633ee1557d02a6e5d9048f26d5f48a268e1b"
+    },
+    {
+      "bytes": 4060,
+      "original_path": "target/m1-r-field-truncation-computed-diagnostic/diagnostic-result.json",
+      "review_path": "review/history/field500-computed-resource-result.json",
+      "sha256": "22d3a771b97207d7debc22e286d448acde3623cf4115fb630ceaefcf30812949"
+    },
+    {
+      "bytes": 6984,
+      "original_path": "target/m1-r-field-truncation-computed-effort1000-diagnostic/diagnostic-result.json",
+      "review_path": "review/history/field1000-singleline-unqualified-result.json",
+      "sha256": "af658098c1116eafecabe9ee92d6b60969c88ced50a4a1713dca48285d12376a"
+    },
+    {
+      "bytes": 5067,
+      "original_path": "target/m1-r-unreached03-controls-diagnostic/diagnostic-result.json",
+      "review_path": "review/history/unreached03-result.json",
+      "sha256": "b256a9a0ffe9e21c0870e1360efa2101dc68119359c21ada95c4a07bbe02c380"
+    },
+    {
+      "bytes": 5977,
+      "original_path": "target/m1-r-suffix-fallback-distributed-charge-diagnostic/diagnostic-result.json",
+      "review_path": "review/history/suffix-distributed-charge-result.json",
+      "sha256": "44254b81ae28a518450f0a592172fb5213d34f103b3e26a6167ba7e8c83e1550"
+    },
+    {
+      "bytes": 1152,
+      "original_path": "target/m1-r-cursor-owner-branch-diagnostic/diagnostic-result.json",
+      "review_path": "review/history/cursor-owner-branch-result.json",
+      "sha256": "c622c48a096a74471200d3d84e7eba5cadd07bd55dcb973a5b2964d3b14c5213"
+    }
+  ],
+  "purpose": "Exact small plaintext copies for ordinary code review; historical generation base only, not final04test closure."
+}

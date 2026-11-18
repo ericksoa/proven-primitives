@@ -1,0 +1,64 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_k7_k8_result_contract_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T05:15:41.280552+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 75.06318316700344,
+  "finished_utc": "2026-11-17T05:16:56.344827+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_six_k7_k8_result_contract_defects.log",
+  "log_sha256": "71170688abdc5f8609a14818b0a39046bd401dd140bc050a3789b34d60282506",
+  "suite": "the_prover_rejects_six_k7_k8_result_contract_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-k7-canonical-constructor-spurious-error",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-k7-canonical-constructor-spurious-error.log",
+      "sha256": "eb90d5163812d913f4439fc49819a5ed21bbb3af1bf8f3f6deceaddbb0772edc",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k8-single-constructor-spurious-error",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-k8-single-constructor-spurious-error.log",
+      "sha256": "57ba294bcfc29fee58e460bc47b75312407ecd9dd5c088861224ae19c6d29a5b",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k7-singleton-install-spurious-error",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-k7-singleton-install-spurious-error.log",
+      "sha256": "c802ae90d57877fafa86cb983ac19d6e6a2120c4e16500c535504f13c7ffb1db",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k7-multi-install-spurious-error",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-k7-multi-install-spurious-error.log",
+      "sha256": "005a3a73f798b5d0dbea9de4a116725f1110866601bc1da2feb6d21ae91feb2a",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k8-invalid-tree-error-replaced",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-k8-invalid-tree-error-replaced.log",
+      "sha256": "ff7c16ac7016d09f1ec53aabb86a65535eb40b90a7a027434371920cf887ad7c",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k8-invalid-tree-mutates-metadata",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-k8-invalid-tree-mutates-metadata.log",
+      "sha256": "5be82d9c2f0c41a7cd32d7550b21106172b8d5d11c21e2c2dd90d39addb08e6e",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

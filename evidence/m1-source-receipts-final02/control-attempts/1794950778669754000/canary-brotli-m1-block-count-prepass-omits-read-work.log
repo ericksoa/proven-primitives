@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-53143/src/brotli_input.rs:30942:1
+      |
+30942 | / fn block_count_planning_work(
+30943 | |     workspace: &[u8],
+30944 | |     window_bytes: u32,
+30945 | |     input_len: usize,
+30946 | | ) -> (r: Result<u64, CompressedHeaderError>)
+      | |___________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-53143/src/brotli_input.rs:30951:12
+      |
+30951 |           }, r.is_ok() ==> block_count_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+      |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+30952 | / {
+30953 | |     reveal(fixed_phase_bad_cursor); reveal(context_mode_pending);
+30954 | |     reveal(block_count_planning_read_valid); reveal(var_uint8_planning_read_units);
+30955 | |     let kind = state_byte(workspace, window_bytes, B3B_CURRENT_KIND)?;
+...     |
+30976 | |     Ok(0)
+30977 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

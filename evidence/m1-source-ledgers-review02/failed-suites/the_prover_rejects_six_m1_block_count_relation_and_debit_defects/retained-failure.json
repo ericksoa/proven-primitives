@@ -1,0 +1,38 @@
+{
+  "suite": "the_prover_rejects_six_m1_block_count_relation_and_debit_defects",
+  "exit_code": 101,
+  "fresh_case_logs": [
+    {
+      "name": "brotli-m1-block-count-prepass-omits-read-work",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_block_count_relation_and_debit_defects/canary-brotli-m1-block-count-prepass-omits-read-work.log",
+      "sha256": "d02f6a02f66c3de772673076726829c5d21950d0a01898b9fd56ff2db30dc9d8"
+    },
+    {
+      "name": "brotli-m1-block-count-plan-loses-need-input",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_block_count_relation_and_debit_defects/canary-brotli-m1-block-count-plan-loses-need-input.log",
+      "sha256": "60f28a9baeaa98d7bbd137959867f3a70b144c9ed5ab6885eab0b3e0a3831157"
+    },
+    {
+      "name": "brotli-m1-block-count-plan-loses-consumption",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_block_count_relation_and_debit_defects/canary-brotli-m1-block-count-plan-loses-consumption.log",
+      "sha256": "5616f27973096b911cfbce056eddff1ed3e3cc1dba3a8ac95a4fc280364372be"
+    },
+    {
+      "name": "brotli-m1-block-count-executor-omits-input-debit",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_block_count_relation_and_debit_defects/canary-brotli-m1-block-count-executor-omits-input-debit.log",
+      "sha256": "0b59aa222f1a5f28335f7c368c81cad75a6ac1ae075250f1e10c00a5848da13d"
+    },
+    {
+      "name": "brotli-m1-block-count-limited-input-is-retryable",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_block_count_relation_and_debit_defects/canary-brotli-m1-block-count-limited-input-is-retryable.log",
+      "sha256": "d9d90950ee623b41e9abdb29e2db71165690ac05167e2efe3f789988cc387fc2"
+    }
+  ],
+  "source_at_failure_bundles": [
+    {
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_block_count_relation_and_debit_defects/source-at-failure-0.tar.gz",
+      "sha256": "14ee44eac7789578c2ecc2264e5f0577b301f7ac525d4db64dee3e46d2d5e146"
+    }
+  ],
+  "not_semantic_closure": true
+}

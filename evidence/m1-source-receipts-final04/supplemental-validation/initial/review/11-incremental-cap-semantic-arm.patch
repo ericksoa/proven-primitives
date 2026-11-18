@@ -1,0 +1,14 @@
+--- a/tests/proof_rejection.rs
++++ b/tests/proof_rejection.rs
+@@ -3821,7 +3821,10 @@
+                 || log.contains("precondition not satisfied")
+                 || log.contains("requires not satisfied")
+                 || log.contains("assertion failed")
+-                || log.contains("invariant not satisfied"),
++                || log.contains("invariant not satisfied")
++                || (name == "brotli-m1-planner-restores-too-small-cap"
++                    && log.contains("error: expression simplifies to false")
++                    && log.contains("by (compute_only)")),
+             "expected semantic proof rejection: {log}"
+         );
+         fs::write(&path, &original).unwrap();

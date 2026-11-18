@@ -1,0 +1,129 @@
+{
+  "status": "UNQUALIFIED: unchanged selected positive1/0; one equivalent branch-distributed negative resource-only0/1 at108s. Stop; no further variants.",
+  "case": "brotli-m1-malformed-suffix-fallback-undercharge",
+  "function": "advance_planned_compressed_action",
+  "positive": {
+    "completed_utc": "2026-11-18T02:00:13.971136+00:00",
+    "exit_code": 0,
+    "verified": 1,
+    "errors": 0,
+    "source_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "source_unchanged": true,
+    "function_body_seconds": [
+      42
+    ],
+    "log": "positive/positive-unchanged-root.log",
+    "log_sha256": "7df9da50af62e47a15573a203a0185a872babff85525e84d6b60f57620fbc13d",
+    "source_manifest_sha256": "7807c26a7b59df03f2ad976c66ada97f38af85981abc30f990278afc3c80911c",
+    "attributes": [
+      "#[verifier::spinoff_prover]",
+      "#[verifier::rlimit(1000)]"
+    ],
+    "global_checker_rlimit": 1000,
+    "default_seed_and_existing_flags_retained": true,
+    "scope": "Actual unchanged selected advance_planned_compressed_action positive; all original root obligations checked."
+  },
+  "negative": {
+    "completed_utc": "2026-11-18T02:05:02.553244+00:00",
+    "exit_code": 1,
+    "verified": 0,
+    "errors": 1,
+    "classification": "resource-only failure; exact-equivalent-fault distribution unresolved and not accepted",
+    "function_body_seconds": 108,
+    "source_sha256": "7f36ee4ddb02e396ac9bcac1519ab0c52221f294df05dde5fa761436c5137424",
+    "source_unchanged": true,
+    "log": "bad-undercharge/bad-distributed-undercharge.log",
+    "log_sha256": "db2f4866240f8f3cfa330cf881ee4b2cc59d4b311c4a81e78e990f6f4ed5c162",
+    "source_manifest_sha256": "9890c37907cc2f585484d68e3cf412ffa9d095cf5c8ed683934fcad0d4871b2e",
+    "bound_positive_result_sha256": "312bc4f1caccdc03f068b1ade9059bb6164b6efbb429668216ce8e94dd4da27c",
+    "strict_gate_classifier": {
+      "semantic_rejection": false,
+      "tool_or_resource_failure": true,
+      "syntax_or_type_failure": false,
+      "computed_false": false,
+      "checked_semantic_error": false
+    },
+    "strict_gate_driver_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+    "strict_gate_accepted": false,
+    "attributes": [
+      "#[verifier::spinoff_prover]",
+      "#[verifier::rlimit(1000)]"
+    ],
+    "checker_flags": [
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "advance_planned_compressed_action",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "environment": {
+      "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+      "RUSTUP_TOOLCHAIN": "1.99.1"
+    },
+    "positive_runs": 1,
+    "negative_runs": 1,
+    "extra_verifier_runs": 0,
+    "all_original_assertions_returns_currentGhost_preserved_in_both_failure_branches": true,
+    "all_original_root_contracts_models_invariants_decreases_attributes_unchanged": true,
+    "one_charge_call_per_runtime_path": true,
+    "fault_scope_not_broadened": true,
+    "shared_writes_by_this_agent": 0,
+    "native_harness_run_by_this_agent": false,
+    "full_gate_completion_claimed": false
+  },
+  "positive_result_sha256": "312bc4f1caccdc03f068b1ade9059bb6164b6efbb429668216ce8e94dd4da27c",
+  "negative_result_sha256": "f6ad763003977db278dbf9f3edc2b20ed46661f364ffa3f2e2a6ed63c73ecc2b",
+  "positive_command_provenance": "positive-command-provenance.json",
+  "positive_command_provenance_sha256": "53f328e2b698080e498d2b92967d8d0572a056b4f5e1f3ec03b312b6edf97350",
+  "provenance_timing": "Sidecar recorded post-run from exact executed tool call; current tool hashes match existing pinned identities. Inherited environment was not claimed contemporaneously captured.",
+  "retained_original_failure": {
+    "actual_source_path": "/var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-malformed-suffix-canary-4885/src/brotli_input.rs",
+    "source_sha256": "617a2c40aa2ad364afd0e0238e542ec09a1b49e2c076459454ec66f98e16a218",
+    "log_sha256": "d985e3eafc521e5419db8530609e64f473e0af867214838f38eb5038b57709ed",
+    "actual_source_equals_original_conditional_amount_mutant": true,
+    "classification": "resource-only failure; unqualified",
+    "body_seconds": 83
+  },
+  "retained_original_failure_classifier": {
+    "semantic_rejection": false,
+    "tool_or_resource_failure": true,
+    "syntax_or_type_failure": false,
+    "computed_false": false,
+    "checked_semantic_error": false
+  },
+  "equivalent_fault_binding": {
+    "original_fault": "charge_work(if initial_outer==3 {4}else{5})",
+    "distributed_fault": "if initial_outer==3 {charge_work(4) with unchanged failure block}else{charge_work(4+1) with unchanged failure block}",
+    "exact_old_failure_block_retained_per_branch": true,
+    "all256_u8_outer_tags_amount_equivalent": true,
+    "one_charge_call_per_path": true,
+    "no_added_read_write_action": true,
+    "scalar_branch_source_units": 0,
+    "inverse_restores_exact3e": true
+  },
+  "prepared_literal_patch": {
+    "path": "minimal-per-case-literal.patch",
+    "sha256": "a125599f8578f2f254b80bc6e4e8e33fca9f79b58a32c820a06bff312c5774a2",
+    "proposed_tests_sha256": "f3cc36597ca6f17c147bcc5310b64c9c11611fe49959155b56305b86a0a2b0ab",
+    "generator_replay_matches_actual_negative": true,
+    "status": "NOT VALIDATED; do not apply as a qualified repair",
+    "all_generic_harness_assertions_arms_and_checker_calls_byte_identical": true
+  },
+  "production_sources_current_sha256": {
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15"
+  },
+  "shared_tests_current_sha256_observed": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+  "shared_writes_by_this_agent": 0,
+  "no_full_gate_completion_claim": true
+}

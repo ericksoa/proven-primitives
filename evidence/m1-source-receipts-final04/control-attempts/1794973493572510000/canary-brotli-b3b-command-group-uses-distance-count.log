@@ -1,0 +1,34 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-48265/src/brotli_input.rs:28274:21
+      |
+28274 |                     assert(alphabet >= 64) by (bit_vector)
+      |                     ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-48265/src/brotli_input.rs:28203:5
+      |
+28203 | /     fn group_parameters(
+28204 | |         &self,
+28205 | |         group: u8,
+28206 | |     ) -> (r: Result<(crate::brotli_prefix::TreeRegion, u16, u16), CompressedHeaderError>)
+      | |________________________________________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-48265/src/brotli_input.rs:28251:28
+      |
+28251 |                       assert(count as nat == tree_group_count_at(
+      |  ____________________________^
+28252 | |                         old(self.workspace)@,
+28253 | |                         self.window_bytes,
+28254 | |                         group,
+28255 | |                     ));
+      | |_____________________^ assertion failed
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,85 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_five_b3c_tree_formula_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 98.36758041600115,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 5,
+  "finished_utc": "2026-11-17T21:32:34.179880+00:00",
+  "log": "controls-the_prover_rejects_five_b3c_tree_formula_undercharges.log",
+  "log_sha256": "9b3c9bee4a1a12de6e9be4cd86f55d253e9c31e3d5da36aef3574af6b49cd61a",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "32b9204c0e5785e0651540fc97104823bfb33e1808693d40419ce3cc20321f55",
+      "log": "canary-brotli-b3c-simple-install-formula-undercharge.log",
+      "name": "brotli-b3c-simple-install-formula-undercharge",
+      "semantic_rejection": true,
+      "sha256": "bc7d704ce5b1388481b1ae561af2be21377e014ec7ffd3ab7d1aa338d6a6bed8",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "bcd2ef097c2f65c7b6844c86d4c4d1d4328c9252033da6e658d7f24de2481f6a",
+      "log": "canary-brotli-b3c-canonical-install-formula-undercharge.log",
+      "name": "brotli-b3c-canonical-install-formula-undercharge",
+      "semantic_rejection": true,
+      "sha256": "bb77e82f1772b93bc8c0b8b47e54aa5d225dbb0411eb4a909922a3bb0277d22c",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "7b2a820a05b518796acd65a0ce845fc0438d03e6c78f6c31f51e2905c52e7d2a",
+      "log": "canary-brotli-b3c-repeat-serialization-formula-undercharge.log",
+      "name": "brotli-b3c-repeat-serialization-formula-undercharge",
+      "semantic_rejection": true,
+      "sha256": "78a0b980ec5da57d902a4e2bb2f14cbaf3caa46b68aae73c1c3e3bfa206046a3",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "2e2aa74ee02fe63327ab376e6e2a6385244fcd60c52be1748e5860dcadf570eb",
+      "log": "canary-brotli-b3c-initial-symbol-formula-undercharge.log",
+      "name": "brotli-b3c-initial-symbol-formula-undercharge",
+      "semantic_rejection": true,
+      "sha256": "b317e35c3babfc121ca0e9073cc24f697eaccfa82cbb5c76efe76a5bdb5b700c",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "97affcfc2234db1f034216d3d0c5c3f8501d191fdbcb6393b577e20867117eeb",
+      "log": "canary-brotli-b3c-serialization-base-formula-undercharge.log",
+      "name": "brotli-b3c-serialization-base-formula-undercharge",
+      "semantic_rejection": true,
+      "sha256": "b5c713646f88c1419699bebd2d9fa08083d333e827cd0dd82c04741c8737415d",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794951055811087000,
+  "started_utc": "2026-11-17T21:30:55.811094+00:00",
+  "suite": "the_prover_rejects_five_b3c_tree_formula_undercharges",
+  "suite_source_sha256": "12dd7c52e411dddb555aa0fee06e2a772c79642ae735cba7713baae73d3bd6da",
+  "validation_errors": []
+}

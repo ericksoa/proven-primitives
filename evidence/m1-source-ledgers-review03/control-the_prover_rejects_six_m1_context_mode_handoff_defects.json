@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_context_mode_handoff_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:59:51.870606+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 153.64322062500287,
+  "finished_utc": "2026-11-17T03:02:25.513292+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_six_m1_context_mode_handoff_defects.log",
+  "log_sha256": "2236d24274aa209acf5049102168ec9fe864c60557c2176a8d2b8cc9aa1327d2",
+  "suite": "the_prover_rejects_six_m1_context_mode_handoff_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-m1-handoff-reset-writes-wrong-var-phase",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-handoff-reset-writes-wrong-var-phase.log",
+      "sha256": "c8c410c168ed20b0a12e0bf200c73cb8d5f00d036f2dcb5fe2d6d2081b7d7b14",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-handoff-reset-writes-wrong-pending-run",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-handoff-reset-writes-wrong-pending-run.log",
+      "sha256": "c8c410c168ed20b0a12e0bf200c73cb8d5f00d036f2dcb5fe2d6d2081b7d7b14",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-handoff-plan-undercharges-one",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-handoff-plan-undercharges-one.log",
+      "sha256": "0556c11f6a7a6b4c2ac9aec3f75c2ead9a57c0469acd1e8b1a983cdee5cd0279",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-handoff-plan-consumes-input",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-handoff-plan-consumes-input.log",
+      "sha256": "b99a6041f82982f7249bfaaf4dde0f973e493327d29dfbaf568065ea838ef296",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-handoff-action-skips-literal-map",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-handoff-action-skips-literal-map.log",
+      "sha256": "eb91aaf9e3b00b0cf0a7a83f20ea8fc0d5fba1540dec156607546f4dcb7af83a",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-handoff-reset-writes-padding",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-handoff-reset-writes-padding.log",
+      "sha256": "2fe48954e1b79cbc44024f62c0f91b08274fd02d554e851bb705f26f1c400b55",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

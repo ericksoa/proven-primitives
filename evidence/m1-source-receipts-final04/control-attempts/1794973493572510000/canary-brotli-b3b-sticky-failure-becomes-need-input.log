@@ -1,0 +1,34 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-46277/src/brotli_input.rs:25777:5
+      |
+25777 | /     fn repeat_terminal_failure(
+25778 | |         &mut self,
+25779 | |         error: CompressedHeaderError,
+25780 | |     ) -> (r: CompressedHeaderStep)
+      | |_________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-46277/src/brotli_input.rs:25790:13
+      |
+25790 | /             r == (CompressedHeaderStep {
+25791 | |                 consumed: 0,
+25792 | |                 status: CompressedHeaderStatus::Failed(error),
+25793 | |             }),
+      | |______________^ failed this postcondition
+...
+25799 | /     {
+25800 | |         CompressedHeaderStep {
+25801 | |             consumed: 0,
+25802 | |             status: CompressedHeaderStatus::NeedInput,
+25803 | |         }
+25804 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

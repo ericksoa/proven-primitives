@@ -1,0 +1,30 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:13882:5
+      |
+13882 |     while i < 18
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:13840:1
+      |
+13840 | / fn write_aux_lengths(
+13841 | |     workspace: &mut [u8],
+13842 | |     window_bytes: u32,
+13843 | |     lengths: [u8; 18],
+13844 | | ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:13922:20
+      |
+13922 |             assert(workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i as int] == lengths@[i as int]);
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

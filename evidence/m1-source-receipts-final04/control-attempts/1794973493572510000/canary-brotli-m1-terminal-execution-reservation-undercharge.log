@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60576,13): 'if' cannot be used in patterns.
+WARNING: (68400,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-52521/src/brotli_input.rs:37352:1
+      |
+37352 | / fn advance_planned_terminal_header(
+37353 | |     workspace: &mut [u8], window_bytes: u32,
+37354 | |     budget: &mut crate::brotli::RequestBudget, outer: u8,
+37355 | | ) -> (r: (CompressedStep, Ghost<nat>))
+      | |_____________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-52521/src/brotli_input.rs:37361:13
+      |
+37361 |       ensures {
+      |  _____________^
+37362 | |             let work = m1_terminal_header_units(old(workspace)@, window_bytes, outer);
+37363 | |             if old(budget).work_remaining as nat >= work {
+37364 | |                 &&& final(budget).work_remaining as nat + work == old(budget).work_remaining as nat
+...     |
+37371 | |         },
+      | |_________^ failed this postcondition
+...
+37433 |       (ordinary_result, Ghost(r_terminal_owner_source_units))
+      |       ------------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

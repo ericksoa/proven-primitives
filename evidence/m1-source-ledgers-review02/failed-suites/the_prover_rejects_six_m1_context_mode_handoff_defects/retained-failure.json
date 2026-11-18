@@ -1,0 +1,28 @@
+{
+  "suite": "the_prover_rejects_six_m1_context_mode_handoff_defects",
+  "exit_code": 101,
+  "fresh_case_logs": [
+    {
+      "name": "brotli-m1-handoff-reset-writes-wrong-var-phase",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_context_mode_handoff_defects/canary-brotli-m1-handoff-reset-writes-wrong-var-phase.log",
+      "sha256": "d748e677ec58689835ba1324425cef15a9e125c93d2d757af89acabed1a77a4d"
+    },
+    {
+      "name": "brotli-m1-handoff-reset-writes-wrong-pending-run",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_context_mode_handoff_defects/canary-brotli-m1-handoff-reset-writes-wrong-pending-run.log",
+      "sha256": "d748e677ec58689835ba1324425cef15a9e125c93d2d757af89acabed1a77a4d"
+    },
+    {
+      "name": "brotli-m1-handoff-plan-undercharges-one",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_context_mode_handoff_defects/canary-brotli-m1-handoff-plan-undercharges-one.log",
+      "sha256": "a555c4b234aae7d0e2956769e4032ab8a22c2ced70d6754f31a4137f0e66cbbf"
+    }
+  ],
+  "source_at_failure_bundles": [
+    {
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_context_mode_handoff_defects/source-at-failure-0.tar.gz",
+      "sha256": "f3363ce92f8c798ded55d5535755ba4e24597dc874f99a97444b752d633c370d"
+    }
+  ],
+  "not_semantic_closure": true
+}

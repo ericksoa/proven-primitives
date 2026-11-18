@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_two_b3b_state_layout_and_bit_order_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 84.83461591700325,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 2,
+  "finished_utc": "2026-11-18T05:04:07.212796+00:00",
+  "log": "controls-the_prover_rejects_two_b3b_state_layout_and_bit_order_defects.log",
+  "log_sha256": "3e80d7adc1e21b9402d343f5ead90168a9674396e99b9582438189414c66499c",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "cb9cb44517e11c7add661d9771de0c26c65adba9268d638dc4f36d98e7c3e32f",
+      "log": "canary-brotli-b3b-outer-phase-overlaps-terminal-tag.log",
+      "name": "brotli-b3b-outer-phase-overlaps-terminal-tag",
+      "semantic_rejection": true,
+      "sha256": "537e71c15d5aeb7716c50905414ea97757f382626217052a784b7c781b2da9cb",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "71fea3411173d75f094c2ed2f3a13f0c9bb0b66f0c3a60a3318b4ac10c889d90",
+      "log": "canary-brotli-installed-code-omits-reversed-head-bit.log",
+      "name": "brotli-installed-code-omits-reversed-head-bit",
+      "semantic_rejection": true,
+      "sha256": "7870eb4878ea18a25fd62ef2dd343fa89481b1a2a4a6216020d386c5d19d580c",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794978162378146000,
+  "started_utc": "2026-11-18T05:02:42.378152+00:00",
+  "suite": "the_prover_rejects_two_b3b_state_layout_and_bit_order_defects",
+  "suite_source_sha256": "e0123a8114a14cf1c60cc2d54397d5b788708c4e5cb6c67733e08f6a4d0b102f",
+  "validation_errors": []
+}

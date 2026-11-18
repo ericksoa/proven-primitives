@@ -1,0 +1,54 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-320/src/brotli_input.rs:25061:5
+      |
+25061 | /     fn advance_context_modes_phase(
+25062 | |         &mut self,
+25063 | |         phase: CompressedOuterPhase,
+25064 | |         input: &[u8],
+25065 | |         end_of_input: bool,
+25066 | |     ) -> (r: (usize, Option<CompressedHeaderStatus>))
+      | |____________________________________________________^
+
+note: function body check finished in 39 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-320/src/brotli_input.rs:25061:5
+      |
+25061 | /     fn advance_context_modes_phase(
+25062 | |         &mut self,
+25063 | |         phase: CompressedOuterPhase,
+25064 | |         input: &[u8],
+25065 | |         end_of_input: bool,
+25066 | |     ) -> (r: (usize, Option<CompressedHeaderStatus>))
+      | |____________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-320/src/brotli_input.rs:25080:13
+      |
+25080 | /             context_mode_handoff_domain(old(self).workspace@, old(self).window_bytes) ==> {
+25081 | |                 &&& r == (0usize, None)
+25082 | |                 &&& context_mode_handoff_applied(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
+25083 | |             },
+      | |_____________^ failed this postcondition
+...
+25290 |                           (consumed, None)
+      |                           ---------------- at the end of the function body
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-320/src/brotli_input.rs:25061:5
+      |
+25061 | /     fn advance_context_modes_phase(
+25062 | |         &mut self,
+25063 | |         phase: CompressedOuterPhase,
+25064 | |         input: &[u8],
+25065 | |         end_of_input: bool,
+25066 | |     ) -> (r: (usize, Option<CompressedHeaderStatus>))
+      | |____________________________________________________^
+
+error: aborting due to 1 previous error
+

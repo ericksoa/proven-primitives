@@ -1,0 +1,43 @@
+--- a/tests/proof_rejection.rs
++++ b/tests/proof_rejection.rs
+@@ -4591,6 +4591,28 @@
+             selected.replacen(old, new, 1),
+             &original[end..]
+         );
++        let mutated = if name == "brotli-m1-cursor-context-owner-skips-terminal-action" {
++            // The checked witnessed call supplies5; the skipped child's literal is authoritative.
++            let skipped_receipts: Vec<_> = new.split("Ghost(").skip(1)
++                .filter_map(|tail| tail.split_once(')').map(|(value, _)| value))
++                .filter(|value| value.chars().next().is_some_and(|first| first.is_ascii_digit()))
++                .collect();
++            assert_eq!(skipped_receipts, vec!["0nat"], "unique skipped-child receipt for {name}");
++            let insertion_at = start + selected.find(old).unwrap();
++            let healthy_receipt = "                proof { assert(if 5nat == 5nat { true } else { false }) by (compute_only); }\n";
++            let mut healthy_source = original.clone();
++            healthy_source.insert_str(insertion_at, healthy_receipt);
++            fs::write(&path, &healthy_source).unwrap();
++            let healthy = check_brotli_input_function(&verus, &temporary, function);
++            assert!(healthy.status.success(), "healthy cursor receipt root failed: {}", transcript(&healthy));
++            let negative_receipt = format!("                proof {{ assert(if {} == 5nat {{ true }} else {{ false }}) by (compute_only); }}\n", skipped_receipts[0]);
++            assert_eq!(&mutated[insertion_at..insertion_at + new.len()], new, "qualified skipped-child stub");
++            let mut coupled_negative = mutated;
++            coupled_negative.insert_str(insertion_at, &negative_receipt);
++            coupled_negative
++        } else {
++            mutated
++        };
+         fs::write(&path, mutated).unwrap();
+         let result = check_brotli_input_function(&verus, &temporary, function);
+         let log = transcript(&result);
+@@ -4605,7 +4627,10 @@
+                 || log.contains("precondition not satisfied")
+                 || log.contains("invariant not satisfied")
+                 || log.contains("requires not satisfied")
+-                || log.contains("assertion failed"),
++                || log.contains("assertion failed")
++                || (name == "brotli-m1-cursor-context-owner-skips-terminal-action"
++                    && log.to_lowercase().contains("error: expression simplifies to false")
++                    && log.contains("by (compute_only)")),
+             "expected a proof rejection, not a tooling error: {log}"
+         );
+         fs::write(&path, &original).unwrap();

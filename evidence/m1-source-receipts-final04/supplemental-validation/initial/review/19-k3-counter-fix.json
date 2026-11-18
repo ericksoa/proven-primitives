@@ -1,0 +1,38 @@
+{
+  "status": "Prepared only; no source/test/gate mutation or extra mutant run",
+  "cases": [
+    {
+      "name": "brotli-k3-rejects-valid-symbol-and-suffix",
+      "suite": "the_prover_rejects_five_k1_k3_success_and_preservation_defects",
+      "module": "prefix",
+      "function": "decode_block_length",
+      "old": "        match offset.checked_add(suffix) {",
+      "original_new": "        if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(r_source_units)); }\n    match offset.checked_add(suffix) {",
+      "new": "        if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(source_units)); }\n    match offset.checked_add(suffix) {",
+      "original_tuple": [
+        "brotli-k3-rejects-valid-symbol-and-suffix",
+        "decode_block_length",
+        "        match offset.checked_add(suffix) {",
+        "        if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(r_source_units)); }\n    match offset.checked_add(suffix) {"
+      ],
+      "updated_tuple": [
+        "brotli-k3-rejects-valid-symbol-and-suffix",
+        "decode_block_length",
+        "        match offset.checked_add(suffix) {",
+        "        if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(source_units)); }\n    match offset.checked_add(suffix) {"
+      ],
+      "change": "Only the undefined Ghost counter identifier r_source_units becomes the existing reached counter source_units.",
+      "runtime_fault_preserved": "Same symbol==0 &&suffix==0 guard returns spurious InvalidBlockLengthSuffix at exactly the same injection point. No guard/result/order/oldassertion/contract changed.",
+      "receipt_preserved": "Existing source_units is declared at prefix75 and receives actual block_length_range child receipt at prefix79. The retained current insertion point is prefix89, after table loads; forsymbol0/suffix0 it carries actual2. No zero/formula substitute and no relocation before table reads.",
+      "evidence": {
+        "failed_suite_log": "evidence/m1-source-receipts-final02/control-attempts/1794950778669754000/controls-the_prover_rejects_five_k1_k3_success_and_preservation_defects.log",
+        "failed_suite_log_sha256": "280e5f47b24f42df51fbadf01d1bc517a5cd9a1e27d41df254efe431d9a58945",
+        "error": "E0425 cannot find value r_source_units, prefix89:99",
+        "snapshot_prefix_sha256": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+        "test_source_sha256": "74cec7fcc319568dc86cc2493df527db6a92423b2e89f4d8584770b7c1d3998e"
+      },
+      "applied": false,
+      "mutants_run": 0
+    }
+  ]
+}

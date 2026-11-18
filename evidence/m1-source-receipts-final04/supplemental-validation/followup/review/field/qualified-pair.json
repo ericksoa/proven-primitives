@@ -1,0 +1,209 @@
+{
+  "status": "QUALIFIED ISOLATED full-selected positive3/0 and one source-coupled genuine computed-false negative; minimal patch STAGED ONLY",
+  "case": "brotli-b3b-tree-field-truncation-needs-input",
+  "selector": "CodeDescriptionDecoder::advance_field",
+  "positive": {
+    "kind": "positive",
+    "started_utc": "2026-11-18T02:59:41.359736+00:00",
+    "finished_utc": "2026-11-18T03:01:32.329382+00:00",
+    "seconds": 110.96788291700068,
+    "exit_code": 0,
+    "verification": {
+      "verified": 3,
+      "errors": 0
+    },
+    "source_hashes": {
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_input.rs": "666cc26857ef99009471d3b583dc6f267a37539ee8c1004714022fcd65b65252",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+    },
+    "source_unchanged": true,
+    "strict_gate_classifier": {
+      "semantic_rejection": false,
+      "tool_or_resource_failure": false,
+      "syntax_or_type_failure": false,
+      "computed_false": false,
+      "checked_semantic_error": false
+    },
+    "clean_positive": true,
+    "qualified_negative": false,
+    "log_sha256": "13d8a58215b527f506152a327bfbf8eb4f7ff569328a13956281f50195e4d518",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-field-truncation-computed-multiline-diagnostic/positive/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "CodeDescriptionDecoder::advance_field",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "not_full_gate": true
+  },
+  "negative": {
+    "kind": "negative",
+    "started_utc": "2026-11-18T03:01:51.398989+00:00",
+    "finished_utc": "2026-11-18T03:02:04.314357+00:00",
+    "seconds": 12.915191959007643,
+    "exit_code": 1,
+    "verification": null,
+    "source_hashes": {
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_input.rs": "53ec53efed6262524cce5fab519c7cf4e301f08847756e97388aa63fe3b41bc2",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+    },
+    "source_unchanged": true,
+    "strict_gate_classifier": {
+      "semantic_rejection": true,
+      "tool_or_resource_failure": false,
+      "syntax_or_type_failure": false,
+      "computed_false": true,
+      "checked_semantic_error": false
+    },
+    "clean_positive": false,
+    "qualified_negative": true,
+    "log_sha256": "56bfa98cfc1f48b5b71a30216b003ffed8214a9bf45873ff6b63f79fb5b9ae21",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-field-truncation-computed-multiline-diagnostic/negative/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "CodeDescriptionDecoder::advance_field",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "not_full_gate": true
+  },
+  "positive_runs": 1,
+  "negative_runs": 1,
+  "extra_verifier_runs": 0,
+  "strict_gate_driver_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+  "strict_gate_classifier_unchanged": true,
+  "actual_primary_negative_error": "error: expression simplifies to false",
+  "raw_transcript_has_existing_by_compute_only_marker": true,
+  "no_synthetic_log_annotation_or_classifier_relaxation": true,
+  "negative_verification_summary_present": false,
+  "negative_smt_loop_completion_claimed": false,
+  "source_operand_binding": {
+    "healthy_actual_return_status": "Failed(Truncated)",
+    "faulty_actual_return_status": "NeedInput",
+    "computed_actual_operand": "Extracted directly from actual old/new return status literals, coupled to actual returned field.",
+    "fixed_expected_pattern": "CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)",
+    "consumed_and_Ghost": "Original read.consumed and current actual Ghost(source_reads), unchanged.",
+    "full_original_fault_for_all_reaching_states": true,
+    "ordinary_runtime_body_and_old_guarantees_assertions_models_hides_retained": true
+  },
+  "necessary_old_obligation_witness": {
+    "witness_result": {
+      "path": "target/m1-r-field-truncation-witness/witness-result.json",
+      "sha256": "9018e0842373ce193473eafcb73443e37ffb3704d90a0bc0a2f5764133053a22"
+    },
+    "source_correspondence_audit": {
+      "path": "target/m1-r-field-truncation-witness/source-token-audit.json",
+      "sha256": "f83440625a243809e07fd0d61b075d22d599d975cd4ec185ce94726d2264670b"
+    },
+    "actual_checks": "Concrete valid Selector1/empty/endtrue admission + unchanged model consequence2/0; same-body exact return replay3/0.",
+    "actual_point": "Actual read.statusTruncated at width2, consumed0/source units0; preceding finalphaseFailedTruncated; unchanged model forcesFailedTruncated and forbidsNeedInput.",
+    "new_spec_or_policy": false
+  },
+  "formatting_identity": {
+    "complete_healthy_tokens_same_as39c5": true,
+    "complete_faulty_tokens_same_as0284": true,
+    "only_added_proof_whitespace_changed": true,
+    "positive_token_sha256": "f3467ba4f613dc2daa29fc38ec2c032046bca2255879785d2e558611be5463bf",
+    "negative_token_sha256": "964a7dcebc7225e0a6bad0ed629ad3d55b06d89797840e0246f5013a00adcb2a"
+  },
+  "checker_effort_exception": {
+    "scope": "ONLY the instrumented field-case test copy, BOTH actual positive and negative.",
+    "function_rlimit": 1000,
+    "SP_retained": true,
+    "helper_global_rlimit": 1000,
+    "ME0_default_seed_default_loop_isolation_other_flags_unchanged": true,
+    "production_field_rlimit_kept": 500,
+    "production_source_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "main_original500_whole_proof_must_pass_again": true,
+    "application_work_quota_or_unit_policy_changed": false,
+    "original_failed500_evidence_retained": true
+  },
+  "minimal_patch": {
+    "path": "minimal-main-test.patch",
+    "sha256": "f397c2f0864e65f4e24930fed4cabc4b4c48fda9dcdf0524697da6e90353ff12",
+    "base_tests_sha256": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+    "proposed_tests_sha256": "745ac4971e3dced309acb10a0136cd0f2787c97d1c775fbd4f3a51725329876f",
+    "original_case_tuple_unchanged": true,
+    "exact_native_format_assembly_reproduces_checked_positive_and_negative": true,
+    "native_harness_executed": false,
+    "scope": "One field-case-only generator branch using same1000 effort on true positive before negative, plus FIELD-only literalfalse AND bycompute OR arm. All other cases keep original mutation path.",
+    "original_native_assertion_sites_retained": 252,
+    "old_native_assertion_texts_exact": 251,
+    "one_intentionally_extended_predicate_preserves_all_four_old_diagnostic_arms_site_message": true,
+    "new_checked_native_assertions": 6
+  },
+  "failed_history_retained_unqualified": [
+    {
+      "path": "target/m1-r-field-truncation-split-diagnostic/diagnostic-result.json",
+      "sha256": "f35db714460f5fb63d4d06109886633ee1557d02a6e5d9048f26d5f48a268e1b",
+      "status": "UNRESOLVED - ONE EQUIVALENT-FAULT SPLIT NEGATIVE RESOURCE-FAILED; STOPPED"
+    },
+    {
+      "path": "target/m1-r-field-truncation-computed-diagnostic/diagnostic-result.json",
+      "sha256": "22d3a771b97207d7debc22e286d448acde3623cf4115fb630ceaefcf30812949",
+      "status": "UNRESOLVED - STOPPED ON REQUIRED COUPLED POSITIVE RESOURCE FAILURE"
+    },
+    {
+      "path": "target/m1-r-field-truncation-computed-effort1000-diagnostic/diagnostic-result.json",
+      "sha256": "af658098c1116eafecabe9ee92d6b60969c88ced50a4a1713dca48285d12376a",
+      "status": "UNRESOLVED - ACTUAL POSITIVE3/0; GENUINE LITERAL COMPUTED FALSE BUT UNCHANGED CLASSIFIER FORMAT CHECK DID NOT MATCH"
+    }
+  ],
+  "core_test_gate_readback": {
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+    "tests/proof_rejection.rs": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+    "target/m1-r-final-gate/driver.py": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46"
+  },
+  "immutable_supplement_manifest_sha256": "89734c8f58d911da782ae47adea4169eb15f963855ba450680804fae6667b8d8",
+  "shared_source_test_gate_evidence_canary_supplement_edits": 0,
+  "explicit_limits": [
+    "Isolated pair qualification only; not native suite execution or full M1 gate completion.",
+    "Computed-false may precede negative SMT; no negative-loop/body SMT completion claimed.",
+    "No compiler/source-to-binary or native execution claim.",
+    "Temporary checker effort differs from production500; no production allowance/quota/policy/API/model change.",
+    "Technical validation is not human architecture approval."
+  ]
+}

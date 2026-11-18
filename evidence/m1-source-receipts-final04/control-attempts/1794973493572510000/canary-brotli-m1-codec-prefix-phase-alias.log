@@ -1,0 +1,49 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::store_complex_code_description_payload (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:15725:1
+      |
+15725 | / fn store_complex_code_description_payload(
+15726 | |     workspace: &mut [u8],
+15727 | |     window_bytes: u32,
+15728 | |     phase: CodeDescriptionPhase,
+15729 | | ) -> (r: (Result<u8, CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________^
+
+note: function body check finished in 22 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:15725:1
+      |
+15725 | / fn store_complex_code_description_payload(
+15726 | |     workspace: &mut [u8],
+15727 | |     window_bytes: u32,
+15728 | |     phase: CodeDescriptionPhase,
+15729 | | ) -> (r: (Result<u8, CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:15741:9
+      |
+15741 | /         r.0.is_ok() && code_rank_aligned(phase) && m1_payload_store_context(old(workspace)@, window_bytes, phase) ==> {
+15742 | |             &&& r.0.unwrap() == m1_description_storage_tag(phase)
+15743 | |             &&& m1_description_payload_values(final(workspace)@, window_bytes, phase)
+15744 | |         },
+      | |_________^ failed this postcondition
+...
+15865 |       (Ok(tag), Ghost(source_writes))
+      |       ------------------------------- at the end of the function body
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:15725:1
+      |
+15725 | / fn store_complex_code_description_payload(
+15726 | |     workspace: &mut [u8],
+15727 | |     window_bytes: u32,
+15728 | |     phase: CodeDescriptionPhase,
+15729 | | ) -> (r: (Result<u8, CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________^
+
+error: aborting due to 1 previous error
+

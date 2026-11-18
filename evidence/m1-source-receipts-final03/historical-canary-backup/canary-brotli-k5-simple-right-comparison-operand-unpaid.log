@@ -1,0 +1,51 @@
+verification results:: 4 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34819:9
+      |
+34819 |         assert(range_total + distinct_total <= 16) by (nonlinear_arith)
+      |         ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34824:5
+      |
+34824 |     while i < count
+      |     ^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34874:9
+      |
+34874 |         while j < count
+      |         ^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34852:5
+      |
+34852 |     while i < count
+      |     ^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34787:1
+      |
+34787 | / fn plan_saved_simple_validation_reads(workspace: &[u8], window_bytes: u32,
+34788 | |     budget: &mut crate::brotli::RequestBudget, count: u8, alphabet_limit: u16,
+34789 | | ) -> (r: (Result<u64, CoreFailure>, Ghost<nat>))
+      | |_______________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34792:9
+      |
+34792 |         r.1@ + final(budget).work_remaining as nat == old(budget).work_remaining as nat,
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+34913 |                 return (Ok(inspected), Ghost(r_saved_forecast_source_reads));
+      |                 ------------------------------------------------------------ at this exit
+
+error: aborting due to 1 previous error
+

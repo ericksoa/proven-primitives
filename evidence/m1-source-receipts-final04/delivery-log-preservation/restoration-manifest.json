@@ -1,0 +1,2374 @@
+{
+  "schema": "m1-r-owned-generated-log-restoration-v1",
+  "status": "completed-archive-verified-and-only-listed-logs-restored",
+  "utc": "2026-11-18T05:12:38.337158+00:00",
+  "scope": "Only 197 owned tracked generated logs; no source, gate package or historical attempt rewritten",
+  "archive": {
+    "path": "evidence/m1-source-receipts-final04/delivery-log-preservation/latest-ordinary-generated-logs.tar.gz",
+    "sha256": "c4bf284e0af4433820e2c4ad2b27583953923e834c13243dfcfbaa597d7c4194"
+  },
+  "immutable_gate_package_sha256": "fa9d255eeb7935048b8906f875110f01afeb4324c91188d503ed7c8c4cec8d46",
+  "entries": [
+    {
+      "live_path": "evidence/canary-brotli-b3b-context-mtf-leaves-stale-reuse-bound.log",
+      "archive_member": "evidence/canary-brotli-b3b-context-mtf-leaves-stale-reuse-bound.log",
+      "generated_sha256": "effb22c88e0a3b830de1d1f64e6b9d942fa44e7365002e8b573cd2b7a2c88e5c",
+      "generated_bytes": 1314,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "7e7a5130fcc743acbd0dae464cda57d114a544173542e9027c1c1350daac94a9",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-context-mtf-leaves-stale-reuse-bound.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3b-context-progress-leaves-stale-initialized-length.log",
+      "archive_member": "evidence/canary-brotli-b3b-context-progress-leaves-stale-initialized-length.log",
+      "generated_sha256": "84f978850356b4e5fca74f7605b32c5170f4d4c03b1f8fce6622693bd140a392",
+      "generated_bytes": 1398,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "b7662e8ae1915b306c61e73b7cd6beefa70ccb4bb498daebc2a0bf28ea4475a2",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-context-progress-leaves-stale-initialized-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3b-pending-span-is-not-drained.log",
+      "archive_member": "evidence/canary-brotli-b3b-pending-span-is-not-drained.log",
+      "generated_sha256": "fb0282eb5351389fbca067411389a7affe1e5c3f64538e7bd91bc7de859f4cd0",
+      "generated_bytes": 2024,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "e8cb774ecf77b1626ccaeb541af795fb9c72f65f08b31954f2ba257dd0bc809b",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-pending-span-is-not-drained.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3b-state-address-shifts-scalar-block.log",
+      "archive_member": "evidence/canary-brotli-b3b-state-address-shifts-scalar-block.log",
+      "generated_sha256": "c7646d876c455e719e8d4b2d0ebd9de255370ffe59f2ff1dd0868bbbc8211497",
+      "generated_bytes": 1592,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "9382d0ae093ebf6308d98f3a372ae133b17925d8cfa5e7900793e6c0d73fe8d2",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-state-address-shifts-scalar-block.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3b-step-bypasses-sticky-failure-helper.log",
+      "archive_member": "evidence/canary-brotli-b3b-step-bypasses-sticky-failure-helper.log",
+      "generated_sha256": "5d5cdd2a5e4754d9fed849944df2d3ce2c9d3219f724da39984e0b0a37a1e181",
+      "generated_bytes": 2644,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "633df1988e3e29c98695350da2bbb9798c29c846443e8ead9fbd18ed8791713f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-step-bypasses-sticky-failure-helper.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3b-sticky-failure-becomes-need-input.log",
+      "archive_member": "evidence/canary-brotli-b3b-sticky-failure-becomes-need-input.log",
+      "generated_sha256": "e8cf183019e1028c7bbafc4d8e723ffe70c53c1d955ecb7e6acf265011da694b",
+      "generated_bytes": 1469,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a4a1d372b95d4734c5fad67c4a317e3da7898deb1cb5672e67f27c4af7bae7bd",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-sticky-failure-becomes-need-input.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3b-sticky-failure-consumes-one-byte.log",
+      "archive_member": "evidence/canary-brotli-b3b-sticky-failure-consumes-one-byte.log",
+      "generated_sha256": "b83e62e6eb6c7ee59bc56c76d1b06d1ecaf80f5a1ddeadb79cdcb1ed37f2d779",
+      "generated_bytes": 1473,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "1524a1045b1c9c35a7390c7a4f8d6fc42155859102ad25ef026b398923d69099",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-sticky-failure-consumes-one-byte.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3b-tag-accepts-first-invalid-value.log",
+      "archive_member": "evidence/canary-brotli-b3b-tag-accepts-first-invalid-value.log",
+      "generated_sha256": "22f38cd34465ddb207755603e3842bc0699d37b8535db6b3707fd4acac8819ae",
+      "generated_bytes": 1756,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "aeeecb9a41fa5631d190ac067484cf0fca72e85e0ae64cb07ebbfb4444d421dc",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-tag-accepts-first-invalid-value.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3b-u16-writes-low-byte-twice.log",
+      "archive_member": "evidence/canary-brotli-b3b-u16-writes-low-byte-twice.log",
+      "generated_sha256": "513fbbf56723dc02a4667123b7542ada7f69a8f4db98859761ec5ef69a67f995",
+      "generated_bytes": 1734,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "5369cb96d1ea08a6df81f081615bc34c7a8d0b9f96f4dc44d61ba6542c756283",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3b-u16-writes-low-byte-twice.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-block-count-base-write-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-block-count-base-write-undercharge.log",
+      "generated_sha256": "1440e7d22325fa705c39567ae4f72f03b32553e5887f2bea734e204fc544c440",
+      "generated_bytes": 1160,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "0f4d9187c1399bb938784717073c9f034d2b96a0fef04ec88f743fad28f5d6cc",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-block-count-base-write-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-block-count-planning-bit-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-block-count-planning-bit-undercharge.log",
+      "generated_sha256": "5f5444c93ab3a8345122b058879a89e5a97a02ce17f2ea79165770e878ca05a9",
+      "generated_bytes": 1349,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8904027f636261c310a6b6c7fc294386f7ebdc54be094425b59447ee33b79005",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-block-count-planning-bit-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-block-count-single-value-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-block-count-single-value-undercharge.log",
+      "generated_sha256": "557ca0bb520639bcf07add5ffc77059f1b8162795c7dbd98e5b73992113fa8a0",
+      "generated_bytes": 1374,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "55ffdd3ae79a36d19cdd200bed048df1b36fbddf782c31e9a1e77f6b8c74803d",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-block-count-single-value-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-block-count-terminal-write-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-block-count-terminal-write-undercharge.log",
+      "generated_sha256": "1ed81923b781bec5456388c2bfe93e06b1f1b734ea16f1f93b3eb1877235ee4d",
+      "generated_bytes": 1242,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a6eda4c549fa197a971218856d8bb74f17ea5a14e0033333bae3f7660deb171b",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-block-count-terminal-write-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-block-count-tree-start-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-block-count-tree-start-undercharge.log",
+      "generated_sha256": "94f0b160364f2a014da958f89fe296fd31d0f70310885c3d4da52b4d8e3cdfbc",
+      "generated_bytes": 1378,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c2c938a71a333ebd69f521eabf90235d5006712098f81584a4d8c0c9ac08f712",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-block-count-tree-start-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-canonical-install-formula-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-canonical-install-formula-undercharge.log",
+      "generated_sha256": "2ca68a5901f7b28b1a3d567994abfe6b558581a9e1c2bae8fdd151e6b49ebc89",
+      "generated_bytes": 1414,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "6919d3b4cac92ba171698f8c2ad59699aac0db2269a4ee7ba19790c7d0bc3cf6",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-canonical-install-formula-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-execution-debit-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-execution-debit-undercharge.log",
+      "generated_sha256": "dc9432a72d78b74fdaa8f48d125b90e287f251d8cbe108a1a56e87e5a6857b44",
+      "generated_bytes": 1527,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f6cc46554fc05a852a96d374f9c2eee0ba61f4b95751a8bf0b817a6778187733",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-execution-debit-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-execution-reserved-after-writes.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-execution-reserved-after-writes.log",
+      "generated_sha256": "8c051016d2b4ead51a819f02f2c6a886a97d26f21d52d4022d291aaa2b8b6b25",
+      "generated_bytes": 1687,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f0a73a131589032821304e08b40c64459b6840008e768d7a2f93e7caa42055ab",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-execution-reserved-after-writes.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-map-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-map-undercharge.log",
+      "generated_sha256": "3625c4c5e54706d0ef0d721c0cbfca9b7145dba07a1249e610fbbc82430b4263",
+      "generated_bytes": 1521,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d5717d94ccfb11b45c8b0ecf25b101dd2316b1ac28d24c0a978cc8766181213f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-map-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-overshoot-terminal-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-overshoot-terminal-undercharge.log",
+      "generated_sha256": "3625c4c5e54706d0ef0d721c0cbfca9b7145dba07a1249e610fbbc82430b4263",
+      "generated_bytes": 1521,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d5717d94ccfb11b45c8b0ecf25b101dd2316b1ac28d24c0a978cc8766181213f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-overshoot-terminal-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-phase-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-phase-undercharge.log",
+      "generated_sha256": "3625c4c5e54706d0ef0d721c0cbfca9b7145dba07a1249e610fbbc82430b4263",
+      "generated_bytes": 1521,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d5717d94ccfb11b45c8b0ecf25b101dd2316b1ac28d24c0a978cc8766181213f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-phase-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-planning-debit-omitted.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-planning-debit-omitted.log",
+      "generated_sha256": "b7cd9b6a7afb1fece97978c88f7e1a8f29f16944bdbdd2a6f6576c4e2d0a161d",
+      "generated_bytes": 1471,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "28ae5344acbe8346b4e84826e3f924d45be4a0d135a43c8f6f047a36ee79bcbb",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-planning-debit-omitted.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-prefix-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-prefix-undercharge.log",
+      "generated_sha256": "3625c4c5e54706d0ef0d721c0cbfca9b7145dba07a1249e610fbbc82430b4263",
+      "generated_bytes": 1521,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d5717d94ccfb11b45c8b0ecf25b101dd2316b1ac28d24c0a978cc8766181213f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-prefix-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-progress-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-progress-undercharge.log",
+      "generated_sha256": "3625c4c5e54706d0ef0d721c0cbfca9b7145dba07a1249e610fbbc82430b4263",
+      "generated_bytes": 1521,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d5717d94ccfb11b45c8b0ecf25b101dd2316b1ac28d24c0a978cc8766181213f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-progress-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-queue-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-queue-undercharge.log",
+      "generated_sha256": "3625c4c5e54706d0ef0d721c0cbfca9b7145dba07a1249e610fbbc82430b4263",
+      "generated_bytes": 1521,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d5717d94ccfb11b45c8b0ecf25b101dd2316b1ac28d24c0a978cc8766181213f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-queue-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-reads-wrong-width.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-reads-wrong-width.log",
+      "generated_sha256": "92f64a1a298f87b5657922da5d57e475a356c654e2312c2c7c77fc9290748f43",
+      "generated_bytes": 1872,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "1957fb823394dc49ce7db8749c82c7c2d196640acc70eb5a402b943c0d9ea6f3",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-reads-wrong-width.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-reset-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-reset-undercharge.log",
+      "generated_sha256": "3625c4c5e54706d0ef0d721c0cbfca9b7145dba07a1249e610fbbc82430b4263",
+      "generated_bytes": 1521,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d5717d94ccfb11b45c8b0ecf25b101dd2316b1ac28d24c0a978cc8766181213f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-reset-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-skips-overshoot-check.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-skips-overshoot-check.log",
+      "generated_sha256": "6bffabf4b8c4c991b1810773d72d5db6b9ee0de4cc53dc165e788e92ea3eec6e",
+      "generated_bytes": 3850,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "4cbc3cbcc808473dd09fb14a3954f32089f60a093c0eab30566c6c38ebdfdeaf",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-skips-overshoot-check.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-start-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-start-undercharge.log",
+      "generated_sha256": "3625c4c5e54706d0ef0d721c0cbfca9b7145dba07a1249e610fbbc82430b4263",
+      "generated_bytes": 1521,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d5717d94ccfb11b45c8b0ecf25b101dd2316b1ac28d24c0a978cc8766181213f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-start-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-start-writes-unrelated-byte.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-start-writes-unrelated-byte.log",
+      "generated_sha256": "7dd15788608809eaad3c57427387be2e22d96e19c09270916057d8b4282977c4",
+      "generated_bytes": 2904,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f86950e044b3ccfb79c7fd46d167c9704a2d945638d7642dfd6470ba887a5b6c",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-start-writes-unrelated-byte.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-terminal-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-terminal-undercharge.log",
+      "generated_sha256": "9902b3e413e19c11f9f05562868067e933915983c82dbc16f921adcaf2566e21",
+      "generated_bytes": 1517,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "57cd6ad47c4e1159623327d867cc5301bb38549cd284fa1591f4fe7d061d28ea",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-terminal-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-wrong-prefix.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-wrong-prefix.log",
+      "generated_sha256": "b80ab12b3585ac94142bfb80c87963e980b2bd245b085bf6bacecfeb58961431",
+      "generated_bytes": 2812,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8f22194eb685d72ae388b6d4c5c231e59f458d032fb0175931109f4b16fdfa6d",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-wrong-prefix.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-bits-wrong-zero.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-bits-wrong-zero.log",
+      "generated_sha256": "8e93d7420591f43f997fecb0010387e4c1573c2227c7d4c99a0aec971af65250",
+      "generated_bytes": 3307,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "cb6c882ff9a48c8c24eddb0a1124a9facb5788baf68ec725a5a63fa9a3713976",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-bits-wrong-zero.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-execution-debit-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-execution-debit-undercharge.log",
+      "generated_sha256": "fd7c7db4abb1a6f6b7848ecb0baed20c0e322a1b6aedd2766ddce5a5cc5025cd",
+      "generated_bytes": 1520,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "e47e3bb98432087153f7c774a0f98963be9f3d9d613f837bb67bac2aca411816",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-execution-debit-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-execution-reserved-after-writes.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-execution-reserved-after-writes.log",
+      "generated_sha256": "7a0c128e7ae6137b03515b268abafc3f9ce411d50079f53539b001c632454eaa",
+      "generated_bytes": 1634,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "6183b81e68caf9d6a018640732198238bbc2c343026b1f99728b857c2e5f3a10",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-execution-reserved-after-writes.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-map-cell-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-map-cell-undercharge.log",
+      "generated_sha256": "fb2069174ecc800dc2f85b7da5c77e1c12a347eb3a2c57fb785952abeb9ac0d8",
+      "generated_bytes": 1457,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "3c7e8c4355ad36342e3dcaf37e524f2debf4d7857289ba849f59e0ebfe271c3b",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-map-cell-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-map-progress-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-map-progress-undercharge.log",
+      "generated_sha256": "5e632c5fa658492d99540817b52092ac49710a38c665f3ab455a1d8df6f8ee81",
+      "generated_bytes": 1453,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "ce756f97407df46e2a253f70a92eb7862869097b9867ec0bbd6fd2a55c3a597e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-map-progress-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-phase-transition-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-phase-transition-undercharge.log",
+      "generated_sha256": "a8d4f774583bb42609f3eae802486cc87649cca0f95af10a10c3a839f64ee4e4",
+      "generated_bytes": 1453,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d8e3d98d9d1575538928d3fb6a1892b59847d2edd7abcf1a4a0e87c138df3f63",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-phase-transition-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-planning-debit-omitted.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-planning-debit-omitted.log",
+      "generated_sha256": "27caed4f7b1d2e256c0ea1aa2d9c687104d4b91db59f057a02fc378cfae8ff32",
+      "generated_bytes": 1546,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "1f48cadc5f85b36e8faab9f5de34b6c2d783b64f32e8879c504ecb47682583a0",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-planning-debit-omitted.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-progress-writes-map-size.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-progress-writes-map-size.log",
+      "generated_sha256": "348c4f2627e4f29d92495681cbfc38605f6d44d65c7a5e7f8b9d34546bd6d488",
+      "generated_bytes": 1479,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "0e0440fe438ed2abc2ea4594fa4d5a9021422012fd229b218e4523d7aa3f0202",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-progress-writes-map-size.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-queue-write-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-queue-write-undercharge.log",
+      "generated_sha256": "a8d4f774583bb42609f3eae802486cc87649cca0f95af10a10c3a839f64ee4e4",
+      "generated_bytes": 1453,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d8e3d98d9d1575538928d3fb6a1892b59847d2edd7abcf1a4a0e87c138df3f63",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-queue-write-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-terminal-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-terminal-undercharge.log",
+      "generated_sha256": "a8d4f774583bb42609f3eae802486cc87649cca0f95af10a10c3a839f64ee4e4",
+      "generated_bytes": 1453,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d8e3d98d9d1575538928d3fb6a1892b59847d2edd7abcf1a4a0e87c138df3f63",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-terminal-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-tree-count-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-tree-count-undercharge.log",
+      "generated_sha256": "69858ee299f9b648b6a79c4f21e789f9ad893ef21d33eddd61e82989de04d0bd",
+      "generated_bytes": 1453,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "4a546f1405a6d9367306c834870bf5c2427735ad9448b78402e4bed542085f45",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-tree-count-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-var-write-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-var-write-undercharge.log",
+      "generated_sha256": "a8d4f774583bb42609f3eae802486cc87649cca0f95af10a10c3a839f64ee4e4",
+      "generated_bytes": 1453,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d8e3d98d9d1575538928d3fb6a1892b59847d2edd7abcf1a4a0e87c138df3f63",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-var-write-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-wrong-decoded-count.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-wrong-decoded-count.log",
+      "generated_sha256": "2cd382296c95ca02713009c05b0224ebfb97e162072c2e0df93e40e91feb1172",
+      "generated_bytes": 2148,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a117f5a35d1627a94e80a4a7f6ab26554797071ee631e8bf3c12c1906991147a",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-wrong-decoded-count.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-count-wrong-zero-map-value.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-count-wrong-zero-map-value.log",
+      "generated_sha256": "4e056244f03aa71a9123de33bb6067b132f1cc45b68c23ee961ed37a8be709c9",
+      "generated_bytes": 2682,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "29629d70341b685bc5a0c44a4054d38c2002a8857478d385459737144537cd28",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-count-wrong-zero-map-value.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-mode-complete-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-mode-complete-undercharge.log",
+      "generated_sha256": "9119b7dc0e95d3b5d71254c8121e5fd17be18f7622958720fb0f90984452ce25",
+      "generated_bytes": 1120,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "9552a158928b76c93559d1e2e7a3e5b014dca607eabccbb9ebb6eed270f7ebb6",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-mode-complete-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-mode-queue-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-mode-queue-undercharge.log",
+      "generated_sha256": "7296d916194c5640bb95309cf1ef09dec2fdbb431df3dea425d78363dc3ed439",
+      "generated_bytes": 1154,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "da99817f116f54371ee6a76c9a2c5e139f67085803256a5973e1c3a9aec12828",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-mode-queue-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-mode-terminal-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-mode-terminal-undercharge.log",
+      "generated_sha256": "2e53340d3786a32dd414acfe01cce40ee626f3c9dd955756754034275c4ad32c",
+      "generated_bytes": 1240,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c4ed45d7346fb521566070e078bf3c788668b94df9963c777568d018f4a38a93",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-mode-terminal-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-context-mode-value-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-context-mode-value-undercharge.log",
+      "generated_sha256": "8d92e7dc1c8f0a3537e05b3745af80bfcef981c6a7697a477db69face8ddb744",
+      "generated_bytes": 1248,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "7092261926bf02a8e1739d81ce546706cf8ef4de6c6697963e6d522f6d440791",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-context-mode-value-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-distance-queue-write-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-distance-queue-write-undercharge.log",
+      "generated_sha256": "9b664c3f13073610cc1e4a08a71097aaf7c294338ffd8454619cdb1316c6d75c",
+      "generated_bytes": 1138,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "830c22c9d9dae73603a62340a88b00152c53353ef84dfb067ced0ebe8c30f0ab",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-distance-queue-write-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-distance-terminal-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-distance-terminal-undercharge.log",
+      "generated_sha256": "ccc20dc8a0ca8a12f0f2c5e026764df712dd0a5a3690d4a1949bc61eacbe70d8",
+      "generated_bytes": 1216,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8e07b83c5a1d4a7ff754a19c46bc445baa0bf5352fa5e324c1eb4a4e71b93f42",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-distance-terminal-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-distance-value-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-distance-value-undercharge.log",
+      "generated_sha256": "07a7abbf255514d7af04a5a25d4d2b98da5201bca6f022a86ee5ce943d8eb279",
+      "generated_bytes": 1256,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "646b3abeac2d4bd5cf1c1524e1e6f2e7fa507821e5b9b0e844d38d977bb6826e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-distance-value-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-initial-suffix-planning-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-initial-suffix-planning-undercharge.log",
+      "generated_sha256": "03847f08134865f765797f35e1ba8f20d2e3c34d7ce877f87dc7fd7f8d01396b",
+      "generated_bytes": 1126,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "904005f064aeec38e481dd1f641dc4e0a1efd12daa46eced6639e5b907f08045",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-initial-suffix-planning-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-initial-suffix-queue-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-initial-suffix-queue-undercharge.log",
+      "generated_sha256": "f39037171c9f768e0f608ad22a70bc0c1dffe3abce67cfbf2044c42582f48e4c",
+      "generated_bytes": 1178,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "242b7fcb95de096a4e53ab0bddafc2f2e012cf59f23a90b5af004bc3140f3652",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-initial-suffix-queue-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-initial-suffix-terminal-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-initial-suffix-terminal-undercharge.log",
+      "generated_sha256": "4412257ded6343198761e68f4221b41f1bb9f4b21faf3403abda3a245e59dbad",
+      "generated_bytes": 1260,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "70b3262eae618cf5b25816aae96a71bfa1ec6065ae14b5d3cc820fece6e78840",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-initial-suffix-terminal-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-initial-suffix-value-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-initial-suffix-value-undercharge.log",
+      "generated_sha256": "af8f4dad7de042edaaa6137e1a17858a6d2a214cd27262733363ea4d2fb1592f",
+      "generated_bytes": 1292,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "e27b744e4e8f39eefe4cc2f3120da3bdad7af21c60d23a4c24a6833b3ea612e5",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-initial-suffix-value-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-initial-symbol-formula-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-initial-symbol-formula-undercharge.log",
+      "generated_sha256": "76150aa1bf9712148e58ad83fd04b8ed6d2dbff6d15b6710a24f5b848037d08e",
+      "generated_bytes": 1637,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c5f5e6685e30be11cba5d141f262d7c1fec9f5f09ec93e0c6af82fa84dfedac8",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-initial-symbol-formula-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-repeat-serialization-formula-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-repeat-serialization-formula-undercharge.log",
+      "generated_sha256": "4ed430d5f5aef94e36519d519512cdecbffc18f0a40cbfd2a8bc4529e72c9265",
+      "generated_bytes": 1519,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "b07b0c1647e5e8843fae44442a7e711440489227a3e6fdd55d116e267b71b763",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-repeat-serialization-formula-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-serialization-base-formula-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-serialization-base-formula-undercharge.log",
+      "generated_sha256": "100ad113ac0f350a6b11cd00da944d7015aa622e81059da05dbd3722091af607",
+      "generated_bytes": 1240,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "295fcb3f80da7f2ec1b887535d9b04045203e9c6ba008b3e56facdaa9920e514",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-serialization-base-formula-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-b3c-simple-install-formula-undercharge.log",
+      "archive_member": "evidence/canary-brotli-b3c-simple-install-formula-undercharge.log",
+      "generated_sha256": "bb98caa90f6410100994568563a0be0853e52ec21635642db8a987f05886b33a",
+      "generated_bytes": 3138,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "58692bf961d2146ce03cb86442f2b508d3bc82ead8a22d642e9c40373399daa6",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-b3c-simple-install-formula-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-builder-code-length-reads-uninitialized-entry.log",
+      "archive_member": "evidence/canary-brotli-builder-code-length-reads-uninitialized-entry.log",
+      "generated_sha256": "9ca4c5a8f91ab41c74560939234d811cf32d726bddbf3b9d55b9ed4470b8a4b3",
+      "generated_bytes": 892,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "b1a6f1070b312b7e549d7e994353afdc69fa8e1aac69a26d3c3c0ebcfee6d1ff",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-builder-code-length-reads-uninitialized-entry.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-builder-code-length-write-shifts-region.log",
+      "archive_member": "evidence/canary-brotli-builder-code-length-write-shifts-region.log",
+      "generated_sha256": "6daf19344d5a2d241c2aec9e1149bbcee8ae4c6b48e6c58fb29964de2f4b9ab9",
+      "generated_bytes": 840,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "08cb9dbfcd3d000b4ec7225f775aad16dca581192464ca55c43ffd99aee15dc4",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-builder-code-length-write-shifts-region.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-builder-count-write-swaps-low-byte.log",
+      "archive_member": "evidence/canary-brotli-builder-count-write-swaps-low-byte.log",
+      "generated_sha256": "bfa76307532b5d9e332358869d69c34452a45629e2d70186b9ace90750dca316",
+      "generated_bytes": 872,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f601dcbb0ee8f411ec225400e9d7f3228b3c4d3aabd06f4957e2be70b5502eb5",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-builder-count-write-swaps-low-byte.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-builder-next-code-writes-wrong-third-byte.log",
+      "archive_member": "evidence/canary-brotli-builder-next-code-writes-wrong-third-byte.log",
+      "generated_sha256": "8f30502e7e783798a1d491a65db1071561a4e2daa0b03c5e884d48fc89c4ec2f",
+      "generated_bytes": 888,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "13298d942eedaed7db5e122717219e0de7136f3bbf4a6077294594bcb4394758",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-builder-next-code-writes-wrong-third-byte.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-canonical-installation-assigns-next-code.log",
+      "archive_member": "evidence/canary-brotli-canonical-installation-assigns-next-code.log",
+      "generated_sha256": "3ed9b631464941a7104445d11b5a5b2aa14c126d95fbe59668d13d48655e5c13",
+      "generated_bytes": 551,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "59b3201602b5f1398a46f1b7db7db1babc7134162d5af5e644d906d731f06c8d",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-canonical-installation-assigns-next-code.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-canonical-record-rejects-unused-zero-length.log",
+      "archive_member": "evidence/canary-brotli-canonical-record-rejects-unused-zero-length.log",
+      "generated_sha256": "e96c802b304ff2823ccd0a2aca83c236bdbb32c4cbe1fa4dd2d0a42399ed2bae",
+      "generated_bytes": 888,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c61a4cdea485a4fdd43849037c9d83b37655938376cdd04df3e6481fc32a61ab",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-canonical-record-rejects-unused-zero-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-code-length-order-starts-at-zero.log",
+      "archive_member": "evidence/canary-brotli-code-length-order-starts-at-zero.log",
+      "generated_sha256": "22e7d909b2fab224397c18d625c44ca85f964bcb721ed2e74175425dc02ce0ed",
+      "generated_bytes": 1081,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "3e5ef10c8f527d253240982a7e4d7539d4a1e3306e621e8c5815720b002af29d",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-code-length-order-starts-at-zero.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-code-selector-misclassifies-simple.log",
+      "archive_member": "evidence/canary-brotli-code-selector-misclassifies-simple.log",
+      "generated_sha256": "7d383fea21fb17b643789d5bd8a3d3bc20ba0bf291b5d6149d9a1765897edc1a",
+      "generated_bytes": 3124,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8d015cf71c398bfb03c82bc229e4858f22f4332dd345b0130717ca05dfcae228",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-code-selector-misclassifies-simple.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-complex-code-misclassifies-space-overflow.log",
+      "archive_member": "evidence/canary-brotli-complex-code-misclassifies-space-overflow.log",
+      "generated_sha256": "32076f94f317bac6306096dc364af5b24ecdd8fbd5991c64214f1e25bf1f5c75",
+      "generated_bytes": 1448,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "402e0ae412c987003ff7f9077586eb5b5fda95f042f5c7c836aecd6ec007f33e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-complex-code-misclassifies-space-overflow.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-complex-static-prefix-maps-four-to-five.log",
+      "archive_member": "evidence/canary-brotli-complex-static-prefix-maps-four-to-five.log",
+      "generated_sha256": "dd366ddf04e2bd10580113de938614b88c004b035cf3b21e7b7164ce4c1d0f04",
+      "generated_bytes": 4057,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "9f60b26d799bb2bb5784e381427898abcc17f8b180bb19589b385ebd728d0c4e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-complex-static-prefix-maps-four-to-five.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-context-repeat-uses-half-base.log",
+      "archive_member": "evidence/canary-brotli-context-repeat-uses-half-base.log",
+      "generated_sha256": "8ed907fb5ac3545692677951688ff451700402d911b23b3b99cad8f432f66969",
+      "generated_bytes": 995,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "dd2ebd816b0d6f802de4cd386ee2cc6cec37306dc522d0d575c906221b33a5d9",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-context-repeat-uses-half-base.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k1-installer-rejects-valid-two-symbol-tree.log",
+      "archive_member": "evidence/canary-brotli-k1-installer-rejects-valid-two-symbol-tree.log",
+      "generated_sha256": "21d1a1592a43e7deb0b447bdbf374d298c2ae4420ca8f7c1443985b61d70bc6c",
+      "generated_bytes": 2540,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "e6a67c7d0b8581beb580a0c60b958b77de4e767a73c258e1ee90708e344b0f53",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k1-installer-rejects-valid-two-symbol-tree.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k1-invalid-length-changes-builder.log",
+      "archive_member": "evidence/canary-brotli-k1-invalid-length-changes-builder.log",
+      "generated_sha256": "035afa6e34da66321104af59ec017d299cf5c659b8e1b74341778a863db98af6",
+      "generated_bytes": 2341,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "db192e7d3224ed19225fc9f0eab89f6059c0c9fb8c1a43825bb3172b8bbc8146",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k1-invalid-length-changes-builder.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k1-invalid-length-changes-metadata.log",
+      "archive_member": "evidence/canary-brotli-k1-invalid-length-changes-metadata.log",
+      "generated_sha256": "766925b7a6671452140ad71bf50f3a14bfede111b7031887abb3115b1192af9a",
+      "generated_bytes": 1033,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f72006307f82177f07d82fa1251e8cbebde81a28fedc678371c7af5b8965d682",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k1-invalid-length-changes-metadata.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k2-writer-rejects-last-valid-index.log",
+      "archive_member": "evidence/canary-brotli-k2-writer-rejects-last-valid-index.log",
+      "generated_sha256": "9d8489eca3c4dd5ef779bb6616e1eb8482a72a92f915847d39e9fa28ac4d02a0",
+      "generated_bytes": 870,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "621c992ee8b9ca9b562c53764221334571e5f5934deb8e99548acf7db8b8f1d4",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k2-writer-rejects-last-valid-index.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k2-writer-rejects-valid-window.log",
+      "archive_member": "evidence/canary-brotli-k2-writer-rejects-valid-window.log",
+      "generated_sha256": "83234b252fd367331a093b771dbe3778afc08ffec5e5ffcaad2dd0e98cb5f18c",
+      "generated_bytes": 878,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "5d85ac1fbe839b8710aeba4143309284b06964390be31051c67a63af23e33d3c",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k2-writer-rejects-valid-window.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k3-decodes-wrong-block-length.log",
+      "archive_member": "evidence/canary-brotli-k3-decodes-wrong-block-length.log",
+      "generated_sha256": "5d16f80e4db54dd76234bd4c6158030ff676c97bedb7bdb384894268e5f05385",
+      "generated_bytes": 792,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "487aacc1cc10c601021c950b31eeeccace9fb8fa1e1173c37f387a4f0241c94f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k3-decodes-wrong-block-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k3-rejects-valid-symbol-and-suffix.log",
+      "archive_member": "evidence/canary-brotli-k3-rejects-valid-symbol-and-suffix.log",
+      "generated_sha256": "74d0599ffd81e7e4b5e17d3998730b87155f4921377269616169964d89393d2c",
+      "generated_bytes": 794,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "6cd1a6dceacf0a6a02a629d4869f4a270cd372e48a18dfe6d21514210cef7290",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k3-rejects-valid-symbol-and-suffix.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k3-suffix-plan-loses-consumption.log",
+      "archive_member": "evidence/canary-brotli-k3-suffix-plan-loses-consumption.log",
+      "generated_sha256": "ca544d7b37c34673e3f83d03131a9b6062e53a1b422941eb493f14df40a31c9e",
+      "generated_bytes": 1353,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "243c9824f57be69b8b6301410fd84ed1e554df741fe330cfadce16dfe45cedcf",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k3-suffix-plan-loses-consumption.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k3-suffix-plan-loses-success.log",
+      "archive_member": "evidence/canary-brotli-k3-suffix-plan-loses-success.log",
+      "generated_sha256": "01e896e2c67cf089eaa8b6dc980da1fb8696df94ff6ae14fed168df801ff3493",
+      "generated_bytes": 1409,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "5d2435da42332f6f167752328d1b4e482e5766bbabacf7236ce81625eb2075dc",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k3-suffix-plan-loses-success.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k3-suffix-plan-undercharges-value-tables.log",
+      "archive_member": "evidence/canary-brotli-k3-suffix-plan-undercharges-value-tables.log",
+      "generated_sha256": "c7593f9742dd38f291a38e60a90c50691072b5e2919ef7e18e2304553b2b7002",
+      "generated_bytes": 1475,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "3ace269803206075541c39aa1e02080c90eb7a21b5936e093edb5617875b88ec",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k3-suffix-plan-undercharges-value-tables.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k4-progress-stores-previous-code-in-history.log",
+      "archive_member": "evidence/canary-brotli-k4-progress-stores-previous-code-in-history.log",
+      "generated_sha256": "a743ed72c51a5234be10cb00eed3f1d4e7f77bd99f9042577b073ba9eb9ee1ae",
+      "generated_bytes": 2703,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "76cb61c2753e02bfed636d3db012755aec2e25c21ec299e93dfe167eef030b99",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k4-progress-stores-previous-code-in-history.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k4-repeat-load-current-from-history.log",
+      "archive_member": "evidence/canary-brotli-k4-repeat-load-current-from-history.log",
+      "generated_sha256": "2f3ebb4376a8821926b16429b3798f28820fea1cb53dc3b848dc1250a1ad1001",
+      "generated_bytes": 1774,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f743dd50e6052e9fce11345f662324a35b06d6848f9c0f053349aa5e118c56ed",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k4-repeat-load-current-from-history.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k4-repeat-load-history-from-current.log",
+      "archive_member": "evidence/canary-brotli-k4-repeat-load-history-from-current.log",
+      "generated_sha256": "2f3ebb4376a8821926b16429b3798f28820fea1cb53dc3b848dc1250a1ad1001",
+      "generated_bytes": 1774,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f743dd50e6052e9fce11345f662324a35b06d6848f9c0f053349aa5e118c56ed",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k4-repeat-load-history-from-current.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k4-repeat-rejects-valid-length-fifteen.log",
+      "archive_member": "evidence/canary-brotli-k4-repeat-rejects-valid-length-fifteen.log",
+      "generated_sha256": "970d62bf267ec1f789d4cba6db501f2580d06007c0547ca58d8b5a344bcec6d5",
+      "generated_bytes": 2939,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "25fc43b1b73763ef2b654406a3331cbde9ded5ff3f85436c21152efcde31eaba",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k4-repeat-rejects-valid-length-fifteen.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k4-repeat-store-overwrites-history.log",
+      "archive_member": "evidence/canary-brotli-k4-repeat-store-overwrites-history.log",
+      "generated_sha256": "e789a4710bd8483ff5ab8f80854ec72b0596833c737630cb646a46061087c3fb",
+      "generated_bytes": 2588,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "4eccbf069ad9f1c0e72d2478630569055d2804a826fac2a31e6282958933bedd",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k4-repeat-store-overwrites-history.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k4-repeat-width-uses-old-class.log",
+      "archive_member": "evidence/canary-brotli-k4-repeat-width-uses-old-class.log",
+      "generated_sha256": "2d18c1ddb3ee93ca7b04482244e124815756892f137866815078367e4751083c",
+      "generated_bytes": 3047,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a81a61eb1b7a366967e809b83fd3e663c3ece506a290ff483e9a364b902345b7",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k4-repeat-width-uses-old-class.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-each-reload-restores-old-eighteen.log",
+      "archive_member": "evidence/canary-brotli-k5-each-reload-restores-old-eighteen.log",
+      "generated_sha256": "c1bf783f2579e06a81a0d7b1c1d97b6d8813f3f4e8f869392c8b323f235c479f",
+      "generated_bytes": 4874,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d0e45bcd22148ffe1c9023c44ca21267f5069b7c64d916eb358b8295d30338d0",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-each-reload-restores-old-eighteen.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-initial-loader-replay-unpaid.log",
+      "archive_member": "evidence/canary-brotli-k5-initial-loader-replay-unpaid.log",
+      "generated_sha256": "a560606278489ec85a3db355096a2bf732f3d99e564a5368c9b3fd35243293ba",
+      "generated_bytes": 3949,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "dac573116cdd8fcf12e4ffdcac9b3d6f233e2b0cc70929abaf2d86141a314147",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-initial-loader-replay-unpaid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-invalid-alphabet-misclassified-valid.log",
+      "archive_member": "evidence/canary-brotli-k5-invalid-alphabet-misclassified-valid.log",
+      "generated_sha256": "f24f59a4b525881e16b0c17c3f259888777a4f475d621323338934915f152a1f",
+      "generated_bytes": 2121,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "0ecb667da631c537b29496369c2a8e72a4d97373518eb525e8709534679eb76e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-invalid-alphabet-misclassified-valid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-invalid-last-auxiliary-misclassified-valid.log",
+      "archive_member": "evidence/canary-brotli-k5-invalid-last-auxiliary-misclassified-valid.log",
+      "generated_sha256": "639274cb7995c1607df633a3cffef61bf2cb881a71a980b3dd553ac38784412b",
+      "generated_bytes": 2021,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "cd1de0baf5a1ba4457280ba3f99f3d284b1c660923a2aabecbf9920e94a49dc4",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-invalid-last-auxiliary-misclassified-valid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-loader-omits-four-simple-copies.log",
+      "archive_member": "evidence/canary-brotli-k5-loader-omits-four-simple-copies.log",
+      "generated_sha256": "71e5e2b10a84204497ef327b01ceb652511c3d136e012dd47ad1ff03f2ac64c6",
+      "generated_bytes": 1777,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f5822a7c279f4af7a8be72ca2bcdee551e513bc8e9c7c85472d065e5922217d6",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-loader-omits-four-simple-copies.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-prefix-reload-omits-validation-cell.log",
+      "archive_member": "evidence/canary-brotli-k5-prefix-reload-omits-validation-cell.log",
+      "generated_sha256": "ccc1913d76fe6a028bdb1e94403d737f9d87facb9e8acba4632c4033c6e591f9",
+      "generated_bytes": 2651,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f8c638ba918ecb6a2260e5e206928fdd12b79043b569d0668c406fd0dfab873a",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-prefix-reload-omits-validation-cell.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-prefix-validation-scan-undercharge.log",
+      "archive_member": "evidence/canary-brotli-k5-prefix-validation-scan-undercharge.log",
+      "generated_sha256": "8ae85c118d59ac71de0b671063802f9c9620dee2a71a44470a120d8b3936df71",
+      "generated_bytes": 1899,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "26b78bc8d195828b9a2decda6b9b536ccde9b97f2f968077ede5264b07612b8c",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-prefix-validation-scan-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-selected-singleton-read-unpaid.log",
+      "archive_member": "evidence/canary-brotli-k5-selected-singleton-read-unpaid.log",
+      "generated_sha256": "890004fa1e826c71e91e68b5ac4041e8d359e62ec67ce05980cf514f1446af2e",
+      "generated_bytes": 1606,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d51e682e9ff8b147f1ef752ffb4862caccdec55c47da9ffe2b9dc51ebb2d0576",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-selected-singleton-read-unpaid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-selector-reload-keeps-old-eighteen.log",
+      "archive_member": "evidence/canary-brotli-k5-selector-reload-keeps-old-eighteen.log",
+      "generated_sha256": "d74757bad6416259af4bf8268da195b978a256b7671123caeeccc0499f6277d0",
+      "generated_bytes": 2651,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "41538f8c3ea22e0a43c2ce5fa41257662f9ca0a61accaeab4d12e0f35f37e842",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-selector-reload-keeps-old-eighteen.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-simple-omits-right-operand-receipt.log",
+      "archive_member": "evidence/canary-brotli-k5-simple-omits-right-operand-receipt.log",
+      "generated_sha256": "a1ea827068003e056a730f30e3915ccead5973af42af6bbba2b37c5ebfa96251",
+      "generated_bytes": 2779,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "1a045e61ec444ea3aa71f8489e8331abf0b43cd557fa31762602f32965ef02aa",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-simple-omits-right-operand-receipt.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-simple-right-comparison-operand-unpaid.log",
+      "archive_member": "evidence/canary-brotli-k5-simple-right-comparison-operand-unpaid.log",
+      "generated_sha256": "4c55f81ebe8dc1c316815f17636b6670a9aae23d19494e52029406f60618454e",
+      "generated_bytes": 3028,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "ddaa1e9fc5f7822b22e15fb38c31dc1a09d7cebec772bae91130afbede96d5d3",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-simple-right-comparison-operand-unpaid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-singleton-guard-reordered-before-scan.log",
+      "archive_member": "evidence/canary-brotli-k5-singleton-guard-reordered-before-scan.log",
+      "generated_sha256": "f51930d284a635e8e57a9193e39f6e205b9d0da633825159f9841f33a7a841f7",
+      "generated_bytes": 1598,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "72d81de65810da1f0c040bc164a297bf9c30ca124c3898248acdba3bd0679714",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-singleton-guard-reordered-before-scan.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-singleton-reload-omits-selected-cell.log",
+      "archive_member": "evidence/canary-brotli-k5-singleton-reload-omits-selected-cell.log",
+      "generated_sha256": "ccc1913d76fe6a028bdb1e94403d737f9d87facb9e8acba4632c4033c6e591f9",
+      "generated_bytes": 2651,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f8c638ba918ecb6a2260e5e206928fdd12b79043b569d0668c406fd0dfab873a",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-singleton-reload-omits-selected-cell.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k5-singleton-skips-last-validation-cell.log",
+      "archive_member": "evidence/canary-brotli-k5-singleton-skips-last-validation-cell.log",
+      "generated_sha256": "ceeeacaf38aadd01befa1398cc821e28f6a91450a91e1bf2a91f0dbdb672e90b",
+      "generated_bytes": 1833,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d97dbc80997c89333312a79dc9e6ba63ffc6ac6dd4ae474202aac7af0342a52e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k5-singleton-skips-last-validation-cell.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-adapter-omits-installation-reservation.log",
+      "archive_member": "evidence/canary-brotli-k6-adapter-omits-installation-reservation.log",
+      "generated_sha256": "efde7b876cbc2be135a1cf6bf41fe460f06ffd499e841ba5eff64621890d3186",
+      "generated_bytes": 4963,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c18da08cbd5da9913276195c7fcee275e71bb54f604271da11b7cab1ea6d6051",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-adapter-omits-installation-reservation.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-distinctness-right-read-unpaid.log",
+      "archive_member": "evidence/canary-brotli-k6-distinctness-right-read-unpaid.log",
+      "generated_sha256": "e94e380f3fa41c86f4d4782deba1692a1e3521fa90ffadfa5c12bf487b4cc288",
+      "generated_bytes": 533,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "ed6d5dd1b1c0acab66f7ca9f4b6f8b89b39a29756e5372fbbed11c1d5943a987",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-distinctness-right-read-unpaid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-first-record-probe-unpaid.log",
+      "archive_member": "evidence/canary-brotli-k6-first-record-probe-unpaid.log",
+      "generated_sha256": "069f215cdb5e54d2b1894cbe5b4357c9bb97d581e673713afb41b44dcab0d2d7",
+      "generated_bytes": 552,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "4c71714e2b4a91298dda54dac335e5a7b212926f7539be5e1d62ac7ba3f74cdf",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-first-record-probe-unpaid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-fourth-record-probe-unpaid.log",
+      "archive_member": "evidence/canary-brotli-k6-fourth-record-probe-unpaid.log",
+      "generated_sha256": "069f215cdb5e54d2b1894cbe5b4357c9bb97d581e673713afb41b44dcab0d2d7",
+      "generated_bytes": 552,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "4c71714e2b4a91298dda54dac335e5a7b212926f7539be5e1d62ac7ba3f74cdf",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-fourth-record-probe-unpaid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-install-omits-record-probes.log",
+      "archive_member": "evidence/canary-brotli-k6-install-omits-record-probes.log",
+      "generated_sha256": "ab8ffe4e56e01a7ec1fa0eed00798df440ce0178b71327e26b282208311eef47",
+      "generated_bytes": 3168,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "1b405a77a5544b75de762432745de4e70143048e2566bd99dee86db6bfa08836",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-install-omits-record-probes.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-install-omits-validation-reads.log",
+      "archive_member": "evidence/canary-brotli-k6-install-omits-validation-reads.log",
+      "generated_sha256": "06c1f9399e7da98bc4db6ea91c49ac40278899bd16641b0ac8c26570a6678b79",
+      "generated_bytes": 3168,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a609e5e9a663b0f32cd55cb3e1eeffd68483cf366ea3850ee5a262b642dfa289",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-install-omits-validation-reads.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-installer-reads-before-destination-guard.log",
+      "archive_member": "evidence/canary-brotli-k6-installer-reads-before-destination-guard.log",
+      "generated_sha256": "d81cbaadf0484850ac4ed9eb1812ba56e93c93f325583465ec902b5343da93bf",
+      "generated_bytes": 2161,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "628a7e90e2ed07f334a4a54fc17cbbd44cf2ea991b04d4222185ba525900eadd",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-installer-reads-before-destination-guard.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-range-validation-read-unpaid.log",
+      "archive_member": "evidence/canary-brotli-k6-range-validation-read-unpaid.log",
+      "generated_sha256": "623df5e6797f3bcb716869c42b7368ee88f4fa39aca13b22abc88a00998564fd",
+      "generated_bytes": 525,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "3108cb21d2d62bafe369988d3b0b6945f8a97450a6ff70aff64b997c62dc5324",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-range-validation-read-unpaid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-selector-four-uses-three-symbols.log",
+      "archive_member": "evidence/canary-brotli-k6-selector-four-uses-three-symbols.log",
+      "generated_sha256": "9e1646a0e53c4668b07065f861565738056eb2b49c8c4d0451a55c767e4d2ff2",
+      "generated_bytes": 2751,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c0a99929ef9f3228cf9269fa28034d6c047969cb105282d8ff16d7f6d5529240",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-selector-four-uses-three-symbols.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-singleton-final-read-unpaid.log",
+      "archive_member": "evidence/canary-brotli-k6-singleton-final-read-unpaid.log",
+      "generated_sha256": "311a812d213c0312f38869bedc3c0842a22860b6b5845cb09b5c616f39f7e051",
+      "generated_bytes": 456,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "b8b7998ac6ee461d9acc79b4cd85d50f6a916fd82ae17b00c840a857a34885b6",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-singleton-final-read-unpaid.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-singleton-reservation-restores-five.log",
+      "archive_member": "evidence/canary-brotli-k6-singleton-reservation-restores-five.log",
+      "generated_sha256": "2606d9c0c31a76f28dd1c58e96323df07cac8146dbfc2416bd16833792c7be3f",
+      "generated_bytes": 3118,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "df6ed172e834d60d9facaee8e5f935be251b6af6994afbcd8d4bc35aa9023f7d",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-singleton-reservation-restores-five.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-k6-triangular-correction-undercharged.log",
+      "archive_member": "evidence/canary-brotli-k6-triangular-correction-undercharged.log",
+      "generated_sha256": "db82a4d957eca4e315f96eedeb3a7d89b480b4ec37a1ab83aff11e9c940c18d9",
+      "generated_bytes": 2791,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "47c3311d0aa9a06b23fbca1fc2da3526c3f01ee1a864de59e0098a9d18de2c7e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-k6-triangular-correction-undercharged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-aux-candidate-read-not-charged.log",
+      "archive_member": "evidence/canary-brotli-m1-aux-candidate-read-not-charged.log",
+      "generated_sha256": "25cf1b5cb3b31fe8344cdf6a387f3cab2150c7845b0fad57086957ecc6a263cf",
+      "generated_bytes": 1817,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "4e2d7ecaa3a14faa489307ee3a5b1912f516c495e42f1fd3c2e851812a86485b",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-aux-candidate-read-not-charged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-aux-canonical-length-read-not-charged.log",
+      "archive_member": "evidence/canary-brotli-m1-aux-canonical-length-read-not-charged.log",
+      "generated_sha256": "b52fe9f608b98293cb69f8622dfa33feb5bc1a1b782ce783c464c29f678d0a21",
+      "generated_bytes": 1403,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "aa2b71b187a81444884fd6a3e54a5f6599418ef82d405d99fc295d03ff7c59df",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-aux-canonical-length-read-not-charged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-aux-count-read-not-charged.log",
+      "archive_member": "evidence/canary-brotli-m1-aux-count-read-not-charged.log",
+      "generated_sha256": "3f4ea479669bf20090bf89f8616c2847af5e0090a13c72a4670cfd2170380041",
+      "generated_bytes": 1511,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "7e32ff5dc9092c9dee4b9be754e573a86d46ed1d4071001c0c9bd9f76d08eabd",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-aux-count-read-not-charged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-aux-first-code-skips-last-length.log",
+      "archive_member": "evidence/canary-brotli-m1-aux-first-code-skips-last-length.log",
+      "generated_sha256": "3f89d0b059800f4f7498de2cd7816aaeb01c4bcdeb9a776fa7d8648cc0a2066f",
+      "generated_bytes": 1534,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "b54c0c47d3e976fb696c20a9c1a23bef7794baa87fcff0cc04fae78a9e9ae439",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-aux-first-code-skips-last-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-aux-singleton-skips-last-length.log",
+      "archive_member": "evidence/canary-brotli-m1-aux-singleton-skips-last-length.log",
+      "generated_sha256": "5a4fbdd9bc293f9b9a18361135f9f141f32f28d54e956cdec431888835912893",
+      "generated_bytes": 1500,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "e43901530e6b93be388c5a93188bbb9a26b054245d15a86a34799a41b075096c",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-aux-singleton-skips-last-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-auxiliary-wrong-symbol.log",
+      "archive_member": "evidence/canary-brotli-m1-auxiliary-wrong-symbol.log",
+      "generated_sha256": "5c264c3083f44764e2070d821528862e13ae6b5c0d0e47ca021a4a37661274d0",
+      "generated_bytes": 1866,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "485fb3075fcdca58e680ba490dc852d6d97438dbd15ed25faf990c3cc0191f78",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-auxiliary-wrong-symbol.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-block-count-executor-omits-input-debit.log",
+      "archive_member": "evidence/canary-brotli-m1-block-count-executor-omits-input-debit.log",
+      "generated_sha256": "41499c084b0d13b9d4417ddd2b666c8be8d6382d5bc2a620566ab3337d2c2d49",
+      "generated_bytes": 1834,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "51b6cbfad7c0b5f12de0d0d3e0bfb3bc5dc2489c138c0e44c12f71d052de1798",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-block-count-executor-omits-input-debit.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-block-count-limited-input-is-retryable.log",
+      "archive_member": "evidence/canary-brotli-m1-block-count-limited-input-is-retryable.log",
+      "generated_sha256": "cd2b1262d7e9b3fb597f5fe293d34dcd131d435a5257c2d8ada46f7ee00326d6",
+      "generated_bytes": 3066,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8b5812de24414660e53dd98b677711fafe570f228752c2eff8e308af3696f016",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-block-count-limited-input-is-retryable.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-block-count-plan-loses-consumption.log",
+      "archive_member": "evidence/canary-brotli-m1-block-count-plan-loses-consumption.log",
+      "generated_sha256": "c92221b064389afa3c45e605c064607862d824e2128c3383ce6dbdf6615988f6",
+      "generated_bytes": 1374,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "da2ff1c4e67ff28451b0d1d8b4c0d4929efe20cd4c182cb6bb9e81fe48be2fe1",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-block-count-plan-loses-consumption.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-block-count-plan-loses-need-input.log",
+      "archive_member": "evidence/canary-brotli-m1-block-count-plan-loses-need-input.log",
+      "generated_sha256": "cbdd30412ee4fc86faef10b86eea98c4ceb95263a48caa98a4ac501f81ba6e4e",
+      "generated_bytes": 1224,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "da2ff1c4e67ff28451b0d1d8b4c0d4929efe20cd4c182cb6bb9e81fe48be2fe1",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-block-count-plan-loses-need-input.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-block-count-prepass-omits-read-work.log",
+      "archive_member": "evidence/canary-brotli-m1-block-count-prepass-omits-read-work.log",
+      "generated_sha256": "c4658fed807a0bafdbd072f6c0e7d5bf0187aec561bca75a416b2b8341f6b10c",
+      "generated_bytes": 1646,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8eb6e4b22e148bb04f354ad39b9fdcfc563aa90ed25ddd8caae1bd321acc39ab",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-block-count-prepass-omits-read-work.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-block-count-value-writes-padding.log",
+      "archive_member": "evidence/canary-brotli-m1-block-count-value-writes-padding.log",
+      "generated_sha256": "6499dc15adf3e22ee053445ca9263a8db0cc6625d632c6be7d0855cf2beedd37",
+      "generated_bytes": 1512,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "db0f03b538db06fb9cd1366533f27fb5ad55725e2327371c954a11bed0cc8487",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-block-count-value-writes-padding.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-block-tree-plan-omits-planning-debit.log",
+      "archive_member": "evidence/canary-brotli-m1-block-tree-plan-omits-planning-debit.log",
+      "generated_sha256": "c9f4378f88404bf98d1382f0232bca9c56a1e31593c82515ff0db85b7ada5d3f",
+      "generated_bytes": 1486,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "5d9b9f10eff0c3cedc5ff7f5b14af3a68b25ca9c9b84c828e2688a63d1cc0aa2",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-block-tree-plan-omits-planning-debit.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-body-execution-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-body-execution-undercharge.log",
+      "generated_sha256": "a0ff688f0fded99bf14bc539a74745e25c20d2c7686fc89f710f8e00334b11fa",
+      "generated_bytes": 1263,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8c315d786ab986bffa15eae0796fb548f819903ba50b1fe4b389b8d05eb45dc8",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-body-execution-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-body-metadata-read-not-charged.log",
+      "archive_member": "evidence/canary-brotli-m1-body-metadata-read-not-charged.log",
+      "generated_sha256": "a0ff688f0fded99bf14bc539a74745e25c20d2c7686fc89f710f8e00334b11fa",
+      "generated_bytes": 1263,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8c315d786ab986bffa15eae0796fb548f819903ba50b1fe4b389b8d05eb45dc8",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-body-metadata-read-not-charged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-canonical-accepts-incomplete-space.log",
+      "archive_member": "evidence/canary-brotli-m1-canonical-accepts-incomplete-space.log",
+      "generated_sha256": "d6b580596dbc04a1da2c13b49a9c75c5754e1984392285bec5b874f72bd07633",
+      "generated_bytes": 3291,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a0f65a339c102354fca3c9f5385c01a25ec98a4206cd8dbe7a030c35b0ac8a04",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-canonical-accepts-incomplete-space.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-canonical-accepts-invalid-length.log",
+      "archive_member": "evidence/canary-brotli-m1-canonical-accepts-invalid-length.log",
+      "generated_sha256": "12da80d3bcbdaf7d70cf88ef0fb0b8036252bb72e82d1e865ee19a54fb301064",
+      "generated_bytes": 3496,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "62ca093b6996e50746f67d55fded3aa04399de28dfe77475305d064878b74e5d",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-canonical-accepts-invalid-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-canonical-validation-read-not-charged.log",
+      "archive_member": "evidence/canary-brotli-m1-canonical-validation-read-not-charged.log",
+      "generated_sha256": "63c7c607f1014ac7c45fa2276d82d1284577f3653e284e21ea0a80010e976759",
+      "generated_bytes": 3316,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "2fd4dbb7a515110300cb00e56411bdeaf95eae33d6ef0311350d6d6592541422",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-canonical-validation-read-not-charged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-code-field-wrong-width.log",
+      "archive_member": "evidence/canary-brotli-m1-code-field-wrong-width.log",
+      "generated_sha256": "7ecc73cf64cd07096682f0eef40e33f4f05ca9a12195309374e1e4776b0434dd",
+      "generated_bytes": 2168,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a4285405fd688ab323e3e782293e4416a8df9b6aab98716235bfe25382cfd69b",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-code-field-wrong-width.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-aux-array-erased.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-aux-array-erased.log",
+      "generated_sha256": "0a0638999d69f7bfe0eabc8638719522e8d91609509c812a8a4d357c27ba05f1",
+      "generated_bytes": 1653,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "fd9bfc2fade3af4c6ea8410a612ab2cc2792e55552ad1ee414639bfb8120680e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-aux-array-erased.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-aux-skip-erased.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-aux-skip-erased.log",
+      "generated_sha256": "0436199e1d3f92c03a4129c6dfaac27618938077f196ac0baeab56e50a39c212",
+      "generated_bytes": 1396,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "6d3ad6e20612545021d3b5488bd38b02852dc0a6a70603f7f210d70e5c119062",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-aux-skip-erased.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-chained-history-erased.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-chained-history-erased.log",
+      "generated_sha256": "7ae7bda1147c44e197d1f21dea462563638318291ba851b00bc99d08952dcaba",
+      "generated_bytes": 1760,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "6a39e446b6d815f9388af9431adf857c436d9017b7a7546a7e43b0d9f0873738",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-chained-history-erased.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-complex-write-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-complex-write-undercharge.log",
+      "generated_sha256": "31bf626d1fb9cb10fbff5974696257401ee163b3ac9c121cda4a8e31d644f592",
+      "generated_bytes": 1223,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "3ae2563618cfb99f7d2df5300a4a72bb6c5ea611a00d1a52aadc3aa2b7711d66",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-complex-write-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-failed-error-tag-alias.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-failed-error-tag-alias.log",
+      "generated_sha256": "2ce44c3f4cdf7d42c7abc9650d03cf266b5f34024eea72dbaf0a53542000966d",
+      "generated_bytes": 1501,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "bfd704526b9f6d6bc540634d5781dd858daff4b69ffd47e3952f9eba0042aaad",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-failed-error-tag-alias.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-parent-tag-erased.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-parent-tag-erased.log",
+      "generated_sha256": "cb34740ea9f238cd281c3e084760f76745ab381e2a3e1a3f929d2727f3354fce",
+      "generated_bytes": 1270,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "73e042f3c33c0a00087defd1cb5c9d103972fce75b980bd42f241af00f2f4d3e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-parent-tag-erased.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-prefix-nonzero-erased.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-prefix-nonzero-erased.log",
+      "generated_sha256": "2f3272ae17762a43ff0b87ec86e937bda7582ed47b59aeba765f9a8f9e2d56bb",
+      "generated_bytes": 2605,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "4c519f133447e9b2a4b18769807bd27b3521ea34b8ee2f082133e614ced00438",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-prefix-nonzero-erased.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-prefix-phase-alias.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-prefix-phase-alias.log",
+      "generated_sha256": "58ad1110ac0f961066f03b8ead80e21f3041aa6871cac0103a45d3a44386e6b8",
+      "generated_bytes": 2605,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "69deb956f654de59f3762ab98c5246ebc878ea114441b0052a5bcf14716f7b14",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-prefix-phase-alias.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-shape-selector-lost.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-shape-selector-lost.log",
+      "generated_sha256": "7d661c853e24fe80021b41f37e9cd0282ea214749c19aa9b3c53d63526a9521e",
+      "generated_bytes": 1427,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "3b2949baea68da7c7adcc6e687d994570fc3b999d24508556196a469ee75cf9e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-shape-selector-lost.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-simple-index-erased.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-simple-index-erased.log",
+      "generated_sha256": "7d661c853e24fe80021b41f37e9cd0282ea214749c19aa9b3c53d63526a9521e",
+      "generated_bytes": 1427,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "3b2949baea68da7c7adcc6e687d994570fc3b999d24508556196a469ee75cf9e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-simple-index-erased.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-simple-write-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-simple-write-undercharge.log",
+      "generated_sha256": "40474f04f0ed58b31054cdf3cd2858eec2da196beaf906984d79acb20c629803",
+      "generated_bytes": 1261,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "21fdc349b8bcda8131dd819b498f8c98b85e1e644e8988cc50cbf4fb86e6b430",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-simple-write-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-codec-symbol-array-alias.log",
+      "archive_member": "evidence/canary-brotli-m1-codec-symbol-array-alias.log",
+      "generated_sha256": "df90cb1d9ccf15024234864196a1101e49943a0b31f8dfaa9c109cb85a502a73",
+      "generated_bytes": 1725,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "59ac177767cc55afd71b9a2737adbd4afebf353a64b61b9fe5d5230d135f1c31",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-codec-symbol-array-alias.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-complex-start-wrong-previous-length.log",
+      "archive_member": "evidence/canary-brotli-m1-complex-start-wrong-previous-length.log",
+      "generated_sha256": "c1fe4553a92f678f34d738ed8421f25480fef64c4baeddac5aff1162ba59c113",
+      "generated_bytes": 1634,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "da7251cee1d65491826c2c8bf0fb9fe941a6b8fb1fca36b469dd72e1f3a1b0cd",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-complex-start-wrong-previous-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-bad-count-executor-wrong-error.log",
+      "archive_member": "evidence/canary-brotli-m1-context-bad-count-executor-wrong-error.log",
+      "generated_sha256": "c4a806ab8305a458482b4c960b0c5c0ff43700925af7dfc28ac257072b7c8039",
+      "generated_bytes": 1921,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "6059e325666cc9187f93a5fa491306601ceef87cbda5e987a2057161e406bf7e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-bad-count-executor-wrong-error.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-bad-count-owner-skips-action.log",
+      "archive_member": "evidence/canary-brotli-m1-context-bad-count-owner-skips-action.log",
+      "generated_sha256": "da967458a04f8b9253ce4f30d6bbd32070d3fe82c768b8ad3f0ae96797baae20",
+      "generated_bytes": 3099,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "29082d819b6d823bb5f23d1816fe4dd8773a9e26b7648d19121f74e1bed1c320",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-bad-count-owner-skips-action.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-bad-count-plan-consumes-input.log",
+      "archive_member": "evidence/canary-brotli-m1-context-bad-count-plan-consumes-input.log",
+      "generated_sha256": "55c533ac716caba1e738a7d0cc12b7436b9f86eb45540ee714471bcfbd74b1da",
+      "generated_bytes": 3114,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a94936027d09c40357a1f196ecb20db37ec8a6b043e2268d914edd73aca3f49f",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-bad-count-plan-consumes-input.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-bad-count-plan-loses-failure.log",
+      "archive_member": "evidence/canary-brotli-m1-context-bad-count-plan-loses-failure.log",
+      "generated_sha256": "391bf0f3dfc18465500d3af0c16a055b00f03c23cde6e567ba759450b8da1955",
+      "generated_bytes": 2974,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f96625bf2da124f01407edda117a9391d0d2a858f15fe83ce1385eccf6b81b48",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-bad-count-plan-loses-failure.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-bad-count-plan-omits-terminal-work.log",
+      "archive_member": "evidence/canary-brotli-m1-context-bad-count-plan-omits-terminal-work.log",
+      "generated_sha256": "3b713909f845ebcced88f55b396e0c0b8d6a628272d589462852c558dbf45a6a",
+      "generated_bytes": 3110,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "86ee0528885a733ca4e977ff582cbee6648a492d8e35d28f27c565426b736215",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-bad-count-plan-omits-terminal-work.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-bad-count-prepass-skips-terminal-plan.log",
+      "archive_member": "evidence/canary-brotli-m1-context-bad-count-prepass-skips-terminal-plan.log",
+      "generated_sha256": "fa26b41b8a10a61972ca2da6e5f7c41d03b9100bf7b4e3f3aa867ddb5bb1cb90",
+      "generated_bytes": 1555,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "b809bcafd8d5ac964526d80ff2e50e59e07eee971d56c27840aa3cd21198b103",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-bad-count-prepass-skips-terminal-plan.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-direct-wrong-value.log",
+      "archive_member": "evidence/canary-brotli-m1-context-direct-wrong-value.log",
+      "generated_sha256": "54fb6d0eb3d042cd4f1d931b3b5fb045992dc1ab49f818ed7d6b68a08a477249",
+      "generated_bytes": 1312,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "fd367144a1d93ca5327113ab832e37f520b1e47a873993e009e69b5b2cacd21e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-direct-wrong-value.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-mode-action-loses-initialized-count.log",
+      "archive_member": "evidence/canary-brotli-m1-context-mode-action-loses-initialized-count.log",
+      "generated_sha256": "65ed761d581e8184a03db341e0a9819e760f1b5502067f9811919bc6a1758c4b",
+      "generated_bytes": 2018,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d15c5ddd099bbd81dd82231cd384f2aa8ebee1e308bf65f7df73d656a3634189",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-mode-action-loses-initialized-count.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-mode-action-writes-wrong-value.log",
+      "archive_member": "evidence/canary-brotli-m1-context-mode-action-writes-wrong-value.log",
+      "generated_sha256": "283648e6f1fb105a6069a0f0ef38a58bc8d48106d15f5cc0df3ea59f40fd4c5b",
+      "generated_bytes": 3121,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "265a89b9ab62c9cd94e7bec4ba766150cc94a0790fa2d129297a8cf23fe8ebc0",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-mode-action-writes-wrong-value.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-mode-executor-omits-input-debit.log",
+      "archive_member": "evidence/canary-brotli-m1-context-mode-executor-omits-input-debit.log",
+      "generated_sha256": "b258fa2a542fb7b08a649adec80fe2e04d060a70c9ca484e127edc4115a621d9",
+      "generated_bytes": 1848,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "ff9abd5a5e431a4e34d3e5c5bdb8b14a62af7c697685a6afd1b182cbf08053fb",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-mode-executor-omits-input-debit.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-mode-limited-input-is-retryable.log",
+      "archive_member": "evidence/canary-brotli-m1-context-mode-limited-input-is-retryable.log",
+      "generated_sha256": "dfff24ae52cce68eb92df42ad800c7535db3bf57a12a594024981fbc088e7f65",
+      "generated_bytes": 1914,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "df945cd3511127cdca3d154b9ef39890392d7239ea732d18850fc0df45decfca",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-mode-limited-input-is-retryable.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-mode-plan-loses-consumption.log",
+      "archive_member": "evidence/canary-brotli-m1-context-mode-plan-loses-consumption.log",
+      "generated_sha256": "d204a9f6e9cb6b1a27015dcbc7bbc0559d477d566e38f44225513b0276b217c1",
+      "generated_bytes": 2522,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "b7e6fd2e20ae2e1cb9cfe8c99bd64c41ab23955e26a0e60800289b6f4371648b",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-mode-plan-loses-consumption.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-mode-plan-loses-need-input.log",
+      "archive_member": "evidence/canary-brotli-m1-context-mode-plan-loses-need-input.log",
+      "generated_sha256": "3c8b80d4832061c2a66caa306e99ec99f99600a3ccc5c271eb1ec2bc6c28a9b2",
+      "generated_bytes": 2454,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d32b538eef6c686dc0e1c1d55b2c2fad2a8a282850717b3f599b0d926d5a1a6e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-mode-plan-loses-need-input.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-mode-plan-omits-value-writes.log",
+      "archive_member": "evidence/canary-brotli-m1-context-mode-plan-omits-value-writes.log",
+      "generated_sha256": "5606991da54f3b3234fdbd4c5ea74162c4d58092af21202bbc69ba0222508901",
+      "generated_bytes": 2550,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d610196c732e5d5e2ab60a093f44b6df79f624dd48c261f53f3c0a9bd2413075",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-mode-plan-omits-value-writes.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-mode-prepass-omits-read-work.log",
+      "archive_member": "evidence/canary-brotli-m1-context-mode-prepass-omits-read-work.log",
+      "generated_sha256": "767a0acb369359b4c03617d95182cfb1c3faf47862d6a2c0952b3756af628dc5",
+      "generated_bytes": 1753,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "0ed3539af9416f8b01c18b4217f8fbc2193fa2dc1a06b9adde9c87653679e392",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-mode-prepass-omits-read-work.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-context-symbol-execution-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-context-symbol-execution-undercharge.log",
+      "generated_sha256": "f4a23a516645bc58c7989e085fa02c99a682eb017d35b543bccbdf3bd5cf52ee",
+      "generated_bytes": 1548,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "e64c008392451406ba069eaf20c86a60ac978e145d84e90fbc8fe30e9fdd18d7",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-context-symbol-execution-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-descriptor-store-writes-unrelated-byte.log",
+      "archive_member": "evidence/canary-brotli-m1-descriptor-store-writes-unrelated-byte.log",
+      "generated_sha256": "90e3a4b593965593c8c63582b8fb7ecf1ba28d7d703f8e373f8f90fbc5600219",
+      "generated_bytes": 1452,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "89da522e63009d27cd2e8730f5ef60c8013d43d4fb61b9f45aa385da84d812cd",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-descriptor-store-writes-unrelated-byte.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-distance-action-flips-postfix.log",
+      "archive_member": "evidence/canary-brotli-m1-distance-action-flips-postfix.log",
+      "generated_sha256": "9812721a87b36d0e9ef855ecf84817c8687de9942812f2ef0ea4f03553c94f2b",
+      "generated_bytes": 1989,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "db0c41014a8537953c8af3b062da5aa15a66a57fd4d0c3cda3d08adea8030fde",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-distance-action-flips-postfix.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-distance-action-writes-wrong-direct-field.log",
+      "archive_member": "evidence/canary-brotli-m1-distance-action-writes-wrong-direct-field.log",
+      "generated_sha256": "9812721a87b36d0e9ef855ecf84817c8687de9942812f2ef0ea4f03553c94f2b",
+      "generated_bytes": 1989,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "db0c41014a8537953c8af3b062da5aa15a66a57fd4d0c3cda3d08adea8030fde",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-distance-action-writes-wrong-direct-field.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-distance-plan-loses-consumption.log",
+      "archive_member": "evidence/canary-brotli-m1-distance-plan-loses-consumption.log",
+      "generated_sha256": "b4945b7b370ff2b1279201b5034162f9d4a693f181862240986f69ec4d4ed8ed",
+      "generated_bytes": 1349,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "4171d3992455864a2514e61b16e43e7bfb53239462f8fe09a9d87a6f36a44988",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-distance-plan-loses-consumption.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-distance-plan-loses-need-input.log",
+      "archive_member": "evidence/canary-brotli-m1-distance-plan-loses-need-input.log",
+      "generated_sha256": "9c26833272398be4beae63140485c53388ec253877de3f035f135de191270358",
+      "generated_bytes": 1273,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "29c089fce1b16116865af81e364b375ff7447b4538b80e26cf97ff1ff10e470a",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-distance-plan-loses-need-input.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-distance-plan-omits-value-writes.log",
+      "archive_member": "evidence/canary-brotli-m1-distance-plan-omits-value-writes.log",
+      "generated_sha256": "fecc30c25d25187914d40e75492a1749661d270e30c1afdd47ef2400bb494cd9",
+      "generated_bytes": 1369,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "cb3227a27d8d2e9178d31da677aabccd806e225de82b32943e0d461f01546da1",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-distance-plan-omits-value-writes.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-distance-prepass-omits-read-work.log",
+      "archive_member": "evidence/canary-brotli-m1-distance-prepass-omits-read-work.log",
+      "generated_sha256": "9c2240401a2d1749b90173f33ae128def85c91cc9914d1408d0af3937b0fdf33",
+      "generated_bytes": 1617,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "8355fbd1371ed757443f508984433dfd43abff3c1c60b02eaae4036536e48f3c",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-distance-prepass-omits-read-work.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-field-planning-replay-not-charged.log",
+      "archive_member": "evidence/canary-brotli-m1-field-planning-replay-not-charged.log",
+      "generated_sha256": "7f1548b1c8c3141d54759df5820fb73717d5ea5fc85b32c05d1bf7a521f355a9",
+      "generated_bytes": 1487,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "fc496b319d94ad95fc40177e9658c5e8685950030fcdf98c9c4c845c0e4764ab",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-field-planning-replay-not-charged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-group-reset-transition-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-group-reset-transition-undercharge.log",
+      "generated_sha256": "be86327691fae14d349cb5b438c5c13b93ad1a7bc3f6e38bdaeb3cd92f375ee0",
+      "generated_bytes": 1108,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c495bfffd33a8d4908647c4a49fb05bcfb5ec04365ccea90fd76e0228b080790",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-group-reset-transition-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-group-tree-plan-omits-planning-debit.log",
+      "archive_member": "evidence/canary-brotli-m1-group-tree-plan-omits-planning-debit.log",
+      "generated_sha256": "9105b7eaac17d6302b401e6e32f25d24fab1e04669db080a0406bbd8cc2cb678",
+      "generated_bytes": 1504,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "2c3147a04c77b8a5906d41db1bbdf33be55aef3f99aa94b3110fe47bf6374dae",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-group-tree-plan-omits-planning-debit.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-group-tree-transition-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-group-tree-transition-undercharge.log",
+      "generated_sha256": "8b9ec74412d3f043b8c45b58160ce34addcdd5dbd90e6c85bb13249623c8f32e",
+      "generated_bytes": 1102,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "373d33431b41ce2cb1d33c87e8e6df35ea230174704f772bfb20993ff5c1e8c1",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-group-tree-transition-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-inconsistent-span-mutates-decoder.log",
+      "archive_member": "evidence/canary-brotli-m1-inconsistent-span-mutates-decoder.log",
+      "generated_sha256": "3fa205729526b46400517b9ad8005f3bc84b00d44fab643c1bd89650669668ac",
+      "generated_bytes": 2098,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "9b8d69ce030fc05a5e5191a41286677f64be2fd13def32e483aca4efb4f70d92",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-inconsistent-span-mutates-decoder.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-initial-symbol-execution-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-initial-symbol-execution-undercharge.log",
+      "generated_sha256": "3469cc9cc1e3901127fc6ceaffbabb0fe8b21c16d1dae820f89c5856b4a4495e",
+      "generated_bytes": 1531,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "7f85ee46419bd8114fa69a7d64547872450ed3325ef2e88a042fb507f6c85c2a",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-initial-symbol-execution-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-parser-restores-too-small-cap.log",
+      "archive_member": "evidence/canary-brotli-m1-parser-restores-too-small-cap.log",
+      "generated_sha256": "0e653bd3b5385ba61cee1603a43f74932cdfaba12344490a7b5b3374c77bd439",
+      "generated_bytes": 2217,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "09cbeff27e9a8612dda4a147a93d4d5b9837d82253cee3b22b235c9f4a6d8d54",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-parser-restores-too-small-cap.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-parser-skips-pending-span-drain.log",
+      "archive_member": "evidence/canary-brotli-m1-parser-skips-pending-span-drain.log",
+      "generated_sha256": "78edc980f663c77ac0c6378766e946f0e5a642a1be41e608b9d1ad381d046112",
+      "generated_bytes": 1610,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "17dcf57f4fbd541ee873467859ac890725e15ce7f66243d6ff48a5ea80ebc8fc",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-parser-skips-pending-span-drain.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-pending-span-writes-wrong-length.log",
+      "archive_member": "evidence/canary-brotli-m1-pending-span-writes-wrong-length.log",
+      "generated_sha256": "edc510f240b4355a78988f11b58e086c6d25f87b107ad4ea762264490b02734a",
+      "generated_bytes": 1820,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "df6e7635fd6963b3b573f5fe6d83f31238aa8ed3414ec00624104558eef8a2f9",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-pending-span-writes-wrong-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-planner-restores-too-small-cap.log",
+      "archive_member": "evidence/canary-brotli-m1-planner-restores-too-small-cap.log",
+      "generated_sha256": "dde7d454a42e6b0aef889d04cde2cfd4813f1563cde284b05bce89021b7a502e",
+      "generated_bytes": 584,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "b9e8c08570f55f05e0f1e66347b2cb4023e51c759736c466934ee599aa277581",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-planner-restores-too-small-cap.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-planner-skips-pending-span-drain.log",
+      "archive_member": "evidence/canary-brotli-m1-planner-skips-pending-span-drain.log",
+      "generated_sha256": "cc28aa482a2a0929bc18ad7735ca0f7b7d870f4a4a77780cfbf793f32c85b985",
+      "generated_bytes": 4734,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "089b34207e98ff8a79fa6273753052eb348747cb38e6378283aba6982f3d0940",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-planner-skips-pending-span-drain.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-prefix-reset-transition-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-prefix-reset-transition-undercharge.log",
+      "generated_sha256": "ab284973732f168c16e67ea937182b5020f278829cbd330762658e49a1b7be31",
+      "generated_bytes": 1026,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "e5d3070ee006018ea4fae8cb8da77fc180d906339aa44a420262c67340e00552",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-prefix-reset-transition-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-ready-reset-transition-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-ready-reset-transition-undercharge.log",
+      "generated_sha256": "fb22058b9326d0dc5ca6d8434e980d4b2a18dd9ea9c312443c92504627567399",
+      "generated_bytes": 1022,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c307846fc70614f6390d89499c665d714cf0ef61b38784c7c1c75f6a1e53a648",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-ready-reset-transition-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-saved-aux-accepts-invalid-length.log",
+      "archive_member": "evidence/canary-brotli-m1-saved-aux-accepts-invalid-length.log",
+      "generated_sha256": "3e90b3a8141e8734608ba27990c4257bd455fcb48b4c41c2d23d7da62fd50505",
+      "generated_bytes": 1640,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "a521abc12028f278c0ea46483b313d6b278dba4e98745e555e52575c02ddd4e4",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-saved-aux-accepts-invalid-length.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-saved-aux-load-not-charged.log",
+      "archive_member": "evidence/canary-brotli-m1-saved-aux-load-not-charged.log",
+      "generated_sha256": "f104ed9f8dd41d572df0780dcd960e3496b2e03d41c42bb827bd2cd90132e965",
+      "generated_bytes": 1511,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "02dfe73b570420c272b77e404c9e1f067b39efab5c6fed87e797e0a790e02735",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-saved-aux-load-not-charged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-saved-aux-skips-last-copy.log",
+      "archive_member": "evidence/canary-brotli-m1-saved-aux-skips-last-copy.log",
+      "generated_sha256": "400d54c0d9a21fbe8b68b0d1ce85a60ba9c21e3f65376cb69c83b97931d230c1",
+      "generated_bytes": 1455,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "82e57bac934deede0150dddffe128a10ee633738a3a91ece35c9143aad039a8d",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-saved-aux-skips-last-copy.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-saved-aux-wrong-partial-count.log",
+      "archive_member": "evidence/canary-brotli-m1-saved-aux-wrong-partial-count.log",
+      "generated_sha256": "7e7f51428dc5b83685573818a229adcdba2b1d570d31d66c931b7dbf02e2f644",
+      "generated_bytes": 1710,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "81be7e5616a22c13f8ea45800a5722649feaf97bf329bb117dc688bc6d1cdf5a",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-saved-aux-wrong-partial-count.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-simple-pair-second-read-not-charged.log",
+      "archive_member": "evidence/canary-brotli-m1-simple-pair-second-read-not-charged.log",
+      "generated_sha256": "8231dc9cabdcbe5d13f6806cb671363cb95a97421b9ed1a4ac51deb1a4fa7a45",
+      "generated_bytes": 1397,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "11e0322d91983bb91aadceabc97d473e05a4db7ec0782834d582523a1c05bc5b",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-simple-pair-second-read-not-charged.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-simple-validation-skips-last-pair.log",
+      "archive_member": "evidence/canary-brotli-m1-simple-validation-skips-last-pair.log",
+      "generated_sha256": "509a4359511086b44cb1568c25ab473bd1aab5179e2221b0395c5f7355ed2a33",
+      "generated_bytes": 1830,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "3c67e03b02b1bfb15cfe57c6ceebc9ed87cde52c2082aa4ccac3658fb4e79e6e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-simple-validation-skips-last-pair.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-tree-plan-omits-saved-load-planning.log",
+      "archive_member": "evidence/canary-brotli-m1-tree-plan-omits-saved-load-planning.log",
+      "generated_sha256": "12097b37987ee87a67649bf169a4013e294e5d094489861865460e0895acaf70",
+      "generated_bytes": 3496,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "2c7efd63056dd79e96dab7038ffca5b73374b3c2082a8029d0ff76dbf76b85bf",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-tree-plan-omits-saved-load-planning.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-tree-reset-transition-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-tree-reset-transition-undercharge.log",
+      "generated_sha256": "4b9654287b7cecb0e26be56022a46622c5cf4f225e15045ef7e05e5ad2c3f683",
+      "generated_bytes": 1028,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "dafad7f905e3fbd53fbb441ac890d7f693c5ab043e277969811dbe4372bedbf5",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-tree-reset-transition-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-var-integer-wrong-value.log",
+      "archive_member": "evidence/canary-brotli-m1-var-integer-wrong-value.log",
+      "generated_sha256": "6fafc1f36406d810712ea20538c5b75fe369395fdb8469d26c7bf35a84b0ce84",
+      "generated_bytes": 1199,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "9461b95c9b39355110eec7b115f3aadc14202fc59eb364e728ce35c11b1d6606",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-var-integer-wrong-value.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-m1-var-reset-transition-undercharge.log",
+      "archive_member": "evidence/canary-brotli-m1-var-reset-transition-undercharge.log",
+      "generated_sha256": "8bd172214d3227e6896b684c2ceef96103a90b4dca6e02ffe1751e95f6377211",
+      "generated_bytes": 1042,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "78f3432a1b507f7b0a3db04136cd36acac1b008dadb1fc0330f6d0290efa300a",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-m1-var-reset-transition-undercharge.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-simple-code-accepts-duplicate-symbol.log",
+      "archive_member": "evidence/canary-brotli-simple-code-accepts-duplicate-symbol.log",
+      "generated_sha256": "54728e70d4fccd16a9927d1e1b42d9d57ee89c916af0682646931f885f7a23d4",
+      "generated_bytes": 4016,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "77fc654ca503030a5d735d577b85334d11dd839f9de4c11712200e0981a1c33e",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-simple-code-accepts-duplicate-symbol.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-simple-code-accepts-limit-value.log",
+      "archive_member": "evidence/canary-brotli-simple-code-accepts-limit-value.log",
+      "generated_sha256": "819c2f62fb23a4de6f23f7ac5b70f418e113c70607669bd75017dbe355f69868",
+      "generated_bytes": 4872,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "f8c5480935911ea53bf42cf09611848f6a9b3942be9f349baa48afcda1c29b6c",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-simple-code-accepts-limit-value.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-terminal-load-turns-truncation-unsupported.log",
+      "archive_member": "evidence/canary-brotli-terminal-load-turns-truncation-unsupported.log",
+      "generated_sha256": "9ba19676c928ef8b233bc77bf56a35328928ab0b4913b81b9ed10235f39cdb0a",
+      "generated_bytes": 1627,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "208c5d08b3990be84f1598211290e1ee017841a8bb2b32b668de178e0286cf35",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-terminal-load-turns-truncation-unsupported.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/canary-brotli-terminal-store-marks-state-complete.log",
+      "archive_member": "evidence/canary-brotli-terminal-store-marks-state-complete.log",
+      "generated_sha256": "711948e2fc101cf4a3be9dd8083fa2ac6f37ff39b3d5f4f92a4d68a82181dc8c",
+      "generated_bytes": 1215,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "d73560f4fda8b473e9917a45945cd94f4bac2afd81ec25a4c319db47504196c9",
+      "matching_owned_tagged_logs": [
+        "evidence/m1-source-receipts-final04/control-attempts/1794973493572510000/canary-brotli-terminal-store-marks-state-complete.log"
+      ],
+      "ordinary_positive_preserved_separately_from_gate_package": false
+    },
+    {
+      "live_path": "evidence/positive-brotli-b3c-repeat-bound-obligation.log",
+      "archive_member": "evidence/positive-brotli-b3c-repeat-bound-obligation.log",
+      "generated_sha256": "af023255dfc92b02f3cb615543d33a022af9364a7b8fb4597e25eae8a6538ea1",
+      "generated_bytes": 2957,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c361ed4afae2c3fec72fff072d37899b38a8ef494b72753a2a4fb4aebc813f65",
+      "matching_owned_tagged_logs": [],
+      "ordinary_positive_preserved_separately_from_gate_package": true
+    },
+    {
+      "live_path": "evidence/positive-brotli-m1-planner-cap-rank.log",
+      "archive_member": "evidence/positive-brotli-m1-planner-cap-rank.log",
+      "generated_sha256": "a69ec771aefe99f35c2df9a935abb985662d7af686d88ea7eefacfc8dec0e000",
+      "generated_bytes": 2575,
+      "restore_from_commit": "11dbb18f1845d610587f8d9d58c2ec950881e569",
+      "restored_sha256": "c3bfa6c89942ca8faecca08cff9686e647ef9909b6c0e906eb58be81e59c21e3",
+      "matching_owned_tagged_logs": [],
+      "ordinary_positive_preserved_separately_from_gate_package": true
+    }
+  ],
+  "completed_utc": "2026-11-18T05:12:43.190043+00:00"
+}

@@ -1,0 +1,50 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_m1_invalid_start_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:15:19.695385+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 594.362341,
+  "finished_utc": "2026-11-17T02:25:14.066617+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_four_m1_invalid_start_defects.log",
+  "log_sha256": "ccb0a0d365b6ccc1ded961378f529fdece1458587c2c1499fe06caa4ae424679",
+  "suite": "the_prover_rejects_four_m1_invalid_start_defects",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-m1-invalid-region-consumes-input",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-invalid-region-consumes-input.log",
+      "sha256": "6e256f0482f8de70a325bbd1ae6a515cc7c0be0ae55de9cb0991fb452cb0665b",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-invalid-region-mutates-descriptor",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-invalid-region-mutates-descriptor.log",
+      "sha256": "61ff823716cd7c8036e710f6cfe2813de28531e2bc23383ef7fba4071c225256",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-invalid-region-plan-consumes-input",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-invalid-region-plan-consumes-input.log",
+      "sha256": "da61d22c5f45289eb0881eee2fba9b2645ffd8327786d4b945e9b6aede23c7e2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-invalid-descriptor-plan-consumes-input",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-invalid-descriptor-plan-consumes-input.log",
+      "sha256": "3d0992f8e5de718ad85427295069e73fa5b6677dbd8f004fb77c6334846c1bce",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

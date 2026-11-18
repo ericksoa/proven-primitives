@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+    "src/lib.rs",
+    "--crate-type",
+    "lib",
+    "--no-cheating",
+    "--num-threads",
+    "8",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "300",
+    "--trace",
+    "--time",
+    "--output-json"
+  ],
+  "started_utc": "2026-11-17T04:45:44.017490+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 241.9267254580045,
+  "finished_utc": "2026-11-17T04:49:45.946726+00:00",
+  "log": "evidence/m1-source-ledgers-review05/whole-crate.log",
+  "log_sha256": "e97341ab590c171cd0d8a115eb1f921e7af4b1257e6db97591c8c3f115749721",
+  "source_unchanged": true
+}

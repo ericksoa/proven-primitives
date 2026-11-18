@@ -1,0 +1,207 @@
+--- published/src/brotli_input.rs
++++ isolated/src/brotli_input.rs
+@@ -15882,6 +15882,39 @@
+ 
+ 
+ 
++proof fn m1_literal_group_bad_command_count_is_admitted(workspace: Seq<u8>, window_bytes: u32)
++    requires
++        b3c_workspace_shape(workspace.len() as nat, window_bytes),
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_OUTER_PHASE) == 8,
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_MTF_UPPER_BOUND) == 63,
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_CONTEXT_PHASE) == 0,
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_CONTEXT_KIND) == 0,
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_MAX_RUN_PREFIX) == 0,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_SIZE) == 1,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_INDEX) == 0,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_INITIALIZED) == 0,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_MAP_TREES) == 0,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_LITERAL_TREES) == 1,
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_GROUP_KIND) == 0,
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_GROUP_PHASE) == 1,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_TREE_COUNT) == 1,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_TREE_INDEX) == 0,
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_ACTIVE_REGION) == 0,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_ACTIVE_TREE) == 0,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_MAX) == 256,
++        b3b_scalar_u16_at(workspace, window_bytes, B3B_ALPHABET_LIMIT) == 256,
++    ensures compressed_decoder_state_ok(workspace, window_bytes),
++        b3b_scalar_byte_at(workspace, window_bytes, B3B_OUTER_PHASE)
++            == compressed_outer_phase_tag_spec(CompressedOuterPhase::LiteralTreeGroup),
++{
++    reveal(b3c_workspace_shape); reveal(compressed_decoder_state_ok);
++    reveal(serialized_mtf_state_ok); reveal(serialized_context_state_ok);
++    reveal(serialized_context_data_ok); reveal(serialized_context_map_prefix_ok);
++    reveal(serialized_context_phase_payload_ok); reveal(tree_group_payload_ok);
++    reveal(tree_group_count_at); reveal(tree_group_alphabet_at);
++    reveal(compressed_outer_phase_tag_spec);
++}
++
+ proof fn m1_tree_iterations_agree(left: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), right: (CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>), input: Seq<u8>, end: bool,
+     region: crate::brotli_prefix::TreeRegion, tree: u16)
+     requires m1_tree_iteration_holds(left, input, end), m1_tree_iteration_holds(right, input, end),
+@@ -16046,6 +16079,15 @@
+             m1_tree_builder_values(workspace, window_bytes, initial.alphabet_limit,
+                 b3b_scalar_u16_at(workspace, window_bytes, B3B_BUILDER_INITIALIZED) as u16), prefix_consumed, result)
+     }
++}
++
++proof fn m1_tree_trace_implies_decodable_start(workspace: Seq<u8>, window_bytes: u32,
++    input: Seq<u8>, end: bool, result: SerializedTreeStep)
++    requires m1_tree_result_has_trace(workspace, window_bytes, input, end, result),
++    ensures m1_tree_has_decodable_start(workspace, window_bytes),
++{
++    reveal(m1_tree_result_has_trace);
++    reveal(m1_tree_has_decodable_start);
+ }
+ 
+ proof fn m1_tree_traced_results_agree(workspace: Seq<u8>, window_bytes: u32, input: Seq<u8>, end: bool,
+@@ -17149,7 +17191,6 @@
+                 proof { reveal(code_store_frame); }
+                 let simple_result = SerializedTreeStep { consumed, status };
+                 proof {
+-                    assert(simple_result.status == status);
+                     let action = (before_field, field_after, step, started, started,
+                         before_initialized, before_initialized, before_values, before_values);
+                     m1_tree_trace_unspanned_action(before_field, field_after, step, started,
+@@ -32372,6 +32413,16 @@
+ ) -> (r: Result<CompressedActionPlan, CoreFailure>)
+     requires old(budget).valid(),
+     ensures
++        r.is_ok() && b3b_workspace_shape(workspace@.len() as nat, window_bytes)
++            && b3b_scalar_byte_at(workspace@, window_bytes, B3B_GROUP_KIND) == 0
++            && 1 <= b3b_scalar_u16_at(workspace@, window_bytes, B3B_TREE_COUNT) <= 256
++            && b3b_scalar_u16_at(workspace@, window_bytes, B3B_TREE_INDEX) + 1
++                == b3b_scalar_u16_at(workspace@, window_bytes, B3B_TREE_COUNT)
++            && (b3b_scalar_u16_at(workspace@, window_bytes, (B3B_BLOCK_COUNTS + 2) as u16) == 0
++                || b3b_scalar_u16_at(workspace@, window_bytes, (B3B_BLOCK_COUNTS + 2) as u16) > 256)
++            && m1_tree_result_has_trace(workspace@, window_bytes, input@, end_of_input,
++                SerializedTreeStep { consumed: r.unwrap().consumed, status: SerializedTreeStatus::Complete }) ==>
++                    r.unwrap().status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)),
+         final(budget).valid(),
+         final(budget).limits == old(budget).limits,
+         final(budget).work_remaining <= old(budget).work_remaining,
+@@ -32390,6 +32441,15 @@
+         input,
+         end_of_input,
+     )?;
++    proof {
++        let completed = SerializedTreeStep { consumed: tree.consumed, status: SerializedTreeStatus::Complete };
++        if m1_tree_result_has_trace(workspace@, window_bytes, input@, end_of_input, completed) {
++            m1_tree_trace_implies_decodable_start(workspace@, window_bytes, input@, end_of_input, completed);
++            m1_tree_traced_results_agree(workspace@, window_bytes, input@, end_of_input,
++                completed, SerializedTreeStep { consumed: tree.consumed, status: tree.status });
++            assert(tree.status == SerializedTreeStatus::Complete);
++        }
++    }
+     let mut execution_work = tree.execution_work;
+     let status = match tree.status {
+         SerializedTreeStatus::NeedInput => Some(CompressedHeaderStatus::NeedInput),
+@@ -32414,6 +32474,29 @@
+                 return Err(core_state_failure());
+             }
+             let next = tree_index + 1;
++            // Match the existing next-command-group rejection before reserving its success path.
++            if next == count && group == 0 {
++                let next_count = match state_u16(workspace, window_bytes, B3B_BLOCK_COUNTS + 2) {
++                    Ok(value) => value,
++                    Err(_) => return Err(core_state_failure()),
++                };
++                if next_count == 0 || next_count > 256 {
++                    execution_work = checked_planned_work_add(execution_work, 4 + 1)?;
++                    let rejected = CompressedActionPlan {
++                        planning_work: tree.planning_work,
++                        execution_work,
++                        consumed: tree.consumed,
++                        status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)),
++                    };
++                    proof {
++                        assert(rejected.execution_work as nat == tree.execution_work as nat + 5);
++                        assert(rejected.planning_work == tree.planning_work);
++                        assert(rejected.consumed == tree.consumed);
++                        assert(rejected.status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)));
++                    }
++                    return Ok(rejected);
++                }
++            }
+             execution_work = checked_planned_work_add(
+                 execution_work,
+                 if next < count {
+@@ -41887,4 +41970,76 @@
+         }
+     }
+ 
+-}
++    #[test]
++    fn m1_group_handoff_missing_next_count_diagnostic() {
++        use crate::brotli::{RequestBudget, RequestLimits};
++        for next_count in [0u16, 257, u16::MAX, 1, 256] {
++            let bad_count = next_count == 0 || next_count > 256;
++            let (mut workspace, window) = fresh_b3b_workspace();
++            workspace.resize(workspace.len() + 131_072, 0);
++            assert!(1024 <= window && window <= 16_777_216 && window.is_power_of_two());
++            assert!(workspace.len() >= window as usize + crate::brotli_prefix::FIXED_SCRATCH_BYTES as usize);
++            put_state_u16(&mut workspace, window, B3B_MAP_SIZE, 1).unwrap();
++            put_state_u16(&mut workspace, window, B3B_LITERAL_TREES, 1).unwrap();
++            put_state_u16(&mut workspace, window, B3B_BLOCK_COUNTS + 2, next_count).unwrap();
++            {
++                let mut decoder = CompressedMetaBlockDecoder { workspace: &mut workspace[..], window_bytes: window };
++                decoder.start_tree_group(0, CompressedOuterPhase::LiteralTreeGroup).unwrap();
++            }
++            store_code_description_decoder(&mut workspace, window, CodeDescriptionDecoder {
++                queue: BitQueue::new(), alphabet_max: 256, alphabet_limit: 256,
++                phase: CodeDescriptionPhase::CompleteSimple(SimpleCodeDescription {
++                    selector: 0, count: 1, symbols: [0, 0xffff, 0xffff, 0xffff] }),
++            }).unwrap();
++            for field in [B3B_MAP_INDEX, B3B_MAP_INITIALIZED, B3B_MAP_TREES, B3B_TREE_INDEX, B3B_ACTIVE_TREE] {
++                assert_eq!(state_u16(&workspace, window, field).unwrap(), 0);
++            }
++            for field in [B3B_MAP_SIZE, B3B_LITERAL_TREES, B3B_TREE_COUNT] {
++                assert_eq!(state_u16(&workspace, window, field).unwrap(), 1);
++            }
++            for field in [B3B_ALPHABET_MAX, B3B_ALPHABET_LIMIT] {
++                assert_eq!(state_u16(&workspace, window, field).unwrap(), 256);
++            }
++            for (field, value) in [(B3B_MTF_UPPER_BOUND, 63), (B3B_CONTEXT_PHASE, 0),
++                (B3B_CONTEXT_KIND, 0), (B3B_MAX_RUN_PREFIX, 0), (B3B_OUTER_PHASE, 8),
++                (B3B_GROUP_KIND, 0), (B3B_GROUP_PHASE, 1), (B3B_ACTIVE_REGION, 0)] {
++                assert_eq!(state_byte(&workspace, window, field).unwrap(), value);
++            }
++            assert_eq!(state_u16(&workspace, window, B3B_BLOCK_COUNTS + 2).unwrap(), next_count);
++            let limits = |max_work| RequestLimits { max_input: 0, max_output: 0, max_work,
++                max_calls: 0, max_initializations: 0, max_window_bits: 16 };
++            let mut tree_budget = RequestBudget::new(limits(u64::MAX)).unwrap();
++            let tree = plan_serialized_tree(&workspace, window, &mut tree_budget, &[], false).unwrap();
++            assert_eq!(tree.status, SerializedTreeStatus::Complete);
++            let mut plan_budget = RequestBudget::new(limits(u64::MAX)).unwrap();
++            let plan = plan_tree_group_action(&workspace, window, &mut plan_budget, &[], false).unwrap();
++            let expected_execution = tree.execution_work + if bad_count { 5 } else { tree_group_start_work() };
++            assert_eq!(plan.planning_work, tree.planning_work);
++            assert_eq!(plan.execution_work, expected_execution);
++            let mut actual_workspace = workspace.clone();
++            let actual = {
++                let mut decoder = CompressedMetaBlockDecoder { workspace: &mut actual_workspace[..], window_bytes: window };
++                decoder.advance_outer_phase_once(CompressedOuterPhase::LiteralTreeGroup, &[], false)
++            };
++            println!("next_count={next_count}; plan=({}, {:?}, {}); actual={:?}", plan.consumed, plan.status, plan.execution_work, actual);
++            assert_eq!((plan.consumed, plan.status), actual);
++            let exact_work = plan.planning_work + expected_execution;
++            let mut exact_workspace = workspace.clone();
++            let mut exact_budget = RequestBudget::new(limits(exact_work)).unwrap();
++            let exact = advance_planned_tree_group(&mut exact_workspace, window, &mut exact_budget,
++                CompressedOuterPhase::LiteralTreeGroup, &[], false);
++            if bad_count {
++                assert!(matches!(exact, Err(CompressedStep { consumed: 0,
++                    status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })));
++            } else { assert_eq!(exact, Ok(0)); }
++            assert_eq!(exact_budget.work_remaining, 0);
++            let mut short_workspace = workspace.clone();
++            let mut short_budget = RequestBudget::new(limits(exact_work - 1)).unwrap();
++            assert!(matches!(advance_planned_tree_group(&mut short_workspace, window, &mut short_budget,
++                CompressedOuterPhase::LiteralTreeGroup, &[], false), Err(CompressedStep { consumed: 0,
++                    status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })));
++            assert_eq!(short_workspace, workspace);
++        }
++    }
++
++}

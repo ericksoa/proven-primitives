@@ -1,0 +1,40 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-52485/src/brotli_input.rs:12081:1
+      |
+12081 | / fn read_b3b_state_tag(
+12082 | |     workspace: &[u8],
+12083 | |     window_bytes: u32,
+12084 | |     relative: u16,
+12085 | |     variants: u8,
+12086 | | ) -> (r: Result<u8, crate::brotli_prefix::WorkspaceError>)
+      | |_________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-52485/src/brotli_input.rs:12088:9
+      |
+12088 | /         b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+12089 | |             && relative as nat + 1 <= B3B_SCALAR_BYTES && r.is_err()
+12090 | |             ==> r == Err(crate::brotli_prefix::WorkspaceError::InvalidSymbol),
+      | |_____________________________________________________________________________^ failed this postcondition
+...
+12108 |           return Err(crate::brotli_prefix::WorkspaceError::InvalidTree);
+      |           ------------------------------------------------------------- at this exit
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-52485/src/brotli_input.rs:12095:27
+      |
+12095 |         &&& r.unwrap() == workspace@[at]
+      |                           ^^^^^^^^^^^^^^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+error: aborting due to 1 previous error
+

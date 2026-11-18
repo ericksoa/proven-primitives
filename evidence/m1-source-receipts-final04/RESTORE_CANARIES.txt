@@ -1,0 +1,28 @@
+After controls, preserve evidence before restoring historical canary logs:
+
+1. Keep the successful immutable control-attempt directory, positive.json,
+   required-controls.json, source-start.json, verifier/runtime transcripts,
+   frozen-source.tar.gz and evidence-package.json. The tagged canary copies
+   carry their own hashes and case identities; do not replace those copies.
+2. Read canary-restoration-manifest.json. Each existed=true entry names the
+   exact pre-control backup and its SHA-256. Restore only that entry's original
+   evidence/canary-*.log from the verified backup, preserving preexisting dirty
+   content as well as clean content. Do not use a blanket git checkout/restore
+   of the evidence directory.
+3. Before restoring any file, confirm its current global bytes still match the
+   corresponding canary bytes archived by the completed control attempt. If
+   another process changed it afterward, stop for that file; do not overwrite
+   the newer content.
+4. An existed=false entry was first created by these controls. Keep its tagged
+   evidence copy. Remove its global canary file only if the current global hash
+   still matches the archived control hash and repository finalization calls
+   for removing that generated file. Never remove unrelated files.
+5. Recheck the source/tool/driver/input hashes against positive.json after
+   restoration. Canary restoration must not edit source, tests, manifests or
+   tools, and must not change the tagged proof/control transcripts.
+
+The driver makes backups and writes this restoration plan. It does not restore
+or delete global historical files automatically. A diagnostic subset does not
+satisfy the full control gate. A passed gate is named frozen validation evidence;
+it does not itself establish M1 completion, source-to-binary equivalence,
+independent human specification review, or architectural approval.

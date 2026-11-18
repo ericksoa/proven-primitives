@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_m1_context_cursor_terminal_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T04:49:46.340521+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 72.30701220799529,
+  "finished_utc": "2026-11-17T04:50:58.648307+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_four_m1_context_cursor_terminal_defects.log",
+  "log_sha256": "8b32460479b65288c6c35e275201ecad363fa5f6a14f012064ca73c8df824f8a",
+  "suite": "the_prover_rejects_four_m1_context_cursor_terminal_defects",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-m1-context-count-cursor-terminal-undercharged",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-context-count-cursor-terminal-undercharged.log",
+      "sha256": "b481fe1c93496ba756e64c4199654d0a76c77c37b459fb5e63e4b78f6c39e81f",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-bits-cursor-terminal-undercharged",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-context-bits-cursor-terminal-undercharged.log",
+      "sha256": "022ee5f04f4e37539a0211a138b2f49ff13a67b9b4a6646aad42470acaf52cad",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-count-cursor-skips-terminal-action",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-context-count-cursor-skips-terminal-action.log",
+      "sha256": "f6a5752512b0186722aed4a68b2fdbec76eb09933d6d819506ee375951ca9755",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-bits-cursor-plan-wrong-error",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-context-bits-cursor-plan-wrong-error.log",
+      "sha256": "022ee5f04f4e37539a0211a138b2f49ff13a67b9b4a6646aad42470acaf52cad",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

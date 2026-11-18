@@ -1,0 +1,33 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-28361/src/brotli_input.rs:17971:1
+      |
+17971 | / fn start_context_map(
+17972 | |     workspace: &mut [u8],
+17973 | |     window_bytes: u32,
+17974 | |     kind: crate::brotli_prefix::ContextMapKind,
+17975 | |     active_len: u16,
+17976 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-28361/src/brotli_input.rs:17983:9
+      |
+17983 |           context_map_start_image(final(workspace)@, window_bytes, kind, active_len),
+      |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+18013 | / {
+18014 | |     reveal(context_map_start_frame); reveal(context_map_start_image);
+18015 | |     let ghost original = workspace@;
+18016 | |     let ghost mut source_units: nat = 0;
+...     |
+18061 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

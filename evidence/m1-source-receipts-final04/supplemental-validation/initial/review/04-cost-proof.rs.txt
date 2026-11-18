@@ -1,0 +1,40 @@
+proof fn r_triage_concrete_selector_loader_costs(workspace: Seq<u8>)
+    requires
+        workspace.len() == 1_177_584,
+        forall|i: int| 0 <= i < workspace.len() ==> #[trigger] workspace[i] ==
+            if i == 1_164_418 || i == 1_164_420 { 192u8 }
+            else if i == 1_164_419 || i == 1_164_421 { 2u8 }
+            else if i == 1_164_414 { 1u8 } else { 0u8 },
+    ensures
+        saved_aux_load_valid(workspace, 1_024),
+        saved_aux_copy_read_units(workspace, 1_024) == 18,
+        loader_forecast_table_reads(workspace, 1_024) == 0,
+        loader_table_read_units(workspace, 1_024) == 22,
+        b3b_scalar_u16_at(workspace, 1_024, B3B_BUILDER_INITIALIZED) == 0,
+{
+    let (known, decoder) = r_triage_concrete_selector_rank_witness();
+    assert(workspace =~= known);
+    assert(workspace == known);
+    assert(b3b_scalar_base(1_024) == 1_164_300);
+    assert forall|i: usize| i < 18 implies #[trigger]
+        workspace[b3b_scalar_base(1_024) + B3B_AUX_LENGTHS as int + i as int] == 0 by {}
+    reveal(saved_aux_copy_read_units);
+    assert(!exists|bad: usize| bad < 18
+        && #[trigger] saved_aux_copy_prefix(workspace, 1_024, bad as nat)
+        && workspace[b3b_scalar_base(1_024) + B3B_AUX_LENGTHS as int + bad as int] > 5);
+    assert(saved_aux_copy_read_units(workspace, 1_024) == 18);
+    assert(b3b_scalar_byte_at(workspace, 1_024, B3B_CODE_PHASE) == 0);
+    reveal(loader_enters_complex_validation);
+    assert(!loader_enters_complex_validation(workspace, 1_024));
+    reveal(loader_reaches_singleton_validation);
+    assert(!loader_reaches_singleton_validation(workspace, 1_024));
+    reveal(loader_simple_validation_count);
+    assert(loader_simple_validation_count(workspace, 1_024) == 0);
+    reveal(loader_forecast_table_reads);
+    reveal(simple_validation_reads);
+    reveal(simple_range_scan_reads);
+    reveal(simple_distinct_scan_reads);
+    assert(loader_forecast_table_reads(workspace, 1_024) == 0);
+    reveal(loader_table_read_units);
+    assert(loader_table_read_units(workspace, 1_024) == 22);
+}

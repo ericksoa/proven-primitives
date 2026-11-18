@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_m1_executor_normal_trace_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T05:15:12.353639+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 110.05219891600427,
+  "finished_utc": "2026-11-17T05:17:02.407420+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_four_m1_executor_normal_trace_defects.log",
+  "log_sha256": "013cfe570234e26ad2c745aafb9d8907098c0d24cf6d1d0cb139687ab073325a",
+  "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-m1-executor-simple-loses-consumption",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-executor-simple-loses-consumption.log",
+      "sha256": "ea450b53a6f7621c20e33db2bcd1202e23d4ffa5470133106d55d6ae62d17fcd",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-executor-canonical-loses-consumption",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-executor-canonical-loses-consumption.log",
+      "sha256": "874e8c07166c94b7aa8fa2f403c258f1d4a47f3164fa4fb14033b1a17a679fe4",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-executor-simple-false-need-input",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-executor-simple-false-need-input.log",
+      "sha256": "2dc202163afbc87f9ffc82fea56faaa21b7b066dba4fa7314093ce75dff1cb51",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-executor-canonical-false-need-input",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-executor-canonical-false-need-input.log",
+      "sha256": "20b0b650b12bacbaed9b4dc024b6b4f8c4aec4a510159b5f619e707be3fb2190",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

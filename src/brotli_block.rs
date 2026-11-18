@@ -950,7 +950,7 @@ impl BlockSwitchCore {
                     status: SwitchStatus::Failed(BlockSwitchError::InvalidPrefixSymbol) };
             }
         };
-        let length = match decode_block_length(length_symbol, length_suffix) {
+        let length = match decode_block_length(length_symbol, length_suffix).0 {
             Ok(value) => value,
             Err(_) => {
                 self.phase = SwitchPhase::Failed(BlockSwitchError::InvalidBlockLength);

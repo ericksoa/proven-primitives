@@ -1,0 +1,39 @@
+{
+  "status": "Final read-only static preservation, no approval inference",
+  "candidate_hashes": {
+    "brotli_input": "25c4718fb0f7debeecf6d1cf0f1de604c77e09ff30a344b8cbf662316bc511aa",
+    "brotli_prefix": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15"
+  },
+  "tests_sha256": "43c8b7b0f641344e1c63d8de7f7cd6dc138fd6eac9e9349a2160ecfa51dd1da1",
+  "qualified_existing_spec_count": 424,
+  "distinct_basename_count_that_old_simple_audit_would_keep": 413,
+  "byte_exact_existing_spec_bodies": 424,
+  "byte_exact_existing_spec_headers": 423,
+  "sole_header_exception": "brotli_prefix::m1_canonical_nonzero_index_sum",
+  "index_sum_decreases_byte_exact": true,
+  "index_sum_body_byte_exact": true,
+  "existing_spec_attributes_exact": 424,
+  "all_original_exec_args_requires_returns_and_guarantees_retained": true,
+  "approved_R_exec_return_pairs": 157,
+  "all_existing_attributes_equal_to_preimplementation_e10c": true,
+  "only_f1a_attribute_difference": "install_completed_simple_tree spinoff_prover already present in e10c; no R attribute delta",
+  "valid_method_spec_ids": [
+    "brotli_input::BitQueue::valid",
+    "brotli_input::MetaBlockHeader::valid",
+    "brotli_input::MetaBlockDecoder::valid",
+    "brotli_input::SimpleCodeDescription::valid",
+    "brotli_input::ComplexCodeLengthAlphabet::valid",
+    "brotli_input::ComplexSymbolProgress::valid",
+    "brotli_input::ComplexAfterSpan::valid",
+    "brotli_input::ComplexProgress::valid",
+    "brotli_input::CodeDescriptionDecoder::valid",
+    "brotli_input::VarUint8Phase::valid",
+    "brotli_input::InstalledPrefixState::valid"
+  ],
+  "audit_script_sha256": "958b24f8b09c17bb2b0bdafd8713f70ba8120065fa7234ed381cf51e549ee1f7",
+  "report_sha256": "faa64bd4a003e84afd8088335bde1b98523b07f8680bd3ee0bec42d0abfc3da3",
+  "declaration_parser_sha256": "d8712ec5b286a688ee6fbe63ff6cf0566c7afb52350888304c2c020e0f499a49",
+  "gate_bundle_unchanged": true,
+  "source_mutations": 0,
+  "mutant_runs": 0
+}

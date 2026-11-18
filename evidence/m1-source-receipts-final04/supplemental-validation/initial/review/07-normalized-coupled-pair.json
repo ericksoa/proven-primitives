@@ -1,0 +1,123 @@
+{
+  "status": "QUALIFIED exact normalized positive and one negative under unchanged strict1c98; minimal generator patch plus cap-only native semantic arm delivered to root",
+  "positive_result": "positive-result.json",
+  "positive_result_sha256": "2e7e4e26e7e60c5e4e0edd8945c277c02c527a0d9fb9016785ba20b3612b24ca",
+  "negative_result": "negative-result.json",
+  "negative_result_sha256": "51854a393afc83699744a4872dfc1ce4a362e0c096b0ecaa9ddb571fbd9a07f0",
+  "witness_receipt_binding": "witness-receipt-binding.json",
+  "witness_receipt_binding_sha256": "d04bf8aad5aa39e7b1f34b2e2c1d107862269c6929c670c31b769f474e9e65fc",
+  "positive": {
+    "completed_utc": "2026-11-18T01:35:21.227203+00:00",
+    "exit_code": 0,
+    "verified": 4,
+    "errors": 0,
+    "source_sha256": "8ed98823e7a68454600fa9a746b8d9d38cc50856d5969a40bc78792fc28a3fd0",
+    "source_unchanged": true,
+    "main_loop_seconds": [
+      111
+    ],
+    "log": "positive/positive-normalized-concrete-rank.log",
+    "log_sha256": "937f23e0806a8bec52150b67188a00a4e781ad39f7f5bdd2ed4c1d477b069882",
+    "source_manifest_sha256": "921ddfbf6305772fcc233be545cd12d109fdef25ae864e21fccd872582e60006",
+    "attributes": [
+      "#[verifier::rlimit(600)]",
+      "#[verifier::spinoff_prover]"
+    ],
+    "global_checker_rlimit": 1000,
+    "default_seed_loop_isolation_and_existing_flags_retained": true,
+    "all_original_root_loop_obligations_retained_and_checked": true,
+    "scope": "Actual full selected positive with exact Boolean-normalized true concrete rank predicate; not alone cap-control qualification."
+  },
+  "negative": {
+    "completed_utc": "2026-11-18T01:39:51.243598+00:00",
+    "exit_code": 1,
+    "classification": "genuine literal computed-false rejection; qualifies under unchanged strict classifier",
+    "actual_primary_error": "error: expression simplifies to false",
+    "verification_summary_present": false,
+    "verified": null,
+    "errors": null,
+    "source_sha256": "3d8831d9b413743c78b9a7dbed5afb95ab9e4cfba887a03004e82a9daf4639f0",
+    "source_unchanged": true,
+    "log": "bad-cap/bad-cap-normalized-concrete-rank.log",
+    "log_sha256": "7fc084ce383df8302ab9141225ab9c2b2d5d9a316e73f94629b404eb500aa97c",
+    "source_manifest_sha256": "e800f005dbf50f8c6490fb19420657425646fdfdc91d603c8681284158283780",
+    "bound_positive_result_sha256": "2e7e4e26e7e60c5e4e0edd8945c277c02c527a0d9fb9016785ba20b3612b24ca",
+    "witness_receipt_binding_sha256": "d04bf8aad5aa39e7b1f34b2e2c1d107862269c6929c670c31b769f474e9e65fc",
+    "strict_gate_classifier": {
+      "semantic_rejection": true,
+      "tool_or_resource_failure": false,
+      "syntax_or_type_failure": false,
+      "computed_false": true,
+      "checked_semantic_error": false
+    },
+    "strict_gate_driver_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+    "strict_gate_accepted": true,
+    "attributes": [
+      "#[verifier::rlimit(600)]",
+      "#[verifier::spinoff_prover]"
+    ],
+    "checker_flags": [
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "plan_serialized_tree",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "environment": {
+      "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+      "RUSTUP_TOOLCHAIN": "1.99.1"
+    },
+    "positive_runs": 1,
+    "negative_runs": 1,
+    "formatter_checker_runs": 0,
+    "extra_verifier_runs": 0,
+    "negative_original_source_obligations_retained": true,
+    "negative_loop_smt_completion_claimed": false,
+    "all_original_production_assertions_contracts_models_invariants_decreases_attributes_retained": true,
+    "shared_writes_by_this_agent": 0,
+    "claim_scope": "Necessary admitted-witness instance of same universal rank-certificate adequacy criterion; early rejection need not run negative-loop SMT and is not an actual2000-action runtime trace."
+  },
+  "harness_delivery": {
+    "first_generator_patch": "minimal-main-test-candidate.patch",
+    "first_patch_sha256": "bde2ab2fa4be01c6cd56ab9a3d2c2b653f6bfb2b7aaf707a9d59aec364fc0431",
+    "incremental_acceptance_patch": "incremental-cap-compute-acceptance.patch",
+    "incremental_patch_sha256": "ec814fb27e425b272c94a0e665b288c33e30a05530fb8358b3caed5c68358227",
+    "base_tests_sha256": "18b4b2c15c6dcc89e92fd2ec6af51d05bb986da78c2c50916a992f9c8010fc5f",
+    "after_generator_patch_tests_sha256": "ac9bbc158d1bb959d60acd3cd8d342c1e7fe06674fcc462b70530836f4acc431",
+    "proposed_final_tests_sha256": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+    "positive_replay_matches_actual": true,
+    "negative_replay_matches_actual": true,
+    "all_original_Rust_assertion_sites_and_diagnostic_arms_retained": true,
+    "all_Rust_assertion_text_byte_identical": false,
+    "one_cap_only_arm_gains_existing_gate_computed_diagnostic_kind": true,
+    "native_harness_run_by_this_agent": false,
+    "shared_writes_by_this_agent": 0
+  },
+  "prior_wording_mismatch_result_retained_unqualified": {
+    "path": "target/m1-r-planner-cap-concrete-rank-diagnostic/negative-result.json",
+    "sha256": "294fe9495dedb6d30e20a984230f6606d60d0fe4d7c2dfe647b83a2232ff3a16"
+  },
+  "cap_identity_remains_required_all318": true,
+  "production_source_sha256": {
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15"
+  },
+  "no_full_gate_completion_claim": true,
+  "scope_limits": [
+    "No actual2000-action runtime trace claim.",
+    "No negative-loop SMT completion claim.",
+    "Supplemental witness proofs are not full-gate counts.",
+    "No native harness result claimed by this agent.",
+    "No architectural authority or human architectural approval inferred."
+  ]
+}

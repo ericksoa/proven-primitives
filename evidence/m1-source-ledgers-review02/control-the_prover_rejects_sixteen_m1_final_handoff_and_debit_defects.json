@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:19:54.469849+00:00",
+  "exit_code": 101,
+  "elapsed_seconds": 165.3485742079938,
+  "finished_utc": "2026-11-17T02:22:39.820947+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects.log",
+  "log_sha256": "8f58b42f00946928f9364f500fed1c6d522b79d60f87b8898ffec0b27a3194e0",
+  "suite": "the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects",
+  "expected_mutants": 16,
+  "mutants": [],
+  "source_unchanged": true
+}

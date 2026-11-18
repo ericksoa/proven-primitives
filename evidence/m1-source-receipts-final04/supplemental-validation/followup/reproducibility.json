@@ -1,0 +1,11 @@
+{
+  "archive": "m1-focused03-followup-evidence.tar.gz",
+  "archive_member_content_hashes_verified": 650,
+  "byte_identical": true,
+  "first_bytes": 17856220,
+  "first_sha256": "c8e52f98307d69af5dee4c93e9a87558b5b771e2077cc95b95c7589d91e29b0f",
+  "independent_streamed_rebuild_bytes": 17856220,
+  "independent_streamed_rebuild_sha256": "c8e52f98307d69af5dee4c93e9a87558b5b771e2077cc95b95c7589d91e29b0f",
+  "new_verifier_or_native_runs": 0,
+  "plaintext_review_copies_verified": 47
+}

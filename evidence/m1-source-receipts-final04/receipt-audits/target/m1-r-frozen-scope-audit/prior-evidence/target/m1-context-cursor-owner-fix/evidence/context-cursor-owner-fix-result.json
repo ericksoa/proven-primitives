@@ -1,0 +1,98 @@
+{
+  "status": "complete-isolated-context-cursor-owner-continuation",
+  "base_input_sha256": "208ed12f8512933e26dee925f809421b63d9a6627587efffe48e9477b483eb58",
+  "source_input_sha256": "14bb55b2ca1baa065ed8bc98396d17f27738e7ef0378258a30553ac2e8b4f2d8",
+  "source_patch": "target/m1-context-cursor-owner-fix/context-cursor-owner-fix.patch",
+  "source_patch_sha256": "0153b6be1859528a8423b77ccb44aa7031feb0acfd64adcff16025da59ad9074",
+  "test_patch": "target/m1-context-cursor-owner-fix/context-cursor-terminal-controls.patch",
+  "test_patch_sha256": "3476baad2ec46cfbb5a4bfaa5a3b32cab8671d8592b24902dc8394fe99d593a0",
+  "source_sha256": {
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+    "src/brotli_block.rs": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+    "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "14bb55b2ca1baa065ed8bc98396d17f27738e7ef0378258a30553ac2e8b4f2d8",
+    "src/brotli_prefix.rs": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+  },
+  "whole_positive": "target/m1-context-cursor-owner-fix/evidence/whole-positive.json",
+  "verification": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 1335,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "source_unchanged_after_whole_and_controls": true,
+  "library_runtime": {
+    "passed": 103,
+    "failed": 0,
+    "log": "target/m1-context-cursor-owner-fix/evidence/final-library-runtime.log",
+    "sha256": "d6d88b2bb82ddab52b160459134d4ae6f90cff2987a8b6e5b27298e8d315870e"
+  },
+  "regression": {
+    "cases": 400,
+    "mismatches_before": 400,
+    "mismatches_after": 0,
+    "before": "target/m1-context-cursor-owner-fix/evidence/before-fix-runtime-attempt02.log",
+    "before_sha256": "68b05628c54412ba4ab6cd7ff55f84a5e94ae779fa49e28bc924bfad92e4dd34",
+    "after": "target/m1-context-cursor-owner-fix/evidence/after-fix-runtime.log",
+    "after_sha256": "42fb72bb57bf015fe786fc888dc01a97e4d17bf51495c9b820bd1fb53b7ff9f8"
+  },
+  "new_controls": [
+    {
+      "name": "brotli-m1-context-count-cursor-terminal-undercharged",
+      "classification": "semantic_rejection",
+      "log": "target/m1-context-cursor-owner-fix/evidence/canary-brotli-m1-context-count-cursor-terminal-undercharged.log",
+      "sha256": "9bbb6158f85b3644f215be441ada71f79c2cd309297d362df473526e701d3262"
+    },
+    {
+      "name": "brotli-m1-context-bits-cursor-terminal-undercharged",
+      "classification": "semantic_rejection",
+      "log": "target/m1-context-cursor-owner-fix/evidence/canary-brotli-m1-context-bits-cursor-terminal-undercharged.log",
+      "sha256": "5f82f918c5250a6bd112b314e30855a54f216c7948de10e38594bc01c73763f4"
+    },
+    {
+      "name": "brotli-m1-context-count-cursor-skips-terminal-action",
+      "classification": "semantic_rejection",
+      "log": "target/m1-context-cursor-owner-fix/evidence/canary-brotli-m1-context-count-cursor-skips-terminal-action.log",
+      "sha256": "e42f595e9e83bb2859dd12c66e02305ba59b50c713ef9a3b883319ff1143bd62"
+    },
+    {
+      "name": "brotli-m1-context-bits-cursor-plan-wrong-error",
+      "classification": "semantic_rejection",
+      "log": "target/m1-context-cursor-owner-fix/evidence/canary-brotli-m1-context-bits-cursor-plan-wrong-error.log",
+      "sha256": "5f82f918c5250a6bd112b314e30855a54f216c7948de10e38594bc01c73763f4"
+    }
+  ],
+  "control_suite_seconds": 72.59,
+  "control_suite_log": "target/m1-context-cursor-owner-fix/evidence/four-terminal-controls.log",
+  "control_suite_sha256": "0a85179a154f22b9122e1634d142edc49b5ffe12af8c36b44f6b6299d07135a6",
+  "admission_proofs": {
+    "path": "target/m1-domain-closure-audit/witnesses-all-fields.log",
+    "verified": 9,
+    "errors": 0,
+    "scope": "unchanged compressed/context state admits arbitrary queue bytes and var-tag/width for phases0/1/2/5/6; invalid cursor witnesses and complete context-mode scalar partition"
+  },
+  "old_models_signatures_requirements_guarantees_preserved": true,
+  "boundary_audit": "target/m1-context-cursor-owner-fix/evidence/original-boundary-audit.json",
+  "runtime_behavior_change": "On classified saved-cursor StateEncoding planner errors, existing failure plan reserves terminal5 then invokes existing W1 through execute_fixed_compressed_plan. Short work leaves complete budget/workspace unchanged. No input consumed.",
+  "unchanged": [
+    "all public and W1 interfaces",
+    "all helper ordinary signatures and original admitted inputs",
+    "all original models and guarantees",
+    "plan representation/layout/workspace",
+    "unit classifications and established terminal5 prepayment policy",
+    "F2,5696,798/8192,reset425",
+    "dependencies/toolchain",
+    "R/S boundary remains unimplemented"
+  ],
+  "main_edited": false,
+  "unproved_or_remaining": "Strict transitive source-operation receipt transport remains R/S pending; suffix proof continuation is separately owned by byte agent; integrated exact-source whole/runtime/all prior+new controls remain parent-owned.",
+  "finished_utc": "2026-11-17T03:38:19.026999+00:00"
+}

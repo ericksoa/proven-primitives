@@ -1,0 +1,43 @@
+{
+  "before": "74cec7fcc319568dc86cc2493df527db6a92423b2e89f4d8584770b7c1d3998e",
+  "after": "c948b5005ad2c930de379b72155a6cf082db8b4b540d5d9bf2fbcf56a2ecc8be",
+  "updates": [
+    {
+      "label": "K3 actual counter name",
+      "old": "\"        if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(r_source_units)); }\\n    match offset.checked_add(suffix) {\"",
+      "new": "\"        if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(source_units)); }\\n    match offset.checked_add(suffix) {\""
+    },
+    {
+      "label": "phase-specific suffix wrong error equivalent branch distribution",
+      "old": "\"                         let malformed_error = match state_byte(self.workspace, self.window_bytes, B3B_BLOCK_LENGTH_PHASE) {\\n                            Ok(1) => CompressedHeaderError::Truncated,\\n                            _ => CompressedHeaderError::InternalState,\\n                        }; return ({ let (r_child_1, Ghost(r_child_units_1)) = self.fail_phase(consumed, malformed_error); proof { r_source_units = r_source_units + r_child_units_1; } r_child_1 }, Ghost(r_source_units));\"",
+      "new": "\"                        match state_byte(self.workspace, self.window_bytes, B3B_BLOCK_LENGTH_PHASE) {\\n                            Ok(1) => {\\n                                return ({ let (r_child_1, Ghost(r_child_units_1)) = self.fail_phase(consumed, CompressedHeaderError::Truncated); proof { r_source_units = r_source_units + r_child_units_1; } r_child_1 }, Ghost(r_source_units));\\n                            },\\n                            _ => {\\n                                return ({ let (r_child_1, Ghost(r_child_units_1)) = self.fail_phase(consumed, CompressedHeaderError::InternalState); proof { r_source_units = r_source_units + r_child_units_1; } r_child_1 }, Ghost(r_source_units));\\n                            },\\n                        }\""
+    },
+    {
+      "label": "brotli-b3c-context-bits-execution-reserved-after-writes harness R child wrapping",
+      "old": "\"    let (used, status) = advance_context_bits_phase(workspace, window_bytes, plan.phase,\\n        kind_tag, kind, active_len, input, end_of_input);\"",
+      "new": "\"    let (used, status) = { let (r_child_result, Ghost(r_child_units)) = advance_context_bits_phase(workspace, window_bytes, plan.phase,\\n        kind_tag, kind, active_len, input, end_of_input); proof { r_context_owner_source_units = r_context_owner_source_units + r_child_units; } r_child_result };\""
+    },
+    {
+      "label": "brotli-b3c-context-count-execution-reserved-after-writes harness R child wrapping",
+      "old": "\"    let (used, status) = advance_context_tree_count_phase(\\n        workspace, window_bytes, kind_tag, kind, active_len, input, end_of_input,\\n    );\"",
+      "new": "\"    let (used, status) = { let (r_child_result, Ghost(r_child_units)) = advance_context_tree_count_phase(\\n        workspace, window_bytes, kind_tag, kind, active_len, input, end_of_input,\\n    ); proof { r_context_owner_source_units = r_context_owner_source_units + r_child_units; } r_child_result };\""
+    },
+    {
+      "label": "skipped reset truthful zero receipt carrier",
+      "old": "        (\n            \"brotli-b3b-serialized-tree-skips-builder-reset\",\n            \"start_serialized_tree\",\n            \"put_state_u16(workspace, window_bytes, B3B_BUILDER_INITIALIZED, 0)\",\n            \"Ok(())\",\n        ),",
+      "new": "        (\n            \"brotli-b3b-serialized-tree-skips-builder-reset\",\n            \"start_serialized_tree\",\n            \"put_state_u16(workspace, window_bytes, B3B_BUILDER_INITIALIZED, 0)\",\n            \"(Ok(()), Ghost(0nat))\",\n        ),"
+    },
+    {
+      "label": "brotli-k7-multi-install-spurious-error",
+      "old": "\"if selector == 1 && alphabet_limit == 2 { return Err(WorkspaceError::InvalidCodeLength); }\\n    let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {\"",
+      "new": "\"if selector == 1 && alphabet_limit == 2 { return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_reads + source_writes)); }\\n    let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {\""
+    },
+    {
+      "label": "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "old": "\"            Ok(value) => value,\\n            Err(_) => {\\n                let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 0,\\n                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };\\n                proof {\"",
+      "new": "\"            Ok(value) => value,\\n            Err(_) => {\\n                let mut failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,\\n                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };\\n                failure_plan.execution_work = 0;\\n                proof {\""
+    }
+  ],
+  "production_files_changed": 0,
+  "not_full_gate_evidence": true
+}

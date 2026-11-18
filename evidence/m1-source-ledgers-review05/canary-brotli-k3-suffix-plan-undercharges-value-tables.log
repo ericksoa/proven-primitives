@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k3-suffix-canary-35652/src/brotli_input.rs:29888:1
+      |
+29888 | / fn plan_initial_suffix_action(workspace: &[u8], window_bytes: u32,
+29889 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+29890 | | ) -> (r: Result<CompressedActionPlan, CoreFailure>)
+      | |__________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k3-suffix-canary-35652/src/brotli_input.rs:29901:9
+      |
+29901 | /         initial_suffix_read_domain(workspace@, window_bytes) ==>
+29902 | |             r.is_ok() == (old(budget).work_remaining as nat >= initial_suffix_planning_units(workspace@, window_bytes, input@.len())),
+      | |_____________________________________________________________________________________________________________________________________^ failed this postcondition
+...
+29915 | / {
+29916 | |     reveal(m1_bad_initial_suffix); reveal(m1_bad_initial_suffix_validation_reads);
+29917 | |     reveal(m1_bad_initial_suffix_plan);
+29918 | |     reveal(initial_suffix_read_domain); reveal(initial_suffix_plan_valid);
+...     |
+30016 | |     Ok(result)
+30017 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

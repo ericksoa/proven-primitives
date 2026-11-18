@@ -1,0 +1,27 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::plan_block_count_action (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-50365/src/brotli_input.rs:30980:1
+      |
+30980 | / fn plan_block_count_action(
+30981 | |     workspace: &[u8],
+30982 | |     window_bytes: u32,
+30983 | |     input: &[u8],
+30984 | |     end_of_input: bool,
+30985 | | ) -> (r: (Result<CompressedActionPlan, CompressedHeaderError>, Ghost<nat>))
+      | |__________________________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-block-relation-canary-50365/src/brotli_input.rs:31059:16
+      |
+31059 |           assert(plan.planning_work as nat == plan.consumed as nat + match step.status {
+      |  ________________^
+31060 | |             VarUint8Status::NeedInput | VarUint8Status::Truncated => 0nat,
+31061 | |             _ => var_uint8_width(start_phase),
+31062 | |         });
+      | |_________^ assertion failed
+
+error: aborting due to 1 previous error
+

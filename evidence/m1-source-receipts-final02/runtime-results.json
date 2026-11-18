@@ -1,0 +1,76 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--lib"
+    ],
+    "elapsed_seconds": 25.34144191700034,
+    "exit_code": 0,
+    "finished_utc": "2026-11-17T21:19:56.572681+00:00",
+    "log": "runtime-library.log",
+    "log_sha256": "8645a97224327b6ffb191862b7421d8d4f7ff8af1691bbe5cbc40d2c82320f7f",
+    "passed": 105,
+    "started_ns": 1794950371230920000,
+    "started_utc": "2026-11-17T21:19:31.230925+00:00"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "primitives"
+    ],
+    "elapsed_seconds": 7.309691417001886,
+    "exit_code": 0,
+    "finished_utc": "2026-11-17T21:20:04.032730+00:00",
+    "log": "runtime-primitives.log",
+    "log_sha256": "8b19520a5d45bc36d063d52146d7c2beb5d9ea2a5fcc6654c8018e6f105ca811",
+    "passed": 9,
+    "started_ns": 1794950396722936000,
+    "started_utc": "2026-11-17T21:19:56.722947+00:00"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "upstream_comparison"
+    ],
+    "elapsed_seconds": 1.0408965829992667,
+    "exit_code": 0,
+    "finished_utc": "2026-11-17T21:20:05.219822+00:00",
+    "log": "runtime-comparison.log",
+    "log_sha256": "3d3b00d4b5d8b1f302362cddfa45fe77db693c9f4370b18112e9187d786d6333",
+    "passed": 1,
+    "started_ns": 1794950404178897000,
+    "started_utc": "2026-11-17T21:20:04.178942+00:00"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "project_source_contains_no_proof_trust_bypasses",
+      "--",
+      "--exact"
+    ],
+    "elapsed_seconds": 5.344587416999275,
+    "exit_code": 0,
+    "finished_utc": "2026-11-17T21:20:10.690949+00:00",
+    "log": "runtime-trust.log",
+    "log_sha256": "87312207706283501196c9bacae622966500570f0e7dbb2b2a5ddebcde97e00e",
+    "passed": 1,
+    "started_ns": 1794950405346285000,
+    "started_utc": "2026-11-17T21:20:05.346339+00:00"
+  }
+]

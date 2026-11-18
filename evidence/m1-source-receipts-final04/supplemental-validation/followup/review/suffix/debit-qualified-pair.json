@@ -1,0 +1,110 @@
+{
+  "status": "QUALIFIED actual positive1/0 and one exact conditional-undercharge computed-false negative under unchanged1c98",
+  "positive_result": "target/m1-r-suffix-fallback-computed-debit-diagnostic/positive/result.json",
+  "positive_result_sha256": "6b58ad47e9f6c6d053441ab78e2cbd465da287e3be762436090cfc5cc932bd75",
+  "positive_actual": {
+    "selector": "advance_planned_compressed_action",
+    "exit_code": 0,
+    "seconds": 107.52074075001292,
+    "verification": {
+      "verified": 1,
+      "errors": 0
+    },
+    "command_record_sha256": "b7fd30b30c85e244c47f6bd5667bc3c2cb201b2eca10e73b9b2ea108cd846bc5",
+    "source_sha256": {
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "brotli_input.rs": "15fc4ed779bd2e4d293eeaa38590169024ef6999e3247f69e8662333feb9bbd0",
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+    },
+    "sources_unchanged": true,
+    "log_sha256": "6cc20eaeeddffc89d435c23b0158d9c71f0991128d7c77d81a0bc3a83a341a08",
+    "scope": "Full selected actual positive only; no control qualification, no negative authorized."
+  },
+  "negative_result": "target/m1-r-suffix-fallback-computed-debit-diagnostic/bad-undercharge/result.json",
+  "negative_result_sha256": "d8f11c221396e82f5d70a8ed4337828c6a1e5ad681859f8a92072670f01f8f25",
+  "negative_actual": {
+    "selector": "advance_planned_compressed_action",
+    "exit_code": 1,
+    "seconds": 12.597731582995038,
+    "verification": null,
+    "command_record_sha256": "e417a6ff7aab9cdd6fbef054c0fdb39d1d6c4722218ffad338a647f0b00c923e",
+    "source_sha256": {
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "brotli_input.rs": "55e8c5e0e6fc5862588afced12f245181c7cec64bacd1bada7ffeaf2a236205d",
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0"
+    },
+    "sources_unchanged": true,
+    "log_sha256": "d5371ad789bdb3f034d9d460e262d2ec9ad6abfa54230ccc2b088808fe41e81f",
+    "negative_runs": 1
+  },
+  "negative_classification": "target/m1-r-suffix-fallback-computed-debit-diagnostic/negative-classification.json",
+  "negative_classification_sha256": "54a563e66a20795f8b96535bb7b75e8843a074195cf266e12c63c0cb5cd5104c",
+  "witness_receipt": "target/m1-r-suffix-fallback-witness/witness-result.json",
+  "witness_receipt_sha256": "6d7c57e87ebe1b5e173208d1db6b6e4f665e0a8303a2fa494704f32e0d79a55e",
+  "witness_precharge_artifact_manifest_sha256": "29daf20465db671e8c316499e14b2da1315471035b975d6807fd60ffc4925bd3",
+  "independent_technical_audit": {
+    "path": "target/m1-r-suffix-fallback-independent-audit/source-ledger-review.json",
+    "sha256": "697d00d50e112a8db6b9e0e7aadef021af543b1a74a82a530def7929d4b94fb5"
+  },
+  "exact_fault_identity": "Removing only computed receipt restores original conditional fault source617a2c40aa2ad364afd0e0238e542ec09a1b49e2c076459454ec66f98e16a218; only outer3 reserves4, all other states5.",
+  "computed_expression_binding": "Exact actual charge amount expression specialized only initial_outer->checked witness3u8; expected5 fixed from old model criterion.",
+  "main_test_patch": {
+    "path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/minimal-undercharge-main-test.patch",
+    "sha256": "53b02e69b6df8fc9fddeec9220a79194f438a21c320ebdbdaf651a6a7fc1817f",
+    "replay_record_path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/main-test-replay.json",
+    "replay_record_sha256": "c95be34a883115a6961e33a76e3bb28f4e83b340c824bc2dc1edbbca76dd08ad",
+    "actual_source_replays_match": {
+      "status": "Exact actual positive1/0 and one computed negative qualify under unchanged1c98; native harness has not run here.",
+      "base_tests_sha256": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+      "proposed_tests_sha256": "e70dbde0c0333eb70c18cd0b573623a2ee741be7411345e08c6e1532bdedaa55",
+      "patch_sha256": "53b02e69b6df8fc9fddeec9220a79194f438a21c320ebdbdaf651a6a7fc1817f",
+      "positive_replay_sha256": "15fc4ed779bd2e4d293eeaa38590169024ef6999e3247f69e8662333feb9bbd0",
+      "negative_replay_sha256": "55e8c5e0e6fc5862588afced12f245181c7cec64bacd1bada7ffeaf2a236205d",
+      "only_existing_five_malformed_suffix_function_changed": true,
+      "case_tuple_actual_fault_literal_unchanged": true,
+      "all_original_Rust_assertion_sites_and_diagnostic_arms_retained": true,
+      "one_native_semantic_predicate_extended_for_undercharge_case_only": true,
+      "all_Rust_assertion_text_byte_identical": false,
+      "existing_resource_exclusion_assertion_byte_identical": true,
+      "production_specs_models_assertions_contracts_ABI_unchanged": true,
+      "no_shared_edits_or_native_checker_runs": true
+    },
+    "native_harness_run_by_this_agent": false,
+    "original_Rust_assertion_sites_and_diagnostic_arms_retained": true,
+    "one_undercharge_case_only_native_predicate_text_extended": true,
+    "all_Rust_assertion_text_byte_identical": false
+  },
+  "candidate_positive_runs": 1,
+  "candidate_negative_runs": 1,
+  "candidate_extra_verifier_runs": 0,
+  "historical_resource_failures_retained_unqualified": {
+    "original83s_and_distributed108s_packet": "target/m1-r-suffix-fallback-distributed-charge-diagnostic/diagnostic-result.json",
+    "sha256": "44254b81ae28a518450f0a592172fb5213d34f103b3e26a6167ba7e8c83e1550"
+  },
+  "all_original_production_specs_assertions_models_contracts_ABI_remain_unchanged": true,
+  "initial_source_manifest_is_retained_as_created_before_negative_authorization": true,
+  "shared_writes_by_this_agent": 0,
+  "all318_control_identity_preserved": true,
+  "limits": [
+    "No native or full48/318 gate completion claimed.",
+    "Computed early rejection need not run negative-body SMT.",
+    "No byte175 negative qualification inferred.",
+    "No human architecture approval inferred from technical review."
+  ]
+}

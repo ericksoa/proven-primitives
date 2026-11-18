@@ -276,3 +276,16 @@ unresolved obligations.
 Use the installed Apple Command Line Tools 27.0 through a per-command
 `DEVELOPER_DIR=/Library/Developer/CommandLineTools` setting for native builds.
 Do not change the global developer selection. The project license is Apache-2.0.
+
+The human explicitly approved Approach R exactly as written in
+`BROTLI_M1_SOURCE_RECEIPT_BOUNDARY_DECISION.md` on 2026-11-17. Within that frozen
+M1 helper scope, implement actual per-invocation source-count receipts through
+`(T, Ghost<nat>)` returns, preserving ordinary results as the first component.
+Corresponding private compiled return and direct-caller changes are approved;
+public Brotli and W1 interfaces remain unchanged. Open only the named derived
+`m1_canonical_nonzero_index_sum` as specified. Preserve arguments, requirements,
+old guarantees, algorithms, operation/guard/error order, unit policy, budgets,
+workspace, dependencies, F2 and proof trust. Receipts must originate in reached
+counters/traces at every return, including partial input/errors; no reservation-
+formula substitutes. Approach S is unselected. Any boundary or policy outside
+that exact decision still needs direct human approval. The named M1 compressed-header source-receipt and plan/action refinement checkpoint is recorded in `BROTLI_M1_SOURCE_RECEIPTS_CHECKPOINT.md` and `evidence/brotli-b3c-m1-source-receipts.json`. Its completion is limited to the exact admitted domains and frozen source in that receipt; B3c/B3d/B4, the F2 native disagreement, independent human specification review and decoder/release gates remain separate. No new architectural authority follows.

@@ -1,0 +1,50 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T01:47:27.311614+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 71.41524662499432,
+  "finished_utc": "2026-11-17T01:48:38.727953+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_four_b3c_initial_suffix_metering_undercharges.log",
+  "log_sha256": "c72e4aebe81ac48b9a39bbf3dc0a7f79d66a1fe30340a35e878b7dde0c6324d1",
+  "suite": "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-b3c-initial-suffix-planning-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-initial-suffix-planning-undercharge.log",
+      "sha256": "fd4121a8c21b385bdb3851a1c3b2163a9aa924877b3b97f3a78d0492dc13ac7a",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-queue-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-initial-suffix-queue-undercharge.log",
+      "sha256": "97316a11c337ea667fdb51915ea56f794a3bf9f6f60af2ac371d3eca1487a720",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-terminal-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-initial-suffix-terminal-undercharge.log",
+      "sha256": "535c42a3301a0457063af1c369852f88f76351837ba912cc709d95cce6c018bf",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-initial-suffix-value-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-initial-suffix-value-undercharge.log",
+      "sha256": "718d5cf5676d5cc10e86f24e10bf7379e784f6639aeb6ab48c28561bb2b6dd3c",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

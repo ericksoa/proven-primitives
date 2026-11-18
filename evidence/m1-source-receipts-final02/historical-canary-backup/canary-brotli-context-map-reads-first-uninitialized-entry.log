@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-29056/src/brotli_prefix.rs:2778:13
+     |
+2778 |       ensures r.is_ok() ==> {
+     |  _____________^
+2779 | |         let at = context_entry_at(window_bytes, kind, index);
+2780 | |         &&& index < initialized
+2781 | |         &&& at < workspace@.len()
+2782 | |         &&& r.unwrap() == workspace@[at as int]
+2783 | |         &&& (r.unwrap() as int) < num_htrees
+2784 | |     },
+     | |_____^ failed this postcondition
+...
+2803 |       Ok(workspace[at])
+     |       ----------------- at the end of the function body
+
+note: recommendation not met
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-29056/src/brotli_prefix.rs:2776:33
+     |
+2776 |         index < initialized ==> workspace@[context_entry_at(window_bytes, kind, index) as int]
+     |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+    --> seq.rs:980:12
+     |
+     = note: recommendation not met
+
+error: aborting due to 1 previous error
+

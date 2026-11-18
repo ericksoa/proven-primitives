@@ -1,0 +1,32 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-40498/src/brotli_prefix.rs:4314:20
+     |
+4314 |             assert(source_index as int == old_cursor as int - 1);
+     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+note: recommendation not met
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-40498/src/brotli_prefix.rs:4299:22
+     |
+4299 |             value == old_list[rank as int],
+     |                      ^^^^^^^^^^^^^^^^^^^^^
+     |
+    --> seq.rs:980:12
+     |
+     = note: recommendation not met
+
+note: recommendation not met
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-40498/src/brotli_prefix.rs:4301:70
+     |
+4301 |                 ==> #[trigger] workspace@[(list_base + i) as int] == old_list[i],
+     |                                                                      ^^^^^^^^^^^
+     |
+    --> seq.rs:980:12
+     |
+     = note: recommendation not met
+
+error: aborting due to 1 previous error
+

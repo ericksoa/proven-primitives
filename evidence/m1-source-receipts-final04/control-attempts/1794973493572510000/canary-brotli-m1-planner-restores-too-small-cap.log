@@ -1,0 +1,11 @@
+
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+error: expression simplifies to false
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-tree-bound-canary-38335/src/brotli_input.rs:35448:20
+      |
+35448 |     proof { assert(if code_phase_rank(CodeDescriptionPhase::Selector, 704) < 2_000nat { true } else { false }) by (compute_only); }
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

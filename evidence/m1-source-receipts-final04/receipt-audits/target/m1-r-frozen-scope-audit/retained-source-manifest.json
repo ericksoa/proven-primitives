@@ -1,0 +1,538 @@
+{
+  "created_utc": "2026-11-17T18:46:53.005606+00:00",
+  "purpose": "Read-only frozen f1a to actual pre-R e10c scope audit. No approval inference; no source changes.",
+  "archives": [
+    {
+      "label": "frozen-f1a",
+      "archive": "evidence/m1-source-ledgers-review02/source-and-tests-before-control-repairs.tar.gz",
+      "archive_sha256": "16ac4ada1467ac48050f8289a6a4e3e63bac18f3a82220751881c3628438e79b",
+      "archive_fs_mtime_utc": "2026-11-17T02:33:27.867844+00:00",
+      "members": [
+        {
+          "member": "benches/primitives.rs",
+          "sha256": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+          "bytes": 8724,
+          "tar_mtime_utc": "2026-11-03T23:27:21.215117+00:00"
+        },
+        {
+          "member": "src/base64.rs",
+          "sha256": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "bytes": 31577,
+          "tar_mtime_utc": "2026-11-03T23:27:21.262213+00:00"
+        },
+        {
+          "member": "src/brotli.rs",
+          "sha256": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+          "bytes": 187225,
+          "tar_mtime_utc": "2026-11-04T22:20:00.642135+00:00"
+        },
+        {
+          "member": "src/brotli_block.rs",
+          "sha256": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+          "bytes": 48159,
+          "tar_mtime_utc": "2026-11-03T23:27:21.263362+00:00"
+        },
+        {
+          "member": "src/brotli_data.rs",
+          "sha256": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "bytes": 143613,
+          "tar_mtime_utc": "2026-11-09T18:20:44.537348+00:00"
+        },
+        {
+          "member": "src/brotli_dictionary.rs",
+          "sha256": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "bytes": 768370,
+          "tar_mtime_utc": "2026-11-03T23:27:21.265698+00:00"
+        },
+        {
+          "member": "src/brotli_input.rs",
+          "sha256": "f1a37362e128944c9c0ca49f00f30c172270677140e60027d3d655c46d831eef",
+          "bytes": 2090532,
+          "tar_mtime_utc": "2026-11-17T01:31:49.309370+00:00"
+        },
+        {
+          "member": "src/brotli_prefix.rs",
+          "sha256": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03",
+          "bytes": 244248,
+          "tar_mtime_utc": "2026-11-17T01:39:59.720475+00:00"
+        },
+        {
+          "member": "src/composition_demo.rs",
+          "sha256": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "bytes": 9751,
+          "tar_mtime_utc": "2026-11-03T23:27:21.268459+00:00"
+        },
+        {
+          "member": "src/lib.rs",
+          "sha256": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "bytes": 4200,
+          "tar_mtime_utc": "2026-11-03T23:27:21.268872+00:00"
+        },
+        {
+          "member": "src/lz4.rs",
+          "sha256": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "bytes": 19229,
+          "tar_mtime_utc": "2026-11-03T23:27:21.268998+00:00"
+        },
+        {
+          "member": "src/percent.rs",
+          "sha256": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+          "bytes": 14715,
+          "tar_mtime_utc": "2026-11-03T23:27:21.269436+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/10x10y",
+          "sha256": "41bd4c895e9fb36d74bc97db5092872a24267e3b0455ff6152b0d262faa00d49",
+          "bytes": 20,
+          "tar_mtime_utc": "2026-11-03T23:27:21.269951+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/10x10y.compressed",
+          "sha256": "d666afc0f6c35d8d7796175aa9a68f16ba59afedee946d4bce9167f6c86e0b84",
+          "bytes": 12,
+          "tar_mtime_utc": "2026-11-03T23:27:21.270195+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/64x",
+          "sha256": "be4d3ed1fc5f5cfa00735b28605a975f3293fa235d23abb1d9dea380fba0fb87",
+          "bytes": 64,
+          "tar_mtime_utc": "2026-11-03T23:27:21.270711+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/64x.compressed",
+          "sha256": "f0273c38c6a55c1d9ccb047da04bacdc4bb07acc44ff83871e6b3490dfc2c313",
+          "bytes": 10,
+          "tar_mtime_utc": "2026-11-03T23:27:21.270873+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/compression",
+          "sha256": "d18f849bb8c5ffef9e1b9b8719e3bcbba35f100655be40f035aeace790dec16b",
+          "bytes": 11,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271023+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/compression.compressed",
+          "sha256": "a87bcbc0f45a2f793c075b26baec65ff9cd551e057c8cdef508231004ba4abf5",
+          "bytes": 11,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271247+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/empty",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271292+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/empty.compressed",
+          "sha256": "67586e98fad27da0b9968bc039a1ef34c939b9b8e523a8bef89d478608c5ecf6",
+          "bytes": 1,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271574+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/monkey",
+          "sha256": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99",
+          "bytes": 843,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271819+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/monkey.compressed",
+          "sha256": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9",
+          "bytes": 425,
+          "tar_mtime_utc": "2026-11-03T23:27:21.272327+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/quickfox_repeated",
+          "sha256": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82",
+          "bytes": 176128,
+          "tar_mtime_utc": "2026-11-03T23:27:21.272682+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/quickfox_repeated.compressed",
+          "sha256": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a",
+          "bytes": 58,
+          "tar_mtime_utc": "2026-11-03T23:27:21.272882+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/x",
+          "sha256": "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015",
+          "bytes": 1,
+          "tar_mtime_utc": "2026-11-03T23:27:21.273033+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/x.compressed",
+          "sha256": "cd094a625b695542a1d37b3a11ea849d8db9584a2f9df4e60cf6158bb39bbf61",
+          "bytes": 5,
+          "tar_mtime_utc": "2026-11-03T23:27:21.273290+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/xyzzy",
+          "sha256": "7609128715518308672067aab169e24944ead24e3d732aab8a8f0b7013a65564",
+          "bytes": 5,
+          "tar_mtime_utc": "2026-11-03T23:27:21.273491+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/xyzzy.compressed",
+          "sha256": "c3f042a6be42887f842324d0e39dabd0d873e1676cd3dd2d7e2824242b318f14",
+          "bytes": 9,
+          "tar_mtime_utc": "2026-11-03T23:27:21.273823+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/zeros",
+          "sha256": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+          "bytes": 262144,
+          "tar_mtime_utc": "2026-11-03T23:27:21.274127+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/zeros.compressed",
+          "sha256": "d1236d7fdab24209a747aa471f1bf33765b27adfd676355d4b4b310195dca49f",
+          "bytes": 13,
+          "tar_mtime_utc": "2026-11-03T23:27:21.274422+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/command.bin",
+          "sha256": "fdbc5d5f207a43d34b26441e29b7024f4f3d00be66502d8a73233bcbe9f6c1b4",
+          "bytes": 5632,
+          "tar_mtime_utc": "2026-11-03T23:27:21.274982+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/context.bin",
+          "sha256": "0e4abc034ef46244934d117f15876cd477d0fb2ac94a023093338e72e37f7ad9",
+          "bytes": 2048,
+          "tar_mtime_utc": "2026-11-03T23:27:21.275142+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/dictionary-meta.bin",
+          "sha256": "1bce8bd7b829f177214697683c3216e836ada1e254bde7582a9111316d9fd0b9",
+          "bytes": 160,
+          "tar_mtime_utc": "2026-11-03T23:27:21.275387+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/dictionary.bin",
+          "sha256": "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70",
+          "bytes": 122784,
+          "tar_mtime_utc": "2026-11-03T23:27:21.276362+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/transforms.bin",
+          "sha256": "7682bbd9a2901334c2b47d83aaca99e6d9fc65a2921a7c88180dde12ec3cd6b6",
+          "bytes": 680,
+          "tar_mtime_utc": "2026-11-03T23:27:21.276986+00:00"
+        },
+        {
+          "member": "tests/native/brotli_stream_harness.c",
+          "sha256": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+          "bytes": 6365,
+          "tar_mtime_utc": "2026-11-03T23:27:21.277218+00:00"
+        },
+        {
+          "member": "tests/primitives.rs",
+          "sha256": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+          "bytes": 11424,
+          "tar_mtime_utc": "2026-11-03T23:27:21.277348+00:00"
+        },
+        {
+          "member": "tests/proof_rejection.rs",
+          "sha256": "27c1e2bd0487017c6a2ad8cb663d13c88ff01f6650ce61244b2bea687d4815ae",
+          "bytes": 267371,
+          "tar_mtime_utc": "2026-11-17T01:38:47.224058+00:00"
+        },
+        {
+          "member": "tests/test_pipeline.py",
+          "sha256": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+          "bytes": 11469,
+          "tar_mtime_utc": "2026-11-03T23:27:21.278067+00:00"
+        },
+        {
+          "member": "tests/upstream_comparison.rs",
+          "sha256": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
+          "bytes": 15306,
+          "tar_mtime_utc": "2026-11-03T23:27:21.278312+00:00"
+        },
+        {
+          "member": "Cargo.toml",
+          "sha256": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+          "bytes": 952,
+          "tar_mtime_utc": "2026-11-03T23:27:21.211155+00:00"
+        },
+        {
+          "member": "Cargo.lock",
+          "sha256": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+          "bytes": 4487,
+          "tar_mtime_utc": "2026-11-03T23:27:21.211050+00:00"
+        },
+        {
+          "member": "rust-toolchain.toml",
+          "sha256": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+          "bytes": 103,
+          "tar_mtime_utc": "2026-11-03T23:27:21.262067+00:00"
+        }
+      ]
+    },
+    {
+      "label": "baseline-e10c",
+      "archive": "evidence/m1-source-ledgers-review05/source-and-tests-before-approach-r.tar.gz",
+      "archive_sha256": "aa3b583615f516522941ab04c18206d5f6120dd4c5d676ddcb591a9a5f27349b",
+      "archive_fs_mtime_utc": "2026-11-17T15:13:51.486115+00:00",
+      "members": [
+        {
+          "member": "benches/primitives.rs",
+          "sha256": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+          "bytes": 8724,
+          "tar_mtime_utc": "2026-11-03T23:27:21.215117+00:00"
+        },
+        {
+          "member": "src/base64.rs",
+          "sha256": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "bytes": 31577,
+          "tar_mtime_utc": "2026-11-03T23:27:21.262213+00:00"
+        },
+        {
+          "member": "src/brotli.rs",
+          "sha256": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+          "bytes": 187225,
+          "tar_mtime_utc": "2026-11-04T22:20:00.642135+00:00"
+        },
+        {
+          "member": "src/brotli_block.rs",
+          "sha256": "b27058882f548c07564be68c436efa8ecd764a2b41ac7a25dcacfde751da0189",
+          "bytes": 48159,
+          "tar_mtime_utc": "2026-11-03T23:27:21.263362+00:00"
+        },
+        {
+          "member": "src/brotli_data.rs",
+          "sha256": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "bytes": 143613,
+          "tar_mtime_utc": "2026-11-09T18:20:44.537348+00:00"
+        },
+        {
+          "member": "src/brotli_dictionary.rs",
+          "sha256": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "bytes": 768370,
+          "tar_mtime_utc": "2026-11-03T23:27:21.265698+00:00"
+        },
+        {
+          "member": "src/brotli_input.rs",
+          "sha256": "e10c61b1354c5b1debef9e76aa55b412d06e35de210cb8949a73ef33b912da23",
+          "bytes": 2120506,
+          "tar_mtime_utc": "2026-11-17T04:43:41.122485+00:00"
+        },
+        {
+          "member": "src/brotli_prefix.rs",
+          "sha256": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03",
+          "bytes": 244248,
+          "tar_mtime_utc": "2026-11-17T01:39:59.720475+00:00"
+        },
+        {
+          "member": "src/composition_demo.rs",
+          "sha256": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "bytes": 9751,
+          "tar_mtime_utc": "2026-11-03T23:27:21.268459+00:00"
+        },
+        {
+          "member": "src/lib.rs",
+          "sha256": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "bytes": 4200,
+          "tar_mtime_utc": "2026-11-03T23:27:21.268872+00:00"
+        },
+        {
+          "member": "src/lz4.rs",
+          "sha256": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "bytes": 19229,
+          "tar_mtime_utc": "2026-11-03T23:27:21.268998+00:00"
+        },
+        {
+          "member": "src/percent.rs",
+          "sha256": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+          "bytes": 14715,
+          "tar_mtime_utc": "2026-11-03T23:27:21.269436+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/10x10y",
+          "sha256": "41bd4c895e9fb36d74bc97db5092872a24267e3b0455ff6152b0d262faa00d49",
+          "bytes": 20,
+          "tar_mtime_utc": "2026-11-03T23:27:21.269951+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/10x10y.compressed",
+          "sha256": "d666afc0f6c35d8d7796175aa9a68f16ba59afedee946d4bce9167f6c86e0b84",
+          "bytes": 12,
+          "tar_mtime_utc": "2026-11-03T23:27:21.270195+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/64x",
+          "sha256": "be4d3ed1fc5f5cfa00735b28605a975f3293fa235d23abb1d9dea380fba0fb87",
+          "bytes": 64,
+          "tar_mtime_utc": "2026-11-03T23:27:21.270711+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/64x.compressed",
+          "sha256": "f0273c38c6a55c1d9ccb047da04bacdc4bb07acc44ff83871e6b3490dfc2c313",
+          "bytes": 10,
+          "tar_mtime_utc": "2026-11-03T23:27:21.270873+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/compression",
+          "sha256": "d18f849bb8c5ffef9e1b9b8719e3bcbba35f100655be40f035aeace790dec16b",
+          "bytes": 11,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271023+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/compression.compressed",
+          "sha256": "a87bcbc0f45a2f793c075b26baec65ff9cd551e057c8cdef508231004ba4abf5",
+          "bytes": 11,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271247+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/empty",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271292+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/empty.compressed",
+          "sha256": "67586e98fad27da0b9968bc039a1ef34c939b9b8e523a8bef89d478608c5ecf6",
+          "bytes": 1,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271574+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/monkey",
+          "sha256": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99",
+          "bytes": 843,
+          "tar_mtime_utc": "2026-11-03T23:27:21.271819+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/monkey.compressed",
+          "sha256": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9",
+          "bytes": 425,
+          "tar_mtime_utc": "2026-11-03T23:27:21.272327+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/quickfox_repeated",
+          "sha256": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82",
+          "bytes": 176128,
+          "tar_mtime_utc": "2026-11-03T23:27:21.272682+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/quickfox_repeated.compressed",
+          "sha256": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a",
+          "bytes": 58,
+          "tar_mtime_utc": "2026-11-03T23:27:21.272882+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/x",
+          "sha256": "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015",
+          "bytes": 1,
+          "tar_mtime_utc": "2026-11-03T23:27:21.273033+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/x.compressed",
+          "sha256": "cd094a625b695542a1d37b3a11ea849d8db9584a2f9df4e60cf6158bb39bbf61",
+          "bytes": 5,
+          "tar_mtime_utc": "2026-11-03T23:27:21.273290+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/xyzzy",
+          "sha256": "7609128715518308672067aab169e24944ead24e3d732aab8a8f0b7013a65564",
+          "bytes": 5,
+          "tar_mtime_utc": "2026-11-03T23:27:21.273491+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/xyzzy.compressed",
+          "sha256": "c3f042a6be42887f842324d0e39dabd0d873e1676cd3dd2d7e2824242b318f14",
+          "bytes": 9,
+          "tar_mtime_utc": "2026-11-03T23:27:21.273823+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/zeros",
+          "sha256": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+          "bytes": 262144,
+          "tar_mtime_utc": "2026-11-03T23:27:21.274127+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/corpus/zeros.compressed",
+          "sha256": "d1236d7fdab24209a747aa471f1bf33765b27adfd676355d4b4b310195dca49f",
+          "bytes": 13,
+          "tar_mtime_utc": "2026-11-03T23:27:21.274422+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/command.bin",
+          "sha256": "fdbc5d5f207a43d34b26441e29b7024f4f3d00be66502d8a73233bcbe9f6c1b4",
+          "bytes": 5632,
+          "tar_mtime_utc": "2026-11-03T23:27:21.274982+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/context.bin",
+          "sha256": "0e4abc034ef46244934d117f15876cd477d0fb2ac94a023093338e72e37f7ad9",
+          "bytes": 2048,
+          "tar_mtime_utc": "2026-11-03T23:27:21.275142+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/dictionary-meta.bin",
+          "sha256": "1bce8bd7b829f177214697683c3216e836ada1e254bde7582a9111316d9fd0b9",
+          "bytes": 160,
+          "tar_mtime_utc": "2026-11-03T23:27:21.275387+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/dictionary.bin",
+          "sha256": "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70",
+          "bytes": 122784,
+          "tar_mtime_utc": "2026-11-03T23:27:21.276362+00:00"
+        },
+        {
+          "member": "tests/fixtures/brotli/reference/transforms.bin",
+          "sha256": "7682bbd9a2901334c2b47d83aaca99e6d9fc65a2921a7c88180dde12ec3cd6b6",
+          "bytes": 680,
+          "tar_mtime_utc": "2026-11-03T23:27:21.276986+00:00"
+        },
+        {
+          "member": "tests/native/brotli_stream_harness.c",
+          "sha256": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+          "bytes": 6365,
+          "tar_mtime_utc": "2026-11-03T23:27:21.277218+00:00"
+        },
+        {
+          "member": "tests/primitives.rs",
+          "sha256": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+          "bytes": 11424,
+          "tar_mtime_utc": "2026-11-03T23:27:21.277348+00:00"
+        },
+        {
+          "member": "tests/proof_rejection.rs",
+          "sha256": "71acb612aff23fb488946b8a32fc96dfe3692991382aba4f1bf2884c36a6504c",
+          "bytes": 280143,
+          "tar_mtime_utc": "2026-11-17T04:44:32.639720+00:00"
+        },
+        {
+          "member": "tests/test_pipeline.py",
+          "sha256": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+          "bytes": 11469,
+          "tar_mtime_utc": "2026-11-03T23:27:21.278067+00:00"
+        },
+        {
+          "member": "tests/upstream_comparison.rs",
+          "sha256": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39",
+          "bytes": 15306,
+          "tar_mtime_utc": "2026-11-03T23:27:21.278312+00:00"
+        },
+        {
+          "member": "Cargo.toml",
+          "sha256": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+          "bytes": 952,
+          "tar_mtime_utc": "2026-11-03T23:27:21.211155+00:00"
+        },
+        {
+          "member": "Cargo.lock",
+          "sha256": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+          "bytes": 4487,
+          "tar_mtime_utc": "2026-11-03T23:27:21.211050+00:00"
+        },
+        {
+          "member": "rust-toolchain.toml",
+          "sha256": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+          "bytes": 103,
+          "tar_mtime_utc": "2026-11-03T23:27:21.262067+00:00"
+        }
+      ]
+    }
+  ]
+}

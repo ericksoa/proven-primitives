@@ -1,0 +1,96 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 274.82212787499884,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 6,
+  "finished_utc": "2026-11-18T01:59:05.082547+00:00",
+  "log": "controls-the_prover_rejects_six_m1_bad_context_count_failure_defects.log",
+  "log_sha256": "e36e7efd0cd7099b637e8f2feebe00f5fb3199497ae16df7cdb05b88c776914e",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "08d789fb74847aa8868f9f4302f6f75abeeb7575bd69aaddbcd1f798c6c35e3d",
+      "log": "canary-brotli-m1-context-bad-count-prepass-skips-terminal-plan.log",
+      "name": "brotli-m1-context-bad-count-prepass-skips-terminal-plan",
+      "semantic_rejection": true,
+      "sha256": "5562a4e137c9a8a9e975929768ca7974160b507cc25f4365b9ffd96d58ba9a9a",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "46580645da09e548b80521b65d6daed47b5e723c540ae860aec14808afb3f9aa",
+      "log": "canary-brotli-m1-context-bad-count-plan-omits-terminal-work.log",
+      "name": "brotli-m1-context-bad-count-plan-omits-terminal-work",
+      "semantic_rejection": true,
+      "sha256": "3921dfd31c2d944f6fc6eadd5b713c8e5900b018049980be6c2f60d3e5aea619",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "34c4560919721bb19d9a768fdf2a67090a8dc0ed158c19ef72c99c16377fd1f8",
+      "log": "canary-brotli-m1-context-bad-count-plan-loses-failure.log",
+      "name": "brotli-m1-context-bad-count-plan-loses-failure",
+      "semantic_rejection": true,
+      "sha256": "e783fb26cffa5a9cc39fe6d16bfac3e3048ad89abedc08bfaee95751a83c9a61",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "7654cf293caf7dc048d2e31a8d399ed65aadab7e41db3a21b8ba3437f7536781",
+      "log": "canary-brotli-m1-context-bad-count-plan-consumes-input.log",
+      "name": "brotli-m1-context-bad-count-plan-consumes-input",
+      "semantic_rejection": true,
+      "sha256": "e9a453733f58baf4e5b1045c15cb06f8148d71ecd4161e815e8deccbf73a0b12",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "aec666bc395c42859be281d31730aae1cf4c09c95fde8f78ac03e7e8b0abb168",
+      "log": "canary-brotli-m1-context-bad-count-executor-wrong-error.log",
+      "name": "brotli-m1-context-bad-count-executor-wrong-error",
+      "semantic_rejection": true,
+      "sha256": "23dda78524433cc3939136f9846e54b7616f9d4107a3d3872165e47f969fa712",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "250615b57d16daa1c1352fd7baa09feb04451c04ea1d3d27b3b05699ea8af3a9",
+      "log": "canary-brotli-m1-context-bad-count-owner-skips-action.log",
+      "name": "brotli-m1-context-bad-count-owner-skips-action",
+      "semantic_rejection": true,
+      "sha256": "a9133d4675d2aaf47d03e270c2a4d2ac62d001a737d31ebb9d4957ecb1aa8fe7",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794966870240722000,
+  "started_utc": "2026-11-18T01:54:30.240730+00:00",
+  "suite": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+  "suite_source_sha256": "80c122f6a46bb1a4ee3ba25f76ad7a9855469e312fcb627a6a7f94b5484a0a5a",
+  "validation_errors": []
+}

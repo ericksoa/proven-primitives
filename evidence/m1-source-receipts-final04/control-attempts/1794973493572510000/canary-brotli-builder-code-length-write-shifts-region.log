@@ -1,0 +1,21 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3a-builder-canaries-43955/src/brotli_prefix.rs:1328:9
+     |
+1328 | /         r.0.is_ok() ==> {
+1329 | |             let at = builder_entry_at(
+1330 | |                 window_bytes,
+1331 | |                 BUILDER_CODE_LENGTHS_OFFSET,
+...    |
+1338 | |             &&& final(workspace)@ == old(workspace)@.update(at as int, value)
+1339 | |         },
+     | |_________^ failed this postcondition
+...
+1372 |       (ordinary_result, Ghost(r_source_units))
+     |       ---------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

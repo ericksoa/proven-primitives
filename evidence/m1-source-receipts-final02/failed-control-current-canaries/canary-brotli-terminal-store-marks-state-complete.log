@@ -1,0 +1,24 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-50154/src/brotli_input.rs:12998:1
+      |
+12998 | / fn store_terminal_error(
+12999 | |     workspace: &mut [u8],
+13000 | |     window_bytes: u32,
+13001 | |     error: CompressedHeaderError,
+13002 | | ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-state-canaries-50154/src/brotli_input.rs:13081:24
+      |
+13081 |                 assert(workspace@[base + B3B_OUTER_PHASE as int] == 12);
+      |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

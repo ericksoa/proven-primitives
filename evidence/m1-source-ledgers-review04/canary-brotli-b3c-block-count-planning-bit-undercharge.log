@@ -1,0 +1,28 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59767,13): 'if' cannot be used in patterns.
+WARNING: (67509,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-18887/src/brotli_input.rs:28834:1
+      |
+28834 | / fn plan_bit_read(
+28835 | |     queue: BitQueue,
+28836 | |     width: usize,
+28837 | |     input_len: usize,
+28838 | | ) -> (r: PlannedBitRead)
+      | |_______________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-block-count-metering-canary-18887/src/brotli_input.rs:28845:9
+      |
+28845 | /         r.work as nat == r.consumed as nat
+28846 | |             + if r.complete { width as nat } else { 0nat },
+      | |__________________________________________________________^ failed this postcondition
+...
+28867 |       PlannedBitRead { consumed, work, complete }
+      |       ------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

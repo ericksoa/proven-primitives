@@ -1,0 +1,28 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-37400/src/brotli_input.rs:35069:5
+      |
+35069 |     while i < 18
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-37400/src/brotli_input.rs:35040:1
+      |
+35040 | / fn plan_saved_aux_load(workspace: &[u8], window_bytes: u32,
+35041 | |     budget: &mut crate::brotli::RequestBudget,
+35042 | | ) -> (r: (Result<(u64, bool), CoreFailure>, Ghost<nat>))
+      | |_______________________________________________________^
+
+error: invariant not satisfied at end of loop body
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-37400/src/brotli_input.rs:35081:13
+      |
+35081 |             i as u64 <= old(budget).work_remaining,
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

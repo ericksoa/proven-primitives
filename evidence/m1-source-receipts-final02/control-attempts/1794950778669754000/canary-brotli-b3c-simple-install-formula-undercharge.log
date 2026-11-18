@@ -1,0 +1,54 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-39089/src/brotli_input.rs:34166:13
+      |
+34166 |             assert((3 + count as int) * alphabet as int <= 4_928) by (nonlinear_arith)
+      |             ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-39089/src/brotli_input.rs:34168:13
+      |
+34168 |             assert(count as int * (count as int + 1) <= 20) by (nonlinear_arith)
+      |             ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-39089/src/brotli_input.rs:34174:13
+      |
+34174 | ...   assert((3 + count as int) * alphabet as int == 3 * alphabet as int + count as int * alphabet as int) by (nonlinear_arith);
+      |       ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-39089/src/brotli_input.rs:34155:1
+      |
+34155 | fn simple_tree_install_work(alphabet: u16, selector: u8) -> (r: u64)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-39089/src/brotli_input.rs:34158:9
+      |
+34158 | /         r as nat == (if selector == 0 { 5nat } else { 3 * alphabet as nat + 5 })
+34159 | |             + k6_simple_install_read_units(alphabet, selector),
+      | |______________________________________________________________^ failed this postcondition
+...
+34162 | /     if selector == 0 { 6 } else {
+34163 | |         let count: u64 = if selector <= 2 { selector as u64 + 1 } else { 4 };
+34164 | |         proof {
+34165 | |             assert(2 <= count <= 4);
+...     |
+34178 | |         work
+34179 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

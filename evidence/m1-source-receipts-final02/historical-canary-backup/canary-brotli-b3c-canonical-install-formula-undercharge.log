@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-30129/src/brotli_input.rs:32065:1
+      |
+32065 | / fn canonical_tree_install_work(
+32066 | |     symbols: u16,
+32067 | |     nonzero: u16,
+32068 | |     nonzero_index_sum: u64,
+32069 | | ) -> (r: u64)
+      | |____________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-30129/src/brotli_input.rs:32071:13
+      |
+32071 |       ensures r == 36 * symbols as u64 + 6 * nonzero as u64
+      |  _____________^
+32072 | |         + nonzero_index_sum + 1_564 + 4 + 1,
+      | |___________________________________________^ failed this postcondition
+32073 |   {
+32074 |       36 * symbols as u64 + 6 * nonzero as u64 + nonzero_index_sum + 1_563 + 4 + 1
+      |       ---------------------------------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

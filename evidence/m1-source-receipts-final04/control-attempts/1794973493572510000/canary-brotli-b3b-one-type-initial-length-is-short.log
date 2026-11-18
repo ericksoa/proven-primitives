@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::CompressedMetaBlockDecoder::apply_block_count_value (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25896:5
+      |
+25896 | /     fn apply_block_count_value(
+25897 | |         &mut self,
+25898 | |         kind: u8,
+25899 | |         raw: u16,
+25900 | |         _queue: BitQueue,
+25901 | |         _var_phase: VarUint8Phase,
+25902 | |     ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |____________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26040:24
+      |
+26040 |                   assert(serialized_initial_length_at(
+      |  ________________________^
+26041 | |                     self.workspace@,
+26042 | |                     self.window_bytes,
+26043 | |                     kind as int,
+26044 | |                 ) == 1u32 << 24);
+      | |_______________________________^ assertion failed
+
+error: aborting due to 1 previous error
+

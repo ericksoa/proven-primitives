@@ -44,41 +44,54 @@ pub(crate) open spec fn block_length_value(symbol: u8, suffix: u32) -> nat {
     BLOCK_LENGTH_OFFSETS@[symbol as int] as nat + suffix as nat
 }
 
-fn block_length_range(symbol: u8) -> (r: (u32, u8))
+fn block_length_range(symbol: u8) -> (r: ((u32, u8), Ghost<nat>))
     requires symbol < 26,
-    ensures r.0 == BLOCK_LENGTH_OFFSETS@[symbol as int],
-        r.1 == BLOCK_LENGTH_EXTRA_BITS@[symbol as int],
-        1 <= r.0 <= 16625, 2 <= r.1 <= 24,
+    ensures
+        r.1@ == 2,
+ r.0.0 == BLOCK_LENGTH_OFFSETS@[symbol as int],
+        r.0.1 == BLOCK_LENGTH_EXTRA_BITS@[symbol as int],
+        1 <= r.0.0 <= 16625, 2 <= r.0.1 <= 24,
 {
-    (BLOCK_LENGTH_OFFSETS[symbol as usize], BLOCK_LENGTH_EXTRA_BITS[symbol as usize])
+    let ghost mut source_units: nat = 0;
+    let offset = BLOCK_LENGTH_OFFSETS[symbol as usize];
+    proof { source_units = source_units + 1; }
+    let width = BLOCK_LENGTH_EXTRA_BITS[symbol as usize];
+    proof { source_units = source_units + 1; }
+    ((offset, width), Ghost(source_units))
 }
 
-pub(crate) fn decode_block_length(symbol: u8, suffix: u32) -> (r: Result<u32, PrefixError>)
+pub(crate) fn decode_block_length(symbol: u8, suffix: u32) -> (r: (Result<u32, PrefixError>, Ghost<nat>))
     ensures
+        r.1@ == if symbol < 26 { 2nat } else { 0nat },
+
         symbol < 26 && suffix < (1u32 << BLOCK_LENGTH_EXTRA_BITS@[symbol as int])
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
         &&& symbol < 26
         &&& suffix < (1u32 << BLOCK_LENGTH_EXTRA_BITS@[symbol as int])
-        &&& r.unwrap() as nat == block_length_value(symbol, suffix)
-        &&& r.unwrap() > 0
+        &&& r.0.unwrap() as nat == block_length_value(symbol, suffix)
+        &&& r.0.unwrap() > 0
     },
 {
+    let ghost mut source_units: nat = 0;
     if symbol >= 26 {
-        return Err(PrefixError::InvalidBlockLengthSymbol);
+        return (Err(PrefixError::InvalidBlockLengthSymbol), Ghost(source_units));
     }
-    let (offset, width) = block_length_range(symbol);
+    let (offset, width) = { let (r_child_result, Ghost(r_child_units)) = block_length_range(symbol); proof { source_units = source_units + r_child_units; } r_child_result };
     if suffix >= (1u32 << width) {
-        return Err(PrefixError::InvalidBlockLengthSuffix);
+        return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(source_units));
     }
     proof {
         assert((1u32 << width) <= 16_777_216u32) by (bit_vector)
             requires width <= 24;
     }
-    match offset.checked_add(suffix) {
+    let ordinary_result = {
+        match offset.checked_add(suffix) {
         Some(value) => Ok(value),
         None => Err(PrefixError::BlockLengthOverflow),
     }
+    };
+    (ordinary_result, Ghost(source_units))
 }
 
 pub(crate) open spec fn code_weight(length: u8) -> nat {
@@ -1303,14 +1316,16 @@ pub(crate) fn write_next_builder_code_length(
     window_bytes: u32,
     initialized: u16,
     value: u8,
-) -> (r: Result<u16, WorkspaceError>)
+) -> (r: (Result<u16, WorkspaceError>, Ghost<nat>))
     ensures
+        r.1@ == if r.0.is_ok() { 1nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized < BUILDER_CODE_LENGTHS
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             let at = builder_entry_at(
                 window_bytes,
                 BUILDER_CODE_LENGTHS_OFFSET,
@@ -1318,24 +1333,25 @@ pub(crate) fn write_next_builder_code_length(
                 1,
             );
             &&& initialized < BUILDER_CODE_LENGTHS
-            &&& r.unwrap() == initialized + 1
+            &&& r.0.unwrap() == initialized + 1
             &&& at < old(workspace)@.len()
             &&& final(workspace)@ == old(workspace)@.update(at as int, value)
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if initialized >= BUILDER_CODE_LENGTHS {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     proof { fixed_layout_is_exact(); }
     let at = match builder_entry_offset(
@@ -1346,10 +1362,14 @@ pub(crate) fn write_next_builder_code_length(
         initialized,
     ) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     workspace[at] = value;
-    Ok(initialized + 1)
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(initialized + 1)
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn read_builder_code_length(
@@ -1357,36 +1377,39 @@ pub(crate) fn read_builder_code_length(
     window_bytes: u32,
     initialized: u16,
     index: u16,
-) -> (r: Result<u8, WorkspaceError>)
+) -> (r: (Result<u8, WorkspaceError>, Ghost<nat>))
     ensures
+        r.1@ == if r.0.is_ok() { 1nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized <= BUILDER_CODE_LENGTHS
             && index < initialized
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
         let at = builder_entry_at(window_bytes, BUILDER_CODE_LENGTHS_OFFSET, index, 1);
         &&& initialized <= BUILDER_CODE_LENGTHS
         &&& index < initialized
         &&& at < workspace@.len()
-        &&& r.unwrap() == workspace@[at as int]
+        &&& r.0.unwrap() == workspace@[at as int]
     },
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if initialized > BUILDER_CODE_LENGTHS || index >= BUILDER_CODE_LENGTHS {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     if index >= initialized {
-        return Err(WorkspaceError::UninitializedRecord);
+        return (Err(WorkspaceError::UninitializedRecord), Ghost(r_source_units));
     }
     proof { fixed_layout_is_exact(); }
     let at = match builder_entry_offset(
@@ -1397,9 +1420,13 @@ pub(crate) fn read_builder_code_length(
         index,
     ) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
-    Ok(workspace[at])
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(workspace[at])
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn write_next_builder_count(
@@ -1407,8 +1434,10 @@ pub(crate) fn write_next_builder_count(
     window_bytes: u32,
     initialized: u16,
     value: u16,
-) -> (r: Result<u16, WorkspaceError>)
+) -> (r: (Result<u16, WorkspaceError>, Ghost<nat>))
     ensures
+        r.1@ == if r.0.is_ok() { 2nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
@@ -1425,32 +1454,33 @@ pub(crate) fn write_next_builder_count(
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized < BUILDER_COUNTS
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             let at = builder_entry_at(window_bytes, BUILDER_COUNTS_OFFSET, initialized, 2);
             let low = (value % 256) as u8;
             let high = (value / 256) as u8;
             &&& initialized < BUILDER_COUNTS
-            &&& r.unwrap() == initialized + 1
+            &&& r.0.unwrap() == initialized + 1
             &&& at + 2 <= old(workspace)@.len()
             &&& final(workspace)@ == old(workspace)@
                 .update(at as int, low)
                 .update(at as int + 1, high)
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if initialized >= BUILDER_COUNTS {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     proof { fixed_layout_is_exact(); }
     let at = match builder_entry_offset(
@@ -1461,11 +1491,16 @@ pub(crate) fn write_next_builder_count(
         initialized,
     ) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     workspace[at] = (value % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 1] = (value / 256) as u8;
-    Ok(initialized + 1)
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(initialized + 1)
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn read_builder_count(
@@ -1473,37 +1508,40 @@ pub(crate) fn read_builder_count(
     window_bytes: u32,
     initialized: u16,
     index: u16,
-) -> (r: Result<u16, WorkspaceError>)
+) -> (r: (Result<u16, WorkspaceError>, Ghost<nat>))
     ensures
+        r.1@ == if r.0.is_ok() { 2nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized <= BUILDER_COUNTS
             && index < initialized
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
         let at = builder_entry_at(window_bytes, BUILDER_COUNTS_OFFSET, index, 2);
         &&& initialized <= BUILDER_COUNTS
         &&& index < initialized
         &&& at + 2 <= workspace@.len()
-        &&& r.unwrap() as nat == workspace@[at as int] as nat
+        &&& r.0.unwrap() as nat == workspace@[at as int] as nat
             + 256 * workspace@[at as int + 1] as nat
     },
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if initialized > BUILDER_COUNTS || index >= BUILDER_COUNTS {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     if index >= initialized {
-        return Err(WorkspaceError::UninitializedRecord);
+        return (Err(WorkspaceError::UninitializedRecord), Ghost(r_source_units));
     }
     proof { fixed_layout_is_exact(); }
     let at = match builder_entry_offset(
@@ -1514,12 +1552,17 @@ pub(crate) fn read_builder_count(
         index,
     ) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     let low = workspace[at];
+    proof { r_source_units = r_source_units + 1; }
     let high = workspace[at + 1];
+    proof { r_source_units = r_source_units + 1; }
     proof { join_tree_code_is_exact(low, high); }
-    Ok(low as u16 | ((high as u16) << 8))
+    let ordinary_result = {
+        Ok(low as u16 | ((high as u16) << 8))
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn write_next_builder_next_code(
@@ -1527,8 +1570,10 @@ pub(crate) fn write_next_builder_next_code(
     window_bytes: u32,
     initialized: u16,
     value: u32,
-) -> (r: Result<u16, WorkspaceError>)
+) -> (r: (Result<u16, WorkspaceError>, Ghost<nat>))
     ensures
+        r.1@ == if r.0.is_ok() { 4nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
@@ -1550,15 +1595,15 @@ pub(crate) fn write_next_builder_next_code(
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized < BUILDER_NEXT_CODES
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             let at = builder_entry_at(window_bytes, BUILDER_NEXT_CODES_OFFSET, initialized, 4);
             let byte0 = (value % 256) as u8;
             let byte1 = ((value / 256) % 256) as u8;
             let byte2 = ((value / 65_536) % 256) as u8;
             let byte3 = (value / 16_777_216) as u8;
             &&& initialized < BUILDER_NEXT_CODES
-            &&& r.unwrap() == initialized + 1
+            &&& r.0.unwrap() == initialized + 1
             &&& at + 4 <= old(workspace)@.len()
             &&& final(workspace)@ == old(workspace)@
                 .update(at as int, byte0)
@@ -1566,20 +1611,21 @@ pub(crate) fn write_next_builder_next_code(
                 .update(at as int + 2, byte2)
                 .update(at as int + 3, byte3)
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if initialized >= BUILDER_NEXT_CODES {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     proof { fixed_layout_is_exact(); }
     let at = match builder_entry_offset(
@@ -1590,13 +1636,20 @@ pub(crate) fn write_next_builder_next_code(
         initialized,
     ) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     workspace[at] = (value % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 1] = ((value / 256) % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 2] = ((value / 65_536) % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 3] = (value / 16_777_216) as u8;
-    Ok(initialized + 1)
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(initialized + 1)
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn read_builder_next_code(
@@ -1604,39 +1657,42 @@ pub(crate) fn read_builder_next_code(
     window_bytes: u32,
     initialized: u16,
     index: u16,
-) -> (r: Result<u32, WorkspaceError>)
+) -> (r: (Result<u32, WorkspaceError>, Ghost<nat>))
     ensures
+        r.1@ == if r.0.is_ok() { 4nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized <= BUILDER_NEXT_CODES
             && index < initialized
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
         let at = builder_entry_at(window_bytes, BUILDER_NEXT_CODES_OFFSET, index, 4);
         &&& initialized <= BUILDER_NEXT_CODES
         &&& index < initialized
         &&& at + 4 <= workspace@.len()
-        &&& r.unwrap() as nat == workspace@[at as int] as nat
+        &&& r.0.unwrap() as nat == workspace@[at as int] as nat
             + 256 * workspace@[at as int + 1] as nat
             + 65_536 * workspace@[at as int + 2] as nat
             + 16_777_216 * workspace@[at as int + 3] as nat
     },
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if initialized > BUILDER_NEXT_CODES || index >= BUILDER_NEXT_CODES {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     if index >= initialized {
-        return Err(WorkspaceError::UninitializedRecord);
+        return (Err(WorkspaceError::UninitializedRecord), Ghost(r_source_units));
     }
     proof { fixed_layout_is_exact(); }
     let at = match builder_entry_offset(
@@ -1647,17 +1703,24 @@ pub(crate) fn read_builder_next_code(
         index,
     ) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     let byte0 = workspace[at];
+    proof { r_source_units = r_source_units + 1; }
     let byte1 = workspace[at + 1];
+    proof { r_source_units = r_source_units + 1; }
     let byte2 = workspace[at + 2];
+    proof { r_source_units = r_source_units + 1; }
     let byte3 = workspace[at + 3];
+    proof { r_source_units = r_source_units + 1; }
     proof { join_builder_u32_is_exact(byte0, byte1, byte2, byte3); }
-    Ok(byte0 as u32
+    let ordinary_result = {
+        Ok(byte0 as u32
         | ((byte1 as u32) << 8)
         | ((byte2 as u32) << 16)
         | ((byte3 as u32) << 24))
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn write_builder_next_code_at(
@@ -1744,8 +1807,10 @@ pub(crate) fn write_next_builder_symbol_chain(
     window_bytes: u32,
     initialized: u16,
     value: u16,
-) -> (r: Result<u16, WorkspaceError>)
+) -> (r: (Result<u16, WorkspaceError>, Ghost<nat>))
     ensures
+        r.1@ == if r.0.is_ok() { 2nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
@@ -1767,8 +1832,8 @@ pub(crate) fn write_next_builder_symbol_chain(
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized < BUILDER_SYMBOL_CHAIN_ENTRIES
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             let at = builder_entry_at(
                 window_bytes,
                 BUILDER_SYMBOL_CHAIN_OFFSET,
@@ -1778,26 +1843,27 @@ pub(crate) fn write_next_builder_symbol_chain(
             let low = (value % 256) as u8;
             let high = (value / 256) as u8;
             &&& initialized < BUILDER_SYMBOL_CHAIN_ENTRIES
-            &&& r.unwrap() == initialized + 1
+            &&& r.0.unwrap() == initialized + 1
             &&& at + 2 <= old(workspace)@.len()
             &&& final(workspace)@ == old(workspace)@
                 .update(at as int, low)
                 .update(at as int + 1, high)
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if initialized >= BUILDER_SYMBOL_CHAIN_ENTRIES {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     proof { fixed_layout_is_exact(); }
     let at = match builder_entry_offset(
@@ -1808,11 +1874,16 @@ pub(crate) fn write_next_builder_symbol_chain(
         initialized,
     ) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     workspace[at] = (value % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 1] = (value / 256) as u8;
-    Ok(initialized + 1)
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(initialized + 1)
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn read_builder_symbol_chain(
@@ -1875,8 +1946,10 @@ pub(crate) fn write_builder_symbol_chain_at(
     initialized: u16,
     index: u16,
     value: u16,
-) -> (r: Result<(), WorkspaceError>)
+) -> (r: (Result<(), WorkspaceError>, Ghost<nat>))
     ensures
+        r.1@ == if r.0.is_ok() { 2nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
@@ -1899,8 +1972,8 @@ pub(crate) fn write_builder_symbol_chain_at(
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized <= BUILDER_SYMBOL_CHAIN_ENTRIES
             && index < initialized
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             let at = builder_entry_at(window_bytes, BUILDER_SYMBOL_CHAIN_OFFSET, index, 2);
             let low = (value % 256) as u8;
             let high = (value / 256) as u8;
@@ -1911,20 +1984,21 @@ pub(crate) fn write_builder_symbol_chain_at(
                 .update(at as int, low)
                 .update(at as int + 1, high)
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if initialized > BUILDER_SYMBOL_CHAIN_ENTRIES || index >= initialized {
-        return Err(WorkspaceError::UninitializedRecord);
+        return (Err(WorkspaceError::UninitializedRecord), Ghost(r_source_units));
     }
     proof { fixed_layout_is_exact(); }
     let at = match builder_entry_offset(
@@ -1935,11 +2009,16 @@ pub(crate) fn write_builder_symbol_chain_at(
         index,
     ) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     workspace[at] = (value % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 1] = (value / 256) as u8;
-    Ok(())
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(())
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 proof fn tree_layout_is_bounded(region: TreeRegion)
@@ -2423,13 +2502,15 @@ pub(crate) fn write_tree_metadata(
     region: TreeRegion,
     tree: u16,
     meta: TreeMetadata,
-) -> (r: Result<(), WorkspaceError>)
+) -> (r: (Result<(), WorkspaceError>, Ghost<nat>))
     requires meta.valid_for(region),
     ensures
+        r.1@ == if r.0.is_ok() { 4nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= old(workspace)@.len()
-            && tree < tree_region_count(region) ==> r.is_ok(),
-        r.is_ok() ==> {
+            && tree < tree_region_count(region) ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             let at = tree_metadata_at(window_bytes, region, tree);
             let descriptor = tree_metadata_descriptor(meta);
             &&& tree < tree_region_count(region)
@@ -2440,14 +2521,15 @@ pub(crate) fn write_tree_metadata(
                 .update(at as int + 2, (descriptor % 256) as u8)
                 .update(at as int + 3, (descriptor / 256) as u8)
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut r_source_units: nat = 0;
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     let descriptor = match meta.storage {
         TreeStorageState::Unused => 0,
@@ -2459,13 +2541,20 @@ pub(crate) fn write_tree_metadata(
     };
     let at = match tree_metadata_offset(window_bytes, region, tree) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     workspace[at] = (meta.symbols % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 1] = (meta.symbols / 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 2] = (descriptor % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 3] = (descriptor / 256) as u8;
-    Ok(())
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(())
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn read_tree_metadata(
@@ -2474,20 +2563,23 @@ pub(crate) fn read_tree_metadata(
     region: TreeRegion,
     initialized_prefix: u16,
     tree: u16,
-) -> (r: Result<TreeMetadata, MetadataReadError>)
+) -> (r: (Result<TreeMetadata, MetadataReadError>, Ghost<nat>))
     ensures
+        r.1@ <= 1,
+        r.1@ == match r.0 { Err(MetadataReadError::Workspace(_)) => 0nat, _ => 1nat },
+
         window_bytes <= 16_777_216
             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && initialized_prefix <= tree_region_count(region)
             && tree < tree_region_count(region)
             && tree >= initialized_prefix
-            ==> r == Err(MetadataReadError::Workspace(
+            ==> r.0 == Err(MetadataReadError::Workspace(
                 WorkspaceError::UninitializedRecord,
             )),
         window_bytes <= 16_777_216
             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && tree < initialized_prefix <= tree_region_count(region)
-            ==> (r.is_ok() == {
+            ==> (r.0.is_ok() == {
                 let at = tree_metadata_at(window_bytes, region, tree);
                 let symbols = little_u16_at(workspace@, at);
                 let descriptor = little_u16_at(workspace@, at + 2);
@@ -2514,39 +2606,41 @@ pub(crate) fn read_tree_metadata(
                     ||| 0x8000 <= descriptor && descriptor - 0x8000 < symbols
                 }
             }
-            ==> r == Err(MetadataReadError::InvalidEncoding),
-        r.is_ok() ==> {
+            ==> r.0 == Err(MetadataReadError::InvalidEncoding),
+        r.0.is_ok() ==> {
         &&& tree < initialized_prefix <= tree_region_count(region)
-        &&& r.unwrap().valid_for(region)
+        &&& r.0.unwrap().valid_for(region)
         &&& {
             let at = tree_metadata_at(window_bytes, region, tree);
             &&& at + 4 <= workspace@.len()
-            &&& r.unwrap().symbols as nat == workspace@[at as int] as nat
+            &&& r.0.unwrap().symbols as nat == workspace@[at as int] as nat
                 + 256 * workspace@[at as int + 1] as nat
-            &&& tree_metadata_descriptor(r.unwrap())
+            &&& tree_metadata_descriptor(r.0.unwrap())
                 == workspace@[at as int + 2] as nat
                     + 256 * workspace@[at as int + 3] as nat
         }
     },
 {
+    let ghost mut r_source_units: nat = 0;
     let count = tree_region_count_exec(region);
     if initialized_prefix > count || tree >= count {
-        return Err(MetadataReadError::Workspace(WorkspaceError::InvalidTree));
+        return (Err(MetadataReadError::Workspace(WorkspaceError::InvalidTree)), Ghost(r_source_units));
     }
     if tree >= initialized_prefix {
-        return Err(MetadataReadError::Workspace(WorkspaceError::UninitializedRecord));
+        return (Err(MetadataReadError::Workspace(WorkspaceError::UninitializedRecord)), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(MetadataReadError::Workspace(WorkspaceError::WorkspaceTooSmall)),
+        None => return (Err(MetadataReadError::Workspace(WorkspaceError::WorkspaceTooSmall)), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(MetadataReadError::Workspace(WorkspaceError::WorkspaceTooSmall));
+        return (Err(MetadataReadError::Workspace(WorkspaceError::WorkspaceTooSmall)), Ghost(r_source_units));
     }
     let at = match tree_metadata_offset(window_bytes, region, tree) {
         Ok(value) => value,
-        Err(error) => return Err(MetadataReadError::Workspace(error)),
+        Err(error) => return (Err(MetadataReadError::Workspace(error)), Ghost(r_source_units)),
     };
+    proof { r_source_units = r_source_units + 1; }
     let symbols_low = workspace[at];
     let symbols_high = workspace[at + 1];
     let descriptor_low = workspace[at + 2];
@@ -2561,21 +2655,21 @@ pub(crate) fn read_tree_metadata(
     let capacity = tree_region_symbols_exec(region);
     let storage = if symbols == 0 {
         if descriptor != 0 {
-            return Err(MetadataReadError::InvalidEncoding);
+            return (Err(MetadataReadError::InvalidEncoding), Ghost(r_source_units));
         }
         TreeStorageState::Unused
     } else if symbols > capacity {
-        return Err(MetadataReadError::InvalidEncoding);
+        return (Err(MetadataReadError::InvalidEncoding), Ghost(r_source_units));
     } else if descriptor & 0x8000 != 0 {
         proof { split_single_metadata_descriptor_is_exact(descriptor); }
         let symbol = descriptor & 0x7fff;
         if symbol >= symbols {
-            return Err(MetadataReadError::InvalidEncoding);
+            return (Err(MetadataReadError::InvalidEncoding), Ghost(r_source_units));
         }
         TreeStorageState::Single { symbol }
     } else {
         if descriptor > symbols {
-            return Err(MetadataReadError::InvalidEncoding);
+            return (Err(MetadataReadError::InvalidEncoding), Ghost(r_source_units));
         }
         TreeStorageState::Canonical { initialized: descriptor }
     };
@@ -2594,7 +2688,10 @@ pub(crate) fn read_tree_metadata(
             + 256 * workspace@[at as int + 1] as nat);
         assert(tree_metadata_descriptor(meta) == descriptor as nat);
     }
-    Ok(meta)
+    let ordinary_result = {
+        Ok(meta)
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) open spec fn context_map_offset(kind: ContextMapKind) -> nat {
@@ -2702,53 +2799,57 @@ pub(crate) fn write_next_context_entry(
     initialized: u16,
     value: u8,
     num_htrees: u16,
-) -> (r: Result<u16, WorkspaceError>)
+) -> (r: (Result<u16, WorkspaceError>, Ghost<nat>))
     requires
         active_len <= context_map_capacity(kind),
         initialized <= active_len,
         1 <= num_htrees <= 256,
         (value as int) < num_htrees,
     ensures
+        r.1@ == if r.0.is_ok() { 1nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
-            && initialized < active_len ==> r.is_ok(),
+            && initialized < active_len ==> r.0.is_ok(),
         final(workspace)@.len() == old(workspace)@.len(),
-        r.is_ok() ==> {
+        r.0.is_ok() ==> {
             let at = context_entry_at(window_bytes, kind, initialized);
             &&& initialized < active_len
-            &&& r.unwrap() == initialized + 1
+            &&& r.0.unwrap() == initialized + 1
             &&& at < old(workspace)@.len()
             &&& final(workspace)@ == old(workspace)@.update(at as int, value)
         },
-        r.is_ok() ==> {
+        r.0.is_ok() ==> {
             (forall|i: int| 0 <= i < initialized ==> #[trigger]
                 old(workspace)@[context_entry_at(window_bytes, kind, i as u16) as int]
                     < num_htrees)
-            ==> forall|i: int| 0 <= i < r.unwrap() ==> #[trigger]
+            ==> forall|i: int| 0 <= i < r.0.unwrap() ==> #[trigger]
                 final(workspace)@[
                     context_entry_at(window_bytes, kind, i as u16) as int
                 ] < num_htrees
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut r_source_units: nat = 0;
     if num_htrees == 0 || num_htrees > 256 || value as u16 >= num_htrees {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     if initialized >= active_len {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     let at = match context_entry_offset(window_bytes, kind, initialized) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     workspace[at] = value;
+    proof { r_source_units = r_source_units + 1; }
     proof {
         assert forall|i: int| 0 <= i < initialized implies
             #[trigger] workspace@[
@@ -2759,7 +2860,10 @@ pub(crate) fn write_next_context_entry(
             assert(context_entry_at(window_bytes, kind, i as u16) != at as nat);
         }
     }
-    Ok(initialized + 1)
+    let ordinary_result = {
+        Ok(initialized + 1)
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn read_context_entry(
@@ -2769,38 +2873,45 @@ pub(crate) fn read_context_entry(
     initialized: u16,
     index: u16,
     num_htrees: u16,
-) -> (r: Result<u8, WorkspaceError>)
+) -> (r: (Result<u8, WorkspaceError>, Ghost<nat>))
     requires
         initialized <= context_map_capacity(kind),
         1 <= num_htrees <= 256,
         index < initialized ==> workspace@[context_entry_at(window_bytes, kind, index) as int]
             < num_htrees,
-    ensures r.is_ok() ==> {
+    ensures
+        r.1@ == if r.0.is_ok() { 1nat } else { 0nat },
+ r.0.is_ok() ==> {
         let at = context_entry_at(window_bytes, kind, index);
         &&& index < initialized
         &&& at < workspace@.len()
-        &&& r.unwrap() == workspace@[at as int]
-        &&& (r.unwrap() as int) < num_htrees
+        &&& r.0.unwrap() == workspace@[at as int]
+        &&& (r.0.unwrap() as int) < num_htrees
     },
 {
+    let ghost mut r_source_units: nat = 0;
     if num_htrees == 0 || num_htrees > 256 {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     if index >= initialized {
-        return Err(WorkspaceError::UninitializedRecord);
+        return (Err(WorkspaceError::UninitializedRecord), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     let at = match context_entry_offset(window_bytes, kind, index) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
-    Ok(workspace[at])
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(workspace[at])
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn write_next_context_mode(
@@ -2808,37 +2919,44 @@ pub(crate) fn write_next_context_mode(
     window_bytes: u32,
     initialized: u16,
     value: u8,
-) -> (r: Result<u16, WorkspaceError>)
+) -> (r: (Result<u16, WorkspaceError>, Ghost<nat>))
     requires initialized <= LITERAL_CONTEXT_MODES_BYTES, value < 4,
     ensures
+        r.1@ == if r.0.is_ok() { 1nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES
-            && initialized < LITERAL_CONTEXT_MODES_BYTES ==> r.is_ok(),
-        r.is_ok() ==> {
+            && initialized < LITERAL_CONTEXT_MODES_BYTES ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             let at = context_mode_at(window_bytes, initialized);
             &&& initialized < LITERAL_CONTEXT_MODES_BYTES
-            &&& r.unwrap() == initialized + 1
+            &&& r.0.unwrap() == initialized + 1
             &&& at < old(workspace)@.len()
             &&& final(workspace)@ == old(workspace)@.update(at as int, value)
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut r_source_units: nat = 0;
     if initialized >= LITERAL_CONTEXT_MODES_BYTES as u16 {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let at = (window_bytes + LITERAL_CONTEXT_MODES_OFFSET + initialized as u32) as usize;
     workspace[at] = value;
-    Ok(initialized + 1)
+    proof { r_source_units = r_source_units + 1; }
+    let ordinary_result = {
+        Ok(initialized + 1)
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn read_context_mode(
@@ -3142,9 +3260,11 @@ fn simple_record_exec(
     count: u8,
     symbols: &[u16; 4],
     symbol: u16,
-) -> (r: TreeRecord)
+) -> (r: (TreeRecord, Ghost<nat>))
     requires 1 <= selector <= 4, count as nat == simple_selector_count(selector),
-    ensures r == simple_record_for_symbol(selector, count, symbols@, symbol),
+    ensures
+        r.1@ == k6_simple_probe_reads(symbols@, count as nat, symbol),
+ r.0 == simple_record_for_symbol(selector, count, symbols@, symbol),
 {
     let ghost mut source_reads: nat = 0;
     let record = if { proof { source_reads = source_reads + 1; } symbol == symbols[0] } {
@@ -3188,7 +3308,10 @@ fn simple_record_exec(
         reveal(k6_simple_probe_reads);
         assert(source_reads == k6_simple_probe_reads(symbols@, count as nat, symbol));
     }
-    record
+    let ordinary_result = {
+        record
+    };
+    (ordinary_result, Ghost(source_reads))
 }
 
 pub(crate) fn install_simple_tree(
@@ -3200,8 +3323,14 @@ pub(crate) fn install_simple_tree(
     selector: u8,
     count: u8,
     symbols: [u16; 4],
-) -> (r: Result<TreeMetadata, WorkspaceError>)
+) -> (r: (Result<TreeMetadata, WorkspaceError>, Ghost<nat>))
     ensures
+        r.0.is_ok() ==> r.1@ == if selector == 0 { 2nat } else {
+            (3 + count as nat) * alphabet_limit as nat + count as nat * (count as nat + 1) / 2
+        },
+        (alphabet_limit == 0 || alphabet_limit as nat > tree_region_symbols(region)
+            || tree as nat >= tree_region_count(region)) ==> r.1@ == 0,
+
         window_bytes <= 16_777_216
             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && 1 <= alphabet_limit <= 704 && selector <= 4
@@ -3210,22 +3339,22 @@ pub(crate) fn install_simple_tree(
             && (forall|i: int, j: int| 0 <= i < j < count ==> #[trigger] symbols@[i] != #[trigger] symbols@[j]) ==> {
                 let destination_valid = alphabet_limit as nat <= tree_region_symbols(region)
                     && (tree as nat) < tree_region_count(region);
-                &&& r.is_ok() == destination_valid
-                &&& (!destination_valid ==> r == Err(WorkspaceError::InvalidSymbol))
+                &&& r.0.is_ok() == destination_valid
+                &&& (!destination_valid ==> r.0 == Err(WorkspaceError::InvalidSymbol))
             },
-        r.is_ok() ==> {
-        &&& r.unwrap().valid_for(region)
-        &&& r.unwrap().symbols == alphabet_limit
+        r.0.is_ok() ==> {
+        &&& r.0.unwrap().valid_for(region)
+        &&& r.0.unwrap().symbols == alphabet_limit
         &&& (tree as nat) < tree_region_count(region)
         &&& (alphabet_limit as nat) <= tree_region_symbols(region)
         &&& if selector == 0 {
             &&& count == 1
-            &&& r.unwrap().storage == TreeStorageState::Single { symbol: symbols[0] }
+            &&& r.0.unwrap().storage == TreeStorageState::Single { symbol: symbols[0] }
             &&& final(workspace)@ == old(workspace)@
         } else {
             &&& 1 <= selector <= 4
             &&& count as nat == simple_selector_count(selector)
-            &&& r.unwrap().storage == TreeStorageState::Canonical {
+            &&& r.0.unwrap().storage == TreeStorageState::Canonical {
                 initialized: alphabet_limit,
             }
             &&& simple_tree_prefix(
@@ -3249,43 +3378,48 @@ pub(crate) fn install_simple_tree(
             )
         }
     },
-    r.is_err() ==> final(workspace)@ == old(workspace)@,
+    r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
     let ghost mut source_reads: nat = 0;
+    let ghost mut source_writes: nat = 0;
     proof { reveal(k6_simple_symbol_prefix); }
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(source_reads + source_writes));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(source_reads + source_writes)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(source_reads + source_writes));
     }
     let capacity = tree_region_symbols_exec(region);
     if alphabet_limit == 0 || alphabet_limit > capacity || tree >= tree_region_count_exec(region) {
         proof { assert(source_reads == 0); }
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(source_reads + source_writes));
     }
     let expected = if selector <= 2 { selector + 1 } else { 4 };
     if selector > 4 || count != expected {
-        return Err(WorkspaceError::InvalidCodeLength);
+        return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_reads + source_writes));
     }
     let mut i: u8 = 0;
     while i < count
         invariant i <= count <= 4,
+            0 < alphabet_limit <= tree_region_symbols(region),
+            tree < tree_region_count(region),
             source_reads == i as nat * i as nat,
             k6_simple_symbol_prefix(symbols@, i as nat, alphabet_limit),
         decreases count - i,
     {
         proof { reveal(k6_simple_symbol_prefix); source_reads = source_reads + 1; }
         if symbols[i as usize] >= alphabet_limit {
-            return Err(WorkspaceError::InvalidSymbol);
+            return (Err(WorkspaceError::InvalidSymbol), Ghost(source_reads + source_writes));
         }
         let mut j: u8 = 0;
         while j < i
             invariant j <= i < count <= 4,
+            0 < alphabet_limit <= tree_region_symbols(region),
+            tree < tree_region_count(region),
                 source_reads == i as nat * i as nat + 1 + 2 * j as nat,
                 k6_simple_symbol_prefix(symbols@, i as nat, alphabet_limit),
                 symbols@[i as int] < alphabet_limit,
@@ -3294,7 +3428,7 @@ pub(crate) fn install_simple_tree(
         {
             proof { reveal(k6_simple_symbol_prefix); source_reads = source_reads + 2; }
             if symbols[j as usize] == symbols[i as usize] {
-                return Err(WorkspaceError::InvalidSymbol);
+                return (Err(WorkspaceError::InvalidSymbol), Ghost(source_reads + source_writes));
             }
             j = j + 1;
         }
@@ -3312,11 +3446,11 @@ pub(crate) fn install_simple_tree(
             source_reads = source_reads + 1;
             assert(source_reads == 2);
         }
-        return TreeMetadata::single(region, alphabet_limit, symbols[0]);
+        return (TreeMetadata::single(region, alphabet_limit, symbols[0]), Ghost(source_reads + source_writes));
     }
     let mut meta = match TreeMetadata::canonical(region, alphabet_limit) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(source_reads + source_writes)),
     };
     let ghost before_workspace = workspace@;
     proof { k6_simple_probe_savings_start(symbols@, count as nat); }
@@ -3324,6 +3458,7 @@ pub(crate) fn install_simple_tree(
     while symbol < alphabet_limit
         invariant
             symbol <= alphabet_limit <= tree_region_symbols(region),
+            source_writes == 3 * symbol as nat,
             k6_simple_symbol_prefix(symbols@, count as nat, alphabet_limit),
             source_reads + k6_simple_probe_savings(symbols@, count as nat, symbol as nat)
                 == count as nat * count as nat + count as nat * symbol as nat,
@@ -3356,26 +3491,25 @@ pub(crate) fn install_simple_tree(
             ),
         decreases alphabet_limit - symbol,
     {
-        let record = simple_record_exec(selector, count, &symbols, symbol);
+        let record = { let (r_child_result, Ghost(r_child_units)) = simple_record_exec(selector, count, &symbols, symbol); proof { source_reads = source_reads + r_child_units; } r_child_result };
         proof {
             k6_simple_probe_step(symbols@, count as nat, alphabet_limit, symbol);
-            source_reads = source_reads + k6_simple_probe_reads(symbols@, count as nat, symbol);
             assert(source_reads + k6_simple_probe_savings(symbols@, count as nat, symbol as nat + 1)
                 == count as nat * count as nat + count as nat * (symbol as nat + 1)) by (nonlinear_arith)
                 requires source_reads + k6_simple_probe_savings(symbols@, count as nat, symbol as nat + 1)
                     == count as nat * count as nat + count as nat * symbol as nat + count as nat;
         }
         let ghost before_write = workspace@;
-        match write_next_tree_record(
+        match { let (r_child_result, Ghost(r_child_units)) = write_next_tree_record(
             workspace,
             window_bytes,
             region,
             tree,
             &mut meta,
             record,
-        ) {
+        ); proof { source_writes = source_writes + r_child_units; } r_child_result } {
             Ok(()) => {}
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_reads + source_writes)),
         }
         proof {
             simple_tree_prefix_after_write(
@@ -3407,12 +3541,26 @@ pub(crate) fn install_simple_tree(
     }
     proof {
         k6_simple_probe_savings_end(symbols@, count as nat, alphabet_limit);
-        if count == 1 {} else if count == 2 {} else if count == 3 {} else {}
+        assert(1 <= count <= 4) by { reveal(k6_simple_symbol_prefix); }
+        assert(count as nat * count as nat
+            == count as nat * ((count as nat - 1) as nat) / 2
+                + count as nat * (count as nat + 1) / 2) by {
+            if count == 1 {} else if count == 2 {} else if count == 3 {} else {}
+        }
+        assert(source_reads + count as nat * ((count as nat - 1) as nat) / 2
+            == count as nat * count as nat + count as nat * alphabet_limit as nat);
         assert(source_reads == count as nat * alphabet_limit as nat + count as nat * (count as nat + 1) / 2);
         assert(source_reads == simple_selector_count(selector) * alphabet_limit as nat
             + simple_selector_count(selector) * (simple_selector_count(selector) + 1) / 2);
+        assert(source_reads + source_writes
+            == (3 + count as nat) * alphabet_limit as nat + count as nat * (count as nat + 1) / 2) by (nonlinear_arith)
+            requires source_reads == count as nat * alphabet_limit as nat + count as nat * (count as nat + 1) / 2,
+                source_writes == 3 * alphabet_limit as nat;
     }
-    Ok(meta)
+    let ordinary_result = {
+        Ok(meta)
+    };
+    (ordinary_result, Ghost(source_reads + source_writes))
 }
 
 pub(crate) open spec fn context_map_values(
@@ -3549,7 +3697,7 @@ pub(crate) fn check_context_tree_coverage(
     kind: ContextMapKind,
     active_len: u16,
     num_htrees: u16,
-) -> (r: Result<(bool, u64), WorkspaceError>)
+) -> (r: (Result<(bool, u64), WorkspaceError>, Ghost<nat>))
     requires
         active_len <= context_map_capacity(kind),
         1 <= num_htrees <= 256,
@@ -3560,12 +3708,15 @@ pub(crate) fn check_context_tree_coverage(
             ]
                 < num_htrees,
     ensures
+        r.0.is_ok() ==> r.1@ == r.0.unwrap().1 as nat,
+        r.0.is_err() ==> r.1@ == 0,
+
         1_024 <= window_bytes <= 16_777_216
-            && (window_bytes & ((window_bytes - 1) as u32)) == 0 ==> r.is_ok(),
-        r.is_ok() ==> {
+            && (window_bytes & ((window_bytes - 1) as u32)) == 0 ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
         let values = context_map_values(old(workspace)@, window_bytes, kind, active_len);
-        &&& r.unwrap().0 == context_tree_coverage(values, num_htrees)
-        &&& r.unwrap().1 == 32u64 + 3u64 * active_len as u64 + num_htrees as u64
+        &&& r.0.unwrap().0 == context_tree_coverage(values, num_htrees)
+        &&& r.0.unwrap().1 == 32u64 + 3u64 * active_len as u64 + num_htrees as u64
         &&& coverage_bitmap_represents(
             final(workspace)@,
             window_bytes,
@@ -3576,16 +3727,17 @@ pub(crate) fn check_context_tree_coverage(
             == values
         &&& coverage_bitmap_frame(old(workspace)@, final(workspace)@, window_bytes)
     },
-    r.is_err() ==> final(workspace)@ == old(workspace)@,
+    r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(source_units));
     }
     let ghost original_workspace = workspace@;
     let ghost values = context_map_values(original_workspace, window_bytes, kind, active_len);
     let bitmap_base_u32 = match window_bytes.checked_add(BUILDER_CODE_LENGTHS_OFFSET) {
         Some(value) => value,
-        None => return Err(WorkspaceError::InvalidWindowBits),
+        None => return (Err(WorkspaceError::InvalidWindowBits), Ghost(source_units)),
     };
     proof {
         assert(bitmap_base_u32 as nat
@@ -3598,6 +3750,7 @@ pub(crate) fn check_context_tree_coverage(
     let mut cleared: u16 = 0;
     while cleared < COVERAGE_BITMAP_BYTES
         invariant
+            source_units == cleared as nat,
             cleared <= COVERAGE_BITMAP_BYTES,
             window_bytes <= 16_777_216,
             workspace@.len() == original_workspace.len(),
@@ -3613,6 +3766,7 @@ pub(crate) fn check_context_tree_coverage(
     {
         let at = bitmap_base + cleared as usize;
         workspace[at] = 0;
+        proof { source_units = source_units + 1; }
         cleared = cleared + 1;
     }
     proof {
@@ -3628,6 +3782,7 @@ pub(crate) fn check_context_tree_coverage(
     let mut index: u16 = 0;
     while index < active_len
         invariant
+            source_units == 32 + 3 * index as nat,
             index <= active_len,
             active_len <= context_map_capacity(kind),
             window_bytes <= 16_777_216,
@@ -3643,9 +3798,10 @@ pub(crate) fn check_context_tree_coverage(
     {
         let map_at = match context_entry_offset(window_bytes, kind, index) {
             Ok(value) => value,
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_units)),
         };
         let value = workspace[map_at];
+        proof { source_units = source_units + 1; }
         proof {
             assert(value == values[index as int]);
         }
@@ -3653,8 +3809,10 @@ pub(crate) fn check_context_tree_coverage(
         let bit = value % 8;
         let bitmap_at = bitmap_base + byte as usize;
         let old_bitmap = workspace[bitmap_at];
+        proof { source_units = source_units + 1; }
         let ghost before_bitmap = workspace@;
         workspace[bitmap_at] = old_bitmap | (1u8 << bit);
+        proof { source_units = source_units + 1; }
         proof {
             bitmap_update_preserves_context_map(
                 before_bitmap,
@@ -3698,6 +3856,7 @@ pub(crate) fn check_context_tree_coverage(
     let mut tree: u16 = 0;
     while tree < num_htrees
         invariant
+            source_units == 32 + 3 * active_len as nat + tree as nat,
             tree <= num_htrees <= 256,
             bitmap_base as nat
                 == window_bytes as nat + BUILDER_CODE_LENGTHS_OFFSET as nat,
@@ -3715,6 +3874,7 @@ pub(crate) fn check_context_tree_coverage(
         let bit = (tree % 8) as u8;
         let bitmap_at = bitmap_base + byte as usize;
         let present = workspace[bitmap_at] & (1u8 << bit) != 0;
+        proof { source_units = source_units + 1; }
         proof {
             assert(bitmap_at as nat == coverage_bitmap_at(window_bytes, byte));
             assert(byte as nat == tree as nat / 8);
@@ -3772,8 +3932,12 @@ pub(crate) fn check_context_tree_coverage(
     proof {
         reveal(context_tree_coverage);
         assert(complete == context_tree_coverage(values, num_htrees));
+        assert(source_units == 32u64 + 3u64 * active_len as u64 + num_htrees as u64);
     }
-    Ok((complete, 32u64 + 3u64 * active_len as u64 + num_htrees as u64))
+    let ordinary_result = {
+        Ok((complete, 32u64 + 3u64 * active_len as u64 + num_htrees as u64))
+    };
+    (ordinary_result, Ghost(source_units))
 }
 
 pub(crate) open spec fn mtf_list_at(window_bytes: u32, index: u16) -> nat {
@@ -4075,17 +4239,20 @@ fn mtf_move_rank(
     workspace: &mut [u8],
     window_bytes: u32,
     rank: u8,
-) -> (r: u8)
+) -> (r: (u8, Ghost<nat>))
     requires
         window_bytes <= 16_777_216,
         window_bytes as nat + FIXED_SCRATCH_BYTES as nat <= old(workspace)@.len(),
     ensures
-        r == mtf_list_values(old(workspace)@, window_bytes)[rank as int],
-        final(workspace)@[mtf_scratch_at(window_bytes) as int] == r,
+        r.1@ == 2 * rank as nat + 4,
+
+        r.0 == mtf_list_values(old(workspace)@, window_bytes)[rank as int],
+        final(workspace)@[mtf_scratch_at(window_bytes) as int] == r.0,
         mtf_list_values(final(workspace)@, window_bytes)
             == mtf_move_front(mtf_list_values(old(workspace)@, window_bytes), rank),
         mtf_region_frame(old(workspace)@, final(workspace)@, window_bytes),
 {
+    let ghost mut source_units: nat = 0;
     let ghost before = workspace@;
     let ghost old_list = mtf_list_values(before, window_bytes);
     let list_base = (window_bytes + MTF_LIST_OFFSET) as usize;
@@ -4102,8 +4269,10 @@ fn mtf_move_rank(
         mtf_list_values_index(before, window_bytes, rank as u16);
     }
     let value = workspace[list_base + rank as usize];
+    proof { source_units = source_units + 1; }
     let ghost before_scratch = workspace@;
     workspace[scratch] = value;
+    proof { source_units = source_units + 1; }
     proof {
         mtf_region_frame_after_update(
             before,
@@ -4117,6 +4286,7 @@ fn mtf_move_rank(
     let mut cursor: u16 = rank as u16;
     while cursor > 0
         invariant
+            source_units == 2 + 2 * (rank as nat - cursor as nat),
             cursor <= rank,
             window_bytes <= 16_777_216,
             workspace@.len() == before.len(),
@@ -4153,12 +4323,14 @@ fn mtf_move_rank(
             assert(source_at < workspace@.len());
         }
         let source = workspace[source_at];
+        proof { source_units = source_units + 1; }
         proof {
             assert(source_at == list_base + source_index);
             assert(before_write[source_at as int]
                 == old_list[source_index as int]);
         }
         workspace[list_base + cursor as usize] = source;
+        proof { source_units = source_units + 1; }
         cursor = cursor - 1;
         proof {
             assert(source == old_list[old_cursor as int - 1]);
@@ -4186,8 +4358,13 @@ fn mtf_move_rank(
         }
     }
     let front = workspace[scratch];
+    proof { source_units = source_units + 1; }
     let ghost before_front = workspace@;
     workspace[list_base] = front;
+    proof {
+        source_units = source_units + 1;
+        assert(source_units == 2 * rank as nat + 4);
+    }
     proof {
         mtf_region_frame_after_update(
             before,
@@ -4199,7 +4376,10 @@ fn mtf_move_rank(
         );
         assert(mtf_list_values(workspace@, window_bytes) =~= mtf_move_front(old_list, rank));
     }
-    value
+    let ordinary_result = {
+        value
+    };
+    (ordinary_result, Ghost(source_units))
 }
 
 proof fn mtf_append_one(ranks: Seq<u8>, list: Seq<u8>, rank: u8)
@@ -4360,7 +4540,7 @@ pub(crate) fn inverse_mtf_context_map(
     active_len: u16,
     num_htrees: u16,
     mtf_upper_bound: u8,
-) -> (r: Result<(u8, u64), WorkspaceError>)
+) -> (r: (Result<(u8, u64), WorkspaceError>, Ghost<nat>))
     requires
         active_len <= context_map_capacity(kind),
         1 <= num_htrees <= 256,
@@ -4373,13 +4553,16 @@ pub(crate) fn inverse_mtf_context_map(
         mtf_upper_bound == 63
             || mtf_reusable(mtf_list_values(old(workspace)@, window_bytes), mtf_upper_bound),
     ensures
+        r.0.is_ok() ==> r.1@ == r.0.unwrap().1 as nat,
+        r.0.is_err() ==> r.1@ == 0,
+
         1_024 <= window_bytes <= 16_777_216
-            && (window_bytes & ((window_bytes - 1) as u32)) == 0 ==> r.is_ok(),
-        r.is_ok() ==> {
+            && (window_bytes & ((window_bytes - 1) as u32)) == 0 ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             let ranks = context_map_values(old(workspace)@, window_bytes, kind, active_len);
             let next_bound = mtf_rank_or(ranks) >> 2;
-            &&& r.unwrap().0 == next_bound
-            &&& r.unwrap().1 as nat
+            &&& r.0.unwrap().0 == next_bound
+            &&& r.0.unwrap().1 as nat
                 == 4 * (mtf_upper_bound as nat + 1) + mtf_rank_work(ranks)
             &&& context_map_values(final(workspace)@, window_bytes, kind, active_len)
                 == mtf_output_values(ranks, mtf_identity())
@@ -4401,10 +4584,11 @@ pub(crate) fn inverse_mtf_context_map(
                 active_len,
             )
         },
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
 {
+    let ghost mut source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(source_units));
     }
     let ghost original_workspace = workspace@;
     let ghost ranks = context_map_values(original_workspace, window_bytes, kind, active_len);
@@ -4441,6 +4625,7 @@ pub(crate) fn inverse_mtf_context_map(
     let mut init: u16 = 0;
     while init < init_limit
         invariant
+            source_units == init as nat,
             init <= init_limit <= 256,
             init_limit == 4 * (mtf_upper_bound as u16 + 1),
             mtf_upper_bound <= 63,
@@ -4467,6 +4652,7 @@ pub(crate) fn inverse_mtf_context_map(
     {
         let ghost before_init_write = workspace@;
         workspace[list_base + init as usize] = init as u8;
+        proof { source_units = source_units + 1; }
         init = init + 1;
         proof {
             let dest_at = (list_base + init as usize - 1) as int;
@@ -4522,6 +4708,7 @@ pub(crate) fn inverse_mtf_context_map(
     let mut work: u64 = init_limit as u64;
     while index < active_len
         invariant
+            source_units == work as nat,
             index <= active_len,
             active_len <= context_map_capacity(kind),
             ranks.len() == active_len,
@@ -4557,9 +4744,10 @@ pub(crate) fn inverse_mtf_context_map(
         let ghost before_move = workspace@;
         let map_at = match context_entry_offset(window_bytes, kind, index) {
             Ok(value) => value,
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_units)),
         };
         let rank = workspace[map_at];
+        proof { source_units = source_units + 1; }
         proof {
             assert(index < active_len);
             assert((index as int) < ranks.len());
@@ -4579,7 +4767,8 @@ pub(crate) fn inverse_mtf_context_map(
             assert(map_at as nat == context_entry_at(window_bytes, kind, index));
             assert(rank == ranks[index as int]);
         }
-        let value = mtf_move_rank(workspace, window_bytes, rank);
+        let value = { let (r_child_result, Ghost(r_child_units)) = mtf_move_rank(workspace, window_bytes, rank); proof { source_units = source_units + r_child_units; } r_child_result };
+        proof {  }
         let ghost after_move = workspace@;
         proof {
             mtf_workspace_frame_after_mtf_region(
@@ -4592,6 +4781,7 @@ pub(crate) fn inverse_mtf_context_map(
             );
         }
         workspace[map_at] = value;
+        proof { source_units = source_units + 1; }
         proof {
             mtf_workspace_frame_after_update(
                 original_workspace,
@@ -4645,6 +4835,7 @@ pub(crate) fn inverse_mtf_context_map(
     proof {
         assert(ranks.take(index as int) =~= ranks);
         assert(index as nat == ranks.len());
+        assert(source_units == work as nat);
         assert(rank_or == mtf_rank_or(ranks));
         mtf_identity_prefix_bounded(num_htrees);
         assert forall|i: int| 0 <= i < ranks.len() implies ranks[i] < num_htrees by {
@@ -4680,7 +4871,10 @@ pub(crate) fn inverse_mtf_context_map(
                 == mtf_output_values(ranks, mtf_identity())[i]);
         }
     }
-    Ok((next_bound, work))
+    let ordinary_result = {
+        Ok((next_bound, work))
+    };
+    (ordinary_result, Ghost(source_units))
 }
 
 pub(crate) fn write_next_tree_record(
@@ -4690,9 +4884,11 @@ pub(crate) fn write_next_tree_record(
     tree: u16,
     meta: &mut TreeMetadata,
     record: TreeRecord,
-) -> (r: Result<(), WorkspaceError>)
+) -> (r: (Result<(), WorkspaceError>, Ghost<nat>))
     requires old(meta).valid_for(region),
     ensures
+        r.1@ == if r.0.is_ok() { 3nat } else { 0nat },
+
     window_bytes <= 16_777_216
         && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
         ==> builder_next_code_byte_sequence(final(workspace)@, window_bytes)
@@ -4720,8 +4916,8 @@ pub(crate) fn write_next_tree_record(
             TreeStorageState::Canonical { initialized } => initialized < old(meta).symbols,
             _ => false,
         }
-        ==> r.is_ok(),
-    r.is_ok() ==> {
+        ==> r.0.is_ok(),
+    r.0.is_ok() ==> {
         &&& final(meta).valid_for(region)
         &&& final(meta).symbols == old(meta).symbols
         &&& match old(meta).storage {
@@ -4741,39 +4937,43 @@ pub(crate) fn write_next_tree_record(
             _ => false,
         }
     },
-    r.is_err() ==> {
+    r.0.is_err() ==> {
         &&& final(workspace)@ == old(workspace)@
         &&& *final(meta) == *old(meta)
     },
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if record.length > MAX_BITS {
-        return Err(WorkspaceError::InvalidCodeLength);
+        return (Err(WorkspaceError::InvalidCodeLength), Ghost(r_source_units));
     }
     let initialized = match meta.storage {
         TreeStorageState::Canonical { initialized } => initialized,
-        _ => return Err(WorkspaceError::UninitializedRecord),
+        _ => return (Err(WorkspaceError::UninitializedRecord), Ghost(r_source_units)),
     };
     if initialized >= meta.symbols {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
     let at = match tree_record_offset(window_bytes, region, tree, initialized) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(r_source_units)),
     };
     let ghost before_workspace = workspace@;
     workspace[at] = record.length;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 1] = (record.code % 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     workspace[at + 2] = (record.code / 256) as u8;
+    proof { r_source_units = r_source_units + 1; }
     meta.storage = TreeStorageState::Canonical { initialized: initialized + 1 };
     proof {
         tree_record_outside_builder_code_lengths(
@@ -4802,7 +5002,10 @@ pub(crate) fn write_next_tree_record(
         assert(builder_next_code_byte_sequence(workspace@, window_bytes)
             =~= builder_next_code_byte_sequence(before_workspace, window_bytes));
     }
-    Ok(())
+    let ordinary_result = {
+        Ok(())
+    };
+    (ordinary_result, Ghost(r_source_units))
 }
 
 pub(crate) fn read_tree_record(
@@ -4812,11 +5015,13 @@ pub(crate) fn read_tree_record(
     tree: u16,
     meta: &TreeMetadata,
     symbol: u16,
-) -> (r: Result<TreeRecord, WorkspaceError>)
+) -> (r: (Result<TreeRecord, WorkspaceError>, Ghost<nat>))
     requires meta.valid_for(region),
     ensures
+        r.1@ == if r.0.is_ok() && matches!(meta.storage, TreeStorageState::Canonical { .. }) { 1nat } else { 0nat },
+
     match meta.storage {
-        TreeStorageState::Canonical { initialized } => r.is_ok() == (
+        TreeStorageState::Canonical { initialized } => r.0.is_ok() == (
             window_bytes <= 16_777_216
             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && tree < tree_region_count(region)
@@ -4834,40 +5039,42 @@ pub(crate) fn read_tree_record(
             TreeStorageState::Canonical { initialized } => symbol < initialized,
             TreeStorageState::Unused => false,
         }
-        ==> r.is_ok(),
-    r.is_ok() ==> {
+        ==> r.0.is_ok(),
+    r.0.is_ok() ==> {
         &&& symbol < meta.symbols
         &&& match meta.storage {
             TreeStorageState::Single { symbol: only } => {
                 &&& symbol == only
-                &&& r.unwrap() == TreeRecord { length: 0, code: 0 }
+                &&& r.0.unwrap() == TreeRecord { length: 0, code: 0 }
             },
             TreeStorageState::Canonical { initialized } => {
                 let at = tree_record_at(window_bytes, region, tree, symbol);
                 &&& symbol < initialized
                 &&& at + 3 <= workspace@.len()
-                &&& r.unwrap().length == workspace@[at as int]
-                &&& r.unwrap().code as nat == workspace@[at as int + 1] as nat
+                &&& r.0.unwrap().length == workspace@[at as int]
+                &&& r.0.unwrap().code as nat == workspace@[at as int + 1] as nat
                     + 256 * workspace@[at as int + 2] as nat
             },
             TreeStorageState::Unused => false,
         }
     },
 {
+    let ghost mut r_source_units: nat = 0;
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(r_source_units));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(r_source_units));
     }
     if symbol >= meta.symbols {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(r_source_units));
     }
-    match meta.storage {
+    let ordinary_result = {
+        match meta.storage {
         TreeStorageState::Unused => Err(WorkspaceError::UninitializedRecord),
         TreeStorageState::Single { symbol: only } => {
             if symbol != only {
@@ -4878,12 +5085,13 @@ pub(crate) fn read_tree_record(
         }
         TreeStorageState::Canonical { initialized } => {
             if symbol >= initialized {
-                return Err(WorkspaceError::UninitializedRecord);
+                return (Err(WorkspaceError::UninitializedRecord), Ghost(r_source_units));
             }
             let at = match tree_record_offset(window_bytes, region, tree, symbol) {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return (Err(error), Ghost(r_source_units)),
             };
+            proof { r_source_units = r_source_units + 1; }
             let _low = workspace[at + 1];
             let _high = workspace[at + 2];
             proof { join_tree_code_is_exact(_low, _high); }
@@ -4893,6 +5101,52 @@ pub(crate) fn read_tree_record(
             })
         }
     }
+    };
+    (ordinary_result, Ghost(r_source_units))
+}
+
+
+// Private source-ledger mathematics; no installer interface is added.
+spec fn m1_canonical_lengths_below(lengths: Seq<u8>, bound: nat) -> nat
+    decreases lengths.len(),
+{
+    if lengths.len() == 0 { 0nat } else {
+        (if 0 < lengths[0] && (lengths[0] as nat) < bound { 1nat } else { 0nat })
+            + m1_canonical_lengths_below(lengths.skip(1), bound)
+    }
+}
+
+pub(crate) open spec fn m1_canonical_nonzero_index_sum(lengths: Seq<u8>, count: nat) -> nat
+    decreases count,
+{
+    if count == 0 { 0nat } else {
+        m1_canonical_nonzero_index_sum(lengths, (count - 1) as nat)
+            + if lengths[count as int - 1] == 0 { 0nat } else { (count - 1) as nat }
+    }
+}
+
+proof fn m1_canonical_lengths_below_step(lengths: Seq<u8>, bound: u8)
+    requires 1 <= bound <= 15,
+    ensures m1_canonical_lengths_below(lengths, bound as nat + 1)
+        == m1_canonical_lengths_below(lengths, bound as nat) + count_length(lengths, bound),
+    decreases lengths.len(),
+{
+    if lengths.len() > 0 {
+        m1_canonical_lengths_below_step(lengths.skip(1), bound);
+    }
+    reveal_with_fuel(m1_canonical_lengths_below, 2);
+    reveal_with_fuel(count_length, 2);
+}
+
+proof fn m1_canonical_lengths_below_endpoints(lengths: Seq<u8>)
+    requires forall|i: int| 0 <= i < lengths.len() ==> lengths[i] <= 15,
+    ensures m1_canonical_lengths_below(lengths, 1) == 0,
+        m1_canonical_lengths_below(lengths, 16) == nonzero_count(lengths),
+    decreases lengths.len(),
+{
+    if lengths.len() > 0 { m1_canonical_lengths_below_endpoints(lengths.skip(1)); }
+    reveal_with_fuel(m1_canonical_lengths_below, 2);
+    reveal_with_fuel(nonzero_count, 2);
 }
 
 #[verifier::rlimit(1000)]
@@ -4903,13 +5157,34 @@ pub(crate) fn install_builder_canonical_tree(
     region: TreeRegion,
     tree: u16,
     meta: &mut TreeMetadata,
-) -> (r: Result<(), WorkspaceError>)
+) -> (r: (Result<(), WorkspaceError>, Ghost<nat>))
     requires old(meta).valid_for(region),
     ensures
+        r.0.is_ok() ==> {
+            let lengths = builder_length_sequence(old(workspace)@, window_bytes, old(meta).symbols);
+            r.1@ == 36 * old(meta).symbols as nat + 6 * nonzero_count(lengths)
+                + m1_canonical_nonzero_index_sum(lengths, old(meta).symbols as nat) + 1564
+        },
+        r.0 == Err(WorkspaceError::InvalidCodeLength) ==> {
+            let lengths = builder_length_sequence(old(workspace)@, window_bytes, old(meta).symbols);
+            let visits = r.1@;
+            let index = (visits - 1) as nat;
+            &&& 1 <= visits <= old(meta).symbols
+            &&& ((visits == old(meta).symbols
+                && (forall|i: int| 0 <= i < old(meta).symbols ==> lengths[i] <= 15)
+                && used_space(lengths) <= 32768
+                && (used_space(lengths) != 32768 || nonzero_count(lengths) < 2))
+                || ((forall|i: int| 0 <= i < index ==> lengths[i] <= 15)
+                    && used_space(lengths.take(index as int)) <= 32768
+                    && (lengths[index as int] > 15
+                        || used_space(lengths.take(index as int)) + code_weight(lengths[index as int]) > 32768)))
+        },
+        r.0.is_err() && r.0 != Err(WorkspaceError::InvalidCodeLength) ==> r.1@ == 0,
+
         window_bytes <= 16_777_216
             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && (tree as nat) >= tree_region_count(region) ==> {
-                &&& r == Err(WorkspaceError::InvalidTree)
+                &&& r.0 == Err(WorkspaceError::InvalidTree)
                 &&& final(workspace)@ == old(workspace)@
                 &&& *final(meta) == *old(meta)
             },
@@ -4921,9 +5196,9 @@ pub(crate) fn install_builder_canonical_tree(
             && old(meta).symbols as nat <= tree_region_symbols(region)
             && lengths_initialized == old(meta).symbols ==> {
             let lengths = builder_length_sequence(old(workspace)@, window_bytes, old(meta).symbols);
-            &&& r.is_ok() == valid_builder_lengths(lengths)
+            &&& r.0.is_ok() == valid_builder_lengths(lengths)
             &&& (!valid_builder_lengths(lengths) ==> {
-                &&& r == Err(WorkspaceError::InvalidCodeLength)
+                &&& r.0 == Err(WorkspaceError::InvalidCodeLength)
                 &&& final(workspace)@ == old(workspace)@
                 &&& *final(meta) == *old(meta)
             })
@@ -4938,7 +5213,7 @@ pub(crate) fn install_builder_canonical_tree(
         ),
         (tree as nat) >= tree_region_count(region)
             ==> final(workspace)@ == old(workspace)@,
-        r.is_ok() ==> {
+        r.0.is_ok() ==> {
             let lengths = builder_length_sequence(
                 old(workspace)@,
                 window_bytes,
@@ -4970,33 +5245,45 @@ pub(crate) fn install_builder_canonical_tree(
             )
         },
 {
+    let ghost mut source_validation_reads: nat = 0;
+    let ghost mut source_count_reads: nat = 0;
+    let ghost mut source_count_writes: nat = 0;
+    let ghost mut source_chain_initialization_writes: nat = 0;
+    let ghost mut source_chain_reads: nat = 0;
+    let ghost mut source_chain_writes: nat = 0;
+    let ghost mut source_next_reads: nat = 0;
+    let ghost mut source_next_writes: nat = 0;
+    let ghost mut source_record_reads: nat = 0;
+    let ghost mut source_record_writes: nat = 0;
+
     proof { canonical_code_space_value(); }
     if window_bytes > 16_777_216 {
-        return Err(WorkspaceError::InvalidWindowBits);
+        return (Err(WorkspaceError::InvalidWindowBits), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
     }
     let required = match (window_bytes as usize).checked_add(FIXED_SCRATCH_BYTES as usize) {
         Some(value) => value,
-        None => return Err(WorkspaceError::WorkspaceTooSmall),
+        None => return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
     };
     if workspace.len() < required {
-        return Err(WorkspaceError::WorkspaceTooSmall);
+        return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
     }
     proof {
         assert(required as nat == window_bytes as nat + FIXED_SCRATCH_BYTES as nat);
         assert(workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat);
     }
     if tree >= tree_region_count_exec(region) {
-        return Err(WorkspaceError::InvalidTree);
+        proof { assert(source_validation_reads == 0); }
+        return (Err(WorkspaceError::InvalidTree), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
     }
     let symbols = meta.symbols;
     let initialized = match meta.storage {
         TreeStorageState::Canonical { initialized } => initialized,
-        _ => return Err(WorkspaceError::UninitializedRecord),
+        _ => return (Err(WorkspaceError::UninitializedRecord), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
     };
     if initialized != 0 || symbols == 0 || lengths_initialized != symbols
         || symbols > BUILDER_CODE_LENGTHS
     {
-        return Err(WorkspaceError::InvalidSymbol);
+        return (Err(WorkspaceError::InvalidSymbol), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
     }
 
     let ghost original_workspace = workspace@;
@@ -5013,6 +5300,9 @@ pub(crate) fn install_builder_canonical_tree(
     while symbol < symbols
         invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
@@ -5022,6 +5312,16 @@ pub(crate) fn install_builder_canonical_tree(
             symbols == meta.symbols,
             meta.storage == (TreeStorageState::Canonical { initialized: 0 }),
             symbol <= symbols <= BUILDER_CODE_LENGTHS,
+            source_validation_reads == symbol as nat,
+            source_count_reads == 0,
+            source_count_writes == 0,
+            source_chain_initialization_writes == 0,
+            source_chain_reads == 0,
+            source_chain_writes == 0,
+            source_next_reads == 0,
+            source_next_writes == 0,
+            source_record_reads == 0,
+            source_record_writes == 0,
             lengths.len() == symbols,
             lengths =~= builder_length_sequence(original_workspace, window_bytes, symbols),
             space as nat + used == CODE_SPACE,
@@ -5031,16 +5331,18 @@ pub(crate) fn install_builder_canonical_tree(
             forall|i: int| 0 <= i < symbol ==> lengths[i] <= MAX_BITS,
         decreases symbols - symbol,
     {
-        let length = match read_builder_code_length(
+        let length = match { let (r_child_result, Ghost(r_child_units)) = read_builder_code_length(
             workspace,
             window_bytes,
             lengths_initialized,
             symbol,
-        ) {
+        ); proof { source_validation_reads = source_validation_reads + r_child_units; } r_child_result } {
             Ok(value) => value,
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
         };
         proof {
+
+            assert(source_validation_reads == symbol as nat + 1);
             builder_length_sequence_index(
                 original_workspace,
                 window_bytes,
@@ -5074,18 +5376,19 @@ pub(crate) fn install_builder_canonical_tree(
             nonzero_step(lengths, symbol as int);
         }
         if length > MAX_BITS {
-            proof { reveal(valid_builder_lengths); assert(!valid_builder_lengths(lengths)); }
-            return Err(WorkspaceError::InvalidCodeLength);
+            proof { assert(source_validation_reads == symbol as nat + 1); reveal(valid_builder_lengths); assert(!valid_builder_lengths(lengths)); }
+            return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
         }
         if length != 0 {
             let amount = weight(length);
             if amount > space {
                 proof {
+                    assert(source_validation_reads == symbol as nat + 1);
                     builder_space_prefix_le(lengths, symbol as int + 1);
                     reveal(valid_builder_lengths);
                     assert(!valid_builder_lengths(lengths));
                 }
-                return Err(WorkspaceError::InvalidCodeLength);
+                return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
             }
             space = space - amount;
             nonzero = nonzero + 1;
@@ -5097,8 +5400,8 @@ pub(crate) fn install_builder_canonical_tree(
         assert(lengths.take(symbol as int) =~= lengths);
     }
     if nonzero < 2 || space != 0 {
-        proof { reveal(valid_builder_lengths); assert(!valid_builder_lengths(lengths)); }
-        return Err(WorkspaceError::InvalidCodeLength);
+        proof { assert(source_validation_reads == symbols as nat); reveal(valid_builder_lengths); assert(!valid_builder_lengths(lengths)); }
+        return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
     }
     proof {
         assert(valid_builder_lengths(lengths));
@@ -5113,15 +5416,21 @@ pub(crate) fn install_builder_canonical_tree(
         ));
     }
 
+    proof { assert(source_validation_reads == symbols as nat); }
     let mut count_initialized: u16 = 0;
     while count_initialized < BUILDER_COUNTS
         invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
             count_initialized <= BUILDER_COUNTS,
+            source_count_reads == count_initialized as nat * symbols as nat,
+            source_count_writes == 2 * count_initialized as nat,
             symbols <= BUILDER_CODE_LENGTHS,
             window_bytes <= 16_777_216,
             workspace@.len() == original_workspace.len(),
@@ -5159,11 +5468,16 @@ pub(crate) fn install_builder_canonical_tree(
         while scan < symbols
             invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
                 scan <= symbols <= BUILDER_CODE_LENGTHS,
+                source_count_reads == count_initialized as nat * symbols as nat + scan as nat,
+                source_count_writes == 2 * count_initialized as nat,
                 count <= scan,
                 count as nat == count_length(
                     lengths.take(scan as int),
@@ -5207,16 +5521,17 @@ pub(crate) fn install_builder_canonical_tree(
         {
             let ghost old_scan = scan;
             let ghost old_count = count;
-            let value = match read_builder_code_length(
+            let value = match { let (r_child_result, Ghost(r_child_units)) = read_builder_code_length(
                 workspace,
                 window_bytes,
                 lengths_initialized,
                 scan,
-            ) {
+            ); proof { source_count_reads = source_count_reads + r_child_units; } r_child_result } {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
             };
             proof {
+
                 builder_length_matches_snapshot(
                     workspace@,
                     original_workspace,
@@ -5249,16 +5564,20 @@ pub(crate) fn install_builder_canonical_tree(
         }
         let ghost before_count_write = workspace@;
         let ghost old_count_initialized = count_initialized;
-        count_initialized = match write_next_builder_count(
+        count_initialized = match { let (r_child_result, Ghost(r_child_units)) = write_next_builder_count(
             workspace,
             window_bytes,
             count_initialized,
             count,
-        ) {
+        ); proof { source_count_writes = source_count_writes + r_child_units; } r_child_result } {
             Ok(value) => value,
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
         };
         proof {
+
+            assert(source_count_reads == count_initialized as nat * symbols as nat) by (nonlinear_arith)
+                requires source_count_reads == old_count_initialized as nat * symbols as nat + symbols as nat,
+                    count_initialized == old_count_initialized + 1;
             assert(count_initialized == old_count_initialized + 1);
             assert(builder_counts_prefix(
                 before_count_write,
@@ -5292,16 +5611,21 @@ pub(crate) fn install_builder_canonical_tree(
             BUILDER_COUNTS as nat,
         ));
     }
+    proof { assert(source_count_reads == 16 * symbols as nat && source_count_writes == 32); }
     let mut chain_initialized: u16 = 0;
     while chain_initialized < BUILDER_SYMBOL_CHAIN_ENTRIES
         invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             count_initialized == BUILDER_COUNTS,
             valid_builder_lengths(lengths),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
             chain_initialized <= BUILDER_SYMBOL_CHAIN_ENTRIES,
+            source_chain_initialization_writes == 2 * chain_initialized as nat,
             symbols <= BUILDER_CODE_LENGTHS,
             window_bytes <= 16_777_216,
             workspace@.len() == original_workspace.len(),
@@ -5330,28 +5654,44 @@ pub(crate) fn install_builder_canonical_tree(
             meta.storage == (TreeStorageState::Canonical { initialized: 0 }),
         decreases BUILDER_SYMBOL_CHAIN_ENTRIES - chain_initialized,
     {
-        chain_initialized = match write_next_builder_symbol_chain(
+        chain_initialized = match { let (r_child_result, Ghost(r_child_units)) = write_next_builder_symbol_chain(
             workspace,
             window_bytes,
             chain_initialized,
             u16::MAX,
-        ) {
+        ); proof { source_chain_initialization_writes = source_chain_initialization_writes + r_child_units; } r_child_result } {
             Ok(value) => value,
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
         };
+        proof {  }
     }
 
+    proof {
+        assert(source_chain_initialization_writes == 1440);
+        reveal(valid_builder_lengths);
+        m1_canonical_lengths_below_endpoints(lengths);
+        assert(lengths.take(0) =~= Seq::<u8>::empty());
+        assert(count_length(Seq::<u8>::empty(), 1) == 0) by { reveal(count_length); }
+    }
     let mut chain_length: u16 = 1;
     while chain_length <= MAX_BITS as u16
         invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
             count_initialized == BUILDER_COUNTS,
             valid_builder_lengths(lengths),
+            lengths.len() == symbols,
+            lengths =~= builder_length_sequence(original_workspace, window_bytes, symbols),
+            full_lengths =~= builder_length_sequence(original_workspace, window_bytes, BUILDER_CODE_LENGTHS),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
             1 <= chain_length <= MAX_BITS as u16 + 1,
+            source_chain_reads == (chain_length as nat - 1) * symbols as nat,
+            source_chain_writes == 2 * m1_canonical_lengths_below(lengths, chain_length as nat),
             symbols <= BUILDER_CODE_LENGTHS,
             window_bytes <= 16_777_216,
             workspace@.len() == original_workspace.len(),
@@ -5385,13 +5725,22 @@ pub(crate) fn install_builder_canonical_tree(
         while scan < symbols
             invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
             count_initialized == BUILDER_COUNTS,
             valid_builder_lengths(lengths),
+            lengths.len() == symbols,
+            lengths =~= builder_length_sequence(original_workspace, window_bytes, symbols),
+            full_lengths =~= builder_length_sequence(original_workspace, window_bytes, BUILDER_CODE_LENGTHS),
             original_workspace == old(workspace)@,
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
                 scan <= symbols <= BUILDER_CODE_LENGTHS,
+                source_chain_reads == (chain_length as nat - 1) * symbols as nat + scan as nat,
+                source_chain_writes == 2 * (m1_canonical_lengths_below(lengths, chain_length as nat)
+                    + count_length(lengths.take(scan as int), chain_length as u8)),
                 1 <= chain_length <= MAX_BITS as u16,
                 previous < BUILDER_SYMBOL_CHAIN_ENTRIES,
                 window_bytes <= 16_777_216,
@@ -5421,45 +5770,65 @@ pub(crate) fn install_builder_canonical_tree(
                 meta.storage == (TreeStorageState::Canonical { initialized: 0 }),
             decreases symbols - scan,
         {
-            let value = match read_builder_code_length(
+            let value = match { let (r_child_result, Ghost(r_child_units)) = read_builder_code_length(
                 workspace,
                 window_bytes,
                 lengths_initialized,
                 scan,
-            ) {
+            ); proof { source_chain_reads = source_chain_reads + r_child_units; } r_child_result } {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
             };
+            proof {
+
+                builder_length_matches_snapshot(workspace@, original_workspace, window_bytes, symbols, scan);
+                assert(value == lengths[scan as int]);
+                count_step(lengths, scan as int, chain_length as u8);
+            }
             if value as u16 == chain_length {
-                match write_builder_symbol_chain_at(
+                match { let (r_child_result, Ghost(r_child_units)) = write_builder_symbol_chain_at(
                     workspace,
                     window_bytes,
                     chain_initialized,
                     previous,
                     scan,
-                ) {
+                ); proof { source_chain_writes = source_chain_writes + r_child_units; } r_child_result } {
                     Ok(()) => {}
-                    Err(error) => return Err(error),
+                    Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
                 }
+                proof {  }
                 previous = BUILDER_COUNTS + scan;
             }
             scan = scan + 1;
         }
+        proof {
+            assert(lengths.take(scan as int) =~= lengths);
+            m1_canonical_lengths_below_step(lengths, chain_length as u8);
+            assert(source_chain_reads == chain_length as nat * symbols as nat) by (nonlinear_arith)
+                requires source_chain_reads == (chain_length as nat - 1) * symbols as nat + symbols as nat,
+                    1 <= chain_length;
+        }
         chain_length = chain_length + 1;
     }
 
+    proof {
+        m1_canonical_lengths_below_endpoints(lengths);
+        assert(source_chain_reads == 15 * symbols as nat);
+        assert(source_chain_writes == 2 * nonzero_count(lengths));
+    }
     let mut next_initialized: u16 = 0;
     let ghost before_first_next = workspace@;
-    next_initialized = match write_next_builder_next_code(
+    next_initialized = match { let (r_child_result, Ghost(r_child_units)) = write_next_builder_next_code(
         workspace,
         window_bytes,
         next_initialized,
         0,
-    ) {
+    ); proof { source_next_writes = source_next_writes + r_child_units; } r_child_result } {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
     };
     proof {
+
         reveal(first_code);
         builder_next_prefix_after_write(
             before_first_next,
@@ -5475,6 +5844,9 @@ pub(crate) fn install_builder_canonical_tree(
     while next_initialized < BUILDER_NEXT_CODES
         invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
             count_initialized == BUILDER_COUNTS,
             valid_builder_lengths(lengths),
@@ -5482,6 +5854,8 @@ pub(crate) fn install_builder_canonical_tree(
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
             1 <= next_initialized <= BUILDER_NEXT_CODES,
+            source_next_reads == if next_initialized <= 2 { 0nat } else { 2 * ((next_initialized as nat - 2) as nat) },
+            source_next_writes == 4 * next_initialized as nat,
             code <= u32::MAX as u64,
             code <= CODE_SPACE as u64,
             code <= 32_768u64,
@@ -5524,16 +5898,17 @@ pub(crate) fn install_builder_canonical_tree(
     {
         let ghost old_next_initialized = next_initialized;
         if next_initialized > 1 {
-            let previous_count = match read_builder_count(
+            let previous_count = match { let (r_child_result, Ghost(r_child_units)) = read_builder_count(
                 workspace,
                 window_bytes,
                 count_initialized,
                 next_initialized - 1,
-            ) {
+            ); proof { source_next_reads = source_next_reads + r_child_units; } r_child_result } {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
             };
             proof {
+
                 builder_count_matches_snapshot(
                     workspace@,
                     count_snapshot,
@@ -5566,7 +5941,7 @@ pub(crate) fn install_builder_canonical_tree(
                 assert(expanded <= 196_606u64);
             }
             if expanded > u32::MAX as u64 {
-                return Err(WorkspaceError::InvalidCodeLength);
+                return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
             }
             code = expanded;
             proof {
@@ -5587,16 +5962,17 @@ pub(crate) fn install_builder_canonical_tree(
             }
         }
         let ghost before_next_write = workspace@;
-        next_initialized = match write_next_builder_next_code(
+        next_initialized = match { let (r_child_result, Ghost(r_child_units)) = write_next_builder_next_code(
             workspace,
             window_bytes,
             next_initialized,
             code as u32,
-        ) {
+        ); proof { source_next_writes = source_next_writes + r_child_units; } r_child_result } {
             Ok(value) => value,
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
         };
         proof {
+
             assert(next_initialized == old_next_initialized + 1);
             builder_next_prefix_after_write(
                 before_next_write,
@@ -5619,10 +5995,14 @@ pub(crate) fn install_builder_canonical_tree(
             BUILDER_NEXT_CODES as nat,
         ));
     }
+    proof { assert(source_next_reads == 28 && source_next_writes == 64); }
     symbol = 0;
     while symbol < symbols
         invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             next_initialized == BUILDER_NEXT_CODES,
             chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
             count_initialized == BUILDER_COUNTS,
@@ -5631,6 +6011,9 @@ pub(crate) fn install_builder_canonical_tree(
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
             symbol <= symbols <= BUILDER_CODE_LENGTHS,
+            source_record_reads == symbol as nat + 4 * nonzero_count(lengths.take(symbol as int))
+                + m1_canonical_nonzero_index_sum(lengths, symbol as nat),
+            source_record_writes == 3 * symbol as nat,
             window_bytes <= 16_777_216,
             workspace@.len() == original_workspace.len(),
             original_workspace.len()
@@ -5674,16 +6057,17 @@ pub(crate) fn install_builder_canonical_tree(
             meta.storage == (TreeStorageState::Canonical { initialized: symbol }),
         decreases symbols - symbol,
     {
-        let length = match read_builder_code_length(
+        let length = match { let (r_child_result, Ghost(r_child_units)) = read_builder_code_length(
             workspace,
             window_bytes,
             lengths_initialized,
             symbol,
-        ) {
+        ); proof { source_record_reads = source_record_reads + r_child_units; } r_child_result } {
             Ok(value) => value,
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
         };
         proof {
+
             builder_length_matches_snapshot(
                 workspace@,
                 original_workspace,
@@ -5695,20 +6079,24 @@ pub(crate) fn install_builder_canonical_tree(
         }
         let mut record = TreeRecord { length, code: 0 };
         if length != 0 {
-            let base = match read_builder_next_code(
+            let base = match { let (r_child_result, Ghost(r_child_units)) = read_builder_next_code(
                 workspace,
                 window_bytes,
                 next_initialized,
                 length as u16,
-            ) {
+            ); proof { source_record_reads = source_record_reads + r_child_units; } r_child_result } {
                 Ok(value) => value,
-                Err(error) => return Err(error),
+                Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
             };
+            proof {  }
             let mut scan: u16 = 0;
             let mut rank: u16 = 0;
             while scan < symbol
                 invariant
             CODE_SPACE == 32_768u32,
+            window_bytes <= 16_777_216,
+            lengths_initialized == symbols,
+            1 <= symbols <= BUILDER_CODE_LENGTHS,
             next_initialized == BUILDER_NEXT_CODES,
             chain_initialized == BUILDER_SYMBOL_CHAIN_ENTRIES,
             count_initialized == BUILDER_COUNTS,
@@ -5717,6 +6105,8 @@ pub(crate) fn install_builder_canonical_tree(
             symbols == old(meta).symbols,
             (tree as nat) < tree_region_count(region),
                     scan <= symbol < symbols <= BUILDER_CODE_LENGTHS,
+                    source_record_reads == symbol as nat + 4 * nonzero_count(lengths.take(symbol as int))
+                        + m1_canonical_nonzero_index_sum(lengths, symbol as nat) + 5 + scan as nat,
                     rank <= scan,
                     rank as nat == count_length(
                         lengths.take(scan as int),
@@ -5751,16 +6141,17 @@ pub(crate) fn install_builder_canonical_tree(
             {
                 let ghost old_scan = scan;
                 let ghost old_rank = rank;
-                let value = match read_builder_code_length(
+                let value = match { let (r_child_result, Ghost(r_child_units)) = read_builder_code_length(
                     workspace,
                     window_bytes,
                     lengths_initialized,
                     scan,
-                ) {
+                ); proof { source_record_reads = source_record_reads + r_child_units; } r_child_result } {
                     Ok(value) => value,
-                    Err(error) => return Err(error),
+                    Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
                 };
                 proof {
+
                     builder_length_matches_snapshot(
                         workspace@,
                         original_workspace,
@@ -5808,7 +6199,7 @@ pub(crate) fn install_builder_canonical_tree(
                 assert(combined <= 33_472u64);
             }
             if combined > u16::MAX as u64 {
-                return Err(WorkspaceError::InvalidCodeLength);
+                return (Err(WorkspaceError::InvalidCodeLength), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes));
             }
             record.code = combined as u16;
             proof {
@@ -5819,8 +6210,12 @@ pub(crate) fn install_builder_canonical_tree(
                 assert(record.code == 0);
             }
         }
+        proof {
+            nonzero_step(lengths, symbol as int);
+            reveal(m1_canonical_nonzero_index_sum);
+        }
         let ghost before_tree_write = workspace@;
-        match write_next_tree_record(workspace, window_bytes, region, tree, meta, record) {
+        match { let (r_child_result, Ghost(r_child_units)) = write_next_tree_record(workspace, window_bytes, region, tree, meta, record); proof { source_record_writes = source_record_writes + r_child_units; } r_child_result } {
             Ok(()) => {
                 proof {
                     assert(builder_length_sequence(
@@ -5844,7 +6239,7 @@ pub(crate) fn install_builder_canonical_tree(
                     );
                 }
             }
-            Err(error) => return Err(error),
+            Err(error) => return (Err(error), Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes)),
         }
         proof {
             assert(builder_length_sequence(
@@ -5855,9 +6250,23 @@ pub(crate) fn install_builder_canonical_tree(
             assert(builder_next_code_byte_sequence(workspace@, window_bytes)
                 == builder_next_code_byte_sequence(next_snapshot, window_bytes));
         }
+        proof {  }
         symbol = symbol + 1;
     }
-    Ok(())
+    proof {
+        assert(lengths.take(symbol as int) =~= lengths);
+        assert(source_record_reads == symbols as nat + 4 * nonzero_count(lengths)
+            + m1_canonical_nonzero_index_sum(lengths, symbols as nat));
+        let source_units = source_validation_reads + source_count_reads + source_count_writes
+            + source_chain_initialization_writes + source_chain_reads + source_chain_writes
+            + source_next_reads + source_next_writes + source_record_reads + source_record_writes;
+        assert(source_units == 36 * symbols as nat + 6 * nonzero_count(lengths)
+            + m1_canonical_nonzero_index_sum(lengths, symbols as nat) + 1564);
+    }
+    let ordinary_result = {
+        Ok(())
+    };
+    (ordinary_result, Ghost(source_validation_reads + source_count_reads + source_count_writes + source_chain_initialization_writes + source_chain_reads + source_chain_writes + source_next_reads + source_next_writes + source_record_reads + source_record_writes))
 }
 
 pub(crate) fn write_next_temp_context_tree_record(
@@ -5865,9 +6274,11 @@ pub(crate) fn write_next_temp_context_tree_record(
     window_bytes: u32,
     meta: &mut TreeMetadata,
     record: TreeRecord,
-) -> (r: Result<(), WorkspaceError>)
+) -> (r: (Result<(), WorkspaceError>, Ghost<nat>))
     requires old(meta).valid_for(TreeRegion::TemporaryContext),
     ensures
+        r.1@ == if r.0.is_ok() { 3nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && old(workspace)@.len()
                 >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
@@ -5876,8 +6287,8 @@ pub(crate) fn write_next_temp_context_tree_record(
                 TreeStorageState::Canonical { initialized } => initialized < old(meta).symbols,
                 _ => false,
             }
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
             &&& final(meta).valid_for(TreeRegion::TemporaryContext)
             &&& final(meta).symbols == old(meta).symbols
             &&& match old(meta).storage {
@@ -5902,7 +6313,7 @@ pub(crate) fn write_next_temp_context_tree_record(
                 _ => false,
             }
         },
-        r.is_err() ==> {
+        r.0.is_err() ==> {
             &&& final(workspace)@ == old(workspace)@
             &&& *final(meta) == *old(meta)
         },
@@ -5922,9 +6333,11 @@ pub(crate) fn read_temp_context_tree_record(
     window_bytes: u32,
     meta: &TreeMetadata,
     symbol: u16,
-) -> (r: Result<TreeRecord, WorkspaceError>)
+) -> (r: (Result<TreeRecord, WorkspaceError>, Ghost<nat>))
     requires meta.valid_for(TreeRegion::TemporaryContext),
     ensures
+        r.1@ == if r.0.is_ok() && matches!(meta.storage, TreeStorageState::Canonical { .. }) { 1nat } else { 0nat },
+
         window_bytes <= 16_777_216
             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
             && symbol < meta.symbols
@@ -5933,13 +6346,13 @@ pub(crate) fn read_temp_context_tree_record(
                 TreeStorageState::Canonical { initialized } => symbol < initialized,
                 TreeStorageState::Unused => false,
             }
-            ==> r.is_ok(),
-        r.is_ok() ==> {
+            ==> r.0.is_ok(),
+        r.0.is_ok() ==> {
         &&& symbol < meta.symbols
         &&& match meta.storage {
             TreeStorageState::Single { symbol: only } => {
                 &&& symbol == only
-                &&& r.unwrap() == TreeRecord { length: 0, code: 0 }
+                &&& r.0.unwrap() == TreeRecord { length: 0, code: 0 }
             },
             TreeStorageState::Canonical { initialized } => {
                 let at = tree_record_at(
@@ -5950,8 +6363,8 @@ pub(crate) fn read_temp_context_tree_record(
                 );
                 &&& symbol < initialized
                 &&& at + 3 <= workspace@.len()
-                &&& r.unwrap().length == workspace@[at as int]
-                &&& r.unwrap().code as nat == workspace@[at as int + 1] as nat
+                &&& r.0.unwrap().length == workspace@[at as int]
+                &&& r.0.unwrap().code as nat == workspace@[at as int + 1] as nat
                     + 256 * workspace@[at as int + 2] as nat
             },
             TreeStorageState::Unused => false,
@@ -6022,17 +6435,17 @@ mod tests {
 
     #[test]
     fn block_length_ranges_match_rfc_table() {
-        assert_eq!(decode_block_length(0, 0), Ok(1));
-        assert_eq!(decode_block_length(0, 3), Ok(4));
-        assert_eq!(decode_block_length(24, 8191), Ok(16_624));
-        assert_eq!(decode_block_length(25, 0), Ok(16_625));
-        assert_eq!(decode_block_length(25, (1 << 24) - 1), Ok(16_793_840));
+        assert_eq!(decode_block_length(0, 0).0, Ok(1));
+        assert_eq!(decode_block_length(0, 3).0, Ok(4));
+        assert_eq!(decode_block_length(24, 8191).0, Ok(16_624));
+        assert_eq!(decode_block_length(25, 0).0, Ok(16_625));
+        assert_eq!(decode_block_length(25, (1 << 24) - 1).0, Ok(16_793_840));
         assert_eq!(
-            decode_block_length(26, 0),
+            decode_block_length(26, 0).0,
             Err(PrefixError::InvalidBlockLengthSymbol)
         );
         assert_eq!(
-            decode_block_length(0, 4),
+            decode_block_length(0, 4).0,
             Err(PrefixError::InvalidBlockLengthSuffix)
         );
     }
@@ -6090,11 +6503,11 @@ mod tests {
         let base = window as usize;
 
         assert_eq!(
-            read_builder_code_length(&workspace, window, 0, 0),
+            read_builder_code_length(&workspace, window, 0, 0).0,
             Err(WorkspaceError::UninitializedRecord)
         );
         assert_eq!(
-            write_next_builder_code_length(&mut workspace, window, BUILDER_CODE_LENGTHS - 1, 15,),
+            write_next_builder_code_length(&mut workspace, window, BUILDER_CODE_LENGTHS - 1, 15,).0,
             Ok(BUILDER_CODE_LENGTHS)
         );
         assert_eq!(
@@ -6103,17 +6516,17 @@ mod tests {
                 window,
                 BUILDER_CODE_LENGTHS,
                 BUILDER_CODE_LENGTHS - 1,
-            ),
+            ).0,
             Ok(15)
         );
         assert_eq!(workspace[base + BUILDER_COUNTS_OFFSET as usize], 0xa5);
 
         assert_eq!(
-            write_next_builder_count(&mut workspace, window, BUILDER_COUNTS - 1, 0x1234),
+            write_next_builder_count(&mut workspace, window, BUILDER_COUNTS - 1, 0x1234).0,
             Ok(BUILDER_COUNTS)
         );
         assert_eq!(
-            read_builder_count(&workspace, window, BUILDER_COUNTS, BUILDER_COUNTS - 1,),
+            read_builder_count(&workspace, window, BUILDER_COUNTS, BUILDER_COUNTS - 1,).0,
             Ok(0x1234)
         );
         assert_eq!(workspace[base + BUILDER_NEXT_CODES_OFFSET as usize], 0xa5);
@@ -6124,7 +6537,7 @@ mod tests {
                 window,
                 BUILDER_NEXT_CODES - 1,
                 0x89ab_cdef,
-            ),
+            ).0,
             Ok(BUILDER_NEXT_CODES)
         );
         assert_eq!(
@@ -6133,7 +6546,7 @@ mod tests {
                 window,
                 BUILDER_NEXT_CODES,
                 BUILDER_NEXT_CODES - 1,
-            ),
+            ).0,
             Ok(0x89ab_cdef)
         );
         assert_eq!(workspace[base + BUILDER_SYMBOL_CHAIN_OFFSET as usize], 0xa5);
@@ -6144,7 +6557,7 @@ mod tests {
                 window,
                 BUILDER_SYMBOL_CHAIN_ENTRIES - 1,
                 0xbeef,
-            ),
+            ).0,
             Ok(BUILDER_SYMBOL_CHAIN_ENTRIES)
         );
         assert_eq!(
@@ -6173,11 +6586,11 @@ mod tests {
                     length: 15,
                     code: 0x4321,
                 },
-            ),
+            ).0,
             Ok(())
         );
         assert_eq!(
-            read_temp_context_tree_record(&workspace, window, &temp_meta, TEMP_CONTEXT_SYMBOLS - 1,),
+            read_temp_context_tree_record(&workspace, window, &temp_meta, TEMP_CONTEXT_SYMBOLS - 1,).0,
             Ok(TreeRecord {
                 length: 15,
                 code: 0x4321,
@@ -6194,16 +6607,16 @@ mod tests {
         let before = workspace.clone();
 
         assert_eq!(
-            write_next_builder_code_length(&mut workspace, window, BUILDER_CODE_LENGTHS, 1,),
+            write_next_builder_code_length(&mut workspace, window, BUILDER_CODE_LENGTHS, 1,).0,
             Err(WorkspaceError::InvalidSymbol)
         );
         assert_eq!(workspace, before);
         assert_eq!(
-            read_builder_count(&workspace, window, 0, 0),
+            read_builder_count(&workspace, window, 0, 0).0,
             Err(WorkspaceError::UninitializedRecord)
         );
         assert_eq!(
-            read_builder_next_code(&workspace, window, BUILDER_NEXT_CODES + 1, 0),
+            read_builder_next_code(&workspace, window, BUILDER_NEXT_CODES + 1, 0).0,
             Err(WorkspaceError::InvalidSymbol)
         );
         assert_eq!(
@@ -6225,7 +6638,7 @@ mod tests {
         let mut meta = TreeMetadata::canonical(TreeRegion::Literal, 2).unwrap();
 
         assert_eq!(
-            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 0),
+            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 0).0,
             Err(WorkspaceError::UninitializedRecord)
         );
         write_next_tree_record(
@@ -6235,7 +6648,7 @@ mod tests {
             0,
             &mut meta,
             TreeRecord { length: 1, code: 0 },
-        )
+        ).0
         .unwrap();
         write_next_tree_record(
             &mut workspace,
@@ -6244,22 +6657,22 @@ mod tests {
             0,
             &mut meta,
             TreeRecord { length: 1, code: 1 },
-        )
+        ).0
         .unwrap();
         assert_eq!(
-            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 0),
+            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 0).0,
             Ok(TreeRecord { length: 1, code: 0 })
         );
         assert_eq!(
-            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 1),
+            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &meta, 1).0,
             Ok(TreeRecord { length: 1, code: 1 })
         );
         assert_eq!(workspace[window as usize + 6], 0xa5);
 
         let single = TreeMetadata::single(TreeRegion::Literal, 256, 19).unwrap();
-        let first = read_tree_record(&workspace, window, TreeRegion::Literal, 1, &single, 19);
+        let first = read_tree_record(&workspace, window, TreeRegion::Literal, 1, &single, 19).0;
         workspace.fill(0x5a);
-        let second = read_tree_record(&workspace, window, TreeRegion::Literal, 1, &single, 19);
+        let second = read_tree_record(&workspace, window, TreeRegion::Literal, 1, &single, 19).0;
         assert_eq!(first, Ok(TreeRecord { length: 0, code: 0 }));
         assert_eq!(first, second);
 
@@ -6273,7 +6686,7 @@ mod tests {
                 0,
                 &mut small_meta,
                 TreeRecord { length: 1, code: 0 },
-            ),
+            ).0,
             Err(WorkspaceError::WorkspaceTooSmall)
         );
     }
@@ -6293,11 +6706,11 @@ mod tests {
                 0,
                 &mut canonical,
                 TreeRecord { length: 0, code: 0 },
-            ),
+            ).0,
             Ok(())
         );
         assert_eq!(
-            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &canonical, 0,),
+            read_tree_record(&workspace, window, TreeRegion::Literal, 0, &canonical, 0,).0,
             Ok(TreeRecord { length: 0, code: 0 })
         );
         assert_eq!(
@@ -6321,7 +6734,7 @@ mod tests {
                     length: MAX_BITS + 1,
                     code: 0,
                 },
-            ),
+            ).0,
             Err(WorkspaceError::InvalidCodeLength)
         );
         assert_eq!(workspace, before);
@@ -6336,7 +6749,7 @@ mod tests {
         let mut initialized = 0u16;
         for length in [1u8, 1, 0, 0] {
             initialized =
-                write_next_builder_code_length(&mut workspace, window, initialized, length)
+                write_next_builder_code_length(&mut workspace, window, initialized, length).0
                     .unwrap();
         }
 
@@ -6352,7 +6765,7 @@ mod tests {
             TreeRegion::Literal,
             tree,
             &mut meta,
-        )
+        ).0
         .unwrap();
 
         assert_eq!(meta.storage, TreeStorageState::Canonical { initialized: 4 });
@@ -6373,7 +6786,7 @@ mod tests {
                     tree,
                     &meta,
                     symbol as u16,
-                ),
+                ).0,
                 Ok(expected),
             );
         }
@@ -6398,7 +6811,7 @@ mod tests {
                 initialized,
                 rank,
                 4,
-            )
+            ).0
             .unwrap();
         }
         let map_start = context_entry_offset(window, ContextMapKind::Distance, 0).unwrap();
@@ -6412,7 +6825,7 @@ mod tests {
             ranks.len() as u16,
             4,
             63,
-        )
+        ).0
         .unwrap();
         assert_eq!(before_map, ranks);
         assert_eq!(next_bound, 0);
@@ -6440,7 +6853,7 @@ mod tests {
                 initialized,
                 rank,
                 4,
-            )
+            ).0
             .unwrap();
         }
         let (second_bound, second_work) = inverse_mtf_context_map(
@@ -6450,7 +6863,7 @@ mod tests {
             second_ranks.len() as u16,
             4,
             next_bound,
-        )
+        ).0
         .unwrap();
         assert_eq!(second_bound, 0);
         assert_eq!(second_work, 4 + (2 * 3 + 6) + 6);
@@ -6460,4 +6873,14 @@ mod tests {
             assert_eq!(workspace[list_start + i], i as u8);
         }
     }
+    #[test]
+    fn r_receipt_marker_is_zero_sized_and_ordinary_result_is_retained() {
+        let pair = decode_block_length(0, 0);
+        assert_eq!(pair.0, Ok(1));
+        assert_eq!(core::mem::size_of_val(&pair.1), 0);
+        let invalid = decode_block_length(26, 0);
+        assert_eq!(invalid.0, Err(PrefixError::InvalidBlockLengthSymbol));
+        assert_eq!(core::mem::size_of_val(&invalid.1), 0);
+    }
+
 }

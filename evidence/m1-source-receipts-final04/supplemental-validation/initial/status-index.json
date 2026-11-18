@@ -1,0 +1,682 @@
+{
+  "normalized_pair": "Original600/SP/global1000/ME0/default seed and isolation; positive4/0 plus genuine literal computed-false negative accepted by unchanged1c983 gate.",
+  "roots": [
+    {
+      "original_root": "target/m1-r-planner-cap-concrete-rank-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-concrete-rank-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "classification": "clean selected-planner positive; not cap-control qualification",
+            "exit_code": 0,
+            "negative_runs": 0,
+            "positive_runs": 1,
+            "scope": "The true concrete arithmetic assertion and all original planner root/loop obligations verified. Startup bridge and cap-control qualification are outside this positive-only result."
+          },
+          "sha256": "54fa189a9ddd918c2b6e69d739526efbc0609bdacebd3c9e9f7a5ccfaa47f312"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-concrete-rank-diagnostic/negative-result.json",
+          "recorded_fields": {
+            "classification": "genuine compute-only arithmetic false observed; pinned diagnostic wording not recognized by unchanged strict classifier; qualification unresolved",
+            "exit_code": 1,
+            "negative_runs": 1,
+            "positive_runs": 1,
+            "strict_gate_accepted": false
+          },
+          "sha256": "294fe9495dedb6d30e20a984230f6606d60d0fe4d7c2dfe647b83a2232ff3a16"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-concrete-rank-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "classification": "clean selected-planner positive; not cap-control qualification",
+            "exit_code": 0,
+            "negative_runs": 0,
+            "positive_runs": 1,
+            "scope": "The true concrete arithmetic assertion and all original planner root/loop obligations verified. Startup bridge and cap-control qualification are outside this positive-only result."
+          },
+          "sha256": "54fa189a9ddd918c2b6e69d739526efbc0609bdacebd3c9e9f7a5ccfaa47f312"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-concrete-rank-diagnostic/prior-checked-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "b797ef0b23255f86045c37e833a76c6857d9b6d4754ab01886efcaf7bec1dbb0"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-const-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-const-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "status": "Authorized CONST-spelling diagnostic complete: instrumented positive still resource-fails; no cap mutant run"
+          },
+          "sha256": "79cc0a021cd4d4c06a9776ecb713d95390924c2ffc8747f961e07720ca326cec"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-derived-invariant-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-derived-invariant-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "classification": "proof_resource_failure, not semantic rejection",
+            "exit_code": 1,
+            "negative_runs": 0,
+            "status": "Positive resource failure; no negative"
+          },
+          "sha256": "125da55de88299403e7c0789c1b83bb1600b91007b585e7f7f33c78f36b5d7f6"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-derived-invariant-diagnostic/prior-no-variable-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "b797ef0b23255f86045c37e833a76c6857d9b6d4754ab01886efcaf7bec1dbb0"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-derived-invariant-static",
+      "records": [],
+      "supplement_classification": "STATIC PROPOSAL ONLY; UNQUALIFIED"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-duplicate-invariant-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-duplicate-invariant-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "negative_runs": 1,
+            "positive_runs": 1,
+            "status": "One actual positive passed, one couplednegative mixed semantic/resource; strict cap control remains unresolved"
+          },
+          "sha256": "61ecb4f9e737eccb746a2911ffbf1a7ce8e91070509042a8e327f9344b783344"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-duplicate-invariant-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "3ac16dece9c7dc04a1e50997d2f7a84a454aa26310fb0b92439c72021d7402e6"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-duplicate-invariant-diagnostic/prior-no-variable-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "b797ef0b23255f86045c37e833a76c6857d9b6d4754ab01886efcaf7bec1dbb0"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-effort-1000-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-effort-1000-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "negative_runs": 1,
+            "positive_runs": 1,
+            "status": "Actual test-effort1000 positive passed; sole coupled negative mixed semantic/resource; strict cap control remains unresolved",
+            "strict_gate_accepted": false
+          },
+          "sha256": "b99d4a3b80c87171456867982eb3381c234d9e7fe823c258c715f7496fc8cc8d"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-effort-1000-diagnostic/negative-result.json",
+          "recorded_fields": {
+            "classification": "mixed rank-assertion and proof-resource failure; unresolved and not accepted",
+            "exit_code": 1,
+            "negative_runs": 1,
+            "strict_gate_accepted": false
+          },
+          "sha256": "2678cf5b99ff925aac87e582ba3c162e3f3835b615ff01596dcd5727ea03517e"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-effort-1000-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "f178f81df4224d22a344f7019ac1a6194d65e09583fb75f828bb38e6a8d6cb34"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-effort-1000-diagnostic/prior-600-diagnostic-result.json",
+          "recorded_fields": {
+            "negative_runs": 1,
+            "positive_runs": 1,
+            "status": "One actual positive passed, one couplednegative mixed semantic/resource; strict cap control remains unresolved"
+          },
+          "sha256": "61ecb4f9e737eccb746a2911ffbf1a7ce8e91070509042a8e327f9344b783344"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-effort-1000-diagnostic/prior-600-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "3ac16dece9c7dc04a1e50997d2f7a84a454aa26310fb0b92439c72021d7402e6"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-equivalent-guard-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-equivalent-guard-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "classification": "positive proof-resource failure; unresolved and not accepted",
+            "exit_code": 1,
+            "negative_runs": 0,
+            "positive_runs": 1,
+            "strict_gate_accepted": false
+          },
+          "sha256": "0d4d7e2ee50595784899e1cc7e104d22a7405de86c8bc15288c5cbe44798cd46"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-equivalent-guard-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "classification": "positive proof-resource failure; unresolved and not accepted",
+            "exit_code": 1,
+            "negative_runs": 0,
+            "positive_runs": 1,
+            "strict_gate_accepted": false
+          },
+          "sha256": "0d4d7e2ee50595784899e1cc7e104d22a7405de86c8bc15288c5cbe44798cd46"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-equivalent-guard-diagnostic/prior-checked-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "3ac16dece9c7dc04a1e50997d2f7a84a454aa26310fb0b92439c72021d7402e6"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-hide-distinct-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-hide-distinct-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "classification": "syntax_or_lowering_tool_failure, not semantic rejection",
+            "exit_code": 1,
+            "negative_runs": 0,
+            "status": "Tool/header placement failure; no mathematical verification/negative"
+          },
+          "sha256": "9137af48bd498e3819629a39eb0946dd299134bb9517a0d6cb75bb80b045011d"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-hide-distinct-diagnostic/prior-duplicate-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "3ac16dece9c7dc04a1e50997d2f7a84a454aa26310fb0b92439c72021d7402e6"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-hide-distinct-prologue-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-hide-distinct-prologue-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "status": "Controlled prologue-opacity positive/negative and one authorized exact-source QI profile completed; cap control remains unresolved"
+          },
+          "sha256": "cfd2fd8da063f73651b6976734e2a996d282cd2ebbf8d4daef6bec22f98338df"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-hide-distinct-prologue-diagnostic/negative-result.json",
+          "recorded_fields": {
+            "classification": "mixed rank-assertion and proof-resource failure; not accepted",
+            "exit_code": 1,
+            "negative_runs": 1
+          },
+          "sha256": "8f2be69873061d5afe7aa66ff59cdef052c4d2d6ea9ba6d1819acb07607c3869"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-hide-distinct-prologue-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "be68b757d038a6340713c53b681775535a2a2f422b911cf89a673b83986ffb3d"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-hide-distinct-prologue-diagnostic/prior-duplicate-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "3ac16dece9c7dc04a1e50997d2f7a84a454aa26310fb0b92439c72021d7402e6"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-hide-distinct-prologue-diagnostic/profile-result.json",
+          "recorded_fields": {
+            "exit_code": 1
+          },
+          "sha256": "bdd48f0674b90424bcc2bae7687450954308c8449976f886a355f451d448a8d1"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-hide-valid-projections-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-hide-valid-projections-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "classification": "positive proof-resource failure; unresolved and not accepted",
+            "exit_code": 1,
+            "negative_runs": 0
+          },
+          "sha256": "bb54be8cfb62e27daa51632284060ba4abd58e1e552bf826e95def38a46b5a9a"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-hide-valid-projections-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "classification": "positive proof-resource failure; unresolved and not accepted",
+            "exit_code": 1,
+            "negative_runs": 0
+          },
+          "sha256": "bb54be8cfb62e27daa51632284060ba4abd58e1e552bf826e95def38a46b5a9a"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-hide-valid-projections-diagnostic/prior-checked-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "be68b757d038a6340713c53b681775535a2a2f422b911cf89a673b83986ffb3d"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-lazy-qi-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-lazy-qi-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "status": "Unresolved; stop"
+          },
+          "sha256": "8b9dff185ec30cb5647800f66df3e84a1744bc49ce5ddb698f0e5e4bcb1a437f"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-literal-assert-static",
+      "records": [],
+      "supplement_classification": "STATIC PROPOSAL ONLY; UNQUALIFIED"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-literal-guard-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-literal-guard-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "status": "Authorized literal-guard instrumentation diagnostic complete: positive resource failure; required cap case remains unresolved"
+          },
+          "sha256": "059476ad27644f7433517d8fb7410aa3ab6ffae5624d7d3f79bf2e5070b354b8"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-literal-rank-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-literal-rank-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "status": "Authorized one-positive/one-negative no-variable cap-rank diagnostic complete; strict cap control remains unresolved"
+          },
+          "sha256": "deed6183c61ccfd7b2bdc533f645f06387fa4044b3e74a0bbc48a43f03a2d34e"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-literal-rank-diagnostic/negative-result.json",
+          "recorded_fields": {
+            "classification": "mixed semantic rank-assertion failure and proof-resource failure; NOT strict gate accepted",
+            "exit_code": 1,
+            "negative_runs": 1
+          },
+          "sha256": "0a336ba1b6ee7dee7b66e7371720b409854cdf05e161f619a31ab5ed32205205"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-literal-rank-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "b797ef0b23255f86045c37e833a76c6857d9b6d4754ab01886efcaf7bec1dbb0"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-loop-merged-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-loop-merged-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "status": "Authorized merged-loop diagnostic ended with natural positive resource failure; no negative"
+          },
+          "sha256": "8e37a5b6fa126800b8e2364ebee72d6ef08f00e00a1ee76f74e55f0ad6fef6e8"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-loop-merged-diagnostic/prior-no-variable-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "b797ef0b23255f86045c37e833a76c6857d9b6d4754ab01886efcaf7bec1dbb0"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-main-loop-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-main-loop-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "classification": "proof_resource_failure, not semantic rejection",
+            "exit_code": 1,
+            "negative_runs": 0,
+            "status": "Authorized main-loop-only false positive resource-failed; no negative"
+          },
+          "sha256": "81aae5fec6847140457e7718eaf82bbfa4f735d5cc3494882f2a8bbae7fb9cdc"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-main-loop-diagnostic/prior-no-variable-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "b797ef0b23255f86045c37e833a76c6857d9b6d4754ab01886efcaf7bec1dbb0"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/coupled-diagnostic-result.json",
+          "recorded_fields": {
+            "status": "QUALIFIED exact normalized positive and one negative under unchanged strict1c98; minimal generator patch plus cap-only native semantic arm delivered to root"
+          },
+          "sha256": "21d791b361bdd9b51afac6024e80523d40cf3b9d3465cfb1d8550c5a0b467a61"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/negative-result.json",
+          "recorded_fields": {
+            "classification": "genuine literal computed-false rejection; qualifies under unchanged strict classifier",
+            "exit_code": 1,
+            "negative_runs": 1,
+            "positive_runs": 1,
+            "strict_gate_accepted": true
+          },
+          "sha256": "51854a393afc83699744a4872dfc1ce4a362e0c096b0ecaa9ddb571fbd9a07f0"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0,
+            "scope": "Actual full selected positive with exact Boolean-normalized true concrete rank predicate; not alone cap-control qualification."
+          },
+          "sha256": "2e7e4e26e7e60c5e4e0edd8945c277c02c527a0d9fb9016785ba20b3612b24ca"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/prior-raw-predicate-positive-result.json",
+          "recorded_fields": {
+            "classification": "clean selected-planner positive; not cap-control qualification",
+            "exit_code": 0,
+            "negative_runs": 0,
+            "positive_runs": 1,
+            "scope": "The true concrete arithmetic assertion and all original planner root/loop obligations verified. Startup bridge and cap-control qualification are outside this positive-only result."
+          },
+          "sha256": "54fa189a9ddd918c2b6e69d739526efbc0609bdacebd3c9e9f7a5ccfaa47f312"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/prior-wording-mismatch-negative-result.json",
+          "recorded_fields": {
+            "classification": "genuine compute-only arithmetic false observed; pinned diagnostic wording not recognized by unchanged strict classifier; qualification unresolved",
+            "exit_code": 1,
+            "negative_runs": 1,
+            "positive_runs": 1,
+            "strict_gate_accepted": false
+          },
+          "sha256": "294fe9495dedb6d30e20a984230f6606d60d0fe4d7c2dfe647b83a2232ff3a16"
+        }
+      ],
+      "supplement_classification": "QUALIFIED ISOLATED NORMALIZED PAIR; NOT FULL GATE"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-rank-summary-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-rank-summary-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "negative_runs": 0,
+            "positive_runs": 1,
+            "status": "UNRESOLVED - STOPPED ON POSITIVE RESOURCE FAILURE"
+          },
+          "sha256": "5dea0b1e4c105a56c609fb98d74d0145cd94da89856d4f233859bd9f3414336a"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-rank-summary-diagnostic/prior-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "3ac16dece9c7dc04a1e50997d2f7a84a454aa26310fb0b92439c72021d7402e6"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-scoped-rank-summaries-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-scoped-rank-summaries-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "classification": "positive proof-resource failure; scoped summaries unresolved and not accepted",
+            "exit_code": 1,
+            "negative_runs": 0,
+            "positive_runs": 1,
+            "strict_gate_accepted": false
+          },
+          "sha256": "677221ecf2de1fdd23c14b3f90d4f163be0179a78798120ed654272109c9d81c"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-scoped-rank-summaries-diagnostic/positive-result.json",
+          "recorded_fields": {
+            "classification": "positive proof-resource failure; scoped summaries unresolved and not accepted",
+            "exit_code": 1,
+            "negative_runs": 0,
+            "positive_runs": 1,
+            "strict_gate_accepted": false
+          },
+          "sha256": "677221ecf2de1fdd23c14b3f90d4f163be0179a78798120ed654272109c9d81c"
+        },
+        {
+          "original_path": "target/m1-r-planner-cap-scoped-rank-summaries-diagnostic/prior-checked-positive-result.json",
+          "recorded_fields": {
+            "exit_code": 0
+          },
+          "sha256": "3ac16dece9c7dc04a1e50997d2f7a84a454aa26310fb0b92439c72021d7402e6"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-planner-cap-seed7-diagnostic",
+      "records": [
+        {
+          "original_path": "target/m1-r-planner-cap-seed7-diagnostic/diagnostic-result.json",
+          "recorded_fields": {
+            "status": "Unresolved; stop"
+          },
+          "sha256": "ed978e2bffdec573885b14e4ca9577b033ca1af5ef0c50d3046b586b388e08db"
+        }
+      ],
+      "supplement_classification": "HISTORICAL VARIANT; UNQUALIFIED AS A CAP CONTROL"
+    },
+    {
+      "original_root": "target/m1-r-concrete-cap-rank-witness",
+      "records": [
+        {
+          "original_path": "target/m1-r-concrete-cap-rank-witness/witness-result.json",
+          "recorded_fields": {
+            "status": "CHECKED concrete admissible image, valid budget and reached startup-rank bridge; NOT a cap-control run"
+          },
+          "sha256": "22bfa50596424342e2878b589bb9777ab3b000851aec1c23ccf5783fd98719ac"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-independent-cap-rank-audit",
+      "records": [
+        {
+          "original_path": "target/m1-r-independent-cap-rank-audit/audit.json",
+          "recorded_fields": {
+            "scope": "Read-only independent inspection and mechanical comparisons; only this requested target report is written. No new checker or native execution, and no shared source/test/gate/evidence/canary edits.",
+            "status": "INDEPENDENT TECHNICAL AUDIT PASSED: positive and admitted reached-rank witness; not cap-negative or full-gate completion"
+          },
+          "sha256": "6e329613520b02649cf12c1482d403effa175bfb9df52383734c6801362d5140"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-harness-preservation-review01",
+      "records": [],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-harness-preservation-review02",
+      "records": [],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-controls03-updates",
+      "records": [
+        {
+          "original_path": "target/m1-r-controls03-updates/static-controls-summary.json",
+          "recorded_fields": {
+            "scope": "static routing and anchor check, not semantic verification"
+          },
+          "sha256": "b3cb81e014270e685c519dbd87688c56686b9f9fe2af3a4ed0e573c0d55ac776"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-cross-call-split-triage",
+      "records": [
+        {
+          "original_path": "target/m1-r-cross-call-split-triage/preservation-audit.json",
+          "recorded_fields": {
+            "scope": "target-only; no main/harness/canary writes"
+          },
+          "sha256": "28ed884667f506fdbc1a8de17222e34379b4edcc55c2ebaa853d2e61a74a374b"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-context-split-probe01/FINAL_PACKET",
+      "records": [],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-context-loop-isolation-comparison",
+      "records": [
+        {
+          "original_path": "target/m1-r-context-loop-isolation-comparison/case-result.json",
+          "recorded_fields": {
+            "status": "QUALIFIED ISOLATED DIAGNOSTIC ONLY; unapplied and not full control closure"
+          },
+          "sha256": "6ecd1ea6ee141b76d58a6cc185bb2cdac482b59a94389ef20a4c5b3f12f8b136"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-suffix-control-triage/FINAL_SINGLE_CASE",
+      "records": [],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-replacement-counter-audit",
+      "records": [
+        {
+          "original_path": "target/m1-r-replacement-counter-audit/all318-scoped-counter-audit.json",
+          "recorded_fields": {
+            "status": "Static complete-function binding scan after each literal replacement, including references left after a removed declaration; no mutant file written or executed"
+          },
+          "sha256": "ed1ca4e608eae019888fc373ab0931c22e6f38df705599573c464e4bd028b443"
+        },
+        {
+          "original_path": "target/m1-r-replacement-counter-audit/replacement-counter-audit-result.json",
+          "recorded_fields": {
+            "scope": "Every primary replacement payload plus the resulting full containing-function counter bindings; references left after a removed declaration are included. Secondary strings outside case tuples were searched for R receipt/counter payloads.",
+            "status": "Static replacement-counter audit complete. One known K3 fix prepared, no additional affected cases. Running frozen attempt untouched."
+          },
+          "sha256": "94e6b55113be44d049b0efc65392cad793e4c7f5be13abea63019ad61a372062"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-late-reservation-harness-audit",
+      "records": [],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-stride7-carrier-audit",
+      "records": [
+        {
+          "original_path": "target/m1-r-stride7-carrier-audit/seven-case-static-audit.json",
+          "recorded_fields": {
+            "scope": "static strings/context/typeflow only; no mutant source saved,compiledorverified; canaryroots untouched"
+          },
+          "sha256": "cd33cd9aeb3df5c1b6d8d4839b0cb3296d9075d4da935bd78e3229a2e5d7a38d"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-all318-carrier-audit",
+      "records": [
+        {
+          "original_path": "target/m1-r-all318-carrier-audit/all318-callee-binding-audit.json",
+          "recorded_fields": {
+            "status": "additional static complete R child-binding RHS audit; in-memory only, no mutant files or executions"
+          },
+          "sha256": "dcd1ac4e665e7d26db90e4880f2bd32fe832d72e8cf284c3848555921d383f27"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    },
+    {
+      "original_root": "target/m1-r-owner-resource-probes01",
+      "records": [
+        {
+          "original_path": "target/m1-r-owner-resource-probes01/summary.json",
+          "recorded_fields": {
+            "status": "twoisolatedauthorizedprobescomplete; one semantic,oneunresolved; notfullgate"
+          },
+          "sha256": "8616841003e46531f36b5b70768b4843f0254c5d89a4379442ecbebabd8538ec"
+        }
+      ],
+      "supplement_classification": "SUPPORTING TECHNICAL EVIDENCE; SEE EXACT RECORDED SCOPE/STATUS"
+    }
+  ],
+  "rule": "Historical records are preserved verbatim. Positive-only, resource, mixed, type/lowering and diagnostic-wording failures remain unqualified; profile/seed/effort variants are not the shipped control. Static proposals are not proof runs.",
+  "withdrawn_plan_copy": "The good-plan assertion/bad-plan-copy proposal was WITHDRAWN and is not used. The retained successful repair mutates the SAME actual failure_plan.execution_work to0 BEFORE original assertions and passes that SAME variable to the existing callee."
+}

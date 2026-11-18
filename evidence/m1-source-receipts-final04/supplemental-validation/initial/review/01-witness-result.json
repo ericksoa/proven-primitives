@@ -1,0 +1,430 @@
+{
+  "status": "CHECKED concrete admissible image, valid budget and reached startup-rank bridge; NOT a cap-control run",
+  "concrete_witness": {
+    "window_bytes": 1024,
+    "workspace_length": 1177584,
+    "scalar_base": 1164300,
+    "nonzero_absolute_bytes": {
+      "1164414": 1,
+      "1164418": 192,
+      "1164419": 2,
+      "1164420": 192,
+      "1164421": 2
+    },
+    "all_other_bytes": 0,
+    "active_region": "Command,tag1",
+    "active_tree": 0,
+    "builder_initialized": 0,
+    "decoder": {
+      "phase": "Selector",
+      "alphabet_max": 704,
+      "alphabet_limit": 704,
+      "queue": {
+        "pending": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "len": 0,
+        "offset": 0
+      }
+    },
+    "rank_formula": "8*704+63",
+    "rank": 5695
+  },
+  "concrete_budget": {
+    "max_work": 64,
+    "work_remaining": 64,
+    "max_window_bits": 10,
+    "input_remaining": 0,
+    "output_remaining": 0,
+    "calls_remaining": 1,
+    "initializations_remaining": 0,
+    "validity": "Proved with the unchanged valid definition inside the budget owning module; no cross-module interface or visibility opening"
+  },
+  "original_models_checked": [
+    "b3b_workspace_shape",
+    "b3b_queue_encoding_valid",
+    "saved_aux_load_valid",
+    "m1_code_decoder_image",
+    "serialized_b3b_queue",
+    "m1_tree_has_decodable_start",
+    "code_phase_rank"
+  ],
+  "startup_bridge": {
+    "input": "empty",
+    "end_of_input": false,
+    "conditional_entry_premises": "Exact checked workspace image;window1024;existing valid budget with64work;empty input,endfalse. These select a concrete admitted path, not new production requirements.",
+    "original_plan_requires": "old(budget).valid()",
+    "composition": "Checked image theorem constructs the exact image; checked owning-module theorem constructs a valid64work budget. Conditional replay proves the original startup reaches the specified decoder/rank on those witnessed values.",
+    "source_aux_scan_contract_gap": "Original helper lacks sufficient-credit=>success. Its unchanged body is therefore inlined at its original call site solely in this checked validation entry; no call success is assumed.",
+    "auxiliary_read_work": 18,
+    "forecast_table_read_work": 0,
+    "full_loader_read_work": 22,
+    "builder_copy_reads": 0,
+    "actual_total_source_units": 40,
+    "remaining_work": 24,
+    "actual_loaded_decoder": "Selector,alphabet_max=alphabet_limit704",
+    "actual_reached_rank": 5695,
+    "old_symbolic_assertion_checked": "initial_rank < 5_696nat",
+    "failure_or_invalid_exits_proved_unreachable": 17,
+    "success_marker_ensured": true,
+    "stopping_point": "Immediately before the original field-action loop; no field/input read or planner iteration is executed by the replay beyond this point."
+  },
+  "checked_components": {
+    "image": {
+      "result": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/image03/result.json",
+        "sha256": "961e057e14077cc2c9610e8b5a885bd3afdbbf8868c67d3045b1dba1832d2b24"
+      },
+      "command_record": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/image03/command.json",
+        "sha256": "aee33d10aef25689e8ce3ca6731cd2fcb6e01acddaae3b18817aac688adff506"
+      },
+      "actual": {
+        "selector": "r_triage_concrete_selector_rank_witness",
+        "command": [
+          "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+          "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-concrete-cap-rank-witness/attempts/image03/src/lib.rs",
+          "--crate-type",
+          "lib",
+          "--verify-only-module",
+          "brotli_input",
+          "--verify-function",
+          "r_triage_concrete_selector_rank_witness",
+          "--no-cheating",
+          "--num-threads",
+          "1",
+          "--triggers-mode",
+          "silent",
+          "--rlimit",
+          "300",
+          "--multiple-errors",
+          "0"
+        ],
+        "environment": {
+          "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+          "RUSTUP_TOOLCHAIN": "1.99.1"
+        },
+        "seconds": 25.019756833993597,
+        "exit_code": 0,
+        "verification": {
+          "verified": 2,
+          "errors": 0
+        },
+        "source_sha256": {
+          "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+          "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+          "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "brotli_input.rs": "bb66c6992f266691ae623746f5214bfa254c433e851f2f58c6fdc6dfc6898c99",
+          "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+          "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+        },
+        "sources_unchanged": true,
+        "log": "target/m1-r-concrete-cap-rank-witness/attempts/image03/verifier.log",
+        "log_sha256": "fb589623548f204290dc1a18e99b044f7f1d3ec99c5ad59725664bf2a33a4484",
+        "counts_as_cap_control": false
+      }
+    },
+    "budget": {
+      "result": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/budget01/result.json",
+        "sha256": "87d4b513a32b805bf5e5d541120cfc2724b46e26106aa6f875c01b22da0d21ca"
+      },
+      "command_record": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/budget01/command.json",
+        "sha256": "02801084638607238e57c3582b076595a727bafb862140b183b818613509e292"
+      },
+      "actual": {
+        "selector": "r_triage_concrete_selector_budget_witness",
+        "command": [
+          "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+          "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-concrete-cap-rank-witness/attempts/budget01/src/lib.rs",
+          "--crate-type",
+          "lib",
+          "--verify-only-module",
+          "brotli",
+          "--verify-function",
+          "r_triage_concrete_selector_budget_witness",
+          "--no-cheating",
+          "--num-threads",
+          "1",
+          "--triggers-mode",
+          "silent",
+          "--rlimit",
+          "300",
+          "--multiple-errors",
+          "0"
+        ],
+        "environment": {
+          "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+          "RUSTUP_TOOLCHAIN": "1.99.1"
+        },
+        "seconds": 18.51088545800303,
+        "exit_code": 0,
+        "verification": {
+          "verified": 1,
+          "errors": 0
+        },
+        "source_sha256": {
+          "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+          "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+          "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "brotli_input.rs": "bb66c6992f266691ae623746f5214bfa254c433e851f2f58c6fdc6dfc6898c99",
+          "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "brotli.rs": "88918def495d56337ceca09fff376b207bb287475ede9d9ec9e03183e6d3cb24",
+          "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+        },
+        "sources_unchanged": true,
+        "log": "target/m1-r-concrete-cap-rank-witness/attempts/budget01/verifier.log",
+        "log_sha256": "7c5d7b080a93a28a4b4c714cf9507fbeb32b071ae1b46f08446a3b362e9d7cd3",
+        "counts_as_cap_control": false
+      }
+    },
+    "model_costs": {
+      "result": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/costs01/result.json",
+        "sha256": "13f5bf90aafd43254553dd3591e7f31f1f45c67941e11c81454a0ad9c9feae4d"
+      },
+      "command_record": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/costs01/command.json",
+        "sha256": "0985d25e72c2e4179fd832b216252635f55f59d27f9b9965a42eb74b3a0097c4"
+      },
+      "actual": {
+        "selector": "r_triage_concrete_selector_loader_costs",
+        "command": [
+          "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+          "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-concrete-cap-rank-witness/attempts/costs01/src/lib.rs",
+          "--crate-type",
+          "lib",
+          "--verify-only-module",
+          "brotli_input",
+          "--verify-function",
+          "r_triage_concrete_selector_loader_costs",
+          "--no-cheating",
+          "--num-threads",
+          "1",
+          "--triggers-mode",
+          "silent",
+          "--rlimit",
+          "300",
+          "--multiple-errors",
+          "0"
+        ],
+        "environment": {
+          "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+          "RUSTUP_TOOLCHAIN": "1.99.1"
+        },
+        "seconds": 23.48959012501291,
+        "exit_code": 0,
+        "verification": {
+          "verified": 1,
+          "errors": 0
+        },
+        "source_sha256": {
+          "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+          "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+          "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "brotli_input.rs": "6722849f5ffc51b69cb8bfca3d23d79df3708273ea19b66d820178e795c50aab",
+          "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "brotli.rs": "88918def495d56337ceca09fff376b207bb287475ede9d9ec9e03183e6d3cb24",
+          "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+        },
+        "sources_unchanged": true,
+        "log": "target/m1-r-concrete-cap-rank-witness/attempts/costs01/verifier.log",
+        "log_sha256": "7951fa4efe4b4011040eb5c12faa69f34721f35ff7b7b2bf01572bfa124cc059",
+        "counts_as_cap_control": false
+      }
+    },
+    "startup_replay": {
+      "result": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/startup02/result.json",
+        "sha256": "422a769c4a94e36958f6c3dc9232b953e6e21ef6c7ebd8ee5b7672d9dece1468"
+      },
+      "command_record": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/startup02/command.json",
+        "sha256": "d58fe8bc7a4b9979d0e60ce40871d6e59390f88abd6b1a7116ea97248dfa844e"
+      },
+      "actual": {
+        "selector": "r_triage_concrete_selector_startup_replay",
+        "command": [
+          "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+          "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-concrete-cap-rank-witness/attempts/startup02/src/lib.rs",
+          "--crate-type",
+          "lib",
+          "--verify-only-module",
+          "brotli_input",
+          "--verify-function",
+          "r_triage_concrete_selector_startup_replay",
+          "--no-cheating",
+          "--num-threads",
+          "1",
+          "--triggers-mode",
+          "silent",
+          "--rlimit",
+          "300",
+          "--multiple-errors",
+          "0"
+        ],
+        "environment": {
+          "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+          "RUSTUP_TOOLCHAIN": "1.99.1"
+        },
+        "seconds": 33.68824441698962,
+        "exit_code": 0,
+        "verification": {
+          "verified": 3,
+          "errors": 0
+        },
+        "source_sha256": {
+          "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+          "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+          "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+          "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+          "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+          "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+          "brotli_input.rs": "aa7390fc9b78412518da829c16f2e48a864145fc5579b587bc7326a14200759b",
+          "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+          "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+          "brotli.rs": "88918def495d56337ceca09fff376b207bb287475ede9d9ec9e03183e6d3cb24",
+          "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+        },
+        "sources_unchanged": true,
+        "log": "target/m1-r-concrete-cap-rank-witness/attempts/startup02/verifier.log",
+        "log_sha256": "084020a8bb9b6d7e29c21ec788a6d785bdf110b8053a6811980f476caa7a8832",
+        "counts_as_cap_control": false
+      }
+    }
+  },
+  "theorem_dependency_binding": {
+    "image_header_and_body_exact_in_replay_source": true,
+    "cost_header_and_body_exact_in_replay_source": true,
+    "budget_module_exact_between_budget_and_replay_snapshots": true
+  },
+  "mechanical_correspondence": {
+    "path": "target/m1-r-concrete-cap-rank-witness/startup-token-correspondence-final.json",
+    "sha256": "c1df1a6df7641bdfdaa03b2a0274663fd7d93d37f8df3f112a468e3c222c05a9"
+  },
+  "body_inlining_and_return_map": {
+    "path": "target/m1-r-concrete-cap-rank-witness/startup-replay-preparation.json",
+    "sha256": "8cf46de5905e50f01a8e0b44dc750c3b1783d7fecff3e55186233619ecf2d513"
+  },
+  "reproducible_static_auditor": {
+    "path": "target/m1-r-concrete-cap-rank-witness/audit_startup.py",
+    "sha256": "3a0c596fb9b13669b52e1afd307465eea35a4bdd93b5b5dfaa4f9c1c2029a379"
+  },
+  "temporary_sources": {
+    "image-lemma.rs.txt": {
+      "path": "target/m1-r-concrete-cap-rank-witness/image-lemma.rs.txt",
+      "sha256": "ebd8dd0d394eda59f3664328b3d016859b991cd86b0ffde5097722827d7f0316"
+    },
+    "budget-lemma.rs.txt": {
+      "path": "target/m1-r-concrete-cap-rank-witness/budget-lemma.rs.txt",
+      "sha256": "796069885aed6c18bb644c4e61de03c8c4f9cc411599d148245a334e3f012b24"
+    },
+    "cost-lemma.rs.txt": {
+      "path": "target/m1-r-concrete-cap-rank-witness/cost-lemma.rs.txt",
+      "sha256": "014351ab1be39ee9d02c48421d0b35fae9f5f1b016f66f81f05bbe9487e8a5f5"
+    },
+    "startup-replay.rs.txt": {
+      "path": "target/m1-r-concrete-cap-rank-witness/startup-replay.rs.txt",
+      "sha256": "97985ec2ea5f0133790f49336724a8728065b4f57b0acca1274730b84c0983df"
+    },
+    "check.py": {
+      "path": "target/m1-r-concrete-cap-rank-witness/check.py",
+      "sha256": "19d287e2137af9a654d3ae800cf63df583d23b0ca7e92a9f048606ec7b986a30"
+    }
+  },
+  "retained_compile_failures": [
+    {
+      "attempt": "image01",
+      "result": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/image01/result.json",
+        "sha256": "7109cb11c08b60edb63a364ed0509d6be8bd75db02a9d779ce1399dfed7bfbdf"
+      },
+      "classification": "Proof-mode repeat-array type error"
+    },
+    {
+      "attempt": "image02",
+      "result": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/image02/result.json",
+        "sha256": "15def68c3ed1f08b9821159c9ee91298d893ef54bdf94862886d5cc0ee855fdb"
+      },
+      "classification": "Repeated same initial repeat-array compiler error; retained, not evidence of a checked theorem"
+    },
+    {
+      "attempt": "startup01",
+      "result": {
+        "path": "target/m1-r-concrete-cap-rank-witness/attempts/startup01/result.json",
+        "sha256": "ec3fa41010ee47a63fb203d503544459001c4049072eb66e1b7b5d5a34e5ae39"
+      },
+      "classification": "Inlining removed contextual Result error type; explicit original type restored for startup02"
+    }
+  ],
+  "control_implication": {
+    "old_criterion": "Universal initial_rank < executable_cap at this reached startup receipt",
+    "necessary_concrete_consequence": "5695 < executable_cap",
+    "scope": "A mathematical necessary consequence of the unchanged cap-rank criterion on an admissible reached start, not an actual2000-action/runtime counterexample",
+    "computed_bound_negative_authorized_or_run": false,
+    "cap_control_runs": 0,
+    "counts_as_full_gate": false
+  },
+  "preservation": {
+    "all_existing_models_helpers_signatures_contracts_and_1136_input_prefix_declarations_unchanged": true,
+    "only_private_target_validation_entries_and_proof_theorems_added": true,
+    "original_prefix_and_aux_assertions_invariants_decreases_retained": true,
+    "new_witness_specific_invariants_are_checked_not_assumed": true,
+    "new_public_or_cross_module_API": false,
+    "production_source_sha256": {
+      "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+      "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "src/brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+    },
+    "production_test_sha256": "18b4b2c15c6dcc89e92fd2ec6af51d05bb986da78c2c50916a992f9c8010fc5f",
+    "production_gate_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+    "main_tests_gate_evidence_canary_writes": 0
+  },
+  "proof_attempt_counts": {
+    "successful_selected_component_checks": 4,
+    "retained_compiler_failures": 3,
+    "total_verifier_invocations": 7,
+    "cap_control_invocations": 0,
+    "native_runtime_execution": 0
+  },
+  "original_whole_positive": {
+    "path": "evidence/m1-source-receipts-final02/positive.json",
+    "sha256": "86d4e79af18845dc26949de1b75c6627a683242b78aeb22a0e23b932466f172f"
+  },
+  "scope_limits": [
+    "No cap-control change or computed negative was run.",
+    "No proof of an actual2000-action execution is asserted.",
+    "No full gate, M1, decoder or release completion follows from this witness task."
+  ],
+  "files_manifest_path": "target/m1-r-concrete-cap-rank-witness/artifact-sha256.json"
+}

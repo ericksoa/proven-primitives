@@ -1,0 +1,221 @@
+{
+  "compared_files": 43,
+  "all_match": true,
+  "checks": [
+    {
+      "path": "benches/primitives.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/base64.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/brotli.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/brotli_block.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/brotli_data.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/brotli_dictionary.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/brotli_input.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/brotli_prefix.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/composition_demo.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/lib.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/lz4.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "src/percent.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/10x10y",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/10x10y.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/64x",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/64x.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/compression",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/compression.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/empty",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/empty.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/monkey",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/monkey.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/quickfox_repeated",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/quickfox_repeated.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/x",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/x.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/xyzzy",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/xyzzy.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/zeros",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/corpus/zeros.compressed",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/reference/command.bin",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/reference/context.bin",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/reference/dictionary-meta.bin",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/reference/dictionary.bin",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/fixtures/brotli/reference/transforms.bin",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/native/brotli_stream_harness.c",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/primitives.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/proof_rejection.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/test_pipeline.py",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "tests/upstream_comparison.rs",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "Cargo.toml",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "Cargo.lock",
+      "present": true,
+      "matches_review05_archive": true
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "present": true,
+      "matches_review05_archive": true
+    }
+  ]
+}

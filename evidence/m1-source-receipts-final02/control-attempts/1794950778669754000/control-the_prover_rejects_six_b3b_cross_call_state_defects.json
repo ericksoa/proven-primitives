@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_b3b_cross_call_state_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 3733.987613083009,
+  "executed_once": false,
+  "exit_code": 101,
+  "expected_mutants": 6,
+  "finished_utc": "2026-11-17T22:58:55.992692+00:00",
+  "log": "controls-the_prover_rejects_six_b3b_cross_call_state_defects.log",
+  "log_sha256": "33bb04b45ef9e45b79295772383b33d41d273f4433b2b6d153d504018a1ab634",
+  "mutants": [],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794952601969474000,
+  "started_utc": "2026-11-17T21:56:41.969483+00:00",
+  "suite": "the_prover_rejects_six_b3b_cross_call_state_defects",
+  "suite_source_sha256": "8c4fcc0f9e6126fb655867b1891fdaaf6b34fc24313d4e33b82e76eb8f49f20c",
+  "validation_errors": []
+}

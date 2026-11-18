@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_k7_k8_result_contract_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 48.569953208992956,
+  "executed_once": false,
+  "exit_code": 101,
+  "expected_mutants": 6,
+  "finished_utc": "2026-11-17T22:05:43.317182+00:00",
+  "log": "controls-the_prover_rejects_six_k7_k8_result_contract_defects.log",
+  "log_sha256": "534abc318145d07710e4436f0bd521eb73a1d0a39d3b9166226329cfce244930",
+  "mutants": [],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794953094746637000,
+  "started_utc": "2026-11-17T22:04:54.746646+00:00",
+  "suite": "the_prover_rejects_six_k7_k8_result_contract_defects",
+  "suite_source_sha256": "8f81672176f58017cab95394f8fc4ffa5be4fd9df42fffb49acdc073c1a6a0f3",
+  "validation_errors": []
+}

@@ -1,0 +1,41 @@
+--- a/tests/proof_rejection.rs
++++ b/tests/proof_rejection.rs
+@@ -3754,9 +3754,10 @@
+         let mut selected = original[start..end].to_string();
+         let (old, new) = if name == "brotli-m1-planner-restores-too-small-cap" {
+             // Check the existing rank's adequacy for the executable cap before
+-            // mutation. This derived assertion is valid on the unmodified
+-            // function; it avoids an expensive fallthrough counterexample.
+-            let receipt = "    let action_cap: u16 = 5_696;\n    proof { assert(initial_rank < action_cap as nat); }\n    while iterations < action_cap";
++            // mutation, including its concrete consequence at the admitted
++            // Selector/704 startup witness. This is a certificate control;
++            // it does not claim an actual 2000-action execution.
++            let receipt = "    proof { assert(initial_rank < 5_696nat); }\n    proof { assert(if code_phase_rank(CodeDescriptionPhase::Selector, 704) < 5_696nat { true } else { false }) by (compute_only); }\n    while iterations < 5_696";
+             assert_eq!(selected.matches("    while iterations < 5_696").count(), 1);
+             selected = selected.replacen("    while iterations < 5_696", receipt, 1);
+             fs::write(
+@@ -3775,10 +3776,20 @@
+                 "unmodified cap/rank obligation failed: {}",
+                 transcript(&positive)
+             );
+-            (
+-                "let action_cap: u16 = 5_696;",
+-                "let action_cap: u16 = 2_000;",
+-            )
++            let rank_receipt = "proof { assert(initial_rank < 5_696nat); }";
++            let bad_rank_receipt = "proof { assert(initial_rank < 2_000nat); }";
++            let concrete_receipt = "proof { assert(if code_phase_rank(CodeDescriptionPhase::Selector, 704) < 5_696nat { true } else { false }) by (compute_only); }";
++            let bad_concrete_receipt = "proof { assert(if code_phase_rank(CodeDescriptionPhase::Selector, 704) < 2_000nat { true } else { false }) by (compute_only); }";
++            assert_eq!(selected.matches(rank_receipt).count(), 1);
++            assert_eq!(selected.matches(concrete_receipt).count(), 1);
++            selected = selected.replacen(rank_receipt, bad_rank_receipt, 1);
++            selected = selected.replacen(concrete_receipt, bad_concrete_receipt, 1);
++            let preview = selected.replacen(old, new, 1);
++            assert_eq!(preview.matches(bad_rank_receipt).count(), 1);
++            assert_eq!(preview.matches(bad_concrete_receipt).count(), 1);
++            assert_eq!(preview.matches("while iterations < 2_000").count(), 1);
++            assert_eq!(preview.matches("            initial_rank <= 5_695,\n").count(), 1);
++            (old, new)
+         } else {
+             (old, new)
+         };

@@ -1,0 +1,56 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_five_k1_k3_success_and_preservation_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:58:24.599126+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 61.652949832991,
+  "finished_utc": "2026-11-17T02:59:26.251889+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_five_k1_k3_success_and_preservation_defects.log",
+  "log_sha256": "6b277ec1069ef326dc5bce92672b163ea53d75254fe72922e52cd6f62f280409",
+  "suite": "the_prover_rejects_five_k1_k3_success_and_preservation_defects",
+  "expected_mutants": 5,
+  "mutants": [
+    {
+      "name": "brotli-k1-installer-rejects-valid-two-symbol-tree",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k1-installer-rejects-valid-two-symbol-tree.log",
+      "sha256": "a19b76b1877e7c6b7148c7237e406ba101788dddd0aa9e4fee15d752c1915cda",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k1-invalid-length-changes-metadata",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k1-invalid-length-changes-metadata.log",
+      "sha256": "4ae55953ed91f7b1f8693457dce4167538361a0ab786ae7a998364c628e38966",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k1-invalid-length-changes-builder",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k1-invalid-length-changes-builder.log",
+      "sha256": "e0e9c14709f7f4b7fb502fb07167feb32646fe77ea77cf38f54fa71cbac95002",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-rejects-valid-symbol-and-suffix",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k3-rejects-valid-symbol-and-suffix.log",
+      "sha256": "4b46c189cfdf2bff05ba73c2d4b1ff229d80aa2fbb9aae8e15278a1eacd6e3c6",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-decodes-wrong-block-length",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k3-decodes-wrong-block-length.log",
+      "sha256": "9afe24007c67d076d27408b1ca9580d8d1792a8c8a2412abbbdf0eba29ca4181",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

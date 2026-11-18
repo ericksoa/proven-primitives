@@ -1,0 +1,40 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-1349/src/brotli_input.rs:32360:5
+      |
+32360 |     while i < 17
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-1349/src/brotli_input.rs:32331:1
+      |
+32331 | / fn plan_saved_singleton_validation_reads(workspace: &[u8], window_bytes: u32,
+32332 | |     budget: &mut crate::brotli::RequestBudget, singleton: u8,
+32333 | | ) -> (r: Result<u64, CoreFailure>)
+      | |_________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-1349/src/brotli_input.rs:32344:9
+      |
+32344 | /         r.is_ok() ==> {
+32345 | |             &&& r.unwrap() <= 18
+32346 | |             &&& r.unwrap() as nat == singleton_value_reads(saved_aux_length_values(workspace@, window_bytes), singleton)
+32347 | |             &&& final(budget).work_remaining as int == old(budget).work_remaining as int - r.unwrap() as int
+32348 | |         },
+      | |_________^ failed this postcondition
+32349 | / {
+32350 | |     proof { reveal(saved_aux_length_values); reveal(singleton_value_reads); }
+32351 | |     let ghost values = saved_aux_length_values(workspace@, window_bytes);
+32352 | |     let ghost total = singleton_value_reads(values, singleton);
+...     |
+32387 | |     Ok(inspected)
+32388 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

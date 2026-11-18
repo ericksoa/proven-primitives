@@ -1,0 +1,30 @@
+#[verifier::rlimit(500)]
+#[verifier::spinoff_prover]
+proof fn r_triage_field_truncation_admission() -> (out: CodeDescriptionDecoder)
+    ensures
+        out.valid(),
+        out.phase == CodeDescriptionPhase::Selector,
+        out.alphabet_max == 1,
+        out.alphabet_limit == 1,
+        out.queue.pending == [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8],
+        out.queue.len == 0,
+        out.queue.offset == 0,
+        out.queue.bits().len() == 0,
+        code_phase_width(out.phase, out.alphabet_max) == 2,
+        !code_phase_terminal(out.phase),
+{
+    let queue = BitQueue { pending: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8], len: 0, offset: 0 };
+    let decoder = CodeDescriptionDecoder {
+        queue, alphabet_max: 1, alphabet_limit: 1,
+        phase: CodeDescriptionPhase::Selector,
+    };
+    reveal(BitQueue::valid);
+    reveal(BitQueue::bits);
+    reveal(CodeDescriptionDecoder::valid);
+    reveal(code_phase_width);
+    reveal(code_phase_terminal);
+    assert(queue.valid());
+    assert(queue.bits().len() == 0);
+    assert(decoder.valid());
+    decoder
+}

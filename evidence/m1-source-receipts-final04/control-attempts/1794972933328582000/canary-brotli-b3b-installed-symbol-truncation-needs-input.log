@@ -1,0 +1,35 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-stride-init-exhaustion-canaries-29799/src/brotli_input.rs:21347:1
+      |
+21347 | / fn handle_context_installed_symbol_status(
+21348 | |     workspace: &mut [u8],
+21349 | |     window_bytes: u32,
+21350 | |     kind: crate::brotli_prefix::ContextMapKind,
+...     |
+21355 | |     symbol_status: InstalledSymbolStatus,
+21356 | | ) -> (r: (Option<ContextAdvanceStatus>, Ghost<nat>))
+      | |___________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-stride-init-exhaustion-canaries-29799/src/brotli_input.rs:21398:9
+      |
+21398 | /         match symbol_status {
+21399 | |             InstalledSymbolStatus::NeedInput => {
+21400 | |                 &&& r.0 == Some(ContextAdvanceStatus::NeedInput)
+21401 | |                 &&& final(workspace)@ == old(workspace)@
+...     |
+21432 | |             },
+21433 | |         },
+      | |_________^ failed this postcondition
+...
+21496 |       (r_ordinary, Ghost(r_source_units))
+      |       ----------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

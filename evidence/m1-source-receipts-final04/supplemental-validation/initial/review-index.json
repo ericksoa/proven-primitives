@@ -1,0 +1,155 @@
+{
+  "files": [
+    {
+      "bytes": 19967,
+      "original_path": "target/m1-r-concrete-cap-rank-witness/witness-result.json",
+      "review_path": "review/01-witness-result.json",
+      "sha256": "22bfa50596424342e2878b589bb9777ab3b000851aec1c23ccf5783fd98719ac"
+    },
+    {
+      "bytes": 3567,
+      "original_path": "target/m1-r-concrete-cap-rank-witness/image-lemma.rs.txt",
+      "review_path": "review/02-image-proof.rs.txt",
+      "sha256": "ebd8dd0d394eda59f3664328b3d016859b991cd86b0ffde5097722827d7f0316"
+    },
+    {
+      "bytes": 778,
+      "original_path": "target/m1-r-concrete-cap-rank-witness/budget-lemma.rs.txt",
+      "review_path": "review/03-budget-proof.rs.txt",
+      "sha256": "796069885aed6c18bb644c4e61de03c8c4f9cc411599d148245a334e3f012b24"
+    },
+    {
+      "bytes": 2049,
+      "original_path": "target/m1-r-concrete-cap-rank-witness/cost-lemma.rs.txt",
+      "review_path": "review/04-cost-proof.rs.txt",
+      "sha256": "014351ab1be39ee9d02c48421d0b35fae9f5f1b016f66f81f05bbe9487e8a5f5"
+    },
+    {
+      "bytes": 17192,
+      "original_path": "target/m1-r-concrete-cap-rank-witness/startup-replay.rs.txt",
+      "review_path": "review/05-startup-replay.rs.txt",
+      "sha256": "97985ec2ea5f0133790f49336724a8728065b4f57b0acca1274730b84c0983df"
+    },
+    {
+      "bytes": 10173,
+      "original_path": "target/m1-r-concrete-cap-rank-witness/startup-token-correspondence-final.json",
+      "review_path": "review/06-final-token-audit.json",
+      "sha256": "c1df1a6df7641bdfdaa03b2a0274663fd7d93d37f8df3f112a468e3c222c05a9"
+    },
+    {
+      "bytes": 5908,
+      "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/coupled-diagnostic-result.json",
+      "review_path": "review/07-normalized-coupled-pair.json",
+      "sha256": "21d791b361bdd9b51afac6024e80523d40cf3b9d3465cfb1d8550c5a0b467a61"
+    },
+    {
+      "bytes": 897,
+      "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/positive-result.json",
+      "review_path": "review/08-normalized-positive-result.json",
+      "sha256": "2e7e4e26e7e60c5e4e0edd8945c277c02c527a0d9fb9016785ba20b3612b24ca"
+    },
+    {
+      "bytes": 2294,
+      "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/negative-result.json",
+      "review_path": "review/09-normalized-negative-result.json",
+      "sha256": "51854a393afc83699744a4872dfc1ce4a362e0c096b0ecaa9ddb571fbd9a07f0"
+    },
+    {
+      "bytes": 2804,
+      "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/minimal-main-test-candidate.patch",
+      "review_path": "review/10-minimal-generator.patch",
+      "sha256": "bde2ab2fa4be01c6cd56ab9a3d2c2b653f6bfb2b7aaf707a9d59aec364fc0431"
+    },
+    {
+      "bytes": 706,
+      "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/incremental-cap-compute-acceptance.patch",
+      "review_path": "review/11-incremental-cap-semantic-arm.patch",
+      "sha256": "ec814fb27e425b272c94a0e665b288c33e30a05530fb8358b3caed5c68358227"
+    },
+    {
+      "bytes": 11909,
+      "original_path": "target/m1-r-independent-cap-rank-audit/audit.json",
+      "review_path": "review/12-independent-cap-rank-audit.json",
+      "sha256": "6e329613520b02649cf12c1482d403effa175bfb9df52383734c6801362d5140"
+    },
+    {
+      "bytes": 8426,
+      "original_path": "target/m1-r-harness-preservation-review02/report.json",
+      "review_path": "review/13-final-harness-preservation.json",
+      "sha256": "eb42f77f24b4160f7e6295b548fc7a44c0e8e8a7292302464f784ecdffe1dbac"
+    },
+    {
+      "bytes": 1655,
+      "original_path": "target/m1-r-harness-preservation-review02/REPORT.txt",
+      "review_path": "review/14-final-harness-preservation.txt",
+      "sha256": "5b0be41bd3f70047e3f2712510557fabc6c3360f6a91946d2f027d044466c34a"
+    },
+    {
+      "bytes": 11305,
+      "original_path": "evidence/m1-source-receipts-final03/positive.json",
+      "review_path": "review/15-real-main-positive03.json",
+      "sha256": "03c4b1ddbd3238dba9b8a3fc1ee903ea6ec6ccad3e10629b8034d883b8c92ce3"
+    },
+    {
+      "bytes": 3211,
+      "original_path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/witness-receipt-binding.json",
+      "review_path": "review/16-witness-receipt-binding.json",
+      "sha256": "d04bf8aad5aa39e7b1f34b2e2c1d107862269c6929c670c31b769f474e9e65fc"
+    },
+    {
+      "bytes": 5278,
+      "original_path": "target/m1-r-owner-resource-probes01/summary.json",
+      "review_path": "review/17-owner-mutable-variable-and-withdrawn-copy.json",
+      "sha256": "8616841003e46531f36b5b70768b4843f0254c5d89a4379442ecbebabd8538ec"
+    },
+    {
+      "bytes": 5127,
+      "original_path": "target/m1-r-controls03-updates/literal-updates.json",
+      "review_path": "review/18-literal-repair-journal.json",
+      "sha256": "55df757f68b6b3faeabc7ec473e80f3473539605f3dcc3462d29c3a7f4ed330c"
+    },
+    {
+      "bytes": 2687,
+      "original_path": "target/m1-r-replacement-counter-audit/k3-counter-literal-fix.json",
+      "review_path": "review/19-k3-counter-fix.json",
+      "sha256": "3cffad2601a4f73a1d7515700b1a8209865384f2d577183e573f895ed7bd93d0"
+    },
+    {
+      "bytes": 7417,
+      "original_path": "target/m1-r-late-reservation-harness-audit/harness-literal-updates.json",
+      "review_path": "review/20-late-reservation-harness-fixes.json",
+      "sha256": "8ed708b23ea80ee65d3e2b27c259738d5ac4301472382938f4dfbf13cee4c13a"
+    },
+    {
+      "bytes": 897,
+      "original_path": "target/m1-r-stride7-carrier-audit/case-fix.json",
+      "review_path": "review/21-stride7-carrier-fix.json",
+      "sha256": "711985a2750c78f613413662ec325efcb33ddf4a3b9d577141ae464ba41dc9c7"
+    },
+    {
+      "bytes": 1299,
+      "original_path": "target/m1-r-all318-carrier-audit/k7-case-fix.json",
+      "review_path": "review/22-k7-carrier-fix.json",
+      "sha256": "9e5e16c331e630abac384157ed9d3282c54611b9502cdd522af558af3b334f63"
+    },
+    {
+      "bytes": 5027,
+      "original_path": "target/m1-r-context-split-probe01/FINAL_PACKET/per-case-update.json",
+      "review_path": "review/23-context-full-match-case-update.json",
+      "sha256": "dfcca7fb3754a9a28070a749370ec36d05b5241fea26705552ae1900c35011e1"
+    },
+    {
+      "bytes": 15850,
+      "original_path": "target/m1-r-cross-call-split-triage/literal-fix.json",
+      "review_path": "review/24-cross-call-literal-fix.json",
+      "sha256": "61715c852d824d911c97dd28305029ad512b2adf9e13354d2a1bfa4bc9c30439"
+    },
+    {
+      "bytes": 6683,
+      "original_path": "target/m1-r-suffix-control-triage/FINAL_SINGLE_CASE/literal-fix.json",
+      "review_path": "review/25-suffix-literal-fix.json",
+      "sha256": "521f87b29425987dc9c6648e99a74b2772ad6908e45c37b864ad35d2dffda1e5"
+    }
+  ],
+  "purpose": "Plaintext exact copies for ordinary code review; full original-path snapshots are in the archive."
+}

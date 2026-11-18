@@ -1,0 +1,12 @@
+verification results:: 6 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: invariant not satisfied at end of loop body
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-55333/src/brotli_prefix.rs:3423:17
+     |
+3423 |                 source_reads == i as nat * i as nat + 1 + 2 * j as nat,
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

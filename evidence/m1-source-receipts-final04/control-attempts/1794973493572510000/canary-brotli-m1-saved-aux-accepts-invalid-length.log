@@ -1,0 +1,30 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:13790:5
+      |
+13790 |     while i < 18
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:13766:1
+      |
+13766 | / fn read_aux_lengths(
+13767 | |     workspace: &[u8],
+13768 | |     window_bytes: u32,
+13769 | | ) -> (r: (Result<[u8; 18], CompressedHeaderError>, Ghost<nat>))
+      | |______________________________________________________________^
+
+error: invariant not satisfied at end of loop body
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:13794:13
+      |
+13794 | /             b3b_workspace_shape(workspace@.len(), window_bytes) ==>
+13795 | |                 total_reads == i as nat + table_u8_scan_reads(values, 5, i as nat),
+      | |__________________________________________________________________________________^
+
+error: aborting due to 1 previous error
+

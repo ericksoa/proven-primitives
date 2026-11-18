@@ -1,0 +1,50 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:51:42.037152+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 378.99192270800995,
+  "finished_utc": "2026-11-17T02:58:01.027698+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_four_m1_tree_action_bound_and_drain_defects.log",
+  "log_sha256": "4e16a44467a5739b463377aff20c2a92e0e93286ea3613b9a76a2b7b4663588b",
+  "suite": "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-m1-parser-restores-too-small-cap",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-parser-restores-too-small-cap.log",
+      "sha256": "9e4db5ffc18c85e16c7c646b1ab611428f82ead2fd3293e195d6836ed5529642",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-planner-restores-too-small-cap",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-planner-restores-too-small-cap.log",
+      "sha256": "ee27c346ac8ef2d9de0ba05a551d831ab0d62ac4a60dd693645a2271818fe984",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-parser-skips-pending-span-drain",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-parser-skips-pending-span-drain.log",
+      "sha256": "4441536ac86834f8c0c058d21674fc1d7007ac9a0b8c9cdab6db4f674e078876",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-planner-skips-pending-span-drain",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-planner-skips-pending-span-drain.log",
+      "sha256": "4ea830d240eea6f4bff3aa1203ae6ae5a92d63e2a9185fb4419b10680d59f5b7",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

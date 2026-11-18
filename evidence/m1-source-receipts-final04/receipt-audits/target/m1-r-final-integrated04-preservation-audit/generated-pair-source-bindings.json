@@ -1,0 +1,62 @@
+[
+  {
+    "case": "brotli-m1-planner-restores-too-small-cap",
+    "positive_sha256": "8ed98823e7a68454600fa9a746b8d9d38cc50856d5969a40bc78792fc28a3fd0",
+    "negative_sha256": "3d8831d9b413743c78b9a7dbed5afb95ab9e4cfba887a03004e82a9daf4639f0",
+    "positive_immutable_source": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/positive/src/brotli_input.rs",
+    "negative_immutable_source": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/bad-cap/src/brotli_input.rs",
+    "qualified_packet": {
+      "path": "target/m1-r-planner-cap-normalized-concrete-rank-diagnostic/coupled-diagnostic-result.json",
+      "sha256": "21d791b361bdd9b51afac6024e80523d40cf3b9d3465cfb1d8550c5a0b467a61"
+    },
+    "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+  },
+  {
+    "case": "brotli-b3b-tree-field-truncation-needs-input",
+    "positive_sha256": "666cc26857ef99009471d3b583dc6f267a37539ee8c1004714022fcd65b65252",
+    "negative_sha256": "53ec53efed6262524cce5fab519c7cf4e301f08847756e97388aa63fe3b41bc2",
+    "positive_immutable_source": "target/m1-r-field-truncation-computed-multiline-diagnostic/positive/src/brotli_input.rs",
+    "negative_immutable_source": "target/m1-r-field-truncation-computed-multiline-diagnostic/negative/src/brotli_input.rs",
+    "qualified_packet": {
+      "path": "target/m1-r-field-truncation-computed-multiline-diagnostic/coupled-diagnostic-result.json",
+      "sha256": "698e973584c8f949142e6121d19d468d991555f42647fadd30aef440b86a97ee"
+    },
+    "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+  },
+  {
+    "case": "brotli-m1-malformed-suffix-fallback-undercharge",
+    "positive_sha256": "15fc4ed779bd2e4d293eeaa38590169024ef6999e3247f69e8662333feb9bbd0",
+    "negative_sha256": "55e8c5e0e6fc5862588afced12f245181c7cec64bacd1bada7ffeaf2a236205d",
+    "positive_immutable_source": "target/m1-r-suffix-fallback-computed-debit-diagnostic/positive/src/brotli_input.rs",
+    "negative_immutable_source": "target/m1-r-suffix-fallback-computed-debit-diagnostic/bad-undercharge/src/brotli_input.rs",
+    "qualified_packet": {
+      "path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/coupled-diagnostic-result.json",
+      "sha256": "a3b49025ca52d48310b6a7a3d5f4320bf3f8c4ed4a1faa8feb1f88274123b983"
+    },
+    "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+  },
+  {
+    "case": "brotli-m1-malformed-suffix-fallback-writes-byte175",
+    "positive_sha256": "1ffeaee26397ae7944efa5a2af040b923b15acecd6b4dbc7dd9f14675b147331",
+    "negative_sha256": "0ca6d8ffb1b2e85a01c09a4d14c0a42fa045baff6532ad76f29c15b44ba4daf7",
+    "positive_immutable_source": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive-normalized/src/brotli_input.rs",
+    "negative_immutable_source": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/bad-byte175/src/brotli_input.rs",
+    "qualified_packet": {
+      "path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/coupled-diagnostic-result.json",
+      "sha256": "3ea7139a3edb79daaf6c4892d95d7545cf6f3d0460e6a3d3477aac15d0e27651"
+    },
+    "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+  },
+  {
+    "case": "brotli-m1-cursor-context-owner-skips-terminal-action",
+    "positive_sha256": "153dd3a1ea9f7b32ebb41fa4af9e1dc4963ef01d9fece2a42e8c8055c1e18c6e",
+    "negative_sha256": "b0c03a308a0177a9c438b80f114640256aecef5e500f514694b7094085b5d1a1",
+    "positive_immutable_source": "target/m1-r-cursor-computed-receipt-diagnostic/positive/src/brotli_input.rs",
+    "negative_immutable_source": "target/m1-r-cursor-computed-receipt-diagnostic/negative/src/brotli_input.rs",
+    "qualified_packet": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/qualified-case-result.json",
+      "sha256": "5bec4a0de70c3c65d83b4a0ba93103afbf90c3ce58164724d63c5272b6d9804a"
+    },
+    "current_integrated_generator_reproduces_actual_checked_sources_byte_for_byte": true
+  }
+]

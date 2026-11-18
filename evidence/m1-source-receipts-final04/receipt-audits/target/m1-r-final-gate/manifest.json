@@ -1,0 +1,34 @@
+{
+  "based_on": {
+    "sha256": "3f289ac7939cb128aff56c404f0e29ddaa7a50053c8bc108aafb412ebf78c5ab",
+    "source": "target/m1-final-gate.py"
+  },
+  "deliberate_defect_runs": 0,
+  "driver_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+  "historical_canary_restoration": "RESTORE_CANARIES.txt",
+  "inputs": {
+    "RESTORE_CANARIES.txt": "8831a895585d80cad8683fbf9b4260207cd23c4a08a4b9bacbf83e6f1436fbb5",
+    "affected-suites.json": "efae38fd5c404b959262b17723eee0471c2763fde736736a004b17cc90fea0ac",
+    "baseline-five-control-updates.json": "49376055684cd9d3a07cc7a2692ea693783fa942b2bffc0a93e4c6ed2078cbeb",
+    "frozen-scope-audit.json": "66a03d1a9bb02eef95a73666df8f53fd1d148e51879f42c8e7cb2fda334f7b03",
+    "original-driver.py.txt": "3f289ac7939cb128aff56c404f0e29ddaa7a50053c8bc108aafb412ebf78c5ab",
+    "original-suite-inventory.json": "06f48d0b9b4d8d8637981b9693184637a75d99a9f70883dff457e29952f4fc63",
+    "prior37-control-manifest.json": "0adc938c187b3671e7bc5e25c26f9bc1160168d157e8cbcee9a93a60f63af2a3"
+  },
+  "new_suites": [
+    "the_prover_rejects_four_m1_actual_source_receipt_omissions"
+  ],
+  "pinned_flags_preserved": true,
+  "required_cases_currently_discovered": 318,
+  "required_final_suites_currently_discovered": 48,
+  "scope_identities": {
+    "actual_approved_baseline_matches_review05_files": 43,
+    "actual_preimplementation_input": "e10c61b1354c5b1debef9e76aa55b412d06e35de210cb8949a73ef33b912da23",
+    "both_prefix": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03",
+    "proposal_frozen_input": "f1a37362e128944c9c0ca49f00f30c172270677140e60027d3d655c46d831eef"
+  },
+  "scope_note": "Distinct proposal f1a... and actual preimplementation e10c... identities are bound separately; no byte equality or human approval inferred",
+  "static_validation": "static-validation.json",
+  "status": "Target-only prepared driver; no runtime/verifier/control runs",
+  "usage": "USAGE.txt"
+}

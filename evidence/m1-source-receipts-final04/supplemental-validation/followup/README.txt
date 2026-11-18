@@ -1,0 +1,38 @@
+M1 focused03 follow-up supplement: four isolated repairs and retained failures
+
+This is a FOLLOW-UP to the immutable initial supplement. It preserves all requested new focused03 failure evidence, failed intermediate variants, checked witnesses, independent audits and four qualified isolated pairs. It does NOT complete M1, the native suites or the full required gate.
+
+Publication boundaries
+
+Production library source remains brotli_input 3e2f1bb6 and brotli_prefix daf8ab85, with the production advance_field allowance still 500. The strict gate driver remains 1c983c9c. The hash 33f26d75 is ONLY the HISTORICAL proof-generation and patch base. Root is integrating the three test patches for four cases; final test identity and closure must be bound later by the ACTUAL 04 gate receipt. This supplement deliberately declares no final test hash and contains no live 04 controls, canaries or bookkeeping.
+
+The first supplement remains immutable at target/m1-r-final-supplement. Its manifest SHA is 89734c8f58d911da782ae47adea4169eb15f963855ba450680804fae6667b8d8. This follow-up complements it rather than rewriting its archive or any frozen gate package.
+
+Exact witnessed implications and source coupling
+
+1. Field truncation status. A checked valid Selector decoder with maximum/limit 1, empty queue, empty input and end=true reaches the SPECIFIC original Truncated return. The original read_bits contract rules out Value and NeedInput; consumed and actual source units are zero. The unchanged code_field_step_refines model and old NeedInput/end guarantee require Failed(Truncated). The computed actual status is parsed from the ACTUAL old/new return literal and coupled to that literal; the expected Failed(Truncated), read.consumed and current Ghost(source_reads) remain fixed. The whole old fault remains for every reaching state. The true instrumented positive passed 3/0 and the one corresponding negative produced genuine computed false under the unchanged strict gate. Only this instrumented field test copy uses allowance 1000 for BOTH positive and negative, matching the existing helper global1000; production keeps500 and its whole proof must pass again at500. The earlier failed500 candidate and the unrecognized single-line diagnostic are retained unqualified. The accepted retry changes only added-proof whitespace, not tokens or log/classifier contents.
+
+2. Suffix fallback debit. The unchanged admitted fallback image reaches the original reservation with initial_outer3, subphase2, valid work5 and accumulated ledger0. Checked old owner-effect and charge_work contracts force final work0 and therefore actual amount5; no later fallback operation changes budget. The computed faulty amount is the EXACT existing conditional charge expression specialized only at the checked saved outer3. The negative still executes its old conditional4/5 amount; the fixed expected5 comes from the OLD contract, not the candidate expression or a new cost policy. Positive1/0 and one genuine computed-false negative qualify. Removing only the proof check restores the exact original conditional undercharge fault.
+
+3. Suffix byte175 frame. A checked source-corresponding replay reaches the original post-store point with actual charge5, actual store child receipt4, original scalar fold+1, budget0 and byte175=0. The unchanged terminal_error_frame permits writes only at offsets10,11,172,173, so byte175 must remain its admitted old value0. The original conditional extra put_state_byte(...,175,1) is activated by saved outer3 and succeeds even at budget0 because the helper has no budget argument; no later operation restores the byte. The computed faulty value1 is parsed from that ACTUAL write argument, same u8 type; the fixed expected0 is proved from the OLD frame and actual reached byte. Healthy0==0 is proof-only and adds no write. Positive1/0 and one genuine computed-false negative qualify. The failed opaque-model-index positive remains unqualified and preserved.
+
+4. Cursor child receipt. A checked admitted ContextModes image with invalid saved queue length9 and valid work5 reaches the original error fallback. The REAL unchanged executor call and captured r_child_units remain; actual post-budget0 plus existing valid-plan conservation proves actual child5, and the original accumulator folds that SAME variable. An independent checked necessity theorem copies the exact OLD owner-effect clause: required finalwork0, old conservation, prior ledger0 and actual fold jointly force parent/child5 for ANY satisfying implementation. This is not a source-receipt policy inferred from a spending formula. The healthy normalized5 is backed by the actual call, never assigned as Ghost5. The faulty computed0 is parsed from the sole unchanged original badstub Ghost(0nat); the stub still skips the executor and remains byte-exact. Removing the proof restores the exact old full-domain fault. Positive1/0 and one genuine computed-false negative qualify under unchanged gate1c98.
+
+All computed negative checks are necessary concrete consequences of the SAME old contracts on admitted reached paths. They are not arbitrary assert(false), fake counters, narrowed faults or new product specifications. Checked assert(false) statements in temporary validation entries prove impossible earlier exits unreachable; they are not assumptions or substituted negative criteria. Existing production helpers, APIs, models, guarantees and runtime/unit policies are unchanged.
+
+History and scope
+
+The focused03 run FAILED: 11 selected suites/88 cases, 8 passed suites/70 accepted cases in those suites, three resource failures and two initially unreached cases; the historical partial semantic captures do not complete a full gate. Sealed failed03 snapshots and follow-up diagnostics are retained at original paths. Resource, mixed, syntax/type, formatting and opaque-evaluation failures remain unqualified, regardless of later repairs. Earlier pending/unapplied notes are preserved as dated history, not present integration claims.
+
+No native execution, native 2000-action trace, negative-loop/body SMT completion, compiler/source-to-binary theorem, full M1 gate completion or human architectural approval is claimed. Genuine computed-false rejection may occur before generic negative SMT. Technical validation does not supply architectural authority.
+
+Review and reproducibility
+
+Start with review/ and review-index.json. archive-files.json maps every original repository-relative path to its size/hash; status-index.json distinguishes the four isolated pair packets from historical/supporting records. source-map-audit.json records sealed map checks and the exact canonical resolutions for an old broad failed-suite map copied into a field-only subset. Original maps are not rewritten. Only failed03-retained and focused03-execution-result.json are taken from controls03-updates; the mutable whole directory and all live04 output are excluded.
+
+The archive uses sorted original paths, fixed uid/gid/mode/mtime, gzip mtime0 and Python standard-library modules only. Rebuild or stream-verify it using rebuild_archive.py as described in the manifest. Neither operation runs a verifier or test. Final integrated tests, native results and full gate closure belong to the later actual04 completion receipt.
+
+Sealed archive: 650 original-path files, 151,538,174 uncompressed bytes, 17,856,220 compressed bytes (17.03 MiB). All member hashes and all 47 plaintext review copies verified. A second streamed build reproduced the exact compressed bytes. No source or evidence was omitted for size.
+
+  python3 rebuild_archive.py --repo /path/to/repository --output /path/to/archive.tar.gz
+  python3 rebuild_archive.py --repo /path/to/repository --verify

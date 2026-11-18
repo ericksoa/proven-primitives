@@ -1,0 +1,67 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+warning: unreachable statement
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-648/src/brotli_input.rs:37172:17
+      |
+37171 |                   return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) });
+      |                   -------------------------------------------------------------------------------------------------- any code following this expression is unreachable
+37172 | /                 return execute_fixed_compressed_plan(workspace, window_bytes, budget,
+37173 | |                     CompressedOuterPhase::ContextModes, &input[..initial_allowed],
+37174 | |                     end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan);
+      | |_________________________________________________________________________________________________________________^ unreachable statement
+      |
+      = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+note: verifying module brotli_input, function lib::brotli_input::advance_planned_compressed_action (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-648/src/brotli_input.rs:36747:1
+      |
+36747 | / fn advance_planned_compressed_action(
+36748 | |     workspace: &mut [u8],
+36749 | |     window_bytes: u32,
+36750 | |     budget: &mut crate::brotli::RequestBudget,
+36751 | |     input: &[u8],
+36752 | |     end_of_input: bool,
+36753 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+note: function body check finished in 69 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-648/src/brotli_input.rs:36747:1
+      |
+36747 | / fn advance_planned_compressed_action(
+36748 | |     workspace: &mut [u8],
+36749 | |     window_bytes: u32,
+36750 | |     budget: &mut crate::brotli::RequestBudget,
+36751 | |     input: &[u8],
+36752 | |     end_of_input: bool,
+36753 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: function body check: Resource limit (rlimit) exceeded; consider rerunning with --profile for more details
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-648/src/brotli_input.rs:36747:1
+      |
+36747 | / fn advance_planned_compressed_action(
+36748 | |     workspace: &mut [u8],
+36749 | |     window_bytes: u32,
+36750 | |     budget: &mut crate::brotli::RequestBudget,
+36751 | |     input: &[u8],
+36752 | |     end_of_input: bool,
+36753 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-648/src/brotli_input.rs:36747:1
+      |
+36747 | / fn advance_planned_compressed_action(
+36748 | |     workspace: &mut [u8],
+36749 | |     window_bytes: u32,
+36750 | |     budget: &mut crate::brotli::RequestBudget,
+36751 | |     input: &[u8],
+36752 | |     end_of_input: bool,
+36753 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: aborting due to 1 previous error; 1 warning emitted
+

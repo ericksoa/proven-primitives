@@ -1,0 +1,285 @@
+fn r_triage_concrete_selector_startup_replay(
+    workspace: &[u8], window_bytes: u32,
+    budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+) -> (r: (bool, Ghost<nat>))
+    requires
+        old(budget).valid(), old(budget).work_remaining == 64,
+        window_bytes == 1_024, input.len() == 0, !end_of_input,
+        workspace@.len() == 1_177_584,
+        forall|i: int| 0 <= i < workspace@.len() ==> #[trigger] workspace@[i] ==
+            if i == 1_164_418 || i == 1_164_420 { 192u8 }
+            else if i == 1_164_419 || i == 1_164_421 { 2u8 }
+            else if i == 1_164_414 { 1u8 } else { 0u8 },
+    ensures
+        r.0,
+        r.1@ == 40,
+        final(budget).valid(),
+        final(budget).work_remaining == 24,
+        r.1@ + final(budget).work_remaining as nat == old(budget).work_remaining as nat,
+{
+
+    hide(code_field_total_read_units);
+    hide(canonical_plan_scan_result);
+    hide(canonical_plan_weight);
+    hide(canonical_plan_nonzero);
+    hide(canonical_plan_index_sum);
+    hide(crate::brotli_prefix::valid_builder_lengths);
+    hide(code_field_step_refines);
+    hide(code_transition_holds);
+    hide(serialized_b3b_queue);
+    hide(b3b_queue_encoding_valid);
+    reveal(m1_tree_invalid_start_costs);
+    let ghost concrete_witness = r_triage_concrete_selector_rank_witness();
+    proof {
+        assert(workspace@ =~= concrete_witness.0);
+        assert(workspace@ == concrete_witness.0);
+        r_triage_concrete_selector_loader_costs(workspace@);
+        assert(m1_tree_has_decodable_start(workspace@, window_bytes));
+        assert forall|j: int| 0 <= j < 18 implies #[trigger]
+            workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j] == 0 by {}
+    }
+
+    let ghost mut r_tree_planning_source_units: nat = 0;
+    const SIMPLE_DESTINATION_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidSymbol;
+    const CANONICAL_TREE_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidTree;
+    const CANONICAL_LENGTH_ERROR: crate::brotli_prefix::WorkspaceError = crate::brotli_prefix::WorkspaceError::InvalidCodeLength;
+    proof {
+        assert(matches!(SIMPLE_DESTINATION_ERROR, crate::brotli_prefix::WorkspaceError::InvalidSymbol)) by (compute_only);
+        assert(matches!(CANONICAL_TREE_ERROR, crate::brotli_prefix::WorkspaceError::InvalidTree)) by (compute_only);
+        assert(matches!(CANONICAL_LENGTH_ERROR, crate::brotli_prefix::WorkspaceError::InvalidCodeLength)) by (compute_only);
+    }
+    proof {
+        if m1_tree_has_decodable_start(workspace@, window_bytes) {
+            m1_tree_decodable_start_facts(workspace@, window_bytes);
+        }
+    }
+    let region_tag = match state_byte(workspace, window_bytes, B3B_ACTIVE_REGION) {
+        Ok(value) => value,
+        Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); },
+    };
+    let region = match decode_tree_region(region_tag) {
+        Some(value) => value,
+        None => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); },
+    };
+    let tree = match state_u16(workspace, window_bytes, B3B_ACTIVE_TREE) {
+        Ok(value) => value,
+        Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); },
+    };
+    let (tree_count, capacity) = match region {
+        crate::brotli_prefix::TreeRegion::Literal => (256u16, crate::brotli_prefix::LITERAL_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::Command => (256u16, crate::brotli_prefix::COMMAND_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::Distance => (256u16, crate::brotli_prefix::DISTANCE_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::BlockType => (3u16, crate::brotli_prefix::BLOCK_TYPE_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::BlockLength => (3u16, crate::brotli_prefix::BLOCK_LENGTH_SYMBOLS),
+        crate::brotli_prefix::TreeRegion::TemporaryContext => (1u16, crate::brotli_prefix::TEMP_CONTEXT_SYMBOLS),
+    };
+    proof {
+        assert(capacity as nat == crate::brotli_prefix::tree_region_symbols(region));
+        assert(tree_count as nat == crate::brotli_prefix::tree_region_count(region));
+    }
+    let queue = match load_b3b_queue(workspace, window_bytes) {
+        Ok(value) => value,
+        Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); },
+    };
+    proof { reveal(serialized_b3b_queue); }
+    let before_load_work = budget.work_remaining;
+    let (saved_load_reads, saved_aux_valid) = { let (r_child_result, Ghost(r_child_units)) = {
+    let ghost mut r_saved_forecast_source_reads: nat = 0;
+    reveal(saved_aux_copy_read_units); reveal(saved_aux_load_valid); reveal(saved_aux_load_eligible);
+    let maximum = match state_u16(workspace, window_bytes, B3B_ALPHABET_MAX).map_err(map_compressed_error) { Ok(value) => value, Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }, };
+    let limit = match state_u16(workspace, window_bytes, B3B_ALPHABET_LIMIT).map_err(map_compressed_error) { Ok(value) => value, Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }, };
+    if maximum == 0 || maximum > 704 || limit == 0 || limit > maximum { { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }; }
+    let mut i = 0usize;
+    while i < 18
+        invariant i <= 18, b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+            window_bytes == 1_024,
+            old(budget).work_remaining == 64,
+            forall|j: int| 0 <= j < 18 ==> #[trigger]
+                workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + j] == 0,
+            r_saved_forecast_source_reads == i as nat,
+            maximum == b3b_scalar_u16_at(workspace@, window_bytes, B3B_ALPHABET_MAX),
+            limit == b3b_scalar_u16_at(workspace@, window_bytes, B3B_ALPHABET_LIMIT),
+            1 <= limit <= maximum <= 704,
+            saved_aux_copy_prefix(workspace@, window_bytes, i as nat),
+            budget.valid(), budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            i as u64 <= old(budget).work_remaining,
+            budget.work_remaining == old(budget).work_remaining - i as u64,
+        decreases 18 - i,
+    {
+        if !budget.charge_work(1) { { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }; }
+        let value = match state_byte(workspace, window_bytes, B3B_AUX_LENGTHS + i as u16)
+            .map_err(map_compressed_error) { Ok(value) => value, Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }, };
+        proof { r_saved_forecast_source_reads = r_saved_forecast_source_reads + 1; }
+        proof {
+            reveal(b3b_scalar_byte_at);
+            assert(value == workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + i as int]);
+        }
+        if value > 5 {
+            proof {
+                assert(exists|bad: usize| bad == i && bad < 18
+                    && #[trigger] saved_aux_copy_prefix(workspace@, window_bytes, bad as nat)
+                    && workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + bad as int] > 5);
+                let bad = choose|bad: usize| bad < 18 && #[trigger] saved_aux_copy_prefix(workspace@, window_bytes, bad as nat)
+                    && workspace@[b3b_scalar_base(window_bytes) + B3B_AUX_LENGTHS as int + bad as int] > 5;
+                saved_aux_bad_indices_agree(workspace@, window_bytes, i as int, bad as int);
+                reveal(saved_aux_copy_read_units);
+            }
+            { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); };
+        }
+        proof { reveal(saved_aux_copy_prefix); }
+        i += 1;
+    }
+    proof { reveal(saved_aux_copy_prefix); reveal(saved_aux_copy_read_units); }
+    let ordinary_result: Result<(u64, bool), CoreFailure> = {
+        Ok((18, true))
+    };
+    (ordinary_result, Ghost(r_saved_forecast_source_reads))
+}; proof { r_tree_planning_source_units = r_tree_planning_source_units + r_child_units; } match r_child_result { Ok(value) => value, Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); } } };
+    let loader_reads = { let (r_child_result, Ghost(r_child_units)) = plan_saved_loader_read_units(workspace, window_bytes, budget, saved_load_reads, saved_aux_valid); proof { r_tree_planning_source_units = r_tree_planning_source_units + r_child_units; } match r_child_result { Ok(value) => value, Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); } } };
+    if !budget.charge_work(loader_reads) { { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }; }
+    let initial_planning_work = before_load_work - budget.work_remaining;
+    proof {
+        assert(loader_reads as nat == loader_table_read_units(workspace@, window_bytes));
+        assert(initial_planning_work as nat == saved_aux_copy_read_units(workspace@, window_bytes)
+            + loader_forecast_table_reads(workspace@, window_bytes) + loader_table_read_units(workspace@, window_bytes));
+    }
+    proof {
+        if m1_tree_has_decodable_start(workspace@, window_bytes) {
+            m1_tree_decodable_start_image(workspace@, window_bytes, queue);
+        }
+    }
+    let ghost concrete_loaded = CodeDescriptionDecoder {
+        queue, alphabet_max: 704, alphabet_limit: 704, phase: CodeDescriptionPhase::Selector,
+    };
+    proof {
+        reveal(serialized_b3b_queue);
+        assert(queue.valid());
+        m1_code_image_rebases_queue(workspace@, window_bytes, concrete_witness.1, queue);
+        assert(m1_code_decoder_image(workspace@, window_bytes, queue, concrete_loaded));
+    }
+    let (loaded_decoder, Ghost(actual_loader_units)) = load_code_description_decoder(workspace, window_bytes, queue);
+    proof { assert(loaded_decoder == Ok(concrete_loaded)); }
+    proof { r_tree_planning_source_units = r_tree_planning_source_units + actual_loader_units; }
+    proof {
+        if m1_tree_has_decodable_start(workspace@, window_bytes) {
+            let expected = choose|expected: CodeDescriptionDecoder| m1_code_decoder_image(workspace@, window_bytes, queue, expected);
+            assert(loaded_decoder == Ok(expected));
+        }
+    }
+    let mut decoder = match loaded_decoder {
+        Ok(value) => value,
+        Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); },
+    };
+    proof { code_phase_rank_is_bounded(decoder); }
+    let ghost initial_rank = code_phase_rank(decoder.phase, decoder.alphabet_limit);
+    proof {
+        reveal(m1_tree_has_decodable_start);
+        assert(m1_code_decoder_image(workspace@, window_bytes, decoder.queue, decoder));
+        assert(serialized_b3b_queue(workspace@, window_bytes, decoder.queue));
+        assert(exists|initial: CodeDescriptionDecoder, initial_region: crate::brotli_prefix::TreeRegion| {
+            &&& m1_code_decoder_image(workspace@, window_bytes, initial.queue, initial)
+            &&& serialized_b3b_queue(workspace@, window_bytes, initial.queue)
+            &&& b3b_scalar_byte_at(workspace@, window_bytes, B3B_ACTIVE_REGION)
+                == tree_region_tag_spec(initial_region)
+        });
+    }
+    let mut builder_initialized = match state_u16(
+        workspace,
+        window_bytes,
+        B3B_BUILDER_INITIALIZED,
+    ) {
+        Ok(value) => value,
+        Err(error) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); },
+    };
+    // Replay spans into a local image. Reading the original builder at install
+    // time would omit the spans produced by this very plan.
+    let mut lengths = [0u8; 704];
+    let copy_len = if builder_initialized <= decoder.alphabet_limit { builder_initialized } else { 0u16 };
+    let ghost mut source_builder_copy_reads: nat = 0;
+    let mut copied = 0u16;
+    while copied < copy_len
+        invariant copy_len == 0,
+            m1_tree_has_decodable_start(workspace@, window_bytes),
+            copied <= copy_len <= decoder.alphabet_limit <= 704,
+            source_builder_copy_reads == copied as nat,
+            r_tree_planning_source_units + budget.work_remaining as nat == old(budget).work_remaining as nat,
+            forall|i: int| 0 <= i < copied ==> #[trigger] lengths@[i]
+                == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+            forall|i: int| copied <= i < 704 ==> #[trigger] lengths@[i] == 0,
+            budget.work_remaining as int == old(budget).work_remaining as int
+                - initial_planning_work as int - copied as int,
+            budget.valid(),
+            budget.limits == old(budget).limits,
+            budget.input_remaining == old(budget).input_remaining,
+            budget.output_remaining == old(budget).output_remaining,
+            budget.calls_remaining == old(budget).calls_remaining,
+            budget.initializations_remaining == old(budget).initializations_remaining,
+            budget.work_remaining <= old(budget).work_remaining,
+        decreases copy_len - copied,
+    {
+        if !budget.charge_work(1) {
+            { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); };
+        }
+        proof {
+            m1_tree_decodable_start_facts(workspace@, window_bytes);
+            reveal(b3b_workspace_shape); reveal(CodeDescriptionDecoder::valid);
+            assert(window_bytes <= 16_777_216);
+            assert(workspace@.len() >= window_bytes as nat + crate::brotli_prefix::FIXED_SCRATCH_BYTES as nat);
+            assert(copied < decoder.alphabet_limit <= 704);
+        }
+        proof { source_builder_copy_reads = source_builder_copy_reads + 1; }
+        lengths[copied as usize] = match { let (builder_value, Ghost(builder_read_units)) = crate::brotli_prefix::read_builder_code_length(
+            workspace, window_bytes, decoder.alphabet_limit, copied,
+        ); proof { r_tree_planning_source_units = r_tree_planning_source_units + builder_read_units; } builder_value } {
+            Ok(value) => value,
+            Err(_) => { proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); },
+        };
+        copied += 1;
+    }
+    proof { assert(source_builder_copy_reads == copy_len as nat); }
+    let ghost initial_decoder = decoder;
+    let ghost initial_initialized = builder_initialized;
+    let ghost initial_values = lengths@;
+    proof {
+        assert(m1_code_decoder_image(workspace@, window_bytes, initial_decoder.queue, initial_decoder));
+        assert(serialized_b3b_queue(workspace@, window_bytes, initial_decoder.queue));
+        assert(b3b_scalar_byte_at(workspace@, window_bytes, B3B_ACTIVE_REGION) == tree_region_tag_spec(region));
+        assert(b3b_scalar_u16_at(workspace@, window_bytes, B3B_ACTIVE_TREE) == tree);
+    }
+    proof {
+        assert(initial_initialized as nat == b3b_scalar_u16_at(workspace@, window_bytes, B3B_BUILDER_INITIALIZED));
+        assert(initial_values =~= m1_tree_builder_values(workspace@, window_bytes,
+            initial_decoder.alphabet_limit, initial_initialized)) by { reveal(m1_tree_builder_values); }
+    }
+    let ghost mut actions: Seq<(CodeDescriptionDecoder, CodeDescriptionDecoder, CodeDescriptionStep, CodeDescriptionDecoder, CodeDescriptionDecoder, u16, u16, Seq<u8>, Seq<u8>)> = Seq::empty();
+    proof { m1_tree_empty_prefix(initial_decoder, initial_initialized, initial_values, input@, end_of_input, region, tree); }
+    let mut consumed = 0usize;
+    let mut planning_work = initial_planning_work + copy_len as u64;
+    let mut execution_work = 0u64;
+    proof {
+        assert(execution_work as nat == m1_tree_action_trace_execution_units(actions, input@, region, tree)) by {
+            reveal_with_fuel(m1_tree_action_trace_execution_units, 1);
+        }
+        assert(planning_work as nat == m1_tree_initial_planning_units(workspace@, window_bytes, initial_decoder, initial_initialized)
+            + m1_tree_action_trace_planning_units(actions, input@, region, tree)) by {
+            reveal(m1_tree_initial_planning_units);
+            reveal_with_fuel(m1_tree_action_trace_planning_units, 1);
+        }
+    }
+    let mut iterations = 0u16;
+    proof {
+        assert(decoder.phase == CodeDescriptionPhase::Selector);
+        assert(decoder.alphabet_max == 704 && decoder.alphabet_limit == 704);
+        assert(copy_len == 0 && builder_initialized == 0);
+        assert(saved_load_reads == 18 && saved_aux_valid);
+        assert(loader_reads == 22 && initial_planning_work == 40);
+        assert(r_tree_planning_source_units == 40 && budget.work_remaining == 24);
+        assert(initial_rank == 5_695);
+        assert(initial_rank < 5_696nat);
+    }
+    (true, Ghost(r_tree_planning_source_units))
+}

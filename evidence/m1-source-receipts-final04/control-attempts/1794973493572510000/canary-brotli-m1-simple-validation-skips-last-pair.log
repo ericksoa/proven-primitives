@@ -1,0 +1,33 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:5030:9
+     |
+5030 |         assert(work == count as u64 * (count as u64 - 1)) by (nonlinear_arith)
+     |         ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:4998:1
+     |
+4998 | / fn simple_distinct_validation_metered(symbols: &[u16; 4], count: u8,
+4999 | |     budget: &mut crate::brotli::RequestBudget,
+5000 | | ) -> (r: (Result<u64, CoreFailure>, Ghost<nat>))
+     | |_______________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:5003:9
+     |
+5003 |         r.0.is_ok() ==> r.1@ == r.0.unwrap() as nat,
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+5055 |     (ordinary_result, Ghost(r_metered_source_reads))
+     |     ------------------------------------------------ at the end of the function body
+
+error: aborting due to 1 previous error
+

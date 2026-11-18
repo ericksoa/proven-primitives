@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_distance_relation_and_frame_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:55:13.001052+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 110.39664125000127,
+  "finished_utc": "2026-11-17T02:57:03.397297+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_six_m1_distance_relation_and_frame_defects.log",
+  "log_sha256": "be97b23169cdf3483110bbf13574a11301a44d46a21b22338e6521d9f9cae230",
+  "suite": "the_prover_rejects_six_m1_distance_relation_and_frame_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-m1-distance-prepass-omits-read-work",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-distance-prepass-omits-read-work.log",
+      "sha256": "0af22128815ff4af3244ceb9a9056d6f96a2c3a96ec1722b3890d69167c718b7",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-distance-plan-loses-need-input",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-distance-plan-loses-need-input.log",
+      "sha256": "e0d1e19629ff467756b9fefb97b41a09f23707d2ab6b7000aa1ffde7051af891",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-distance-plan-loses-consumption",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-distance-plan-loses-consumption.log",
+      "sha256": "03787b9e2fe35ed08d2a0079eb7391ba8645041264e8ff706cafa5309f73fc74",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-distance-plan-omits-value-writes",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-distance-plan-omits-value-writes.log",
+      "sha256": "739bf8ca42c6a205969098c5149eae4e7d97e94cfbbd6504fcdf8b94482cd319",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-distance-action-writes-wrong-direct-field",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-distance-action-writes-wrong-direct-field.log",
+      "sha256": "502b55cb3f850da52842ee25d52617af276ac7ba4d9d01c4fdf5ab74d36044dd",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-distance-action-flips-postfix",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-distance-action-flips-postfix.log",
+      "sha256": "502b55cb3f850da52842ee25d52617af276ac7ba4d9d01c4fdf5ab74d36044dd",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

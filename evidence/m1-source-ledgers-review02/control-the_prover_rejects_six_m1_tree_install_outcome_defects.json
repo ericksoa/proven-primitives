@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:13:35.976610+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 103.66712337499484,
+  "finished_utc": "2026-11-17T02:15:19.645339+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_six_m1_tree_install_outcome_defects.log",
+  "log_sha256": "ea34be9a203868a5fa1bd1abf9dc39529c9eac6b6379d0cad9ad15b9d3dc9c82",
+  "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-m1-tree-simple-rejection-is-truncated",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-tree-simple-rejection-is-truncated.log",
+      "sha256": "1f4f4bf1c98204223a7f77097e4b367c8b28b327bf4d665bfde1de0b3325a276",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-tree-canonical-rejection-is-internal",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-tree-canonical-rejection-is-internal.log",
+      "sha256": "a0fe9cfcd6381ffdedc82ef45cb622066efe3d73dcfff58af4476cdd61bf9ed4",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-tree-simple-plan-reports-invalid-tree",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-tree-simple-plan-reports-invalid-tree.log",
+      "sha256": "9d6dc67e4099164e9c4c19f0362091c29f2ed7b1409463fca9a166dd03061275",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-tree-canonical-plan-loses-tree-priority",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-tree-canonical-plan-loses-tree-priority.log",
+      "sha256": "71c98c82a1e51e4d85d0ac5195eb08c29c42528e233f01618c3b21d7a54c64b3",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-tree-canonical-plan-loses-length-error",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-tree-canonical-plan-loses-length-error.log",
+      "sha256": "202d386749ce72fde8162bf889c322f03286fd60bdea1b1868dfff8b72bdcb75",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-tree-owner-flags-matching-workspace-error",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-tree-owner-flags-matching-workspace-error.log",
+      "sha256": "fe5d776703a56a58c856820a3d38fc7d152b2b401667066f8009c3cdfbba7ea6",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

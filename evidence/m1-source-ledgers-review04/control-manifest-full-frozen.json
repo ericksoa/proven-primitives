@@ -1,0 +1,443 @@
+[
+  {
+    "suite": "the_prover_rejects_four_b3b_inverse_mtf_defects",
+    "mutants": [
+      "brotli-mtf-initializes-list-to-zero",
+      "brotli-mtf-shifts-from-current-cell",
+      "brotli-mtf-undercharges-each-rank",
+      "brotli-mtf-reuses-too-little-list-prefix"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_b3b_metadata_map_and_coverage_defects",
+    "mutants": [
+      "brotli-metadata-single-uses-wrong-tag-bit",
+      "brotli-metadata-block-length-overlaps-block-type",
+      "brotli-metadata-reads-first-inactive-record",
+      "brotli-distance-context-map-uses-literal-region",
+      "brotli-context-map-reads-first-uninitialized-entry",
+      "brotli-context-coverage-accepts-any-present-tree"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_b3c_block_count_metering_undercharges",
+    "mutants": [
+      "brotli-b3c-block-count-planning-bit-undercharge",
+      "brotli-b3c-block-count-base-write-undercharge",
+      "brotli-b3c-block-count-terminal-write-undercharge",
+      "brotli-b3c-block-count-single-value-undercharge",
+      "brotli-b3c-block-count-tree-start-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_three_b3c_distance_metering_undercharges",
+    "mutants": [
+      "brotli-b3c-distance-queue-write-undercharge",
+      "brotli-b3c-distance-terminal-undercharge",
+      "brotli-b3c-distance-value-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+    "mutants": [
+      "brotli-b3c-context-mode-complete-undercharge",
+      "brotli-b3c-context-mode-queue-undercharge",
+      "brotli-b3c-context-mode-terminal-undercharge",
+      "brotli-b3c-context-mode-value-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+    "mutants": [
+      "brotli-b3c-initial-suffix-planning-undercharge",
+      "brotli-b3c-initial-suffix-queue-undercharge",
+      "brotli-b3c-initial-suffix-terminal-undercharge",
+      "brotli-b3c-initial-suffix-value-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_b3c_tree_formula_undercharges",
+    "mutants": [
+      "brotli-b3c-simple-install-formula-undercharge",
+      "brotli-b3c-canonical-install-formula-undercharge",
+      "brotli-b3c-repeat-serialization-formula-undercharge",
+      "brotli-b3c-initial-symbol-formula-undercharge",
+      "brotli-b3c-serialization-base-formula-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+    "mutants": [
+      "brotli-b3c-context-count-queue-write-undercharge",
+      "brotli-b3c-context-count-var-write-undercharge",
+      "brotli-b3c-context-count-map-cell-undercharge",
+      "brotli-b3c-context-count-map-progress-undercharge",
+      "brotli-b3c-context-count-tree-count-undercharge",
+      "brotli-b3c-context-count-phase-transition-undercharge",
+      "brotli-b3c-context-count-terminal-undercharge",
+      "brotli-b3c-context-count-planning-debit-omitted",
+      "brotli-b3c-context-count-execution-debit-undercharge",
+      "brotli-b3c-context-count-execution-reserved-after-writes",
+      "brotli-b3c-context-count-wrong-decoded-count",
+      "brotli-b3c-context-count-wrong-zero-map-value",
+      "brotli-b3c-context-count-progress-writes-map-size"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_seventeen_b3c_context_bits_defects",
+    "mutants": [
+      "brotli-b3c-context-bits-queue-undercharge",
+      "brotli-b3c-context-bits-start-undercharge",
+      "brotli-b3c-context-bits-prefix-undercharge",
+      "brotli-b3c-context-bits-map-undercharge",
+      "brotli-b3c-context-bits-progress-undercharge",
+      "brotli-b3c-context-bits-reset-undercharge",
+      "brotli-b3c-context-bits-phase-undercharge",
+      "brotli-b3c-context-bits-terminal-undercharge",
+      "brotli-b3c-context-bits-planning-debit-omitted",
+      "brotli-b3c-context-bits-execution-debit-undercharge",
+      "brotli-b3c-context-bits-execution-reserved-after-writes",
+      "brotli-b3c-context-bits-wrong-prefix",
+      "brotli-b3c-context-bits-wrong-zero",
+      "brotli-b3c-context-bits-start-writes-unrelated-byte",
+      "brotli-b3c-context-bits-overshoot-terminal-undercharge",
+      "brotli-b3c-context-bits-skips-overshoot-check",
+      "brotli-b3c-context-bits-reads-wrong-width"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_nested_reset_transition_undercharges",
+    "mutants": [
+      "brotli-m1-tree-reset-transition-undercharge",
+      "brotli-m1-var-reset-transition-undercharge",
+      "brotli-m1-prefix-reset-transition-undercharge",
+      "brotli-m1-group-tree-transition-undercharge",
+      "brotli-m1-group-reset-transition-undercharge",
+      "brotli-m1-ready-reset-transition-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_nine_m1_source_refinement_and_debit_defects",
+    "mutants": [
+      "brotli-m1-code-field-wrong-width",
+      "brotli-m1-auxiliary-wrong-symbol",
+      "brotli-m1-complex-start-wrong-previous-length",
+      "brotli-m1-var-integer-wrong-value",
+      "brotli-m1-body-metadata-read-not-charged",
+      "brotli-m1-body-execution-undercharge",
+      "brotli-m1-context-direct-wrong-value",
+      "brotli-m1-initial-symbol-execution-undercharge",
+      "brotli-m1-context-symbol-execution-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects",
+    "mutants": [
+      "brotli-m1-aux-count-read-not-charged",
+      "brotli-m1-aux-first-code-skips-last-length",
+      "brotli-m1-aux-canonical-length-read-not-charged",
+      "brotli-m1-aux-candidate-read-not-charged",
+      "brotli-m1-aux-singleton-skips-last-length",
+      "brotli-m1-simple-pair-second-read-not-charged",
+      "brotli-m1-simple-validation-skips-last-pair",
+      "brotli-m1-field-planning-replay-not-charged",
+      "brotli-m1-saved-aux-load-not-charged",
+      "brotli-m1-saved-aux-wrong-partial-count",
+      "brotli-m1-saved-aux-skips-last-copy",
+      "brotli-m1-saved-aux-accepts-invalid-length",
+      "brotli-m1-canonical-validation-read-not-charged",
+      "brotli-m1-canonical-accepts-invalid-length",
+      "brotli-m1-canonical-accepts-incomplete-space"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+    "mutants": [
+      "brotli-m1-parser-restores-too-small-cap",
+      "brotli-m1-planner-restores-too-small-cap",
+      "brotli-m1-parser-skips-pending-span-drain",
+      "brotli-m1-planner-skips-pending-span-drain"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects",
+    "mutants": [
+      "brotli-m1-tree-plan-omits-saved-load-planning",
+      "brotli-m1-block-tree-plan-omits-planning-debit",
+      "brotli-m1-group-tree-plan-omits-planning-debit",
+      "brotli-m1-pending-span-writes-wrong-length",
+      "brotli-m1-descriptor-store-writes-unrelated-byte",
+      "brotli-m1-inconsistent-span-mutates-decoder"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_block_count_relation_and_debit_defects",
+    "mutants": [
+      "brotli-m1-block-count-prepass-omits-read-work",
+      "brotli-m1-block-count-plan-loses-need-input",
+      "brotli-m1-block-count-plan-loses-consumption",
+      "brotli-m1-block-count-executor-omits-input-debit",
+      "brotli-m1-block-count-limited-input-is-retryable",
+      "brotli-m1-block-count-value-writes-padding"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_distance_relation_and_frame_defects",
+    "mutants": [
+      "brotli-m1-distance-prepass-omits-read-work",
+      "brotli-m1-distance-plan-loses-need-input",
+      "brotli-m1-distance-plan-loses-consumption",
+      "brotli-m1-distance-plan-omits-value-writes",
+      "brotli-m1-distance-action-writes-wrong-direct-field",
+      "brotli-m1-distance-action-flips-postfix"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+    "mutants": [
+      "brotli-m1-context-bad-count-prepass-skips-terminal-plan",
+      "brotli-m1-context-bad-count-plan-omits-terminal-work",
+      "brotli-m1-context-bad-count-plan-loses-failure",
+      "brotli-m1-context-bad-count-plan-consumes-input",
+      "brotli-m1-context-bad-count-executor-wrong-error",
+      "brotli-m1-context-bad-count-owner-skips-action"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_context_mode_relation_and_frame_defects",
+    "mutants": [
+      "brotli-m1-context-mode-prepass-omits-read-work",
+      "brotli-m1-context-mode-plan-loses-need-input",
+      "brotli-m1-context-mode-plan-loses-consumption",
+      "brotli-m1-context-mode-plan-omits-value-writes",
+      "brotli-m1-context-mode-action-writes-wrong-value",
+      "brotli-m1-context-mode-action-loses-initialized-count",
+      "brotli-m1-context-mode-executor-omits-input-debit",
+      "brotli-m1-context-mode-limited-input-is-retryable"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_two_k2_context_mode_success_guarantee_defects",
+    "mutants": [
+      "brotli-k2-writer-rejects-last-valid-index",
+      "brotli-k2-writer-rejects-valid-window"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_k1_k3_success_and_preservation_defects",
+    "mutants": [
+      "brotli-k1-installer-rejects-valid-two-symbol-tree",
+      "brotli-k1-invalid-length-changes-metadata",
+      "brotli-k1-invalid-length-changes-builder",
+      "brotli-k3-rejects-valid-symbol-and-suffix",
+      "brotli-k3-decodes-wrong-block-length"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_three_k3_suffix_plan_relation_defects",
+    "mutants": [
+      "brotli-k3-suffix-plan-loses-consumption",
+      "brotli-k3-suffix-plan-loses-success",
+      "brotli-k3-suffix-plan-undercharges-value-tables"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_context_mode_handoff_defects",
+    "mutants": [
+      "brotli-m1-handoff-reset-writes-wrong-var-phase",
+      "brotli-m1-handoff-reset-writes-wrong-pending-run",
+      "brotli-m1-handoff-plan-undercharges-one",
+      "brotli-m1-handoff-plan-consumes-input",
+      "brotli-m1-handoff-action-skips-literal-map",
+      "brotli-m1-handoff-reset-writes-padding"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+    "mutants": [
+      "brotli-m1-cursor-tag-rejects-with-wrong-error",
+      "brotli-m1-cursor-distance-prepass-forgets-rejection",
+      "brotli-m1-cursor-block-prepass-forgets-var-rejection",
+      "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "brotli-m1-cursor-context-owner-skips-terminal-action",
+      "brotli-m1-cursor-executor-forgets-terminal-work-debit"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_k4_repeat_codec_defects",
+    "mutants": [
+      "brotli-k4-repeat-store-overwrites-history",
+      "brotli-k4-repeat-load-current-from-history",
+      "brotli-k4-progress-stores-previous-code-in-history",
+      "brotli-k4-repeat-load-history-from-current",
+      "brotli-k4-repeat-width-uses-old-class",
+      "brotli-k4-repeat-rejects-valid-length-fifteen"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_fourteen_k5_loader_accounting_defects",
+    "mutants": [
+      "brotli-k5-loader-omits-four-simple-copies",
+      "brotli-k5-prefix-validation-scan-undercharge",
+      "brotli-k5-singleton-guard-reordered-before-scan",
+      "brotli-k5-selected-singleton-read-unpaid",
+      "brotli-k5-singleton-skips-last-validation-cell",
+      "brotli-k5-simple-right-comparison-operand-unpaid",
+      "brotli-k5-simple-omits-right-operand-receipt",
+      "brotli-k5-selector-reload-keeps-old-eighteen",
+      "brotli-k5-prefix-reload-omits-validation-cell",
+      "brotli-k5-singleton-reload-omits-selected-cell",
+      "brotli-k5-initial-loader-replay-unpaid",
+      "brotli-k5-each-reload-restores-old-eighteen",
+      "brotli-k5-invalid-last-auxiliary-misclassified-valid",
+      "brotli-k5-invalid-alphabet-misclassified-valid"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_twelve_m1_general_codec_defects",
+    "mutants": [
+      "brotli-m1-codec-simple-index-erased",
+      "brotli-m1-codec-shape-selector-lost",
+      "brotli-m1-codec-symbol-array-alias",
+      "brotli-m1-codec-aux-array-erased",
+      "brotli-m1-codec-prefix-phase-alias",
+      "brotli-m1-codec-prefix-nonzero-erased",
+      "brotli-m1-codec-aux-skip-erased",
+      "brotli-m1-codec-chained-history-erased",
+      "brotli-m1-codec-parent-tag-erased",
+      "brotli-m1-codec-failed-error-tag-alias",
+      "brotli-m1-codec-simple-write-undercharge",
+      "brotli-m1-codec-complex-write-undercharge"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_twelve_k6_simple_install_metering_defects",
+    "mutants": [
+      "brotli-k6-singleton-reservation-restores-five",
+      "brotli-k6-selector-four-uses-three-symbols",
+      "brotli-k6-install-omits-validation-reads",
+      "brotli-k6-install-omits-record-probes",
+      "brotli-k6-triangular-correction-undercharged",
+      "brotli-k6-first-record-probe-unpaid",
+      "brotli-k6-fourth-record-probe-unpaid",
+      "brotli-k6-range-validation-read-unpaid",
+      "brotli-k6-distinctness-right-read-unpaid",
+      "brotli-k6-singleton-final-read-unpaid",
+      "brotli-k6-adapter-omits-installation-reservation",
+      "brotli-k6-installer-reads-before-destination-guard"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+    "mutants": [
+      "brotli-m1-executor-simple-loses-consumption",
+      "brotli-m1-executor-canonical-loses-consumption",
+      "brotli-m1-executor-simple-false-need-input",
+      "brotli-m1-executor-canonical-false-need-input"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "mutants": [
+      "brotli-m1-executor-parser-error-replaced",
+      "brotli-m1-executor-bad-span-error-replaced",
+      "brotli-m1-executor-canonical-error-replaced",
+      "brotli-m1-executor-empty-input-fabricates-error",
+      "brotli-m1-pending-span-wrong-failure-reason",
+      "brotli-m1-planner-parser-error-replaced",
+      "brotli-m1-planner-bad-span-error-replaced",
+      "brotli-m1-planner-bad-builder-error-replaced"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_k7_k8_result_contract_defects",
+    "mutants": [
+      "brotli-k7-canonical-constructor-spurious-error",
+      "brotli-k8-single-constructor-spurious-error",
+      "brotli-k7-singleton-install-spurious-error",
+      "brotli-k7-multi-install-spurious-error",
+      "brotli-k8-invalid-tree-error-replaced",
+      "brotli-k8-invalid-tree-mutates-metadata"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "mutants": [
+      "brotli-m1-tree-simple-rejection-is-truncated",
+      "brotli-m1-tree-canonical-rejection-is-internal",
+      "brotli-m1-tree-simple-plan-reports-invalid-tree",
+      "brotli-m1-tree-canonical-plan-loses-tree-priority",
+      "brotli-m1-tree-canonical-plan-loses-length-error",
+      "brotli-m1-tree-owner-flags-matching-workspace-error"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_invalid_start_defects",
+    "mutants": [
+      "brotli-m1-invalid-region-consumes-input",
+      "brotli-m1-invalid-region-mutates-descriptor",
+      "brotli-m1-invalid-region-plan-consumes-input",
+      "brotli-m1-invalid-descriptor-plan-consumes-input"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_m1_tree_error_identity_defects",
+    "mutants": [
+      "brotli-m1-saved-loader-spurious-unsupported-mode",
+      "brotli-m1-malformed-region-executor-wrong-error",
+      "brotli-m1-malformed-region-planner-wrong-error",
+      "brotli-m1-malformed-descriptor-plan-wrong-error",
+      "brotli-m1-tree-caller-flags-equal-internal-errors"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_m1_literal_handoff_defects",
+    "mutants": [
+      "brotli-m1-literal-handoff-accepts-zero-command-count",
+      "brotli-m1-literal-handoff-accepts-large-command-count",
+      "brotli-m1-literal-handoff-terminal-work-undercharge",
+      "brotli-m1-literal-handoff-loses-error",
+      "brotli-m1-literal-handoff-loses-planning-debit"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects",
+    "mutants": [
+      "brotli-m1-handoff-loses-distance-parameter-rejection",
+      "brotli-m1-handoff-loses-final-count-validation",
+      "brotli-m1-handoff-accepts-out-of-range-literal-context",
+      "brotli-m1-handoff-accepts-out-of-range-distance-context",
+      "brotli-m1-handoff-accepts-zero-initial-length",
+      "brotli-m1-handoff-first-map-read-not-prepaid",
+      "brotli-m1-handoff-second-map-read-not-prepaid",
+      "brotli-m1-handoff-ready-start-undercharge",
+      "brotli-m1-block-tree-execution-reservation-undercharge",
+      "brotli-m1-tree-group-execution-reservation-undercharge",
+      "brotli-m1-map-tail-execution-reservation-undercharge",
+      "brotli-m1-terminal-execution-reservation-undercharge",
+      "brotli-m1-terminal-plan-accepts-zero-length",
+      "brotli-m1-map-handoff-rejection-undercharge",
+      "brotli-m1-map-tail-replay-consumption-corrupted",
+      "brotli-m1-map-tail-replay-coverage-error-corrupted"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_four_m1_context_cursor_terminal_defects",
+    "mutants": [
+      "brotli-m1-context-count-cursor-terminal-undercharged",
+      "brotli-m1-context-bits-cursor-terminal-undercharged",
+      "brotli-m1-context-count-cursor-skips-terminal-action",
+      "brotli-m1-context-bits-cursor-plan-wrong-error"
+    ]
+  },
+  {
+    "suite": "the_prover_rejects_five_m1_malformed_suffix_defects",
+    "mutants": [
+      "brotli-m1-malformed-suffix-invalid-fields-undercharge",
+      "brotli-m1-malformed-suffix-wrong-width-undercharge",
+      "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+      "brotli-m1-malformed-suffix-fallback-undercharge",
+      "brotli-m1-malformed-suffix-fallback-writes-byte175"
+    ]
+  }
+]

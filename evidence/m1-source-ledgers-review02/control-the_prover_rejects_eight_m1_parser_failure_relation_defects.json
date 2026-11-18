@@ -1,0 +1,74 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:11:51.544917+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 389.67114370800846,
+  "finished_utc": "2026-11-17T02:18:21.221858+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_eight_m1_parser_failure_relation_defects.log",
+  "log_sha256": "bdf4de7acf74c31449feb4c0c740d338457f3a6264c6b51006dafda0de575680",
+  "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+  "expected_mutants": 8,
+  "mutants": [
+    {
+      "name": "brotli-m1-executor-parser-error-replaced",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-executor-parser-error-replaced.log",
+      "sha256": "5093a97bd99512f76d7d426cc5245707fb4823c1a65616a5518ee09cda61adb9",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-executor-bad-span-error-replaced",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-executor-bad-span-error-replaced.log",
+      "sha256": "2ffaf3af45695d7d4afbaf07f621d699b8110b77ff200e74f45e5477788ea4d9",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-executor-canonical-error-replaced",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-executor-canonical-error-replaced.log",
+      "sha256": "dbd28d60759bfe75776ca1ee82c042a4e6c4ee285392e3d964df1f629c201d19",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-executor-empty-input-fabricates-error",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-executor-empty-input-fabricates-error.log",
+      "sha256": "95c114bda4ef58eb15226e005d9ab9877c7e892e964b1140520d7bc390b15f91",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-pending-span-wrong-failure-reason",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-pending-span-wrong-failure-reason.log",
+      "sha256": "3444b1261d64989b88b6934dde76a8e237837c8991711978a42e8b38f82f4490",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-planner-parser-error-replaced",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-planner-parser-error-replaced.log",
+      "sha256": "5a99b0c23f2af38242f4ba7bdea21e277900a5c7f54d5ff8459113ac3ee51ee5",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-planner-bad-span-error-replaced",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-planner-bad-span-error-replaced.log",
+      "sha256": "4978857c0c1783257063d5453b52a22a167124dc1971d65662dcbe329e49eb74",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-planner-bad-builder-error-replaced",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-planner-bad-builder-error-replaced.log",
+      "sha256": "ba48070e27418f24e5239ad0a70287514adc662d9aff3efabbd957fbfde7537e",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

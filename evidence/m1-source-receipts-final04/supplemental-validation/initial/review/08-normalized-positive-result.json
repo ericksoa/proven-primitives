@@ -1,0 +1,22 @@
+{
+  "completed_utc": "2026-11-18T01:35:21.227203+00:00",
+  "exit_code": 0,
+  "verified": 4,
+  "errors": 0,
+  "source_sha256": "8ed98823e7a68454600fa9a746b8d9d38cc50856d5969a40bc78792fc28a3fd0",
+  "source_unchanged": true,
+  "main_loop_seconds": [
+    111
+  ],
+  "log": "positive/positive-normalized-concrete-rank.log",
+  "log_sha256": "937f23e0806a8bec52150b67188a00a4e781ad39f7f5bdd2ed4c1d477b069882",
+  "source_manifest_sha256": "921ddfbf6305772fcc233be545cd12d109fdef25ae864e21fccd872582e60006",
+  "attributes": [
+    "#[verifier::rlimit(600)]",
+    "#[verifier::spinoff_prover]"
+  ],
+  "global_checker_rlimit": 1000,
+  "default_seed_loop_isolation_and_existing_flags_retained": true,
+  "all_original_root_loop_obligations_retained_and_checked": true,
+  "scope": "Actual full selected positive with exact Boolean-normalized true concrete rank predicate; not alone cap-control qualification."
+}

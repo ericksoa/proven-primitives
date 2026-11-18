@@ -1,0 +1,43 @@
+{
+  "suite": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+  "exit_code": 101,
+  "fresh_case_logs": [
+    {
+      "name": "brotli-m1-context-bad-count-prepass-skips-terminal-plan",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_context_count_failure_defects/canary-brotli-m1-context-bad-count-prepass-skips-terminal-plan.log",
+      "sha256": "205b04f2d203aa2a8656a0980031d2f61586662620c86a4e96a40400e8022c89"
+    },
+    {
+      "name": "brotli-m1-context-bad-count-plan-omits-terminal-work",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_context_count_failure_defects/canary-brotli-m1-context-bad-count-plan-omits-terminal-work.log",
+      "sha256": "504565bdb0355ae0de1dbf06719392ebe2db610520036a1a266a3787bf66023b"
+    },
+    {
+      "name": "brotli-m1-context-bad-count-plan-loses-failure",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_context_count_failure_defects/canary-brotli-m1-context-bad-count-plan-loses-failure.log",
+      "sha256": "ed8bd7e4daf9ad2abbb20e3292627422a985cbe325bbc25f5b80fc3265e28a2a"
+    },
+    {
+      "name": "brotli-m1-context-bad-count-plan-consumes-input",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_context_count_failure_defects/canary-brotli-m1-context-bad-count-plan-consumes-input.log",
+      "sha256": "f1931599cc3d8579a463640c9f95557f19590b8b407fb274d28e5815aa648923"
+    },
+    {
+      "name": "brotli-m1-context-bad-count-executor-wrong-error",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_context_count_failure_defects/canary-brotli-m1-context-bad-count-executor-wrong-error.log",
+      "sha256": "9c8ebe438566fd915ec7dec8c26be22ce25c8989f5562ceb3059678a41b26a76"
+    },
+    {
+      "name": "brotli-m1-context-bad-count-owner-skips-action",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_context_count_failure_defects/canary-brotli-m1-context-bad-count-owner-skips-action.log",
+      "sha256": "44a7ac49439e03e38970e59b77af8f925c1524c3360bb30969fe60c2284b6c3d"
+    }
+  ],
+  "source_at_failure_bundles": [
+    {
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_context_count_failure_defects/source-at-failure-0.tar.gz",
+      "sha256": "e7136d4e05157ead1ce531e1e9b7724e35a7ed7f4ed4d19de24971df1b2f4147"
+    }
+  ],
+  "not_semantic_closure": true
+}

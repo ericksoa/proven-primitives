@@ -1,0 +1,27 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_context_mode_handoff_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T04:50:58.690411+00:00",
+  "exit_code": 101,
+  "elapsed_seconds": 169.37338162500237,
+  "finished_utc": "2026-11-17T04:53:48.078683+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_six_m1_context_mode_handoff_defects.log",
+  "log_sha256": "0bbcdbbf49dc1993c131c2da802e186ad80e583d42a9600b7795103602291fe7",
+  "suite": "the_prover_rejects_six_m1_context_mode_handoff_defects",
+  "expected_mutants": 6,
+  "mutants": [],
+  "source_unchanged": true,
+  "executed_once": false,
+  "validation_errors": []
+}

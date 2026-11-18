@@ -1,0 +1,25 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:35127:1
+      |
+35127 | / fn plan_code_description_field(decoder: &mut CodeDescriptionDecoder,
+35128 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+35129 | | ) -> (r: (Result<(CodeDescriptionStep, u64, u64), CoreFailure>, Ghost<nat>))
+      | |___________________________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-31884/src/brotli_input.rs:35132:9
+      |
+35132 |         r.1@ + final(budget).work_remaining as nat == old(budget).work_remaining as nat,
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+35214 |     (ordinary_result, Ghost(r_field_source_units))
+      |     ---------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

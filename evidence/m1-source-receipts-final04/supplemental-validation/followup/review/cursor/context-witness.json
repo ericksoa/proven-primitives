@@ -1,0 +1,135 @@
+{
+  "status": "CHECKED concrete ContextModes cursor image/domain and actual-call receipt/effect witness; no new cursor negative",
+  "witness": {
+    "window_bytes": 1024,
+    "workspace_length": 1177584,
+    "scalar_base": 1164300,
+    "nonzero_absolute_bytes": {
+      "1164308": 9,
+      "1164310": 5,
+      "1164316": 1,
+      "1164459": 63
+    },
+    "all_other_bytes": 0,
+    "outer_phase": "ContextModes,tag5",
+    "literal_count": 1,
+    "modes_initialized": 0,
+    "queue_len": 9,
+    "mtf_upper_bound": 63,
+    "input": "empty",
+    "end_of_input": false
+  },
+  "admitted_domain_proved": [
+    "b3c_workspace_shape",
+    "b3b_workspace_shape",
+    "compressed_decoder_state_ok",
+    "context_mode_pending",
+    "not b3b_queue_encoding_valid",
+    "fixed_phase_bad_cursor(ContextModes)",
+    "fixed_outer_bad_cursor"
+  ],
+  "budget5": {
+    "actual_private_owning_module_proof": {
+      "path": "target/m1-r-cursor-context-witness/retained-budget5/result.json",
+      "sha256": "4ec1e88a720e8f84d08bd6f0439c002bf990cf39c19517a8197694a140256886"
+    },
+    "source_sha256": "53df69b317072db951cf0b05aa77bf737db20c4060b07cc609e7ba8c77b102e1",
+    "no_cross_module_export": true,
+    "actual_valid_work5_not_assumed_from_types": true
+  },
+  "image_proof": {
+    "result": {
+      "path": "target/m1-r-cursor-context-witness/attempts/image01/result.json",
+      "sha256": "10c822c84c92de711765255dc8d55a445d151f020376c3556ff431ea061c3eb2"
+    },
+    "command": {
+      "path": "target/m1-r-cursor-context-witness/attempts/image01/command.json",
+      "sha256": "7ed7c2fc4ff36e560fb73d50f7c98cd6fed680956d4c4cf7ef606c6ba2c45150"
+    },
+    "log": {
+      "path": "target/m1-r-cursor-context-witness/attempts/image01/verifier.log",
+      "sha256": "254eb29ce6201dd9e494dd0c001f4b94c1fd3ac22b8c97d5db5a32f4a10aca40"
+    },
+    "actual": {
+      "verified": 2,
+      "errors": 0
+    }
+  },
+  "actual_owner_call_replay": {
+    "result": "ErrStateEncoding,consumed0",
+    "command": {
+      "path": "target/m1-r-cursor-context-witness/attempts/owner01/command.json",
+      "sha256": "86499519d89fc1c435d8ec6f197c11a1b138948808dd970fb09b204998ed0649"
+    },
+    "log": {
+      "path": "target/m1-r-cursor-context-witness/attempts/owner01/verifier.log",
+      "sha256": "328a941ab6f9c3835bcd8706ddaa31ce8e35cbc803cc23b279d3a78de137cd33"
+    },
+    "source": {
+      "path": "target/m1-r-cursor-context-witness/attempts/owner01/src/brotli_input.rs",
+      "sha256": "43975e4601c16e1f3b0be8b2b75f81dfcdf6d19d10b6181a135390adb218e85f"
+    },
+    "actual": {
+      "verified": 1,
+      "errors": 0
+    },
+    "original_ordinary_owner_body_and_original_root_guarantees_retained": true,
+    "planner_Ok_arm_checked_unreachable": "Existing context_mode_planning_work says Err iff fixed_phase_bad_cursor; concrete image proves it true.",
+    "precall_workspace": "same as original witnessed image",
+    "precall_work": 5,
+    "precall_accumulated_receipt": 0,
+    "failure_plan": "Original planning0/execution4+1/consumed0/FailedInternalState constructor",
+    "actual_executor_call": "Original execute_fixed_compressed_plan call byte-exact at tested ContextModes fallback site",
+    "postcall_work": 0,
+    "actual_captured_child_source_units": 5,
+    "derivation": "Original valid-plan receipt conservation gives actual child units + actual post-budget0 == actual pre-budget5; original successful execution debit gives post-budget0. No receipt assigned from reservation/model/constant.",
+    "actual_ghost_fold": "Original r_header_action_source_units += r_child_units preserved, actual returned receipt5",
+    "state_effect": "Existing terminal_error_frame and serialized_terminal_error(InternalState) proved after actual call"
+  },
+  "fresh_selected_executor_positive": {
+    "path": "target/m1-r-unreached03-controls-diagnostic/executor-positive/result.json",
+    "sha256": "e3ad40f1be648044e3ba188ef2259900fe83cb3ca0d56409c86c9a432959206f"
+  },
+  "mechanical_correspondence": {
+    "path": "target/m1-r-cursor-context-witness/ordinary-correspondence.json",
+    "sha256": "882c35a2a16b224318dd9594774ffdf3712a386c3dec2d7cfe9c362bb32c167b"
+  },
+  "receipt_source_coupling_proposal": {
+    "path": "target/m1-r-cursor-context-witness/computed-receipt-source-coupling.json",
+    "sha256": "32c0483b68fcfba874372e563c1b5693223eef65ab7c49dbf1d47939512fc789"
+  },
+  "only_temporary_entries_proofs_added": true,
+  "original_helpers_models_contracts_API_and_requirements_unchanged": true,
+  "all_1136_original_input_prefix_declarations_exact": true,
+  "core_source_sha256": {
+    "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+    "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+    "brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+    "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+  },
+  "production_tests_sha256": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+  "gate_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+  "new_cursor_negative_authorized_or_run": false,
+  "new_cursor_negative_materialized": false,
+  "witness_checker_invocations": 2,
+  "budget_existence_reused_after_actual_pass": true,
+  "main_tests_gate_evidence_canary_edits": 0,
+  "counts_as_final_gate": false,
+  "separate_old_unreached_cases": {
+    "results": {
+      "path": "target/m1-r-unreached03-controls-diagnostic/diagnostic-result.json",
+      "sha256": "b256a9a0ffe9e21c0870e1360efa2101dc68119359c21ada95c4a07bbe02c380"
+    },
+    "byte175": "resource-only0/1, additional blocker",
+    "executor_debit": "clean semantic0/1 after actual selected executor1/0",
+    "not_part_of_new_cursor_negative": true
+  },
+  "healthy_computed_positive": "Separately authorized one true-computed positive153d is running in its own target directory; not counted by this witness packet."
+}

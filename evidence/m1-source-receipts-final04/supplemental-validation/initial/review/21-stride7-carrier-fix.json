@@ -1,0 +1,13 @@
+{
+  "suite": "the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects",
+  "case": "brotli-b3b-serialized-tree-skips-builder-reset",
+  "function": "start_serialized_tree",
+  "old": "put_state_u16(workspace, window_bytes, B3B_BUILDER_INITIALIZED, 0)",
+  "previous_new": "Ok(())",
+  "new": "(Ok(()), Ghost(0nat))",
+  "change_scope": "only this percase mutantreplacement string, noassertion/model/contract/productionedit",
+  "fault_preserved": "skip the exact builderinitialized reset invocation and its actual two workspacebytewrites, while stillordinaryOk",
+  "receipt_origin": "the removed invocation reacheszero sourceoperations; empty invocation eventtrace has actualcount0. This is not a plannerreservation or modeledtwo-write substitute. All earlier reachedchildreceipts remainunchanged.",
+  "old_assertions_and_root_contracts": "retained exactly",
+  "extra_mutants_run": 0
+}

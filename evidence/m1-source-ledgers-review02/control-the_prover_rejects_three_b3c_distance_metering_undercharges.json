@@ -1,0 +1,44 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_three_b3c_distance_metering_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T01:46:33.512331+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 53.760939957996015,
+  "finished_utc": "2026-11-17T01:47:27.274098+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_three_b3c_distance_metering_undercharges.log",
+  "log_sha256": "1ea11199494a5871dd22e6a46908366ec3cc8d707cef994728642997878f71ee",
+  "suite": "the_prover_rejects_three_b3c_distance_metering_undercharges",
+  "expected_mutants": 3,
+  "mutants": [
+    {
+      "name": "brotli-b3c-distance-queue-write-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-distance-queue-write-undercharge.log",
+      "sha256": "f513d9a2cc1d82c34cb6f02d7e059e6ec8a2652fadf5c2f6686c523cf0c15e01",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-distance-terminal-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-distance-terminal-undercharge.log",
+      "sha256": "a02cbec7fb93bb0ea461cc458b39b09b71ce70c4a968cffcd5115fe04718bb44",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-distance-value-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-distance-value-undercharge.log",
+      "sha256": "e76f236aec8c7f1537fffec39003b6542cf543e357ad38934c4ba9d683ea430e",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

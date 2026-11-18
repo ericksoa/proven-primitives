@@ -1,0 +1,91 @@
+from pathlib import Path
+import argparse,concurrent.futures,datetime,gzip,hashlib,json,os,re,shutil,subprocess,time
+ROOT=Path.cwd(); EV=ROOT/'evidence'; TOOL=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos')
+parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['positive','controls']);parser.add_argument('--tag',required=True);parser.add_argument('--suite',action='append');args=parser.parse_args()
+assert re.fullmatch('[a-z0-9-]+',args.tag)
+OUT=EV/args.tag;OUT.mkdir(exist_ok=True)
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1',VERUS_ROOT=str(TOOL))
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+now=lambda:datetime.datetime.now(datetime.timezone.utc).isoformat()
+files=sorted(p for folder in ['src','tests','benches'] for p in (ROOT/folder).rglob('*') if p.is_file())
+files += [ROOT/p for p in ['Cargo.toml','Cargo.lock','rust-toolchain.toml']]
+def snapshot():return {str(p.relative_to(ROOT)):h(p) for p in files}
+def write(name,data):(OUT/name).write_text(json.dumps(data,indent=2)+'\n')
+def run(name,cmd):
+ log=OUT/(name+'.log');row={'command':cmd,'started_utc':now()};t=time.monotonic()
+ with log.open('w') as out:p=subprocess.run(cmd,env=env,stdout=out,stderr=subprocess.STDOUT)
+ row.update(exit_code=p.returncode,elapsed_seconds=time.monotonic()-t,finished_utc=now(),log=str(log.relative_to(ROOT)),log_sha256=h(log))
+ print(json.dumps(row),flush=True);return row,log.read_text()
+if args.phase=='positive':
+ frozen=snapshot();shutil.copy2(Path(__file__),OUT/'gate-driver.py.txt');write('source-start.json',{'source_sha256':frozen,'started_utc':now(),'gate_driver_sha256':h(Path(__file__)),'verifier_binary':{n:h(TOOL/n) for n in ['verus','rust_verify','z3']}})
+ # Source and validation bytes are frozen throughout all positive checks.
+ runtime=[]
+ for name,cmd in [
+  ('runtime-library',['cargo','test','--locked','--release','--lib']),
+  ('runtime-primitives',['cargo','test','--locked','--release','--test','primitives']),
+  ('runtime-comparison',['cargo','test','--locked','--release','--test','upstream_comparison']),
+  ('runtime-trust',['cargo','test','--locked','--release','--test','proof_rejection','project_source_contains_no_proof_trust_bypasses','--','--exact']),
+ ]:
+  row,text=run(name,cmd);row['passed']=sum(map(int,re.findall(r'test result: ok\. (\d+) passed; 0 failed',text)));runtime.append(row)
+  write('runtime-results.json',runtime);assert row['exit_code']==0 and snapshot()==frozen,name
+ cmd=[str(TOOL/'verus'),'src/lib.rs','--crate-type','lib','--no-cheating','--num-threads','8','--triggers-mode','silent','--rlimit','300','--trace','--time','--output-json']
+ row,text=run('whole-crate',cmd);row['source_unchanged']=snapshot()==frozen;write('whole-result.json',row)
+ a=text.find('{\n  "func-details"');assert a>=0,'No verifier report';proof=json.loads(text[a:]);write('verification.json',proof)
+ assert row['exit_code']==0 and row['source_unchanged'] and proof['verification-results']['success'] and proof['verification-results']['errors']==0 and proof['verification-results']['is-verifying-entire-crate']
+ write('positive.json',{'source_sha256':frozen,'runtime_passed':sum(r['passed'] for r in runtime),'verification':proof['verification-results'],'whole':row,'source_unchanged':True})
+else:
+ positive=json.loads((OUT/'positive.json').read_text());frozen=positive['source_sha256'];assert snapshot()==frozen
+ assert h(Path(__file__))==json.loads((OUT/'source-start.json').read_text())['gate_driver_sha256']
+ assert positive['verification']['success'] and positive['verification']['is-verifying-entire-crate'] and positive['source_unchanged']
+ source=(ROOT/'tests/proof_rejection.rs').read_text()
+ cases=[]
+ for m in re.finditer(r'^fn (the_prover_rejects_[a-zA-Z0-9_]+)\(',source,re.M):
+  n=m.group(1)
+  applicable=any(x in n for x in ['_m1_','_k1_','_k2_','_k3_','_k4_','_k5_','_k6_','_k7_']) or (n in [
+   'the_prover_rejects_five_b3c_block_count_metering_undercharges',
+   'the_prover_rejects_three_b3c_distance_metering_undercharges',
+   'the_prover_rejects_four_b3c_context_mode_metering_undercharges',
+   'the_prover_rejects_four_b3c_initial_suffix_metering_undercharges',
+   'the_prover_rejects_five_b3c_tree_formula_undercharges',
+   'the_prover_rejects_thirteen_b3c_context_tree_count_defects',
+   'the_prover_rejects_seventeen_b3c_context_bits_defects',
+   'the_prover_rejects_four_b3b_inverse_mtf_defects',
+   'the_prover_rejects_six_b3b_metadata_map_and_coverage_defects',
+  ])
+  if not applicable or (args.suite and n not in args.suite):continue
+  end=source.index('\n}\n',m.start())+3
+  names=list(dict.fromkeys(re.findall(r'"(brotli-[a-z0-9-]+)"',source[m.start():end])))
+  assert names,n;cases.append((n,names))
+ if args.suite:assert set(args.suite)=={n for n,_ in cases}
+ new_manifest=[{'suite':n,'mutants':ns} for n,ns in cases]
+ if (OUT/'control-manifest.json').exists():assert json.loads((OUT/'control-manifest.json').read_text())==new_manifest,'Use a separate tag for a subset retry'
+ write('control-manifest.json',new_manifest)
+ if not args.suite:
+  if (OUT/'control-manifest-full-frozen.json').exists():assert json.loads((OUT/'control-manifest-full-frozen.json').read_text())==new_manifest
+  write('control-manifest-full-frozen.json',new_manifest)
+ def control(case):
+  n,names=case;row,log=run('controls-'+n,['cargo','test','--locked','--release','--test','proof_rejection',n,'--','--ignored','--exact','--nocapture'])
+  # For tests without an ignore flag, cargo's --ignored would run zero tests; require one result.
+  if row['exit_code']==0 and 'test result: ok. 0 passed;' in log:
+   row,log=run('controls-'+n,['cargo','test','--locked','--release','--test','proof_rejection',n,'--','--exact','--nocapture'])
+  executed_once='test result: ok. 1 passed; 0 failed' in log
+  row.update(suite=n,expected_mutants=len(names),mutants=[],source_unchanged=snapshot()==frozen,executed_once=executed_once,validation_errors=[])
+  if row['exit_code']==0 and not executed_once:row['validation_errors'].append('Expected exactly one executed suite')
+  if row['exit_code']==0 and executed_once:
+   for mutant in names:
+    path=EV/('canary-'+mutant+'.log')
+    if not path.exists() or path.stat().st_mtime < datetime.datetime.fromisoformat(row['started_utc']).timestamp():
+     row['validation_errors'].append('Missing or stale transcript: '+mutant);continue
+    text=path.read_text();lower=text.lower()
+    computed='error: expression simplifies to false' in lower and 'by (compute_only)' in text
+    semantic=(computed or (re.search(r'verification results:: .*\b[1-9][0-9]* errors',text) and any(x in lower for x in ['postcondition not satisfied','precondition not satisfied','requires not satisfied','invariant not satisfied','assertion failed'])))
+    tooling=any(x in lower for x in ['resource limit','rlimit) exceeded','expected rlimit-count','panicked','internal compiler error','unexpected smt output'])
+    dest=OUT/path.name;shutil.copy2(path,dest)
+    row['mutants'].append({'name':mutant,'log':str(dest.relative_to(ROOT)),'sha256':h(dest),'semantic_rejection':bool(semantic) and not tooling})
+  write('control-'+n+'.json',row)
+  return row
+ with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(control,cases))
+ write('controls-results.json',rows)
+ assert all(r['exit_code']==0 and r['executed_once'] and not r['validation_errors'] and r['source_unchanged'] and len(r['mutants'])==r['expected_mutants'] and all(m['semantic_rejection'] for m in r['mutants']) for r in rows),'Controls did not all produce semantic rejections'
+ assert snapshot()==frozen
+ print('semantic_rejections',sum(len(r['mutants']) for r in rows),flush=True)

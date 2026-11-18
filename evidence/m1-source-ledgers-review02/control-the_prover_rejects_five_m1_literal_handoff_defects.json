@@ -1,0 +1,56 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_five_m1_literal_handoff_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:18:21.298844+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 93.13555316599377,
+  "finished_utc": "2026-11-17T02:19:54.435832+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_five_m1_literal_handoff_defects.log",
+  "log_sha256": "6f4e2947e6f6e388006a9734e8f78429f34047952a7bf137bf2a6f2041df620e",
+  "suite": "the_prover_rejects_five_m1_literal_handoff_defects",
+  "expected_mutants": 5,
+  "mutants": [
+    {
+      "name": "brotli-m1-literal-handoff-accepts-zero-command-count",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-literal-handoff-accepts-zero-command-count.log",
+      "sha256": "55afcc16f444de585c9c6816190959db4b74db05283b24db260b243a1bf449f2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-literal-handoff-accepts-large-command-count",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-literal-handoff-accepts-large-command-count.log",
+      "sha256": "55afcc16f444de585c9c6816190959db4b74db05283b24db260b243a1bf449f2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-literal-handoff-terminal-work-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-literal-handoff-terminal-work-undercharge.log",
+      "sha256": "593d327d30e1217490c07ddac741dd99901bf7cc4b864b55b8ba6b6870037d52",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-literal-handoff-loses-error",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-literal-handoff-loses-error.log",
+      "sha256": "af96043219801fdd7ec04c6fb7e134333dcecddd3ac7c7f1fed95912274bcac6",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-literal-handoff-loses-planning-debit",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-literal-handoff-loses-planning-debit.log",
+      "sha256": "4bc90a279dfc854878025fb955a4d6c1b4a5ba4b81ba3d6a6294425d7d9bd20a",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

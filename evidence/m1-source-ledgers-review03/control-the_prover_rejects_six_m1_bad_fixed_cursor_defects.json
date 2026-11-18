@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T03:00:24.141480+00:00",
+  "exit_code": 101,
+  "elapsed_seconds": 150.41365383299126,
+  "finished_utc": "2026-11-17T03:02:54.554594+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_six_m1_bad_fixed_cursor_defects.log",
+  "log_sha256": "2e015e72871deaa786d2353a85a33078eb516e402c4f277e5d9e15f54481d40a",
+  "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+  "source_unchanged": null,
+  "mutants": [],
+  "reconstructed_from_driver_stdout": true,
+  "not_semantic_closure": true
+}

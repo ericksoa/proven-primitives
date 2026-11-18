@@ -1,0 +1,44 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_three_k3_suffix_plan_relation_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:01:37.297594+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 58.16436533399974,
+  "finished_utc": "2026-11-17T02:02:35.462866+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_three_k3_suffix_plan_relation_defects.log",
+  "log_sha256": "201724d0025938d3c6e2eb63e2cd9659daacbe9a2041c6deb06f97d5dfa6db81",
+  "suite": "the_prover_rejects_three_k3_suffix_plan_relation_defects",
+  "expected_mutants": 3,
+  "mutants": [
+    {
+      "name": "brotli-k3-suffix-plan-loses-consumption",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-k3-suffix-plan-loses-consumption.log",
+      "sha256": "d6c0057107b2113445aafc09de070fa3e50106436807e393382252431c6ba719",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-suffix-plan-loses-success",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-k3-suffix-plan-loses-success.log",
+      "sha256": "be3310ad30154b11f16ba85a3570f83097029458d384bf9d74c3e4ae6ef2cb5f",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k3-suffix-plan-undercharges-value-tables",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-k3-suffix-plan-undercharges-value-tables.log",
+      "sha256": "a21e5f2b8f990b6e94bf19d81d24def3d9798f69c529e83f76210c7c1dcdec1d",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

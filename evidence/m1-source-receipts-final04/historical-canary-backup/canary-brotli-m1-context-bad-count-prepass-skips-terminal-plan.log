@@ -1,0 +1,30 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-8209/src/brotli_input.rs:31419:1
+      |
+31419 | / fn context_mode_planning_work(
+31420 | |     workspace: &[u8],
+31421 | |     window_bytes: u32,
+31422 | |     input_len: usize,
+31423 | | ) -> (r: Result<u64, CompressedHeaderError>)
+      | |___________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-count-failure-canary-8209/src/brotli_input.rs:31425:9
+      |
+31425 | /         b3b_workspace_shape(workspace@.len() as nat, window_bytes) ==> {
+31426 | |             &&& r.is_err() == fixed_phase_bad_cursor(workspace@, window_bytes, CompressedOuterPhase::ContextModes)
+31427 | |             &&& (r.is_err() ==> r == Err(CompressedHeaderError::InternalState))
+31428 | |         },
+      | |_________^ failed this postcondition
+...
+31443 |           return Err(CompressedHeaderError::InternalState);
+      |           ------------------------------------------------ at this exit
+
+error: aborting due to 1 previous error
+

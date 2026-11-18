@@ -1,0 +1,31 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-cursor-terminal-canary-41760/src/brotli_input.rs:38004:1
+      |
+38004 | / fn advance_planned_context_tree_count(
+38005 | |     workspace: &mut [u8],
+38006 | |     window_bytes: u32,
+38007 | |     budget: &mut crate::brotli::RequestBudget,
+38008 | |     input: &[u8],
+38009 | |     end_of_input: bool,
+38010 | | ) -> (r: (Result<usize, CompressedStep>, Ghost<nat>))
+      | |____________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-cursor-terminal-canary-41760/src/brotli_input.rs:38020:9
+      |
+38020 | /         m1_context_bad_saved_cursor(old(workspace)@, window_bytes) ==>
+38021 | |             m1_context_cursor_owner_effect(old(workspace)@, final(workspace)@, window_bytes,
+38022 | |                 *old(budget), *final(budget), r.0),
+      | |__________________________________________________^ failed this postcondition
+...
+38059 |               return ({ let (r_child_result, Ghost(r_chil...t }, Ghost(r_context_wrapper_source_units));
+      |               -------------------------------------------...------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

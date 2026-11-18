@@ -1,0 +1,1976 @@
+[
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "4db4c2dd0b54714896b64643f0bf6584dbb688244b6c70b15bd26d8f4204587d",
+        "name": "brotli-m1-context-mode-prepass-omits-read-work"
+      },
+      {
+        "identity_sha256": "14ae26024aa776a9176ac62a03f3ba5003fabf4f281074334aedfc06b92f9784",
+        "name": "brotli-m1-context-mode-plan-loses-need-input"
+      },
+      {
+        "identity_sha256": "83c0a0e834164c78539760d9e6d2c18402e17f4c10edd10ec5d471d42c8b1e96",
+        "name": "brotli-m1-context-mode-plan-loses-consumption"
+      },
+      {
+        "identity_sha256": "4e9444d6c93a9bf42fb39185e637b2d26595c1318ca1747a0d96d46074bc45f9",
+        "name": "brotli-m1-context-mode-plan-omits-value-writes"
+      },
+      {
+        "identity_sha256": "affcefe9494c145cdaf3bf5c7510521038778eb171d17ca62915a227e5e883b5",
+        "name": "brotli-m1-context-mode-action-writes-wrong-value"
+      },
+      {
+        "identity_sha256": "b53637668ef385c64de5221fcf34daa4ea04fd7f6c3a0e79d25a0add3049cef6",
+        "name": "brotli-m1-context-mode-action-loses-initialized-count"
+      },
+      {
+        "identity_sha256": "c7a91745a4e49c9b004ec4e871abae00d8f430d2e45a55557579092f57cae892",
+        "name": "brotli-m1-context-mode-executor-omits-input-debit"
+      },
+      {
+        "identity_sha256": "09c3f90af3b5fac37e0d3cc666b82469e66e19469c6f5f470112754e789188d9",
+        "name": "brotli-m1-context-mode-limited-input-is-retryable"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-context-mode-prepass-omits-read-work",
+      "brotli-m1-context-mode-plan-loses-need-input",
+      "brotli-m1-context-mode-plan-loses-consumption",
+      "brotli-m1-context-mode-plan-omits-value-writes",
+      "brotli-m1-context-mode-action-writes-wrong-value",
+      "brotli-m1-context-mode-action-loses-initialized-count",
+      "brotli-m1-context-mode-executor-omits-input-debit",
+      "brotli-m1-context-mode-limited-input-is-retryable"
+    ],
+    "suite": "the_prover_rejects_eight_m1_context_mode_relation_and_frame_defects",
+    "suite_source_sha256": "9e81241401bcb6fe63ed737dfc4db882c60bb41e6f21c21a7bdf8921edb9d50c"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "f45ba9a258862fabf1cc51132012d1d7f4369bda58f3244db129cc2b27c759ca",
+        "name": "brotli-m1-executor-parser-error-replaced"
+      },
+      {
+        "identity_sha256": "0c3412909381c3bcb25bc937e2ac2d37bd6053bda27486eb75b7b5a0a30c6a06",
+        "name": "brotli-m1-executor-bad-span-error-replaced"
+      },
+      {
+        "identity_sha256": "af66e6f75528424f47eb4e8961bd6f138be144482d8e3cf9a93fdcdae7cecd6b",
+        "name": "brotli-m1-executor-canonical-error-replaced"
+      },
+      {
+        "identity_sha256": "8cb7fc9c3ca48a652722709bcc752abdc5ef02b7e1658e9f8e07478fcf28069b",
+        "name": "brotli-m1-executor-empty-input-fabricates-error"
+      },
+      {
+        "identity_sha256": "048301206fb885885222d0722a6c9b8238473f7aff94466ecec4bcc76a9fced7",
+        "name": "brotli-m1-pending-span-wrong-failure-reason"
+      },
+      {
+        "identity_sha256": "6d973e96fd707f8c7e4491def0fb2d73b86dec4a5be5bca291ec19ba1a29236a",
+        "name": "brotli-m1-planner-parser-error-replaced"
+      },
+      {
+        "identity_sha256": "5bba1bc6843291569c621d2be7ef9c682176b3eba6c2d97431be9c196a5449ef",
+        "name": "brotli-m1-planner-bad-span-error-replaced"
+      },
+      {
+        "identity_sha256": "0a97d602c8dfaeca77362b48736745e36f6d1cf27e53cb5d25e9c32e3b53682f",
+        "name": "brotli-m1-planner-bad-builder-error-replaced"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-executor-parser-error-replaced",
+      "brotli-m1-executor-bad-span-error-replaced",
+      "brotli-m1-executor-canonical-error-replaced",
+      "brotli-m1-executor-empty-input-fabricates-error",
+      "brotli-m1-pending-span-wrong-failure-reason",
+      "brotli-m1-planner-parser-error-replaced",
+      "brotli-m1-planner-bad-span-error-replaced",
+      "brotli-m1-planner-bad-builder-error-replaced"
+    ],
+    "suite": "the_prover_rejects_eight_m1_parser_failure_relation_defects",
+    "suite_source_sha256": "01c9f4f870124137acf9d09e02ae0f6f45c0d6e474c4fe9832a3de019c2406f9"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "9cc655fff21ff5024b220b17f96cfdd8309a47ae61768d7a0606f37dd4370522",
+        "name": "brotli-m1-aux-count-read-not-charged"
+      },
+      {
+        "identity_sha256": "bc4b8acbaf6e12a7716e51fc252251a35e88757e151addfa9211286a4915c2dc",
+        "name": "brotli-m1-aux-first-code-skips-last-length"
+      },
+      {
+        "identity_sha256": "db3f1e9e81bc685103aba243587d7e2265a6b3ac9666164c78ce6394c9a404a6",
+        "name": "brotli-m1-aux-canonical-length-read-not-charged"
+      },
+      {
+        "identity_sha256": "615d10c0a3435549e664d3cbec39462b2c546ab5ac648c17d18e0f70998bcb26",
+        "name": "brotli-m1-aux-candidate-read-not-charged"
+      },
+      {
+        "identity_sha256": "412e621364c66775853fad32a936a6b08abfb428ca90d24993978f8984dc72e1",
+        "name": "brotli-m1-aux-singleton-skips-last-length"
+      },
+      {
+        "identity_sha256": "53ef01916436ad6c48f9097b2747e9f3920390025cd459bf6d629ef997b8ddfa",
+        "name": "brotli-m1-simple-pair-second-read-not-charged"
+      },
+      {
+        "identity_sha256": "8a8c8c024fa9f8beac599118d12bd86a5814da30ba729277b068e761f2121dfc",
+        "name": "brotli-m1-simple-validation-skips-last-pair"
+      },
+      {
+        "identity_sha256": "65f26615849097093b99e16a32a650a36704dbc612f36f59a8c46c1aa6c33d16",
+        "name": "brotli-m1-field-planning-replay-not-charged"
+      },
+      {
+        "identity_sha256": "5d95326b6ebd19329f0b338046d4abd8b06badf6861abc22ab1a9531206c432e",
+        "name": "brotli-m1-saved-aux-load-not-charged"
+      },
+      {
+        "identity_sha256": "d125ffe6f31cca98c29e82c84edb91a5b5edffde7fe52687b6faf0bd14e4bafb",
+        "name": "brotli-m1-saved-aux-wrong-partial-count"
+      },
+      {
+        "identity_sha256": "47f6c3505cf836d22eb0286c36f884b3b0718b9453aa0826625de49a16204035",
+        "name": "brotli-m1-saved-aux-skips-last-copy"
+      },
+      {
+        "identity_sha256": "5dc33f2fd412e1242c412563bd64d98ebaeb6025fd5844b7c923437762f50570",
+        "name": "brotli-m1-saved-aux-accepts-invalid-length"
+      },
+      {
+        "identity_sha256": "bd27a05532ec7bce69c12abddaf2b08f374b31e0d2eb405b7f60a7f12b0de69f",
+        "name": "brotli-m1-canonical-validation-read-not-charged"
+      },
+      {
+        "identity_sha256": "b86ab4a75848bfdd573ce77f07ff7aa674f2edc815401b68cc2c4136319ef6b4",
+        "name": "brotli-m1-canonical-accepts-invalid-length"
+      },
+      {
+        "identity_sha256": "b171632bbccfbaf67fb585282b8b488f19174211780180ff93c4a3364aeb054a",
+        "name": "brotli-m1-canonical-accepts-incomplete-space"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-aux-count-read-not-charged",
+      "brotli-m1-aux-first-code-skips-last-length",
+      "brotli-m1-aux-canonical-length-read-not-charged",
+      "brotli-m1-aux-candidate-read-not-charged",
+      "brotli-m1-aux-singleton-skips-last-length",
+      "brotli-m1-simple-pair-second-read-not-charged",
+      "brotli-m1-simple-validation-skips-last-pair",
+      "brotli-m1-field-planning-replay-not-charged",
+      "brotli-m1-saved-aux-load-not-charged",
+      "brotli-m1-saved-aux-wrong-partial-count",
+      "brotli-m1-saved-aux-skips-last-copy",
+      "brotli-m1-saved-aux-accepts-invalid-length",
+      "brotli-m1-canonical-validation-read-not-charged",
+      "brotli-m1-canonical-accepts-invalid-length",
+      "brotli-m1-canonical-accepts-incomplete-space"
+    ],
+    "suite": "the_prover_rejects_fifteen_m1_saved_table_and_lookup_defects",
+    "suite_source_sha256": "6e7aa38d83215583fd6ac5e824faead8d3958ec58a07bbcc35b37da843ffd852"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "7f567ae5ffa43bc4aceedc4a60a3f7f6afa5daf7740d7cc8bcdcfc41a424b2a7",
+        "name": "brotli-b3c-block-count-planning-bit-undercharge"
+      },
+      {
+        "identity_sha256": "fdee586211b14e106f9cf68cf1fe1dada44c111f5e0df1d2599008d1f78856d5",
+        "name": "brotli-b3c-block-count-base-write-undercharge"
+      },
+      {
+        "identity_sha256": "9389693f0ad15cde7bf1750f86ea3cceb63ac47ccae17d983e6573a1fd03185b",
+        "name": "brotli-b3c-block-count-terminal-write-undercharge"
+      },
+      {
+        "identity_sha256": "22c04e9d45acb026593dd0afeb4cf1551ce1b79400dc745283ee63ef7b4bd60d",
+        "name": "brotli-b3c-block-count-single-value-undercharge"
+      },
+      {
+        "identity_sha256": "7fea594affc4d38c00dfabedfdcd78ea87158202696cd465dff87b48e7166bdd",
+        "name": "brotli-b3c-block-count-tree-start-undercharge"
+      }
+    ],
+    "mutants": [
+      "brotli-b3c-block-count-planning-bit-undercharge",
+      "brotli-b3c-block-count-base-write-undercharge",
+      "brotli-b3c-block-count-terminal-write-undercharge",
+      "brotli-b3c-block-count-single-value-undercharge",
+      "brotli-b3c-block-count-tree-start-undercharge"
+    ],
+    "suite": "the_prover_rejects_five_b3c_block_count_metering_undercharges",
+    "suite_source_sha256": "e37f7d706bbae520890b5f70ad0cd31a17881a5dfbd6d10f431ec8f2b362cfae"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "7eda039808be5c9bd77d9f2ab0ded34a7be822e99ad85fb1d70ebbcc39c7bbb1",
+        "name": "brotli-b3c-simple-install-formula-undercharge"
+      },
+      {
+        "identity_sha256": "1b2a037eb5249b5648614b22aae72d8588f177c815f2464be0d66746215405ef",
+        "name": "brotli-b3c-canonical-install-formula-undercharge"
+      },
+      {
+        "identity_sha256": "074076515756a4afd58d35e80aa62bd76d6ccec975f5cff45e41955ae166c82c",
+        "name": "brotli-b3c-repeat-serialization-formula-undercharge"
+      },
+      {
+        "identity_sha256": "93233f486654f435d7e411d1242f318479427d5b4d549fb3ad4882798e2fbca8",
+        "name": "brotli-b3c-initial-symbol-formula-undercharge"
+      },
+      {
+        "identity_sha256": "bb0e59830fda0192709a798e9dc236aeff62128abfabeaa18a4ca2fad6ce4f15",
+        "name": "brotli-b3c-serialization-base-formula-undercharge"
+      }
+    ],
+    "mutants": [
+      "brotli-b3c-simple-install-formula-undercharge",
+      "brotli-b3c-canonical-install-formula-undercharge",
+      "brotli-b3c-repeat-serialization-formula-undercharge",
+      "brotli-b3c-initial-symbol-formula-undercharge",
+      "brotli-b3c-serialization-base-formula-undercharge"
+    ],
+    "suite": "the_prover_rejects_five_b3c_tree_formula_undercharges",
+    "suite_source_sha256": "12dd7c52e411dddb555aa0fee06e2a772c79642ae735cba7713baae73d3bd6da"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "f49d0e84687c06cf897f84852580b869e849f3e33c4bd4b0ce64ca40a2ad437e",
+        "name": "brotli-k1-installer-rejects-valid-two-symbol-tree"
+      },
+      {
+        "identity_sha256": "cd3579affcbf46e651b522a6bfdf93c3139eb6ea75cdca4cb47ad3fdc5253404",
+        "name": "brotli-k1-invalid-length-changes-metadata"
+      },
+      {
+        "identity_sha256": "c083a7705372668f8d53e05064b5bf8d1aeecb3b9f61ecbf9a13e06caae262a6",
+        "name": "brotli-k1-invalid-length-changes-builder"
+      },
+      {
+        "identity_sha256": "244f3c6535f3a7bb95b107ffa9de42d519df802e81d3a0218e263c81ef9c5880",
+        "name": "brotli-k3-rejects-valid-symbol-and-suffix"
+      },
+      {
+        "identity_sha256": "88a7d8f31182ae5f48442b3838b81c340ab53111e6e27181cd2009f5f08697d8",
+        "name": "brotli-k3-decodes-wrong-block-length"
+      }
+    ],
+    "mutants": [
+      "brotli-k1-installer-rejects-valid-two-symbol-tree",
+      "brotli-k1-invalid-length-changes-metadata",
+      "brotli-k1-invalid-length-changes-builder",
+      "brotli-k3-rejects-valid-symbol-and-suffix",
+      "brotli-k3-decodes-wrong-block-length"
+    ],
+    "suite": "the_prover_rejects_five_k1_k3_success_and_preservation_defects",
+    "suite_source_sha256": "e08fa15e4af2e42bd7728cac28bfbc3b6743c2f0bb4a55c230e0266da9117256"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "5b68d7666cd057eb624c3f9ea256b0937584a327d96b7e8c6599ec380e125a0c",
+        "name": "brotli-m1-literal-handoff-accepts-zero-command-count"
+      },
+      {
+        "identity_sha256": "7e4fcc565e81eaaf9b700dce9aa11cd80e5aac7bd3057fd367c78d2f0b819fe6",
+        "name": "brotli-m1-literal-handoff-accepts-large-command-count"
+      },
+      {
+        "identity_sha256": "f779881882a58a507f687add031dc30134f36f9645b8b91a80692c1bda56704c",
+        "name": "brotli-m1-literal-handoff-terminal-work-undercharge"
+      },
+      {
+        "identity_sha256": "c06b5d9a4e8d82a735e843182fec11bac3f113dd2bd4a3e22f2594eb36698b19",
+        "name": "brotli-m1-literal-handoff-loses-error"
+      },
+      {
+        "identity_sha256": "475debbcf9bb6f15403fa2a3482ecb467b5bb1cadaf07901bfdf11752386cbcc",
+        "name": "brotli-m1-literal-handoff-loses-planning-debit"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-literal-handoff-accepts-zero-command-count",
+      "brotli-m1-literal-handoff-accepts-large-command-count",
+      "brotli-m1-literal-handoff-terminal-work-undercharge",
+      "brotli-m1-literal-handoff-loses-error",
+      "brotli-m1-literal-handoff-loses-planning-debit"
+    ],
+    "suite": "the_prover_rejects_five_m1_literal_handoff_defects",
+    "suite_source_sha256": "2f146cef80110f3bd02eb97cb0adc3c35e0b4911abdcc31dd2e61f9d1f016533"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "fce9cf8a137339beaca381560def21261ecce04215d731c2939de70abd91c7a9",
+        "name": "brotli-m1-malformed-suffix-invalid-fields-undercharge"
+      },
+      {
+        "identity_sha256": "736dab3192028ed3e0c005edd7dedc693f68370a6be1a8554042444169462e17",
+        "name": "brotli-m1-malformed-suffix-wrong-width-undercharge"
+      },
+      {
+        "identity_sha256": "1362f4518024737382003ff73054f709053a69af7e4ee5469029595fa2dad735",
+        "name": "brotli-m1-malformed-suffix-bad-kind-is-truncated"
+      },
+      {
+        "identity_sha256": "884b5ad442a316cf69e2eead3cce8d451305168c2e4bec5924f1ef0c23742bf5",
+        "name": "brotli-m1-malformed-suffix-fallback-undercharge"
+      },
+      {
+        "identity_sha256": "af29bb99907ac215d5054a4a1074e4940223bbf4e9578c220da1b1c78cec11d1",
+        "name": "brotli-m1-malformed-suffix-fallback-writes-byte175"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-malformed-suffix-invalid-fields-undercharge",
+      "brotli-m1-malformed-suffix-wrong-width-undercharge",
+      "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+      "brotli-m1-malformed-suffix-fallback-undercharge",
+      "brotli-m1-malformed-suffix-fallback-writes-byte175"
+    ],
+    "suite": "the_prover_rejects_five_m1_malformed_suffix_defects",
+    "suite_source_sha256": "589583e20123da99c41d2f509fd1072486dc791707bd167efaeaf771928c432e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "c1efbc7ba4d11c27a6640b5a5c774fe35fad16ab4c68e92dcd89357a5be21d81",
+        "name": "brotli-m1-saved-loader-spurious-unsupported-mode"
+      },
+      {
+        "identity_sha256": "a1c0ed28ba8bd0a0319da9cfc0273030f2ee8793b1ffbec8ed2d570ad935153a",
+        "name": "brotli-m1-malformed-region-executor-wrong-error"
+      },
+      {
+        "identity_sha256": "894ce275365fef98d6d21a5e693793b3b3801eb24b5ec880afa5b4178cb117f1",
+        "name": "brotli-m1-malformed-region-planner-wrong-error"
+      },
+      {
+        "identity_sha256": "dad6855a53e3f7eec52a2537a8aa0a5ca3ea8f642de775f8d1a16e6c5bb1e7a1",
+        "name": "brotli-m1-malformed-descriptor-plan-wrong-error"
+      },
+      {
+        "identity_sha256": "9d723ce3bc9ada3cdd4f442412878cebe39b45883fcb8c88564e5f7f894e47b3",
+        "name": "brotli-m1-tree-caller-flags-equal-internal-errors"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-saved-loader-spurious-unsupported-mode",
+      "brotli-m1-malformed-region-executor-wrong-error",
+      "brotli-m1-malformed-region-planner-wrong-error",
+      "brotli-m1-malformed-descriptor-plan-wrong-error",
+      "brotli-m1-tree-caller-flags-equal-internal-errors"
+    ],
+    "suite": "the_prover_rejects_five_m1_tree_error_identity_defects",
+    "suite_source_sha256": "befbbd886ea32c718beedf58c13df22ac46b09010f33133d720ee1b2e98af29e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "edcabe35b1e89be26674272e062ce6288c16908de8bb2e28970222e40bbb1d57",
+        "name": "brotli-b3b-one-type-initial-length-is-short"
+      },
+      {
+        "identity_sha256": "0583bd84cdbd39c0f0977260f147b719612cf773c1ffef2d960a6fa45e9be6d7",
+        "name": "brotli-b3b-block-count-omits-plus-one"
+      },
+      {
+        "identity_sha256": "a407be2ec994d116959c4ca873ebd5611460e110a9e16c000f74149af8e81ed0",
+        "name": "brotli-b3b-one-type-category-builds-trees"
+      },
+      {
+        "identity_sha256": "44260a87065e71b010b89cf71918532196aa0b0d8419b446a097008fa2a12f72",
+        "name": "brotli-b3b-category-order-skips-command"
+      }
+    ],
+    "mutants": [
+      "brotli-b3b-one-type-initial-length-is-short",
+      "brotli-b3b-block-count-omits-plus-one",
+      "brotli-b3b-one-type-category-builds-trees",
+      "brotli-b3b-category-order-skips-command"
+    ],
+    "suite": "the_prover_rejects_four_b3b_block_count_and_category_defects",
+    "suite_source_sha256": "805428165cca7c4097695d3f64b61ac55e691706eb1d929067180245fdc47ecb"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "50c0376f56cae0c54601f8dbf757bb6acd01d8d9f3158d6c13098ffaa798fc33",
+        "name": "brotli-mtf-initializes-list-to-zero"
+      },
+      {
+        "identity_sha256": "8c2a51f5f4dce18ceb353d6b6b6bc231ddb3374bc7586be77df0fedd7af744e5",
+        "name": "brotli-mtf-shifts-from-current-cell"
+      },
+      {
+        "identity_sha256": "57b92dea6ed80b60eefa366f90a30c80448b7645d8bade4ace17c5a16472beaa",
+        "name": "brotli-mtf-undercharges-each-rank"
+      },
+      {
+        "identity_sha256": "374a19f116b4b52e047d9ebeb104dcb19cd7a83173fd94ee0b98ed2939d0e231",
+        "name": "brotli-mtf-reuses-too-little-list-prefix"
+      }
+    ],
+    "mutants": [
+      "brotli-mtf-initializes-list-to-zero",
+      "brotli-mtf-shifts-from-current-cell",
+      "brotli-mtf-undercharges-each-rank",
+      "brotli-mtf-reuses-too-little-list-prefix"
+    ],
+    "suite": "the_prover_rejects_four_b3b_inverse_mtf_defects",
+    "suite_source_sha256": "4cf16aa7044dfedc4414d657b7291a82261913b183fcbed6a7dcba586f07f469"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "b103f509830b05a3dee7022066d27bae2c966bc12011a3e35a6a8007659635dd",
+        "name": "brotli-b3c-context-mode-complete-undercharge"
+      },
+      {
+        "identity_sha256": "59337e2f1f45d353a32f54e4a6367e664a0d4f9aff3f6336d1ca5dcb8e596f63",
+        "name": "brotli-b3c-context-mode-queue-undercharge"
+      },
+      {
+        "identity_sha256": "222e28bf3ebbcf1db759ab3f9ae904a3831cb6b3612ab2bdeb60a46d71cd6658",
+        "name": "brotli-b3c-context-mode-terminal-undercharge"
+      },
+      {
+        "identity_sha256": "fc896453af8be63621ce70cc357b3ec28ca5d16ed073f920cd3085b8dbee5c3d",
+        "name": "brotli-b3c-context-mode-value-undercharge"
+      }
+    ],
+    "mutants": [
+      "brotli-b3c-context-mode-complete-undercharge",
+      "brotli-b3c-context-mode-queue-undercharge",
+      "brotli-b3c-context-mode-terminal-undercharge",
+      "brotli-b3c-context-mode-value-undercharge"
+    ],
+    "suite": "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+    "suite_source_sha256": "fe72c8bc917d50b3105e5b83fcfdb2f04e5d41025029cf3c2c1f926ba795656f"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "eaa553d17114f99cd2f3cb1af7e5539602d38f9012183f6d799324c152d10701",
+        "name": "brotli-b3c-initial-suffix-planning-undercharge"
+      },
+      {
+        "identity_sha256": "bce521a1657b7d0df246a5cd1d418d44dc94f91e8a050d8431a11fa2fbb5a91f",
+        "name": "brotli-b3c-initial-suffix-queue-undercharge"
+      },
+      {
+        "identity_sha256": "867ee50e6c0d3e4da09a8b7536551108632905ac5ff30de113943766e6d0801d",
+        "name": "brotli-b3c-initial-suffix-terminal-undercharge"
+      },
+      {
+        "identity_sha256": "d0f83ca5d0924b36e458ebe4bbcb8a25504e7f75d87388a67b1544fb74084f80",
+        "name": "brotli-b3c-initial-suffix-value-undercharge"
+      }
+    ],
+    "mutants": [
+      "brotli-b3c-initial-suffix-planning-undercharge",
+      "brotli-b3c-initial-suffix-queue-undercharge",
+      "brotli-b3c-initial-suffix-terminal-undercharge",
+      "brotli-b3c-initial-suffix-value-undercharge"
+    ],
+    "suite": "the_prover_rejects_four_b3c_initial_suffix_metering_undercharges",
+    "suite_source_sha256": "77f24b05a0af81ccb9d7219d86b243e04af7a6001eb746202d08bf421001afd3"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "c3406b85afcb80d0c095657744d0b12e333a3aa570fa467bb6006b403e53bdcf",
+        "name": "brotli-m1-r-bit-selection-receipt-omitted"
+      },
+      {
+        "identity_sha256": "10058aed03f22aaa48c8e53f4fb469c7e092d688e6e9b6ba58fe5e2f3c8c6e92",
+        "name": "brotli-m1-r-queue-child-receipt-omitted"
+      },
+      {
+        "identity_sha256": "05996c5deabc0176b29720ad74e059b4f89ed24ed937a6c0da89bf966fb97ff1",
+        "name": "brotli-m1-r-fixed-owner-child-receipt-omitted"
+      },
+      {
+        "identity_sha256": "8bc5efbf4f6e8abbb7c5e1500f4c81ea7128e7734107e815c5a808214c818df9",
+        "name": "brotli-m1-r-public-driver-child-receipt-omitted"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-r-bit-selection-receipt-omitted",
+      "brotli-m1-r-queue-child-receipt-omitted",
+      "brotli-m1-r-fixed-owner-child-receipt-omitted",
+      "brotli-m1-r-public-driver-child-receipt-omitted"
+    ],
+    "suite": "the_prover_rejects_four_m1_actual_source_receipt_omissions",
+    "suite_source_sha256": "d2a2f8b89d988b2d8f600fa4e810b9a86b069eea7d8a601dd53e9d2132fc6496"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "59ab9ecb9ab86995191604d4179c4d103fade0904a0305957534dd84e7dc5db1",
+        "name": "brotli-m1-context-count-cursor-terminal-undercharged"
+      },
+      {
+        "identity_sha256": "24d995cfad0ec95ec098c577b9368f21cdad9eb6787e92242a35b5f495c53953",
+        "name": "brotli-m1-context-bits-cursor-terminal-undercharged"
+      },
+      {
+        "identity_sha256": "ef1cc50edbb8e405aa887d84e67a8e950460d3ad5911fe08ba480164dfb1c34d",
+        "name": "brotli-m1-context-count-cursor-skips-terminal-action"
+      },
+      {
+        "identity_sha256": "7a92b0c938ff2fe77a403c69cf38ee05a6f7c58dc46938822a2db2de76cbfb8b",
+        "name": "brotli-m1-context-bits-cursor-plan-wrong-error"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-context-count-cursor-terminal-undercharged",
+      "brotli-m1-context-bits-cursor-terminal-undercharged",
+      "brotli-m1-context-count-cursor-skips-terminal-action",
+      "brotli-m1-context-bits-cursor-plan-wrong-error"
+    ],
+    "suite": "the_prover_rejects_four_m1_context_cursor_terminal_defects",
+    "suite_source_sha256": "67ce18e2012f8ec75d7ffebbdb3241d38f9a5c789ffbdc1a5388e372aa2d8b4f"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "7ed1ecf82aeaca7dfbc1a0c589b95384b4ca010e90a316c1a55034d71851cee0",
+        "name": "brotli-m1-executor-simple-loses-consumption"
+      },
+      {
+        "identity_sha256": "5e2b554edb1b82c5e90122c9b20fd38834f92d1a2fec0479a490cde586790461",
+        "name": "brotli-m1-executor-canonical-loses-consumption"
+      },
+      {
+        "identity_sha256": "2c8709fed8ac289f6536a5507835fa5c989d24189294ce9031b9448d86322230",
+        "name": "brotli-m1-executor-simple-false-need-input"
+      },
+      {
+        "identity_sha256": "94dd5a4e310f4e7bfaf317063990d7c511c473696cde255c4821fd81d9590434",
+        "name": "brotli-m1-executor-canonical-false-need-input"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-executor-simple-loses-consumption",
+      "brotli-m1-executor-canonical-loses-consumption",
+      "brotli-m1-executor-simple-false-need-input",
+      "brotli-m1-executor-canonical-false-need-input"
+    ],
+    "suite": "the_prover_rejects_four_m1_executor_normal_trace_defects",
+    "suite_source_sha256": "cb9ca27debbedc350a5030d203d96437289dc2f44eeb83d7044bf1cf40feff3e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "b68c10d113b9724d760dbe5549431c31d6958478e9bccd0fcb20de02d40ca82e",
+        "name": "brotli-m1-invalid-region-consumes-input"
+      },
+      {
+        "identity_sha256": "47bc75f1195e98cc90b01590d4e19282a9b419afe4b789326c86aa5304fc3592",
+        "name": "brotli-m1-invalid-region-mutates-descriptor"
+      },
+      {
+        "identity_sha256": "7e6fa9344c1686b1ff9b7b1995b6f91ddf216bfd16d537dbea86dfcf621dbf4a",
+        "name": "brotli-m1-invalid-region-plan-consumes-input"
+      },
+      {
+        "identity_sha256": "8528be88a3414413b1f3c2b5f00ee258cabc138e3c9c5d61e0d71a7cbbf64338",
+        "name": "brotli-m1-invalid-descriptor-plan-consumes-input"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-invalid-region-consumes-input",
+      "brotli-m1-invalid-region-mutates-descriptor",
+      "brotli-m1-invalid-region-plan-consumes-input",
+      "brotli-m1-invalid-descriptor-plan-consumes-input"
+    ],
+    "suite": "the_prover_rejects_four_m1_invalid_start_defects",
+    "suite_source_sha256": "5bded8aa4c370ee8a4ea0511f06c15b92c826d9b960380101e7369afaa24724e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "bb78a0195f458350d1a04e323495304c89002c53fbcc08390405e33b5d006d2d",
+        "name": "brotli-m1-parser-restores-too-small-cap"
+      },
+      {
+        "identity_sha256": "7a0c32b0634751871443ee7d42fd68abeeb820497f56e8e3104394ca01eb2450",
+        "name": "brotli-m1-planner-restores-too-small-cap"
+      },
+      {
+        "identity_sha256": "5e4f243ab0347a99adf07bbfe70bbd0e705033e36422bcbac2dce45d84f865ea",
+        "name": "brotli-m1-parser-skips-pending-span-drain"
+      },
+      {
+        "identity_sha256": "9f52920b3d21f95f54b0ef0e3cd36e0bdf2dc153d1bd648a027f55463146e462",
+        "name": "brotli-m1-planner-skips-pending-span-drain"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-parser-restores-too-small-cap",
+      "brotli-m1-planner-restores-too-small-cap",
+      "brotli-m1-parser-skips-pending-span-drain",
+      "brotli-m1-planner-skips-pending-span-drain"
+    ],
+    "suite": "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+    "suite_source_sha256": "7af45e2f02a1c21ff98d7a4aeeb7dfda1625d9522b7ea4e923533d58e069157d"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "e8ca71f2f1caf1234d04ea704ea57665c6bb8ea80e95c8acc58d0cb4aa08a87c",
+        "name": "brotli-k5-loader-omits-four-simple-copies"
+      },
+      {
+        "identity_sha256": "aa78f31cb92520592a2fc16623311b7617de4a0ec2466e75fb0e4ce7276f5fd8",
+        "name": "brotli-k5-prefix-validation-scan-undercharge"
+      },
+      {
+        "identity_sha256": "d32b36e0461fdb85c85da109b50831e11bf0f07b53f8d84483726f1bcea6a536",
+        "name": "brotli-k5-singleton-guard-reordered-before-scan"
+      },
+      {
+        "identity_sha256": "e06ee315b1fa9e51f47928debccc9564a9a75363e4256279535b2ef6385aff5c",
+        "name": "brotli-k5-selected-singleton-read-unpaid"
+      },
+      {
+        "identity_sha256": "e8e296f4c9637ff76cc536d1ed7428d788a45d15dfe26b3c64f690dba9a9fe50",
+        "name": "brotli-k5-singleton-skips-last-validation-cell"
+      },
+      {
+        "identity_sha256": "e53131537b43a18790604fe2e90563cc42bd060a08fea2efa51b6911469ff312",
+        "name": "brotli-k5-simple-right-comparison-operand-unpaid"
+      },
+      {
+        "identity_sha256": "98d811e15978c09153debf3ea721427146a16d6f2971fb2911796735058c7507",
+        "name": "brotli-k5-simple-omits-right-operand-receipt"
+      },
+      {
+        "identity_sha256": "7db21acf482d424b5f9b2c7def299874e06528044f32de5ff9c0a5f674a270ca",
+        "name": "brotli-k5-selector-reload-keeps-old-eighteen"
+      },
+      {
+        "identity_sha256": "60086473948184a1d1a3fc25f09318536d0e5fc19433724af6c57babf94258a0",
+        "name": "brotli-k5-prefix-reload-omits-validation-cell"
+      },
+      {
+        "identity_sha256": "a52fa9e6c72525a77bdfffacc6aa319d8259fc8fc4ff5c84ebb213a426b7ef9b",
+        "name": "brotli-k5-singleton-reload-omits-selected-cell"
+      },
+      {
+        "identity_sha256": "1a8c03f465156fad2f76eebb0e0cb61b3e6609299fb1f1057a6b825f90eb9cfe",
+        "name": "brotli-k5-initial-loader-replay-unpaid"
+      },
+      {
+        "identity_sha256": "fad0f2ec552149abc63c0cdf6f9c95a95f89a743a4a5f933e8eb7967389728d6",
+        "name": "brotli-k5-each-reload-restores-old-eighteen"
+      },
+      {
+        "identity_sha256": "98b82c72e5a8cc58d661d637d041ee4e2475585a74b4e66d5d826401b1d8c693",
+        "name": "brotli-k5-invalid-last-auxiliary-misclassified-valid"
+      },
+      {
+        "identity_sha256": "d8e9e6907a9eb16334000560b55545da4e7abb145d383746e31ea0ccc9aa9809",
+        "name": "brotli-k5-invalid-alphabet-misclassified-valid"
+      }
+    ],
+    "mutants": [
+      "brotli-k5-loader-omits-four-simple-copies",
+      "brotli-k5-prefix-validation-scan-undercharge",
+      "brotli-k5-singleton-guard-reordered-before-scan",
+      "brotli-k5-selected-singleton-read-unpaid",
+      "brotli-k5-singleton-skips-last-validation-cell",
+      "brotli-k5-simple-right-comparison-operand-unpaid",
+      "brotli-k5-simple-omits-right-operand-receipt",
+      "brotli-k5-selector-reload-keeps-old-eighteen",
+      "brotli-k5-prefix-reload-omits-validation-cell",
+      "brotli-k5-singleton-reload-omits-selected-cell",
+      "brotli-k5-initial-loader-replay-unpaid",
+      "brotli-k5-each-reload-restores-old-eighteen",
+      "brotli-k5-invalid-last-auxiliary-misclassified-valid",
+      "brotli-k5-invalid-alphabet-misclassified-valid"
+    ],
+    "suite": "the_prover_rejects_fourteen_k5_loader_accounting_defects",
+    "suite_source_sha256": "46f57412abc7dafd69d15994c8ce1c567b6a3b414d5b63ad1bfc0d1829951a0e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "73311ebcd8b6d9bba875f346a43ba52992d7402c7b435a46296fa3005b58500e",
+        "name": "brotli-m1-code-field-wrong-width"
+      },
+      {
+        "identity_sha256": "a248b74e33f4126c3a39ec4c845559fdb958b6e52de196d346c70bd5e013ea5c",
+        "name": "brotli-m1-auxiliary-wrong-symbol"
+      },
+      {
+        "identity_sha256": "dec123e69e6593f49faecd2e7d7f5700e222ac3a6301a814236fa1ee6ba2a55e",
+        "name": "brotli-m1-complex-start-wrong-previous-length"
+      },
+      {
+        "identity_sha256": "0d973431392d6d13519fd66e19718fd5e18ea0281c34feff35da3e53b80d06e3",
+        "name": "brotli-m1-var-integer-wrong-value"
+      },
+      {
+        "identity_sha256": "4fee8b9d93147b5392fe27976f0a32ec87b7767f8a1687394e80970a3cb88a24",
+        "name": "brotli-m1-body-metadata-read-not-charged"
+      },
+      {
+        "identity_sha256": "03d44e0da0b5ea8bc1d5537a21c0af3ab252eaac4f7c0d5be8b910bce1f5aa51",
+        "name": "brotli-m1-body-execution-undercharge"
+      },
+      {
+        "identity_sha256": "4e09a93b1f8b914923cfb2cbe46321dbdfa54427bfd9dabca9ae655b4441672e",
+        "name": "brotli-m1-context-direct-wrong-value"
+      },
+      {
+        "identity_sha256": "ba97dd2f4b6f2b40b3ed3a0eac30ed69e59fcd237fa109eb53ba961187e0ee63",
+        "name": "brotli-m1-initial-symbol-execution-undercharge"
+      },
+      {
+        "identity_sha256": "177b15ffe5782aeda7e75c7d1402f79f10a8d4be66df570720adf7f76df48ab4",
+        "name": "brotli-m1-context-symbol-execution-undercharge"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-code-field-wrong-width",
+      "brotli-m1-auxiliary-wrong-symbol",
+      "brotli-m1-complex-start-wrong-previous-length",
+      "brotli-m1-var-integer-wrong-value",
+      "brotli-m1-body-metadata-read-not-charged",
+      "brotli-m1-body-execution-undercharge",
+      "brotli-m1-context-direct-wrong-value",
+      "brotli-m1-initial-symbol-execution-undercharge",
+      "brotli-m1-context-symbol-execution-undercharge"
+    ],
+    "suite": "the_prover_rejects_nine_m1_source_refinement_and_debit_defects",
+    "suite_source_sha256": "501023e34c5668c43c0927dc8df7ce6c1bba89474f60589208cabed9b75f180f"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "868821b47312fc202c0f992cb30f2537b191b6487cce3bfcdaef4465a9a0ebc5",
+        "name": "brotli-b3b-literal-context-row-stride-is-63"
+      },
+      {
+        "identity_sha256": "bf62db8e8eb7d494975e91061b557faa7c209d4e0262106b445fcb66f0e48ad5",
+        "name": "brotli-b3b-distance-context-row-stride-is-three"
+      },
+      {
+        "identity_sha256": "975cfb45fef4f04ff87905ccde96b2dd43abe54b2dc74eb15b53e39584bb1450",
+        "name": "brotli-b3b-serialized-tree-skips-builder-reset"
+      },
+      {
+        "identity_sha256": "983ef9a2fcf35a856e33e35c8717b72d14ab18ddf107f912b250f9e8fd041da3",
+        "name": "brotli-b3b-context-tree-starts-in-literal-region"
+      },
+      {
+        "identity_sha256": "f3930a2894b6deb3048a063aa67ffe926fdfcfa66425ec971d5f470aa8a2a01d",
+        "name": "brotli-b3b-installed-symbol-truncation-needs-input"
+      },
+      {
+        "identity_sha256": "50f70454f2897c3ed279659f2a621f022b7969a9c3abb2b4898cbad5e38abc2d",
+        "name": "brotli-b3b-context-bit-truncation-needs-input"
+      },
+      {
+        "identity_sha256": "9f8b6ea9ae65e8911303dbaf837f5b23732ba0f6814f919cd08e35b0329c2d76",
+        "name": "brotli-b3b-tree-field-truncation-needs-input"
+      }
+    ],
+    "mutants": [
+      "brotli-b3b-literal-context-row-stride-is-63",
+      "brotli-b3b-distance-context-row-stride-is-three",
+      "brotli-b3b-serialized-tree-skips-builder-reset",
+      "brotli-b3b-context-tree-starts-in-literal-region",
+      "brotli-b3b-installed-symbol-truncation-needs-input",
+      "brotli-b3b-context-bit-truncation-needs-input",
+      "brotli-b3b-tree-field-truncation-needs-input"
+    ],
+    "suite": "the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects",
+    "suite_source_sha256": "f3310fbc5a7ee25f7c833b2bc81df383a7f67171467a649a1479ae1eee0760c7"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "7b7e515a006f73b8efa5a5c2396bb8b3325b59cfaecef91ac3bd3dc4a5ce9cf0",
+        "name": "brotli-b3c-context-bits-queue-undercharge"
+      },
+      {
+        "identity_sha256": "4f7b005540f7e7d9788dc7f99b08ea244cf15d213257b63f2733d6aa834f2972",
+        "name": "brotli-b3c-context-bits-start-undercharge"
+      },
+      {
+        "identity_sha256": "d632bcb8cac590d36002bb44df60cee227384e4432272821a725eb4365432033",
+        "name": "brotli-b3c-context-bits-prefix-undercharge"
+      },
+      {
+        "identity_sha256": "f1482588d788fed249213acc5e0399fcdea3ef67585d4b8d544d7bbe3c4b53ee",
+        "name": "brotli-b3c-context-bits-map-undercharge"
+      },
+      {
+        "identity_sha256": "a0805ee9670d366813953245fdcccda604cff96296397d167c97635b5af6fe05",
+        "name": "brotli-b3c-context-bits-progress-undercharge"
+      },
+      {
+        "identity_sha256": "e18980126a2b2e052623ea144190fd0897b885bda12dcc7cd005c23b69c2d8a6",
+        "name": "brotli-b3c-context-bits-reset-undercharge"
+      },
+      {
+        "identity_sha256": "89f4fc93b8067623cc29a2d74bd50acebe2fe7348823bf9f5a213369010f9b36",
+        "name": "brotli-b3c-context-bits-phase-undercharge"
+      },
+      {
+        "identity_sha256": "54c767c0461da37c6fdfc92ef4dfd1b1bee358317545641593205fae10c4390b",
+        "name": "brotli-b3c-context-bits-terminal-undercharge"
+      },
+      {
+        "identity_sha256": "82f3ee61978863cfd0d37bd66a05201acba04e7ba550c36402ed8732c76ad788",
+        "name": "brotli-b3c-context-bits-planning-debit-omitted"
+      },
+      {
+        "identity_sha256": "3087dc2a6dceed350b4ae965c3eb40bd33cb093674f92da8473f4fc3e7a79a5e",
+        "name": "brotli-b3c-context-bits-execution-debit-undercharge"
+      },
+      {
+        "identity_sha256": "32b09040e16c7b8de7d5ea9befc9caa75c525c076b8b70a739f9885b7d4a2575",
+        "name": "brotli-b3c-context-bits-execution-reserved-after-writes"
+      },
+      {
+        "identity_sha256": "7f53e163e7567a05c4c838a83f71478316bf9b1c24d14fabd8728af1f0e223e9",
+        "name": "brotli-b3c-context-bits-wrong-prefix"
+      },
+      {
+        "identity_sha256": "00c8918f80d21f7eb51e989d942331d57a4e6856fad22ff7ed70602d543986d0",
+        "name": "brotli-b3c-context-bits-wrong-zero"
+      },
+      {
+        "identity_sha256": "ccf59b9e355843f54c36390d3e46f225d4997bffed8c42556575e0354e6890f5",
+        "name": "brotli-b3c-context-bits-start-writes-unrelated-byte"
+      },
+      {
+        "identity_sha256": "0f911934918de3b903a5e3a9014dd5610bfdcb0dce7ebbdf89d748a076b30cad",
+        "name": "brotli-b3c-context-bits-overshoot-terminal-undercharge"
+      },
+      {
+        "identity_sha256": "85791521751dca32e94b10e22bd21e4e79abae0efc1a280110595af4a94277d6",
+        "name": "brotli-b3c-context-bits-skips-overshoot-check"
+      },
+      {
+        "identity_sha256": "6e2c8ac2a86e21da016b6e9fe17fb28f82ce97d704da5c68522b737a3ed8dcec",
+        "name": "brotli-b3c-context-bits-reads-wrong-width"
+      }
+    ],
+    "mutants": [
+      "brotli-b3c-context-bits-queue-undercharge",
+      "brotli-b3c-context-bits-start-undercharge",
+      "brotli-b3c-context-bits-prefix-undercharge",
+      "brotli-b3c-context-bits-map-undercharge",
+      "brotli-b3c-context-bits-progress-undercharge",
+      "brotli-b3c-context-bits-reset-undercharge",
+      "brotli-b3c-context-bits-phase-undercharge",
+      "brotli-b3c-context-bits-terminal-undercharge",
+      "brotli-b3c-context-bits-planning-debit-omitted",
+      "brotli-b3c-context-bits-execution-debit-undercharge",
+      "brotli-b3c-context-bits-execution-reserved-after-writes",
+      "brotli-b3c-context-bits-wrong-prefix",
+      "brotli-b3c-context-bits-wrong-zero",
+      "brotli-b3c-context-bits-start-writes-unrelated-byte",
+      "brotli-b3c-context-bits-overshoot-terminal-undercharge",
+      "brotli-b3c-context-bits-skips-overshoot-check",
+      "brotli-b3c-context-bits-reads-wrong-width"
+    ],
+    "suite": "the_prover_rejects_seventeen_b3c_context_bits_defects",
+    "suite_source_sha256": "74d501a41b0c529ff9d9117f7a8f9fb0c18d96c3d55a88dd0e04a0b6ce5cbd64"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "09b3f2e49d35d73dfeab12b7a5a7bd09435e2578af40296d2972c9ed2346dfb9",
+        "name": "brotli-builder-code-length-write-shifts-region"
+      },
+      {
+        "identity_sha256": "69a9d0db253c4a774656db9259679d8debf61adf38f3c450cb920dd45617e5d7",
+        "name": "brotli-builder-code-length-reads-uninitialized-entry"
+      },
+      {
+        "identity_sha256": "6798774dafe9c660815d376f489953a4230b7e2168474efb3c191fb5c0979306",
+        "name": "brotli-builder-count-write-swaps-low-byte"
+      },
+      {
+        "identity_sha256": "eecf4433a7c938e0f1d13a65bc479e034fcca8e38c0a3981d5e69ca9c2034a7e",
+        "name": "brotli-builder-next-code-writes-wrong-third-byte"
+      },
+      {
+        "identity_sha256": "15df0eee4348c0bf3e2cb91b2c0051f03c9ce15a0e936dc78deafc81f9c46acc",
+        "name": "brotli-canonical-record-rejects-unused-zero-length"
+      },
+      {
+        "identity_sha256": "6792aa7820616c52aab57ac940be064d8072aa1aca28451f340f8b3b1225f847",
+        "name": "brotli-canonical-installation-assigns-next-code"
+      }
+    ],
+    "mutants": [
+      "brotli-builder-code-length-write-shifts-region",
+      "brotli-builder-code-length-reads-uninitialized-entry",
+      "brotli-builder-count-write-swaps-low-byte",
+      "brotli-builder-next-code-writes-wrong-third-byte",
+      "brotli-canonical-record-rejects-unused-zero-length",
+      "brotli-canonical-installation-assigns-next-code"
+    ],
+    "suite": "the_prover_rejects_six_b3a_builder_storage_defects",
+    "suite_source_sha256": "45e8fa9dd341d08198084d59d1c2b302e602f29346725e053aa09a980a115a2c"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "99ecf030c28c7c4c321d262fa93aa2ace67e056b30daea79b897e22aec726651",
+        "name": "brotli-code-selector-misclassifies-simple"
+      },
+      {
+        "identity_sha256": "72d11ed9ceb4db7ac408a7e95229df7981f2babd827073f0b5240970363d4379",
+        "name": "brotli-simple-code-accepts-limit-value"
+      },
+      {
+        "identity_sha256": "cf38bbb968664764e1428113c8566f6aa518b3d8a6e751238e04f495a1c1009a",
+        "name": "brotli-simple-code-accepts-duplicate-symbol"
+      },
+      {
+        "identity_sha256": "0a78f1e105bb6361bb185f50941368556c036a880e1dbb5f7bb5a2871d3f5221",
+        "name": "brotli-complex-static-prefix-maps-four-to-five"
+      },
+      {
+        "identity_sha256": "f7cfa9073a17c11856809ceee98f9c9b5cdc3d79d6cbd5f84ec5588f9831f511",
+        "name": "brotli-complex-code-misclassifies-space-overflow"
+      },
+      {
+        "identity_sha256": "3f69dcc102a798d945930e17c97d61d2e49e841f5b88ac847c10cf0b1099548c",
+        "name": "brotli-code-length-order-starts-at-zero"
+      }
+    ],
+    "mutants": [
+      "brotli-code-selector-misclassifies-simple",
+      "brotli-simple-code-accepts-limit-value",
+      "brotli-simple-code-accepts-duplicate-symbol",
+      "brotli-complex-static-prefix-maps-four-to-five",
+      "brotli-complex-code-misclassifies-space-overflow",
+      "brotli-code-length-order-starts-at-zero"
+    ],
+    "suite": "the_prover_rejects_six_b3a_code_description_defects",
+    "suite_source_sha256": "987036a72ab5b992d65c0f18e533b2fb6ac4400903354ffa9f35196d09d13492"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "1b31ba7898eec426afdec112221fbcf27485ea8e651eb10a2b5e1d8180f14590",
+        "name": "brotli-b3b-pending-span-is-not-drained"
+      },
+      {
+        "identity_sha256": "1f86e07d35496801e859c9cbf1537490ed5bd30bf35cd4d8faebf411743b201e",
+        "name": "brotli-b3b-sticky-failure-consumes-one-byte"
+      },
+      {
+        "identity_sha256": "228ed75bea866e3b79a64f9523034a9747318737b49d783162a202500d41152d",
+        "name": "brotli-b3b-sticky-failure-becomes-need-input"
+      },
+      {
+        "identity_sha256": "83cb013513c309515c086a1f42d45b61d35e58a022843db6fad457aa889b35cc",
+        "name": "brotli-b3b-step-bypasses-sticky-failure-helper"
+      },
+      {
+        "identity_sha256": "79aa91bc4f4d5d3267ea2c15fe24e4976e6049b959abac8fafb699192ddd0007",
+        "name": "brotli-b3b-context-progress-leaves-stale-initialized-length"
+      },
+      {
+        "identity_sha256": "83a33d74d329b83c176331be7d35cc9096886812fff5d65106bcdfaf1ac2dfe7",
+        "name": "brotli-b3b-context-mtf-leaves-stale-reuse-bound"
+      }
+    ],
+    "mutants": [
+      "brotli-b3b-pending-span-is-not-drained",
+      "brotli-b3b-sticky-failure-consumes-one-byte",
+      "brotli-b3b-sticky-failure-becomes-need-input",
+      "brotli-b3b-step-bypasses-sticky-failure-helper",
+      "brotli-b3b-context-progress-leaves-stale-initialized-length",
+      "brotli-b3b-context-mtf-leaves-stale-reuse-bound"
+    ],
+    "suite": "the_prover_rejects_six_b3b_cross_call_state_defects",
+    "suite_source_sha256": "12e89a4b31701f47a35d0208ad1dd3fc3a4f37a541f79d06538f74ab928d2660"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "9123375658040efe3a87acd97e12f31636524bb291c94944310ba93c6f23a03c",
+        "name": "brotli-metadata-single-uses-wrong-tag-bit"
+      },
+      {
+        "identity_sha256": "cd84d7497fc9996d689a776418b85973898e2695bc5325d493dc42808cbc559d",
+        "name": "brotli-metadata-block-length-overlaps-block-type"
+      },
+      {
+        "identity_sha256": "5d69e2d83c48003481b7c636539d553bfdef8e1dd50048101e9fddc8a472b083",
+        "name": "brotli-metadata-reads-first-inactive-record"
+      },
+      {
+        "identity_sha256": "199c33cbfc0b54a40da12d4c6d8427a65c9e48c2c99d21f7b70543ea2658b206",
+        "name": "brotli-distance-context-map-uses-literal-region"
+      },
+      {
+        "identity_sha256": "c9908f2a8b86d25c6b35a765699c1974a724ee9745251328e3275b99d088a95d",
+        "name": "brotli-context-map-reads-first-uninitialized-entry"
+      },
+      {
+        "identity_sha256": "f581a84e6b0a0d8de2756d268f32950f841c18ad87e6be96cf49f289c27b8ce8",
+        "name": "brotli-context-coverage-accepts-any-present-tree"
+      }
+    ],
+    "mutants": [
+      "brotli-metadata-single-uses-wrong-tag-bit",
+      "brotli-metadata-block-length-overlaps-block-type",
+      "brotli-metadata-reads-first-inactive-record",
+      "brotli-distance-context-map-uses-literal-region",
+      "brotli-context-map-reads-first-uninitialized-entry",
+      "brotli-context-coverage-accepts-any-present-tree"
+    ],
+    "suite": "the_prover_rejects_six_b3b_metadata_map_and_coverage_defects",
+    "suite_source_sha256": "62fe3437a1531851e13c0deb7505085eda09fffe38d4de12a45f344f1c131c4e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "4b5043ff55cfd607ba01f81382ed5a9726f419b9c4fa859af0ce61a84447f73e",
+        "name": "brotli-context-repeat-uses-half-base"
+      },
+      {
+        "identity_sha256": "681f788cf1ab66dce2c52ab540d4012a1430bef04d984eaad5b9cd946d216283",
+        "name": "brotli-b3b-state-address-shifts-scalar-block"
+      },
+      {
+        "identity_sha256": "d2d0b37f9eb8675bb800d6c48eb11fd3e6e105d3683c6cc0dbc3e51ef84c529d",
+        "name": "brotli-b3b-u16-writes-low-byte-twice"
+      },
+      {
+        "identity_sha256": "75499a66efd07e850ce23a1e25e4653f67f16752ceec257ef33d8e2c1cece39e",
+        "name": "brotli-b3b-tag-accepts-first-invalid-value"
+      },
+      {
+        "identity_sha256": "7bce46c648b190a511a2050e4c9c06d404a43606fe5dddd5bad660779c35540d",
+        "name": "brotli-terminal-store-marks-state-complete"
+      },
+      {
+        "identity_sha256": "85d59fefad4ad2dbb331732b162350efc5cbb42481c06c8b51dcdd5799bf2c77",
+        "name": "brotli-terminal-load-turns-truncation-unsupported"
+      }
+    ],
+    "mutants": [
+      "brotli-context-repeat-uses-half-base",
+      "brotli-b3b-state-address-shifts-scalar-block",
+      "brotli-b3b-u16-writes-low-byte-twice",
+      "brotli-b3b-tag-accepts-first-invalid-value",
+      "brotli-terminal-store-marks-state-complete",
+      "brotli-terminal-load-turns-truncation-unsupported"
+    ],
+    "suite": "the_prover_rejects_six_b3b_serialization_and_error_defects",
+    "suite_source_sha256": "cf67d5bdf4eab73b9551ba757c90620e46c9d89b18e45daf6ec57b4b21618bc7"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "978e59136691dd8ead6598079ffa85806b8667c128a6acc12e5e53f5b21283f4",
+        "name": "brotli-b3b-completed-simple-tree-writes-unused-metadata"
+      },
+      {
+        "identity_sha256": "740da78802bd49c00013c0de99f6fecd3ce4b8694d9fec52148183b370e3fec0",
+        "name": "brotli-b3b-tree-group-order-skips-command"
+      },
+      {
+        "identity_sha256": "f14437587bf5afb702d57a38fc2f1fd7828ae5619fa22435345cd1b7780619f1",
+        "name": "brotli-b3b-command-group-uses-distance-count"
+      },
+      {
+        "identity_sha256": "c3919e899d94ed5080d7b4681a323ab13832f21f1020807d886678dcb83e9c60",
+        "name": "brotli-b3b-tree-group-index-advances-by-two"
+      },
+      {
+        "identity_sha256": "2910ee872262a5328d2faf1f88b8980e4938333b9592dd2817ae51a4439bf46b",
+        "name": "brotli-b3b-command-group-alphabet-is-703"
+      },
+      {
+        "identity_sha256": "71ac62cab7d6b9b8fd3e87cc1705fab4617cac6978beb43ca0f213f622daa018",
+        "name": "brotli-b3b-active-command-tree-starts-at-one"
+      }
+    ],
+    "mutants": [
+      "brotli-b3b-completed-simple-tree-writes-unused-metadata",
+      "brotli-b3b-tree-group-order-skips-command",
+      "brotli-b3b-command-group-uses-distance-count",
+      "brotli-b3b-tree-group-index-advances-by-two",
+      "brotli-b3b-command-group-alphabet-is-703",
+      "brotli-b3b-active-command-tree-starts-at-one"
+    ],
+    "suite": "the_prover_rejects_six_b3b_tree_group_defects",
+    "suite_source_sha256": "6646cc504a13d6b4148a3c3f7348e9e2c0cc430399965903f2bc1b49b0a2ce46"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "99c83b2505c20bc095e2e75b073bc2df41004d662a7a8831ed1d504dbd641217",
+        "name": "brotli-k4-repeat-store-overwrites-history"
+      },
+      {
+        "identity_sha256": "32da119e6574d41fdb2c623369e114c017fc3c8e27872e8fa922247e13d4cb51",
+        "name": "brotli-k4-repeat-load-current-from-history"
+      },
+      {
+        "identity_sha256": "a8b0e51e9db94842243166dda4ba71e9bed2ffb29c2b046417dadfc78ac3400e",
+        "name": "brotli-k4-progress-stores-previous-code-in-history"
+      },
+      {
+        "identity_sha256": "2f4a808b27a91cdfc6688dc9466688bd7119e730164dc3aa76079c11f86e2ea7",
+        "name": "brotli-k4-repeat-load-history-from-current"
+      },
+      {
+        "identity_sha256": "b60fe1f718bcd72ca1f2dabb5470051054f70034588c97aa9739f104764473fa",
+        "name": "brotli-k4-repeat-width-uses-old-class"
+      },
+      {
+        "identity_sha256": "b1b5277284b19c9ddf67ece78e9543dcd1e0cfdc3ff6b526caf701b2ff708443",
+        "name": "brotli-k4-repeat-rejects-valid-length-fifteen"
+      }
+    ],
+    "mutants": [
+      "brotli-k4-repeat-store-overwrites-history",
+      "brotli-k4-repeat-load-current-from-history",
+      "brotli-k4-progress-stores-previous-code-in-history",
+      "brotli-k4-repeat-load-history-from-current",
+      "brotli-k4-repeat-width-uses-old-class",
+      "brotli-k4-repeat-rejects-valid-length-fifteen"
+    ],
+    "suite": "the_prover_rejects_six_k4_repeat_codec_defects",
+    "suite_source_sha256": "099a1dd454987a08bac7e0327c09124403e01c23b8e6053a426a39af42d8fa0c"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "0548543e2f0aa539afb229dbbea86961b32af2d2c57f2b71becf09847b7e4d87",
+        "name": "brotli-k7-canonical-constructor-spurious-error"
+      },
+      {
+        "identity_sha256": "978c8e964362147ff7e352a5bea39a9a6bc26793649384b30acb042b62788f02",
+        "name": "brotli-k8-single-constructor-spurious-error"
+      },
+      {
+        "identity_sha256": "d89293170bb00443b2a2d9151cd2b859cae4bb8310e9cf7c6c5ae3d2d0b43fde",
+        "name": "brotli-k7-singleton-install-spurious-error"
+      },
+      {
+        "identity_sha256": "1af3831e345fdab90caeddf4af70ec5633d8655bfcb7e261677825ed13630d5e",
+        "name": "brotli-k7-multi-install-spurious-error"
+      },
+      {
+        "identity_sha256": "cb4fafdd9a0ff4ef36cf22e305db9ebbfb47435ed1b01c5709526049340eb38b",
+        "name": "brotli-k8-invalid-tree-error-replaced"
+      },
+      {
+        "identity_sha256": "0e232d1eaa2717cb2620c4d747fa9b9fa6e896e9ca4a46563d993cf7da08f73d",
+        "name": "brotli-k8-invalid-tree-mutates-metadata"
+      }
+    ],
+    "mutants": [
+      "brotli-k7-canonical-constructor-spurious-error",
+      "brotli-k8-single-constructor-spurious-error",
+      "brotli-k7-singleton-install-spurious-error",
+      "brotli-k7-multi-install-spurious-error",
+      "brotli-k8-invalid-tree-error-replaced",
+      "brotli-k8-invalid-tree-mutates-metadata"
+    ],
+    "suite": "the_prover_rejects_six_k7_k8_result_contract_defects",
+    "suite_source_sha256": "45b731679e3d7a6dbecc68660586f191ac20803715f93eea77d5ba262a1dcaf0"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "39f812566a3cd2d902e9b4b0404416cda69a9a9b730b12544078742b86a08439",
+        "name": "brotli-m1-context-bad-count-prepass-skips-terminal-plan"
+      },
+      {
+        "identity_sha256": "e18ef5d5a33f7e3ab4da6e3f1f04c124ee8d63b81050e2a48551e6eaab7cdb6b",
+        "name": "brotli-m1-context-bad-count-plan-omits-terminal-work"
+      },
+      {
+        "identity_sha256": "72e60aaa5188a121def5caad6b53a7ac251ebf6299b781459e747e479f9646b1",
+        "name": "brotli-m1-context-bad-count-plan-loses-failure"
+      },
+      {
+        "identity_sha256": "549ccd1b6fcde1e8e72ad96db88e7cfa1be08a98bd558aa616f55d0308daf0fb",
+        "name": "brotli-m1-context-bad-count-plan-consumes-input"
+      },
+      {
+        "identity_sha256": "f6a620ab51291ef16602f7ba8825fd0be6e2f25d0344e004436fe598d09c0dff",
+        "name": "brotli-m1-context-bad-count-executor-wrong-error"
+      },
+      {
+        "identity_sha256": "769e75ec6ff7ba85fbf60987e9492daaa16956ea6af0d0bcf28fbc1549503bf5",
+        "name": "brotli-m1-context-bad-count-owner-skips-action"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-context-bad-count-prepass-skips-terminal-plan",
+      "brotli-m1-context-bad-count-plan-omits-terminal-work",
+      "brotli-m1-context-bad-count-plan-loses-failure",
+      "brotli-m1-context-bad-count-plan-consumes-input",
+      "brotli-m1-context-bad-count-executor-wrong-error",
+      "brotli-m1-context-bad-count-owner-skips-action"
+    ],
+    "suite": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+    "suite_source_sha256": "80c122f6a46bb1a4ee3ba25f76ad7a9855469e312fcb627a6a7f94b5484a0a5a"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "1f43421d6b1487cbcb41c16cf8335285a6c024b9e7a56642745a11cb81439afe",
+        "name": "brotli-m1-cursor-tag-rejects-with-wrong-error"
+      },
+      {
+        "identity_sha256": "28aee96eeb8e0648212f35b3c3adbc2b8d08fe2ae3aa603dded9239fb70ac728",
+        "name": "brotli-m1-cursor-distance-prepass-forgets-rejection"
+      },
+      {
+        "identity_sha256": "3e9e448616a0fb78358be90dc75c09f17a6bc7a094f994be4ed7a62c3896d7c1",
+        "name": "brotli-m1-cursor-block-prepass-forgets-var-rejection"
+      },
+      {
+        "identity_sha256": "a551102b8f9c523304a904d4a43dd7135ac108e02883a6e055814d723e185b0b",
+        "name": "brotli-m1-cursor-block-forecast-omits-terminal-work"
+      },
+      {
+        "identity_sha256": "5e3caac6a39236b47f1cd32471e69518889336f3be939d42ebc80a1c511c983d",
+        "name": "brotli-m1-cursor-context-owner-skips-terminal-action"
+      },
+      {
+        "identity_sha256": "c401162fd52a0e466128065fdfbaa215d071486f8ef555a8b70f95a6e4dde962",
+        "name": "brotli-m1-cursor-executor-forgets-terminal-work-debit"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-cursor-tag-rejects-with-wrong-error",
+      "brotli-m1-cursor-distance-prepass-forgets-rejection",
+      "brotli-m1-cursor-block-prepass-forgets-var-rejection",
+      "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "brotli-m1-cursor-context-owner-skips-terminal-action",
+      "brotli-m1-cursor-executor-forgets-terminal-work-debit"
+    ],
+    "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+    "suite_source_sha256": "a50eba7b9d51b42bc844dbfc4299d89bef77af0b3debdca80f99a20023f44773"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "ed773e58a99181dd2a1761620a1f745b4891ffe6f823cfc2a118f8265e708a42",
+        "name": "brotli-m1-block-count-prepass-omits-read-work"
+      },
+      {
+        "identity_sha256": "0d8066bb588812481c817d31f69f859fdd1ff344202524fc8a98c020763624cf",
+        "name": "brotli-m1-block-count-plan-loses-need-input"
+      },
+      {
+        "identity_sha256": "e54b0332ccd08ec05c6f6cd1604ade0b9d660eb5af7a0acd2abfeeb9f711b614",
+        "name": "brotli-m1-block-count-plan-loses-consumption"
+      },
+      {
+        "identity_sha256": "8dd6d924fb764dbe20224b708ae3a0613173437ab84cbcb18040e64f188d2fc3",
+        "name": "brotli-m1-block-count-executor-omits-input-debit"
+      },
+      {
+        "identity_sha256": "687f3ac1006ddd4964a47d70c3423f13d14b6cf1af83b5f4d425046823939978",
+        "name": "brotli-m1-block-count-limited-input-is-retryable"
+      },
+      {
+        "identity_sha256": "20b32cc543b29de4cfaa1aab60f89d2cdac75a9644f189dae27f1bec4112d0a2",
+        "name": "brotli-m1-block-count-value-writes-padding"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-block-count-prepass-omits-read-work",
+      "brotli-m1-block-count-plan-loses-need-input",
+      "brotli-m1-block-count-plan-loses-consumption",
+      "brotli-m1-block-count-executor-omits-input-debit",
+      "brotli-m1-block-count-limited-input-is-retryable",
+      "brotli-m1-block-count-value-writes-padding"
+    ],
+    "suite": "the_prover_rejects_six_m1_block_count_relation_and_debit_defects",
+    "suite_source_sha256": "8cd83226837d70592f272055262f0c873106fc88b86c15071f10a2ac345f1055"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "8848e2fe4610bba804ab4f8c4034c0d223fd214b49bc094c25c02cdbf3a895bd",
+        "name": "brotli-m1-handoff-reset-writes-wrong-var-phase"
+      },
+      {
+        "identity_sha256": "92fd42d7e647f06a89b36a249f911ca4960d7d5e0e3c107fc2d828dc968db940",
+        "name": "brotli-m1-handoff-reset-writes-wrong-pending-run"
+      },
+      {
+        "identity_sha256": "cf7b32626a235b89ec84fe70be7516174d96a53df65f39f0628a75411483fcb9",
+        "name": "brotli-m1-handoff-plan-undercharges-one"
+      },
+      {
+        "identity_sha256": "1e68fbaaff9d68086fa996463f769bbd8a10ae350538b964b8be3fcdad92f7a6",
+        "name": "brotli-m1-handoff-plan-consumes-input"
+      },
+      {
+        "identity_sha256": "0931d248697af056fbdb6c45a5575126196dda8ee24e7a9a2d9ba5a6ed5cff0c",
+        "name": "brotli-m1-handoff-action-skips-literal-map"
+      },
+      {
+        "identity_sha256": "564a5374db99b4fc96def5644d76a0da626ddb8598d6b0596325b5b298b4f484",
+        "name": "brotli-m1-handoff-reset-writes-padding"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-handoff-reset-writes-wrong-var-phase",
+      "brotli-m1-handoff-reset-writes-wrong-pending-run",
+      "brotli-m1-handoff-plan-undercharges-one",
+      "brotli-m1-handoff-plan-consumes-input",
+      "brotli-m1-handoff-action-skips-literal-map",
+      "brotli-m1-handoff-reset-writes-padding"
+    ],
+    "suite": "the_prover_rejects_six_m1_context_mode_handoff_defects",
+    "suite_source_sha256": "1e742a0b2ba15597468bbceb9fa178392de4ec60bf8e3c21cc5d0eccc5c9db58"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "45b1285e9c8081a605ab0cff23337c0538eebad436e9b0c3592c2dbe209cd3c2",
+        "name": "brotli-m1-distance-prepass-omits-read-work"
+      },
+      {
+        "identity_sha256": "03120b0dc8280b394184ec123659f5e099d614cbe40198fd7242aa372ddf95d7",
+        "name": "brotli-m1-distance-plan-loses-need-input"
+      },
+      {
+        "identity_sha256": "0b64ef1ee7fad23affa882d1f6e37a902d87da4799802aa0fa6a32ce0e5c0da9",
+        "name": "brotli-m1-distance-plan-loses-consumption"
+      },
+      {
+        "identity_sha256": "c212023c8c26727e9cb6654b5babdb675e6466b2a7d38f36f6a8a5cbcf247dae",
+        "name": "brotli-m1-distance-plan-omits-value-writes"
+      },
+      {
+        "identity_sha256": "85cf06a9addc3aff90c30ab0cedc118f1e45c67c72d10e1c80c0a0c4b2e9f85b",
+        "name": "brotli-m1-distance-action-writes-wrong-direct-field"
+      },
+      {
+        "identity_sha256": "ddd4bbee777079c4e231fed42c936c6e0e80ce365b8d5ac8a47993fe32b029b9",
+        "name": "brotli-m1-distance-action-flips-postfix"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-distance-prepass-omits-read-work",
+      "brotli-m1-distance-plan-loses-need-input",
+      "brotli-m1-distance-plan-loses-consumption",
+      "brotli-m1-distance-plan-omits-value-writes",
+      "brotli-m1-distance-action-writes-wrong-direct-field",
+      "brotli-m1-distance-action-flips-postfix"
+    ],
+    "suite": "the_prover_rejects_six_m1_distance_relation_and_frame_defects",
+    "suite_source_sha256": "d235bb7d1d2c48c7eeba822cf170548c2b5911858fe8ace437df630fea7ff3c0"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "96d1aebd043ae81bc5c7e7395b00c08afc9ee266da6a130ea974e0ba562a3e0a",
+        "name": "brotli-m1-tree-reset-transition-undercharge"
+      },
+      {
+        "identity_sha256": "085355394156983edb7a8df7bbb6706213adae628219da1ce74bf0864bb1c1aa",
+        "name": "brotli-m1-var-reset-transition-undercharge"
+      },
+      {
+        "identity_sha256": "62aeda63505ff7614c61eadec1f98f0a389f71fcd8ceccb56842316147beb67d",
+        "name": "brotli-m1-prefix-reset-transition-undercharge"
+      },
+      {
+        "identity_sha256": "d5c371cbd4c6dd5e841bdec75f4e65fbcbe1d03c04a86b6f89c104f49eee0e06",
+        "name": "brotli-m1-group-tree-transition-undercharge"
+      },
+      {
+        "identity_sha256": "5f12ec1dbbf0b407f8b9b076a199f4337b19341b51fa08deebd01191f5e8d3fc",
+        "name": "brotli-m1-group-reset-transition-undercharge"
+      },
+      {
+        "identity_sha256": "4e70182daf25548c199ff1db4358e57671df90cfc8ffe878c2bb5c35c9af6561",
+        "name": "brotli-m1-ready-reset-transition-undercharge"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-tree-reset-transition-undercharge",
+      "brotli-m1-var-reset-transition-undercharge",
+      "brotli-m1-prefix-reset-transition-undercharge",
+      "brotli-m1-group-tree-transition-undercharge",
+      "brotli-m1-group-reset-transition-undercharge",
+      "brotli-m1-ready-reset-transition-undercharge"
+    ],
+    "suite": "the_prover_rejects_six_m1_nested_reset_transition_undercharges",
+    "suite_source_sha256": "9d29fae80884009f6aebb58d1214d27a83ce8fbbec41b7761e7b23bfea7fa93e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "2aaecb3a9af556fb5bd2cc87089821f41b8befb6cf06515d4c3504ab66288573",
+        "name": "brotli-m1-tree-simple-rejection-is-truncated"
+      },
+      {
+        "identity_sha256": "09b914e1e5c2d2038f2a2a9caa84d2fefe803b31a29884531c38ef652e9ee1ec",
+        "name": "brotli-m1-tree-canonical-rejection-is-internal"
+      },
+      {
+        "identity_sha256": "b9a7b821840e1b174841667c1f4022b62ab63938e8c7f4a9bae74269938145ca",
+        "name": "brotli-m1-tree-simple-plan-reports-invalid-tree"
+      },
+      {
+        "identity_sha256": "d044e793534f7cf732fb51cf1a0f774a5c1ae17f8cd7e54f7078c63924776d25",
+        "name": "brotli-m1-tree-canonical-plan-loses-tree-priority"
+      },
+      {
+        "identity_sha256": "c5360322dab8b36c70ddfb63c5c597f8429f79fcc1a2a86566906780af6e58cb",
+        "name": "brotli-m1-tree-canonical-plan-loses-length-error"
+      },
+      {
+        "identity_sha256": "defe7a903e6d7f2b2eec949deb42eaea218b316326ef5650e1e9dbbb55d34fc4",
+        "name": "brotli-m1-tree-owner-flags-matching-workspace-error"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-tree-simple-rejection-is-truncated",
+      "brotli-m1-tree-canonical-rejection-is-internal",
+      "brotli-m1-tree-simple-plan-reports-invalid-tree",
+      "brotli-m1-tree-canonical-plan-loses-tree-priority",
+      "brotli-m1-tree-canonical-plan-loses-length-error",
+      "brotli-m1-tree-owner-flags-matching-workspace-error"
+    ],
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "suite_source_sha256": "511d0463c98f5f35402ba7133150e387920101ee9df8cd26e3d0687c1b149a06"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "7951b75235f7e9260c0f640a1c673463c0d6af65791099d5061a49853f54660c",
+        "name": "brotli-m1-tree-plan-omits-saved-load-planning"
+      },
+      {
+        "identity_sha256": "06635db23764a737420d35e673e7d675c1240c8512e60288c48241a7206462d3",
+        "name": "brotli-m1-block-tree-plan-omits-planning-debit"
+      },
+      {
+        "identity_sha256": "c125ccb0e76507a8d5d3b10e832d108c00320cdfdeb7ff3dcdbd30a0f58a39e0",
+        "name": "brotli-m1-group-tree-plan-omits-planning-debit"
+      },
+      {
+        "identity_sha256": "3d972bb621b0d9ae7978dcc1278098b1ccf725c0522548efd7ede741f4235ad2",
+        "name": "brotli-m1-pending-span-writes-wrong-length"
+      },
+      {
+        "identity_sha256": "450846cbd195a56b5d869b54e4f3358a29a64e104a0c6313db1d4ef8654fed3d",
+        "name": "brotli-m1-descriptor-store-writes-unrelated-byte"
+      },
+      {
+        "identity_sha256": "9d46b31b8ee85ae07861458c2796da7b983b3f487beb1987ea78de4a7fa51bd5",
+        "name": "brotli-m1-inconsistent-span-mutates-decoder"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-tree-plan-omits-saved-load-planning",
+      "brotli-m1-block-tree-plan-omits-planning-debit",
+      "brotli-m1-group-tree-plan-omits-planning-debit",
+      "brotli-m1-pending-span-writes-wrong-length",
+      "brotli-m1-descriptor-store-writes-unrelated-byte",
+      "brotli-m1-inconsistent-span-mutates-decoder"
+    ],
+    "suite": "the_prover_rejects_six_m1_tree_plan_debit_and_frame_defects",
+    "suite_source_sha256": "8ff19650df7fa5d3c001e439f51c0eaba75e98f2cd97467c933f3cedac96e624"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "cbf093a26df7b10b5bd9bf827407f6e30482206990ede64cbd6f961c82d400a7",
+        "name": "brotli-m1-handoff-loses-distance-parameter-rejection"
+      },
+      {
+        "identity_sha256": "afbe50371e6296739d8c4adb27246826e79474625695f40ae2778ce1338c3c18",
+        "name": "brotli-m1-handoff-loses-final-count-validation"
+      },
+      {
+        "identity_sha256": "4131477b8b03f4e9242f111ad41a6c9d80832b4cbe35f36d2e5d13dde07b66eb",
+        "name": "brotli-m1-handoff-accepts-out-of-range-literal-context"
+      },
+      {
+        "identity_sha256": "86171ef754e54ea2c90fb48037f925fb6fb544c515fdb04f0d61464bd9c5d824",
+        "name": "brotli-m1-handoff-accepts-out-of-range-distance-context"
+      },
+      {
+        "identity_sha256": "58e3bf21cfbd5d1e9807ddfd4ae02d6eda6a3e5138a1560d6685893bcdf55214",
+        "name": "brotli-m1-handoff-accepts-zero-initial-length"
+      },
+      {
+        "identity_sha256": "7422501ca59b20d3bd26c7f510c99ae36741ff7ef2d4878f7a160cb5fad26281",
+        "name": "brotli-m1-handoff-first-map-read-not-prepaid"
+      },
+      {
+        "identity_sha256": "dc72b5aba5b0f837442a594c29d75b987fce02cf04d23308fb56b5e7d8d180ee",
+        "name": "brotli-m1-handoff-second-map-read-not-prepaid"
+      },
+      {
+        "identity_sha256": "306ffb9e047653147a5f0ae7fcdabbc53bb892c4cd4c97fc8e82fd80aca0ce55",
+        "name": "brotli-m1-handoff-ready-start-undercharge"
+      },
+      {
+        "identity_sha256": "306ae070bba037ff1058fd797daf283118affe34c85985562dcaabdd4d4724d9",
+        "name": "brotli-m1-block-tree-execution-reservation-undercharge"
+      },
+      {
+        "identity_sha256": "2efadc4bee9aa1b0328c508d040c09570f835e35aa06b195f178808c13fea7ad",
+        "name": "brotli-m1-tree-group-execution-reservation-undercharge"
+      },
+      {
+        "identity_sha256": "fda31cf2506d1f9d69a215c454feb8d5791b5ca40c7467062afa9fee67e84c1f",
+        "name": "brotli-m1-map-tail-execution-reservation-undercharge"
+      },
+      {
+        "identity_sha256": "b58b711f54f2298b5e3f8179c8be0a962a18faa2823b9b37bc151604ac8cf7da",
+        "name": "brotli-m1-terminal-execution-reservation-undercharge"
+      },
+      {
+        "identity_sha256": "2187c8b0117ead366d8adfcbbde123c4deb25385ec491208b570e35b520c02ba",
+        "name": "brotli-m1-terminal-plan-accepts-zero-length"
+      },
+      {
+        "identity_sha256": "a45010bdafe6afd2883b29dd44840cd629aae19c10aa7c6c4e353bd1ba266a80",
+        "name": "brotli-m1-map-handoff-rejection-undercharge"
+      },
+      {
+        "identity_sha256": "59be982896c9e38e146e25d6d6b6e5dc080e439764e6e344e6ff876e78e49888",
+        "name": "brotli-m1-map-tail-replay-consumption-corrupted"
+      },
+      {
+        "identity_sha256": "d67dfcfb5fb471f76a713c9cbc8a1dfe5dc7b2a741c9c283dede0136c5f9a80a",
+        "name": "brotli-m1-map-tail-replay-coverage-error-corrupted"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-handoff-loses-distance-parameter-rejection",
+      "brotli-m1-handoff-loses-final-count-validation",
+      "brotli-m1-handoff-accepts-out-of-range-literal-context",
+      "brotli-m1-handoff-accepts-out-of-range-distance-context",
+      "brotli-m1-handoff-accepts-zero-initial-length",
+      "brotli-m1-handoff-first-map-read-not-prepaid",
+      "brotli-m1-handoff-second-map-read-not-prepaid",
+      "brotli-m1-handoff-ready-start-undercharge",
+      "brotli-m1-block-tree-execution-reservation-undercharge",
+      "brotli-m1-tree-group-execution-reservation-undercharge",
+      "brotli-m1-map-tail-execution-reservation-undercharge",
+      "brotli-m1-terminal-execution-reservation-undercharge",
+      "brotli-m1-terminal-plan-accepts-zero-length",
+      "brotli-m1-map-handoff-rejection-undercharge",
+      "brotli-m1-map-tail-replay-consumption-corrupted",
+      "brotli-m1-map-tail-replay-coverage-error-corrupted"
+    ],
+    "suite": "the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects",
+    "suite_source_sha256": "0759f7d35534f3a8283b299f2f151f5261cf3182cb603816195d5376016de88d"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "df9b0d88f889e871366925a270ad4591fb8930d36b7fdadaf4f173e3fb4bb42e",
+        "name": "brotli-b3b-context-tree-count-omits-plus-one-for-zero"
+      },
+      {
+        "identity_sha256": "fea674e7b5c59d3ea71dbb8387e6673a58c81941f527111d88543abdef7da3f3",
+        "name": "brotli-b3b-context-phase-one-reads-two-bits"
+      },
+      {
+        "identity_sha256": "e290d7efbf5cae065b76b1b7dc53705f5b630cc0e3a4eba6ca764f301c6578ed",
+        "name": "brotli-b3b-context-phase-two-reads-three-bits"
+      },
+      {
+        "identity_sha256": "10d5c1795ddbdb6cc8a45aec10ad2db7b29ea69b1d0e9a70705b21f4d55fa613",
+        "name": "brotli-b3b-context-rle-suffix-is-one-bit-short"
+      },
+      {
+        "identity_sha256": "2efe0e6e330fa92e16616eb5c124ad3880641cd770eacb5e0d07d993f943f47b",
+        "name": "brotli-b3b-context-phase-six-reads-two-bits"
+      },
+      {
+        "identity_sha256": "67b5f37909626e64b8c70ead78f03d3b323ba4abb86fcce784b37a3b0c670f97",
+        "name": "brotli-b3b-context-need-input-does-not-suspend"
+      },
+      {
+        "identity_sha256": "a32a95c9fb5887a93a3f92cf9864392aeaf34a322547701e528719344a63e806",
+        "name": "brotli-b3b-context-exact-fill-is-overflow"
+      },
+      {
+        "identity_sha256": "f33a198ced115f2cbf2142b36a256915a56a18ca7b7b66a6c9e4451284e7bc35",
+        "name": "brotli-b3b-context-rle-writes-one"
+      },
+      {
+        "identity_sha256": "55c8ef515c358d0c6de13765f6860ce652b98e045a4bc0a5387c656af07a11c9",
+        "name": "brotli-b3b-context-temporary-alphabet-adds-one"
+      },
+      {
+        "identity_sha256": "85248b73f3a1c05dc1909c0cebc4f2b0c5c0dd1203987613b0e64b06670fd250",
+        "name": "brotli-b3b-context-zero-mtf-flag-routes-to-mtf"
+      },
+      {
+        "identity_sha256": "617a9d34d94921b6ad03852d5f51df66131ab792b42ef44ba69407e26651b3bf",
+        "name": "brotli-b3b-context-direct-value-is-one-low"
+      },
+      {
+        "identity_sha256": "ffa7675420585490b6baa8b5238e8602e53601eb82eee074573f4d5ef9c606c9",
+        "name": "brotli-b3b-context-symbol-uses-literal-tree-region"
+      },
+      {
+        "identity_sha256": "752214ae0b96c3cc857d3d9a081c52fcd6c67448590502a22dcda18b16d33479",
+        "name": "brotli-b3b-context-coverage-rejects-covered-map"
+      }
+    ],
+    "mutants": [
+      "brotli-b3b-context-tree-count-omits-plus-one-for-zero",
+      "brotli-b3b-context-phase-one-reads-two-bits",
+      "brotli-b3b-context-phase-two-reads-three-bits",
+      "brotli-b3b-context-rle-suffix-is-one-bit-short",
+      "brotli-b3b-context-phase-six-reads-two-bits",
+      "brotli-b3b-context-need-input-does-not-suspend",
+      "brotli-b3b-context-exact-fill-is-overflow",
+      "brotli-b3b-context-rle-writes-one",
+      "brotli-b3b-context-temporary-alphabet-adds-one",
+      "brotli-b3b-context-zero-mtf-flag-routes-to-mtf",
+      "brotli-b3b-context-direct-value-is-one-low",
+      "brotli-b3b-context-symbol-uses-literal-tree-region",
+      "brotli-b3b-context-coverage-rejects-covered-map"
+    ],
+    "suite": "the_prover_rejects_thirteen_b3b_context_map_defects",
+    "suite_source_sha256": "6eede7f09a8105470a2ab2993469d392b173a47ef4b7036cd6fd350c82e449a3"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "07e3db37b9bb7ff16b5775e663032f9d0840531b2fec595f28b8f58dfcd4c38e",
+        "name": "brotli-b3c-context-count-queue-write-undercharge"
+      },
+      {
+        "identity_sha256": "6af2b164b2d495b216cc7b1db73146d475121a9b85bfd6923d20ad09655ae989",
+        "name": "brotli-b3c-context-count-var-write-undercharge"
+      },
+      {
+        "identity_sha256": "32de75408662446419cf0b808c8e359ceaab4f93bba1a46ffe5c2104b57ba69f",
+        "name": "brotli-b3c-context-count-map-cell-undercharge"
+      },
+      {
+        "identity_sha256": "8db0203585a4fb61d15dde9d7cbd0710efc10ec9987b03586282e7d8360165ea",
+        "name": "brotli-b3c-context-count-map-progress-undercharge"
+      },
+      {
+        "identity_sha256": "3c89cd48977a75b017bbce698116a3321c15938264068ab17206ed9637d2dc3f",
+        "name": "brotli-b3c-context-count-tree-count-undercharge"
+      },
+      {
+        "identity_sha256": "4cb787f0edbf24602a91260b7c0eb6821326aa6479db3877c91c74fd6e497c3a",
+        "name": "brotli-b3c-context-count-phase-transition-undercharge"
+      },
+      {
+        "identity_sha256": "0b600395936988aa9938e97945f36a08990cee5fb0a90940d4c32c4a33ea12a0",
+        "name": "brotli-b3c-context-count-terminal-undercharge"
+      },
+      {
+        "identity_sha256": "4ed7a758e352f48928b46ab1e9ca7692efd290ec86e669bbed1f89b2ef2caefa",
+        "name": "brotli-b3c-context-count-planning-debit-omitted"
+      },
+      {
+        "identity_sha256": "34569b2bc91f88e2181559a72ba234cd87296eac25fb8669d07a9dacf64f6c90",
+        "name": "brotli-b3c-context-count-execution-debit-undercharge"
+      },
+      {
+        "identity_sha256": "50f840f0ae9f8ec1129e1db787ab802b3bb6f4938ec70d5416d0e05658f4f3ab",
+        "name": "brotli-b3c-context-count-execution-reserved-after-writes"
+      },
+      {
+        "identity_sha256": "88c35df715b6162818a45f2d2a8ba2a9370d01d48fb7d2daf65eb462b70816e7",
+        "name": "brotli-b3c-context-count-wrong-decoded-count"
+      },
+      {
+        "identity_sha256": "c1019d2038134b4be5c22889724d99caef833f80d5e1ae077761b2eb8984e574",
+        "name": "brotli-b3c-context-count-wrong-zero-map-value"
+      },
+      {
+        "identity_sha256": "33c7bff251cd6e72b24cee51c58795b89d332d4031e8d5b1283997c0e840d9b6",
+        "name": "brotli-b3c-context-count-progress-writes-map-size"
+      }
+    ],
+    "mutants": [
+      "brotli-b3c-context-count-queue-write-undercharge",
+      "brotli-b3c-context-count-var-write-undercharge",
+      "brotli-b3c-context-count-map-cell-undercharge",
+      "brotli-b3c-context-count-map-progress-undercharge",
+      "brotli-b3c-context-count-tree-count-undercharge",
+      "brotli-b3c-context-count-phase-transition-undercharge",
+      "brotli-b3c-context-count-terminal-undercharge",
+      "brotli-b3c-context-count-planning-debit-omitted",
+      "brotli-b3c-context-count-execution-debit-undercharge",
+      "brotli-b3c-context-count-execution-reserved-after-writes",
+      "brotli-b3c-context-count-wrong-decoded-count",
+      "brotli-b3c-context-count-wrong-zero-map-value",
+      "brotli-b3c-context-count-progress-writes-map-size"
+    ],
+    "suite": "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+    "suite_source_sha256": "0187a2380ad3ee1d174fcfe78cce618ef63ac5d9442e6d4066cb7618b184d61c"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "bb59c6fcbd82479efedc0cb8a2fb6b86175e8f72399b3ac919f4571502075383",
+        "name": "brotli-b3c-distance-queue-write-undercharge"
+      },
+      {
+        "identity_sha256": "42773e9c5e897c915a7642560dc69756897c7313b91125ee8a7d7bea577bf645",
+        "name": "brotli-b3c-distance-terminal-undercharge"
+      },
+      {
+        "identity_sha256": "b17cd65ec675b41364d024212b502bb4722d10388b808e3e19c9495f54ec9afa",
+        "name": "brotli-b3c-distance-value-undercharge"
+      }
+    ],
+    "mutants": [
+      "brotli-b3c-distance-queue-write-undercharge",
+      "brotli-b3c-distance-terminal-undercharge",
+      "brotli-b3c-distance-value-undercharge"
+    ],
+    "suite": "the_prover_rejects_three_b3c_distance_metering_undercharges",
+    "suite_source_sha256": "5d1a49d314408f32ac0e338e0db726d7db406d8a6829504e845a366187fe444e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "129321bb691a8e872124d645b21c9912163fc8ed9dda28868f0c9ce396b2c7fd",
+        "name": "brotli-k3-suffix-plan-loses-consumption"
+      },
+      {
+        "identity_sha256": "a244267da961103bbf21bdceee1cbb2f767f6c315dca99e6b1c89ecbf1c1de9c",
+        "name": "brotli-k3-suffix-plan-loses-success"
+      },
+      {
+        "identity_sha256": "e1144b5210284d8de462c87fb20183028ea583d3d290ab26e559b230d0a133c1",
+        "name": "brotli-k3-suffix-plan-undercharges-value-tables"
+      }
+    ],
+    "mutants": [
+      "brotli-k3-suffix-plan-loses-consumption",
+      "brotli-k3-suffix-plan-loses-success",
+      "brotli-k3-suffix-plan-undercharges-value-tables"
+    ],
+    "suite": "the_prover_rejects_three_k3_suffix_plan_relation_defects",
+    "suite_source_sha256": "76c6319a539e4b11c85ba7efd2109d91c346b52c1a490313cfd4748b7289124a"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "2821592f130b7b93ac0a53cefc34a501b4eb607cebcb4070821cc279b7ff7ce7",
+        "name": "brotli-k6-singleton-reservation-restores-five"
+      },
+      {
+        "identity_sha256": "111eb7de83a5eb10d843249efc0e6b5e0ff99e413df376902285eb2b629ea398",
+        "name": "brotli-k6-selector-four-uses-three-symbols"
+      },
+      {
+        "identity_sha256": "ca393769f566f573af0f491c0335d2b515e86290b9d0edce2f73c4b229a7820e",
+        "name": "brotli-k6-install-omits-validation-reads"
+      },
+      {
+        "identity_sha256": "d39be35b76ffb6c6cfb349ec65fb1d04183461a8f24bce807dfd4f01b61c0ab5",
+        "name": "brotli-k6-install-omits-record-probes"
+      },
+      {
+        "identity_sha256": "c1ca044988b538aaf3c256dfd16649df02dedb96a99119499d5f7a56441b7ce2",
+        "name": "brotli-k6-triangular-correction-undercharged"
+      },
+      {
+        "identity_sha256": "822bb74e72602fccf2f5ef587cdaa1bbc70eb3ae486bfc0d51f4f20f9a0391d4",
+        "name": "brotli-k6-first-record-probe-unpaid"
+      },
+      {
+        "identity_sha256": "8522d5768eaa26e3b2d39f8236dfb2731f757f01298809ca3463fabc257920b9",
+        "name": "brotli-k6-fourth-record-probe-unpaid"
+      },
+      {
+        "identity_sha256": "1c5a96369f7ba4a821c56d52713cfab0af9e1b048980162fb012f24e1702dbb7",
+        "name": "brotli-k6-range-validation-read-unpaid"
+      },
+      {
+        "identity_sha256": "5e99fe4350477f7c666a6a149cfccb3ecc1146b02c4131ccdef72b0b264bcd93",
+        "name": "brotli-k6-distinctness-right-read-unpaid"
+      },
+      {
+        "identity_sha256": "304052a5032e41c9c0760c6572cb3d54c3182d169847941418c775bb876dac19",
+        "name": "brotli-k6-singleton-final-read-unpaid"
+      },
+      {
+        "identity_sha256": "9fb867663ff59f5db3a210395226bece311c591e0a2b8f367115955a1c6757e4",
+        "name": "brotli-k6-adapter-omits-installation-reservation"
+      },
+      {
+        "identity_sha256": "b332dcc2ff5ab798df646d2b75ef0af75ebe3a9581851ab6a5825a386b88c46e",
+        "name": "brotli-k6-installer-reads-before-destination-guard"
+      }
+    ],
+    "mutants": [
+      "brotli-k6-singleton-reservation-restores-five",
+      "brotli-k6-selector-four-uses-three-symbols",
+      "brotli-k6-install-omits-validation-reads",
+      "brotli-k6-install-omits-record-probes",
+      "brotli-k6-triangular-correction-undercharged",
+      "brotli-k6-first-record-probe-unpaid",
+      "brotli-k6-fourth-record-probe-unpaid",
+      "brotli-k6-range-validation-read-unpaid",
+      "brotli-k6-distinctness-right-read-unpaid",
+      "brotli-k6-singleton-final-read-unpaid",
+      "brotli-k6-adapter-omits-installation-reservation",
+      "brotli-k6-installer-reads-before-destination-guard"
+    ],
+    "suite": "the_prover_rejects_twelve_k6_simple_install_metering_defects",
+    "suite_source_sha256": "81c39d654132e0491a7e293b341b01f4ef7db01935fba5c5978547a37c7a5655"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "6448dacbcb643c5521c006465b343c4134725d98307805afc206c842a28c0f3c",
+        "name": "brotli-m1-codec-simple-index-erased"
+      },
+      {
+        "identity_sha256": "ad3b450bb55d8d2f03b31445f40c3307a83274b75a999e22440655979c32e98e",
+        "name": "brotli-m1-codec-shape-selector-lost"
+      },
+      {
+        "identity_sha256": "8ca048d697147adf3ace1a16688854069ecad0798671a46e4569d48e3091be79",
+        "name": "brotli-m1-codec-symbol-array-alias"
+      },
+      {
+        "identity_sha256": "74266176982fb23c972107bb57eefe061f1228c06e68511edf73f20f484de3ce",
+        "name": "brotli-m1-codec-aux-array-erased"
+      },
+      {
+        "identity_sha256": "67cf4b09d091ebc727378364c0dadbbc8abc8c3f974d52b0f93b55b39eb7983b",
+        "name": "brotli-m1-codec-prefix-phase-alias"
+      },
+      {
+        "identity_sha256": "fd087cbffb3e9bbe56def94932d57b61404c876cf601ffcc909b56f7377e9e11",
+        "name": "brotli-m1-codec-prefix-nonzero-erased"
+      },
+      {
+        "identity_sha256": "1064b0353d6688e404888d46ac35f32ef52559c16a43b875a707c034d7b30edf",
+        "name": "brotli-m1-codec-aux-skip-erased"
+      },
+      {
+        "identity_sha256": "5a1758eaeb17ae1c6c8737bcfc129eb87bf0a8c7922891feaad96092394d51e4",
+        "name": "brotli-m1-codec-chained-history-erased"
+      },
+      {
+        "identity_sha256": "df2a8a952f508f97fef7a66c52dedef451d4bb785e8d8097a5fc3058cbaf3bf9",
+        "name": "brotli-m1-codec-parent-tag-erased"
+      },
+      {
+        "identity_sha256": "5066d8fdfb962d0127117edbe84b1159128747bee88913c26df8c173475e5fa8",
+        "name": "brotli-m1-codec-failed-error-tag-alias"
+      },
+      {
+        "identity_sha256": "dcaebad125a841b01017090dfd5c1cd73e6f18264d5b90fcb9a6490f3d0a626c",
+        "name": "brotli-m1-codec-simple-write-undercharge"
+      },
+      {
+        "identity_sha256": "d39aa597ca48010a36bd44eec4ce2181cbdc8edd510255bb1b867cad7bfcdb9a",
+        "name": "brotli-m1-codec-complex-write-undercharge"
+      }
+    ],
+    "mutants": [
+      "brotli-m1-codec-simple-index-erased",
+      "brotli-m1-codec-shape-selector-lost",
+      "brotli-m1-codec-symbol-array-alias",
+      "brotli-m1-codec-aux-array-erased",
+      "brotli-m1-codec-prefix-phase-alias",
+      "brotli-m1-codec-prefix-nonzero-erased",
+      "brotli-m1-codec-aux-skip-erased",
+      "brotli-m1-codec-chained-history-erased",
+      "brotli-m1-codec-parent-tag-erased",
+      "brotli-m1-codec-failed-error-tag-alias",
+      "brotli-m1-codec-simple-write-undercharge",
+      "brotli-m1-codec-complex-write-undercharge"
+    ],
+    "suite": "the_prover_rejects_twelve_m1_general_codec_defects",
+    "suite_source_sha256": "9d69849f8c3ed3d9712bef688e27d2ee827059abaab6693a0f250fe74ceb7c01"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "03dbc8af4511fa582f24a41690f9262d24e70e2984256ff4141f5a7ad1dc9876",
+        "name": "brotli-distance-postfix-uses-upper-four-bits"
+      },
+      {
+        "identity_sha256": "faa4abab1e0213dcccafe47f9b35b54ef6b49401a73596ec4a883fbc440836b8",
+        "name": "brotli-varuint-final-exhaustion-needs-more-input"
+      }
+    ],
+    "mutants": [
+      "brotli-distance-postfix-uses-upper-four-bits",
+      "brotli-varuint-final-exhaustion-needs-more-input"
+    ],
+    "suite": "the_prover_rejects_two_b3b_distance_and_exhaustion_defects",
+    "suite_source_sha256": "1d9e6419b265348f3dfb6213411bbccbbd7f51d37eb35c2853ec8384f800e40e"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "cb9cb44517e11c7add661d9771de0c26c65adba9268d638dc4f36d98e7c3e32f",
+        "name": "brotli-b3b-outer-phase-overlaps-terminal-tag"
+      },
+      {
+        "identity_sha256": "71fea3411173d75f094c2ed2f3a13f0c9bb0b66f0c3a60a3318b4ac10c889d90",
+        "name": "brotli-installed-code-omits-reversed-head-bit"
+      }
+    ],
+    "mutants": [
+      "brotli-b3b-outer-phase-overlaps-terminal-tag",
+      "brotli-installed-code-omits-reversed-head-bit"
+    ],
+    "suite": "the_prover_rejects_two_b3b_state_layout_and_bit_order_defects",
+    "suite_source_sha256": "e0123a8114a14cf1c60cc2d54397d5b788708c4e5cb6c67733e08f6a4d0b102f"
+  },
+  {
+    "case_identities": [
+      {
+        "identity_sha256": "834fd816be4ed6e5b36c3e2430b88f07a9048225b5ef20a2d9db8c0a1fd76fe7",
+        "name": "brotli-k2-writer-rejects-last-valid-index"
+      },
+      {
+        "identity_sha256": "74f12aab93ee1f08890a87e1fd10f57a23c589cb2343f6059f292ed74af584a2",
+        "name": "brotli-k2-writer-rejects-valid-window"
+      }
+    ],
+    "mutants": [
+      "brotli-k2-writer-rejects-last-valid-index",
+      "brotli-k2-writer-rejects-valid-window"
+    ],
+    "suite": "the_prover_rejects_two_k2_context_mode_success_guarantee_defects",
+    "suite_source_sha256": "9d1ec463335e20c523628a46be9fbd1c2ce5f4b5df8dc999411e97e98ff8610e"
+  }
+]

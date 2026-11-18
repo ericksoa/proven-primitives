@@ -1,0 +1,31 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-46527/src/brotli_prefix.rs:710:7
+    |
+710 | proof fn fixed_layout_is_exact()
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-46527/src/brotli_prefix.rs:732:9
+    |
+710 | proof fn fixed_layout_is_exact()
+    |       -------------------------- at the end of the function body
+...
+732 |         BLOCK_TYPE_METADATA_OFFSET + BLOCK_TYPE_METADATA_BYTES == BLOCK_LENGTH_METADATA_OFFSET,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+
+error: postcondition not satisfied
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-46527/src/brotli_prefix.rs:733:9
+    |
+710 |   proof fn fixed_layout_is_exact()
+    |         -------------------------- at the end of the function body
+...
+733 | /         BLOCK_LENGTH_METADATA_OFFSET + BLOCK_LENGTH_METADATA_BYTES
+734 | |             == TEMP_CONTEXT_METADATA_OFFSET,
+    | |___________________________________________^ failed this postcondition
+
+error: aborting due to 2 previous errors
+

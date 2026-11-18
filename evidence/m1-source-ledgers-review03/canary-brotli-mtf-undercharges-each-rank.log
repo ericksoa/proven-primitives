@@ -1,0 +1,14 @@
+verification results:: 2 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-92874/src/brotli_prefix.rs:4664:20
+     |
+4664 |               assert(work as nat
+     |  ____________________^
+4665 | |                 == init_limit as nat + mtf_rank_work(ranks.take(index as int)));
+     | |______________________________________________________________________________^ assertion failed
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,31 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-30351/src/brotli_input.rs:35791:1
+      |
+35791 | / fn execute_planned_context_bits(workspace: &mut [u8], window_bytes: u32,
+35792 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+35793 | |     input_was_limited: bool, plan: ContextBitsPlan,
+35794 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-30351/src/brotli_input.rs:35814:9
+      |
+35814 | /         old(budget).work_remaining < plan.execution_work ==> {
+35815 | |             &&& final(workspace)@ == old(workspace)@
+35816 | |             &&& *final(budget) == *old(budget)
+35817 | |             &&& r == Err(CompressedStep { consumed: 0,
+35818 | |                 status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+35819 | |         },
+      | |_________^ failed this postcondition
+...
+35876 |           return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+      |           -------------------------------------------------------------------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

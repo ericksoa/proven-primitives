@@ -1,0 +1,156 @@
+{
+  "scope": "Two separately reported old cases only; isolated diagnostics, not final gate",
+  "suffix_byte175": {
+    "label": "suffix-byte175-negative",
+    "selector": "advance_planned_compressed_action",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-unreached03-controls-diagnostic/suffix-byte175-negative/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "advance_planned_compressed_action",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "environment": {
+      "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+      "RUSTUP_TOOLCHAIN": "1.99.1"
+    },
+    "seconds": 75.26892000000225,
+    "exit_code": 1,
+    "verification": {
+      "verified": 0,
+      "errors": 1
+    },
+    "strict_classifier": {
+      "semantic_rejection": false,
+      "tool_or_resource_failure": true,
+      "syntax_or_type_failure": false,
+      "computed_false": false,
+      "checked_semantic_error": false
+    },
+    "log": {
+      "path": "target/m1-r-unreached03-controls-diagnostic/suffix-byte175-negative/verifier.log",
+      "sha256": "ff9d383ea6c1e59d9eab1d162ce1ddf6a5e741a95e4b7fb5a2b2e4d4dfa05e39"
+    },
+    "input_source_sha256": "60a6ba6ef4d2490e6f43a3dbc0ff23d9671995bdeb6c94f80c6da1f01aec61c5",
+    "attributes": [
+      "#[verifier::spinoff_prover]",
+      "#[verifier::rlimit(1000)]"
+    ],
+    "clean_positive": false,
+    "clean_semantic_negative": false,
+    "counts_as_final_gate": false
+  },
+  "executor_positive": {
+    "label": "executor-positive",
+    "selector": "execute_fixed_compressed_plan",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-unreached03-controls-diagnostic/executor-positive/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "execute_fixed_compressed_plan",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "environment": {
+      "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+      "RUSTUP_TOOLCHAIN": "1.99.1"
+    },
+    "seconds": 25.740444791998016,
+    "exit_code": 0,
+    "verification": {
+      "verified": 1,
+      "errors": 0
+    },
+    "strict_classifier": {
+      "semantic_rejection": false,
+      "tool_or_resource_failure": false,
+      "syntax_or_type_failure": false,
+      "computed_false": false,
+      "checked_semantic_error": false
+    },
+    "log": {
+      "path": "target/m1-r-unreached03-controls-diagnostic/executor-positive/verifier.log",
+      "sha256": "3b127cf53da788addbd22fd7717e3c3f3b6c45a3f40f6e0efef9e1aecc53911d"
+    },
+    "input_source_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "attributes": [],
+    "clean_positive": true,
+    "clean_semantic_negative": false,
+    "counts_as_final_gate": false
+  },
+  "executor_debit": {
+    "label": "executor-debit-negative",
+    "selector": "execute_fixed_compressed_plan",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-unreached03-controls-diagnostic/executor-debit-negative/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "execute_fixed_compressed_plan",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "environment": {
+      "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+      "RUSTUP_TOOLCHAIN": "1.99.1"
+    },
+    "seconds": 19.402816041983897,
+    "exit_code": 1,
+    "verification": {
+      "verified": 0,
+      "errors": 1
+    },
+    "strict_classifier": {
+      "semantic_rejection": true,
+      "tool_or_resource_failure": false,
+      "syntax_or_type_failure": false,
+      "computed_false": false,
+      "checked_semantic_error": true
+    },
+    "log": {
+      "path": "target/m1-r-unreached03-controls-diagnostic/executor-debit-negative/verifier.log",
+      "sha256": "b68ebfe48028c0452f8348a39eacd61370ad0f0e00ac50b149ee04b61cb32efe"
+    },
+    "input_source_sha256": "f0c76fde485a906aef39b2eb79328c5c0f552866fe3033f2e60e6735453fd9b5",
+    "attributes": [],
+    "clean_positive": false,
+    "clean_semantic_negative": true,
+    "counts_as_final_gate": false
+  },
+  "shared_edits": 0,
+  "production_unchanged": true,
+  "further_runs": 0
+}

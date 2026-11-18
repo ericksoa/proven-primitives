@@ -1,0 +1,14 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-92903/src/brotli_prefix.rs:3758:20
+     |
+3758 |               assert(complete == (old_complete
+     |  ____________________^
+3759 | |                 && value_seen(values, active_len as nat, old_tree as nat)));
+     | |__________________________________________________________________________^ assertion failed
+
+error: aborting due to 1 previous error
+

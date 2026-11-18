@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-literal-handoff-canary-34113/src/brotli_input.rs:36445:1
+      |
+36445 | / fn plan_tree_group_action(
+36446 | |     workspace: &[u8],
+36447 | |     window_bytes: u32,
+36448 | |     budget: &mut crate::brotli::RequestBudget,
+36449 | |     input: &[u8],
+36450 | |     end_of_input: bool,
+36451 | | ) -> (r: (Result<CompressedActionPlan, CoreFailure>, Ghost<nat>))
+      | |________________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-literal-handoff-canary-34113/src/brotli_input.rs:36457:9
+      |
+36457 |         r.0.is_ok() ==> r.1@ == r.0.unwrap().planning_work as nat,
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+36572 |     (ordinary_result, Ghost(r_tree_wrapper_plan_source_reads))
+      |     ---------------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,11 @@
+Final harness preservation rebind: PASS
+
+Final02 baseline tests74cec7 -> frozen tests33f26d. All318 case names, suites, arities, selectors, module routes and unique effective anchors are preserved. All production sources match final02 byte for byte, preserving every original model/contract/assertion/loop clause/API/runtime operation. Strict gate driver remains1c983c9c unchanged.
+
+Every original native assertion site and diagnostic arm remains. ONE cap-only semantic predicate is intentionally extended to recognize the same literal computed-false + compute_only conjunction already accepted by the unchanged strict gate. Do not claim every old assertion text is byte-exact. All other baseline assertion text is retained exactly; new assertions check cap coupling.
+
+Current harness assembly exactly reproduces normalized positive8ed98823 (actual4/0) and negative3d8831d9 (genuine literal computed-false accepted by independently re-evaluated unchanged classifier; no resource/tool/type error). Symbolic receipt, Boolean-identity concrete receipt and actual guard share5696/2000. Original<=5695 invariant retained once; no duplicate invariant. Independent admitted-startup witness audit remains applicable by exact Boolean identity.
+
+Same existing rank-certificate-adequacy criterion only. No2000-action/native/source-to-binary/negative-loop-SMT-complete claim. This static review does not claim fresh main positive03 or full gate completion. No checker run or source/test/gate/evidence/canary edit by reviewer. Technical validation is not human architecture approval.
+
+Exact hashes, assertion extension and source assembly are recorded in report.json.

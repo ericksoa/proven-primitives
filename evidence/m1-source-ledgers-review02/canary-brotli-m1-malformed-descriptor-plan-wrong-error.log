@@ -1,0 +1,92 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32929:5
+      |
+32929 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:33155:17
+      |
+33155 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32991:5
+      |
+32991 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 42 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32991:5
+      |
+32991 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32991:5
+      |
+32991 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32790:9
+      |
+32790 | /         r.is_ok() && b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+32791 | |             && !m1_tree_has_decodable_start(workspace@, window_bytes) ==>
+32792 | |                 r.unwrap().status == SerializedTreeStatus::Failed(CompressedHeaderError::InternalState),
+      | |_______________________________________________________________________________________________________^ failed this postcondition
+...
+32897 |           Err(error) => return Ok(SerializedTreePlan { planning_work: initial_planning_work,
+      |  _______________________-
+32898 | |             execution_work: loader_reads, consumed: 0,
+32899 | |             status: SerializedTreeStatus::Failed(CompressedHeaderError::UnsupportedMode) }),
+      | |___________________________________________________________________________________________- at this exit
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32776:1
+      |
+32776 | / fn plan_serialized_tree(
+32777 | |     workspace: &[u8],
+32778 | |     window_bytes: u32,
+32779 | |     budget: &mut crate::brotli::RequestBudget,
+32780 | |     input: &[u8],
+32781 | |     end_of_input: bool,
+32782 | | ) -> (r: Result<SerializedTreePlan, CoreFailure>)
+      | |________________________________________________^
+
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32929:5
+      |
+32929 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop finished in 2 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32929:5
+      |
+32929 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32935:20
+      |
+32935 |                 == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+note: while loop finished in 4 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-error-identity-canary-85480/src/brotli_input.rs:32991:5
+      |
+32991 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

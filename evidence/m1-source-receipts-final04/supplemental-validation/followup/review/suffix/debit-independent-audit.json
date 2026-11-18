@@ -1,0 +1,51 @@
+{
+  "status": "Independent technical audit PASS; no nonvacuity/source-coupling gap found",
+  "reviewer": "/root/m1_source_ledger",
+  "scope": "Read-only source/model/actual-proof audit; no checker or control negative run by this audit",
+  "core_input_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+  "component_results": {
+    "budget01": {
+      "path": "target/m1-r-suffix-fallback-witness/attempts/budget01/result.json",
+      "sha256": "4ec1e88a720e8f84d08bd6f0439c002bf990cf39c19517a8197694a140256886"
+    },
+    "prefix01": {
+      "path": "target/m1-r-suffix-fallback-witness/attempts/prefix01/result.json",
+      "sha256": "9604422ef99fe0f1de1301afdc7d2de7b76254ab2e22de9c5bac7d780143d150"
+    },
+    "criterion01": {
+      "path": "target/m1-r-suffix-fallback-witness/attempts/criterion01/result.json",
+      "sha256": "4056f97cccadc2480c2cb8c7e91bc9c1a75a67b335cca59d8003544e5504b17e"
+    }
+  },
+  "checked_facts": [
+    "Actual Budget5, prefix and required-debit checks each1/0 with no-cheating and source/command/log hashes verified.",
+    "Independent byte-exact prefix reconstruction after undoing28checked unreachable-return adapters and the admission proof; original expressions/calls/assertions retained.",
+    "Concrete admitted image reaches original fallback charge with initial_outer3,subphase2,budget5 unchanged,ledger0.",
+    "Old owner effect requires endwork0; successful original charge gives5-amount; both original5 and original conditional4or5 satisfy amount<=5.",
+    "Original later source has no budget operation, so actual amount5 is a necessary consequence, not a new cost policy.",
+    "Positive15fc adds only the true computed check5==5 and actually passes1/0 under original root guarantees.",
+    "Proposed negative computed operand is the exact runtime conditional amount with only initial_outer specialized to witnessed3u8.",
+    "Removing only the proof receipt restores exact old conditional-fault source617a; no original assertion/model/root requirement changes."
+  ],
+  "prefix_correspondence": {
+    "path": "target/m1-r-suffix-fallback-witness/prefix-correspondence.json",
+    "sha256": "6bd50734bc9d4e041802549f4e65471c211ee79c6f975bf982411216cc64ac8a"
+  },
+  "required_debit_lemma": {
+    "path": "target/m1-r-suffix-fallback-witness/required-debit.rs.txt",
+    "sha256": "e8d40e77ccc51c4b79a792b4d79c5c131e6b6355af18988809335afad3e3591c"
+  },
+  "normalized_positive_source_sha256": "15fc4ed779bd2e4d293eeaa38590169024ef6999e3247f69e8662333feb9bbd0",
+  "normalized_positive_result": {
+    "path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/positive/result.json",
+    "sha256": "6b58ad47e9f6c6d053441ab78e2cbd465da287e3be762436090cfc5cc932bd75"
+  },
+  "reviewed_static_negative_source_sha256": "55e8c5e0e6fc5862588afced12f245181c7cec64bacd1bada7ffeaf2a236205d",
+  "original_fault_source_sha256": "617a2c40aa2ad364afd0e0238e542ec09a1b49e2c076459454ec66f98e16a218",
+  "expected5_from_unchanged_model_not_candidate_expression": true,
+  "checker_runs_for_audit": 0,
+  "source_shared_edits_for_audit": 0,
+  "audit_itself_performed_read_only": true,
+  "this_target_report_serialized_after_read_only_review": true,
+  "architecture_authority_inferred": false
+}

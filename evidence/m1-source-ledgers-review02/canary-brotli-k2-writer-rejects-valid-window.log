@@ -1,0 +1,17 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k2-writer-canary-77435/src/brotli_prefix.rs:2814:9
+     |
+2814 | /         window_bytes <= 16_777_216
+2815 | |             && old(workspace)@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES
+2816 | |             && initialized < LITERAL_CONTEXT_MODES_BYTES ==> r.is_ok(),
+     | |______________________________________________________________________^ failed this postcondition
+...
+2837 |           return Err(WorkspaceError::InvalidWindowBits);
+     |           --------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

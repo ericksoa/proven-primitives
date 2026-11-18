@@ -1,0 +1,93 @@
+{
+  "status": "Independent BYTE175 technical assessment PASS; no nonvacuity/source-coupling/contract gap found",
+  "reviewer": "/root/m1_source_ledger",
+  "reviewed_terminal_packet": {
+    "path": "target/m1-r-suffix-fallback-witness/terminal-witness-result.json",
+    "sha256": "01f4a2d6dbb10a8d54eaa0f5c5293dc90dda87b1ac7637cf16656a653a3c7865"
+  },
+  "reviewed_terminal_file_map": {
+    "path": "target/m1-r-suffix-fallback-witness/terminal-artifact-sha256.json",
+    "sha256": "3e5ebc651187d27cdf128b3a61f20e96e1717e115ef70f8021e2c79c95794a61"
+  },
+  "actual_components": {
+    "terminal01": {
+      "result": {
+        "path": "target/m1-r-suffix-fallback-witness/attempts/terminal01/result.json",
+        "sha256": "d562956c522e9cb25d61bd0646a30daa040b51a248c7610313202f9341354962"
+      },
+      "command": {
+        "path": "target/m1-r-suffix-fallback-witness/attempts/terminal01/command.json",
+        "sha256": "412395857c1a94c31c4824c7c8da41e6283fcd69f7e8f19393e7eb6ece88d886"
+      },
+      "log": {
+        "path": "target/m1-r-suffix-fallback-witness/attempts/terminal01/verifier.log",
+        "sha256": "04afcf7883833ee77be7a5b341c529e9f05615e448d55ab2b2abc53cce0908a4"
+      },
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      }
+    },
+    "frame-criterion01": {
+      "result": {
+        "path": "target/m1-r-suffix-fallback-witness/attempts/frame-criterion01/result.json",
+        "sha256": "8252be3186a1b3c7a91317fe87a1f1a3c4a3cbe28ed6fde8dda19a8be203d6a9"
+      },
+      "command": {
+        "path": "target/m1-r-suffix-fallback-witness/attempts/frame-criterion01/command.json",
+        "sha256": "ec10faf20c552ac9d46401a521789f47d30e86840921f9505ab9d319a069ae07"
+      },
+      "log": {
+        "path": "target/m1-r-suffix-fallback-witness/attempts/frame-criterion01/verifier.log",
+        "sha256": "ae15f2d0758645b64ab03e2f94e98838da0de16e0282b558c4f7c352d94b1969"
+      },
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      }
+    }
+  },
+  "prefix_reconstruction": "Independently restored exact original3e prefix bytes after removing entry/checkpoint proofs and undoing30checked exit adapters; all original expressions/calls/assertions retained.",
+  "noncomment_tokens_reported": 4257,
+  "actual_reached_state": "Original charge5 and original store_terminal_error childGhost4 plus original+1 give ledger5,budget0,byte1750; saved initial_outer3, all30earlier exits checked unreachable.",
+  "old_necessary_frame": "Unchanged terminal_error_frame preserves offset175 because only10,11,172,173 may change; existing admitted-image byte175 is0.",
+  "primitive_contract_check": "put_state_byte receivesu8value; shape+175+1<=256 entailsOk; success entails after[base+175]==actualvalue; helper has no budget argument. Thus actualoldconditionalwrite1executes on the reached outer3 witness even afterbudget0.",
+  "no_later_restore": "Only original proof obligations and constant error return follow; no later ordinary workspace or budget operation restores175.",
+  "healthy_normalization": {
+    "source_sha256": "1ffeaee26397ae7944efa5a2af040b923b15acecd6b4dbc7dd9f14675b147331",
+    "actual_positive": {
+      "path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive-normalized/result.json",
+      "sha256": "b65cfd78953d7bdc3fc25038b99bc88d57f4eb5f2ea5164faa3c073216a1c692"
+    },
+    "command": {
+      "path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive-normalized/command.json",
+      "sha256": "592be51e6788870d8a37c229f4b83cf6d56329f3657f082d4200ae56ad7e84c5"
+    },
+    "log": {
+      "path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive-normalized/verifier.log",
+      "sha256": "69bdb700ed8f3f43a7d880cc8a6226b4ac141ca88847fb8ed1bf1bdd889e6995"
+    },
+    "meaning": "Healthy0 is the actually checked poststore byte0 required by the old frame; only proof0==0 is inserted, no healthy extra write/fake ledger/opacity/model change.",
+    "removal_restores_core3e": true
+  },
+  "negative_static_coupling_reviewed": {
+    "source_sha256": "0ca6d8ffb1b2e85a01c09a4d14c0a42fa045baff6532ad76f29c15b44ba4daf7",
+    "actual_call_arguments_parsed": [
+      "workspace",
+      "window_bytes",
+      "175",
+      "1"
+    ],
+    "computed_operand": "1u8 parsedfrom actualoldwrite valueargument1",
+    "expected_operand": "0u8 fixed by unchanged old frame/image and actually proved poststorebyte0",
+    "runtime_old_guard_and_fault_unchanged": true,
+    "proof_removal_restores_old_fault_sha256": "60a6ba6ef4d2490e6f43a3dbc0ff23d9671995bdeb6c94f80c6da1f01aec61c5"
+  },
+  "failed_model_index_positive_not_used_as_qualification": true,
+  "checker_runs_by_this_audit": 0,
+  "negative_created_or_run_by_this_audit": false,
+  "source_or_shared_edits": 0,
+  "audit_work_performed_read_only": true,
+  "this_target_report_serialized_afterward_for_binding": true,
+  "architectural_approval_inferred": false
+}

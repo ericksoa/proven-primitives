@@ -1,0 +1,36 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-31712/src/brotli_input.rs:31838:1
+      |
+31838 | / fn execute_planned_initial_symbol(workspace: &mut [u8], window_bytes: u32,
+31839 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end: bool,
+31840 | |     input_was_limited: bool, plan: CompressedActionPlan,
+31841 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-source-refinement-canary-31712/src/brotli_input.rs:31855:9
+      |
+31855 | /         old(budget).work_remaining < plan.execution_work ==> {
+31856 | |             &&& final(workspace)@ == old(workspace)@
+31857 | |             &&& *final(budget) == *old(budget)
+31858 | |             &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+31859 | |         },
+      | |_________^ failed this postcondition
+...
+31883 | /     match status {
+31884 | |         None => Ok(used),
+31885 | |         Some(CompressedHeaderStatus::NeedInput) => Err(CompressedStep { consumed: used,
+31886 | |             status: if input_was_limited { CompressedStatus::Failed(CoreFailure::ResourceLimit) }
+...     |
+31890 | |         _ => Err(CompressedStep { consumed: used, status: CompressedStatus::Failed(core_state_failure()) }),
+31891 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

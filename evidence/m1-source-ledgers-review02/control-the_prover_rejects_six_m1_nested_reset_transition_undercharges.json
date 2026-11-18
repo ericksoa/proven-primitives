@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_nested_reset_transition_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T01:49:26.717505+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 107.58699774999695,
+  "finished_utc": "2026-11-17T01:51:14.306117+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_six_m1_nested_reset_transition_undercharges.log",
+  "log_sha256": "ecaef5226f5fe09326aee7ef9bdc3de56f426cff389d620b99d576cc13842611",
+  "suite": "the_prover_rejects_six_m1_nested_reset_transition_undercharges",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-m1-tree-reset-transition-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-tree-reset-transition-undercharge.log",
+      "sha256": "a33d54f100d96df24b1ed42a3ae66d71fdcb9259a1193e327fa638f5faae1f25",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-var-reset-transition-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-var-reset-transition-undercharge.log",
+      "sha256": "6687eeed69bb2042ec7a91cd8423f133950bef0add85951858921537e929dbc3",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-prefix-reset-transition-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-prefix-reset-transition-undercharge.log",
+      "sha256": "3549cabd4f84dcc74329601ba85e01c4d01907c57084ebdf102e8f638fb25e6c",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-group-tree-transition-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-group-tree-transition-undercharge.log",
+      "sha256": "46faff759d829707450909b289d85a33d626d872a6713b253b9ee1dc1fa4e4da",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-group-reset-transition-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-group-reset-transition-undercharge.log",
+      "sha256": "2257558ecc3b89476dbe6a87457df592d1d4b3fd2eb1fcafd0969574de7100ea",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-ready-reset-transition-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-m1-ready-reset-transition-undercharge.log",
+      "sha256": "cd6b39dfa16a09fd5560186a1ee42bfd43c1a1a35efa35a37ca9ee419c720dfe",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

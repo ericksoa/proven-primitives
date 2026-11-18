@@ -1,0 +1,28 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59783,13): 'if' cannot be used in patterns.
+WARNING: (67570,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:34264:1
+      |
+34264 | / fn advance_planned_tree_group(
+34265 | |     workspace: &mut [u8],
+34266 | |     window_bytes: u32,
+34267 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+34270 | |     end_of_input: bool,
+34271 | | ) -> (r: Result<usize, CompressedStep>)
+      | |______________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:34335:16
+      |
+34335 |           assert(budget.work_remaining as nat + plan.execution_work as nat
+      |  ________________^
+34336 | |             == before_execution_reservation.work_remaining as nat);
+      | |_________________________________________________________________^ assertion failed
+
+error: aborting due to 1 previous error
+

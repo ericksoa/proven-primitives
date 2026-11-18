@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 367.7418101670046,
+  "executed_once": false,
+  "exit_code": 101,
+  "expected_mutants": 4,
+  "finished_utc": "2026-11-17T21:49:08.174769+00:00",
+  "log": "controls-the_prover_rejects_four_m1_tree_action_bound_and_drain_defects.log",
+  "log_sha256": "0f220596ce14d3cbd584391cd535045c2c0c1becaf3a4fd1f79482e9292a77ca",
+  "mutants": [],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794951780428451000,
+  "started_utc": "2026-11-17T21:43:00.428460+00:00",
+  "suite": "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+  "suite_source_sha256": "d0bb0512295b0d742bb609bb6c89083975cbe24f04f743f41d9c3e670fb90e20",
+  "validation_errors": []
+}

@@ -1,0 +1,61 @@
+{
+  "extensions": [
+    {
+      "suite": "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+      "case_names": [
+        "brotli-m1-planner-restores-too-small-cap"
+      ],
+      "original_assertion": "assert!(\n            log.contains(\"postcondition not satisfied\")\n                || log.contains(\"precondition not satisfied\")\n                || log.contains(\"requires not satisfied\")\n                || log.contains(\"assertion failed\")\n                || log.contains(\"invariant not satisfied\"),\n            \"expected semantic proof rejection: {log}\"\n        )",
+      "integrated_assertion": "assert!(\n            log.contains(\"postcondition not satisfied\")\n                || log.contains(\"precondition not satisfied\")\n                || log.contains(\"requires not satisfied\")\n                || log.contains(\"assertion failed\")\n                || log.contains(\"invariant not satisfied\")\n                || (name == \"brotli-m1-planner-restores-too-small-cap\"\n                    && log.contains(\"error: expression simplifies to false\")\n                    && log.contains(\"by (compute_only)\")),\n            \"expected semantic proof rejection: {log}\"\n        )",
+      "exact_appended_OR_arm": "\n                || (name == \"brotli-m1-planner-restores-too-small-cap\"\n                    && log.contains(\"error: expression simplifies to false\")\n                    && log.contains(\"by (compute_only)\"))",
+      "all_old_predicate_arms_prefix_exact": true,
+      "original_message_and_assertion_site_retained": true,
+      "scope_only_named_cases_and_both_unchanged_gate_markers": true
+    },
+    {
+      "suite": "the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects",
+      "case_names": [
+        "brotli-b3b-tree-field-truncation-needs-input"
+      ],
+      "original_assertion": "assert!(\n            log.contains(\"postcondition not satisfied\")\n                || log.contains(\"precondition not satisfied\")\n                || log.contains(\"invariant not satisfied\")\n                || log.contains(\"assertion failed\"),\n            \"expected a proof rejection, not a tooling error: {log}\"\n        )",
+      "integrated_assertion": "assert!(\n            log.contains(\"postcondition not satisfied\")\n                || log.contains(\"precondition not satisfied\")\n                || log.contains(\"invariant not satisfied\")\n                || log.contains(\"assertion failed\")\n                || (name == \"brotli-b3b-tree-field-truncation-needs-input\"\n                    && log.contains(\"error: expression simplifies to false\")\n                    && log.contains(\"by (compute_only)\")),\n            \"expected a proof rejection, not a tooling error: {log}\"\n        )",
+      "exact_appended_OR_arm": "\n                || (name == \"brotli-b3b-tree-field-truncation-needs-input\"\n                    && log.contains(\"error: expression simplifies to false\")\n                    && log.contains(\"by (compute_only)\"))",
+      "all_old_predicate_arms_prefix_exact": true,
+      "original_message_and_assertion_site_retained": true,
+      "scope_only_named_cases_and_both_unchanged_gate_markers": true
+    },
+    {
+      "suite": "the_prover_rejects_five_m1_malformed_suffix_defects",
+      "case_names": [
+        "brotli-m1-malformed-suffix-fallback-undercharge",
+        "brotli-m1-malformed-suffix-fallback-writes-byte175"
+      ],
+      "original_assertion": "assert!(log.contains(\"postcondition not satisfied\")\n            || log.contains(\"precondition not satisfied\")\n            || log.contains(\"requires not satisfied\")\n            || log.contains(\"invariant not satisfied\")\n            || log.contains(\"assertion failed\"),\n            \"expected a proof rejection, not a tooling error: {log}\")",
+      "integrated_assertion": "assert!(log.contains(\"postcondition not satisfied\")\n            || log.contains(\"precondition not satisfied\")\n            || log.contains(\"requires not satisfied\")\n            || log.contains(\"invariant not satisfied\")\n            || log.contains(\"assertion failed\")\n            || ((name == \"brotli-m1-malformed-suffix-fallback-undercharge\"\n                || name == \"brotli-m1-malformed-suffix-fallback-writes-byte175\")\n                && log.contains(\"error: expression simplifies to false\")\n                && log.contains(\"by (compute_only)\")),\n            \"expected a proof rejection, not a tooling error: {log}\")",
+      "exact_appended_OR_arm": "\n            || ((name == \"brotli-m1-malformed-suffix-fallback-undercharge\"\n                || name == \"brotli-m1-malformed-suffix-fallback-writes-byte175\")\n                && log.contains(\"error: expression simplifies to false\")\n                && log.contains(\"by (compute_only)\"))",
+      "all_old_predicate_arms_prefix_exact": true,
+      "original_message_and_assertion_site_retained": true,
+      "scope_only_named_cases_and_both_unchanged_gate_markers": true
+    },
+    {
+      "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+      "case_names": [
+        "brotli-m1-cursor-context-owner-skips-terminal-action"
+      ],
+      "original_assertion": "assert!(\n            log.contains(\"postcondition not satisfied\")\n                || log.contains(\"precondition not satisfied\")\n                || log.contains(\"invariant not satisfied\")\n                || log.contains(\"requires not satisfied\")\n                || log.contains(\"assertion failed\"),\n            \"expected a proof rejection, not a tooling error: {log}\"\n        )",
+      "integrated_assertion": "assert!(\n            log.contains(\"postcondition not satisfied\")\n                || log.contains(\"precondition not satisfied\")\n                || log.contains(\"invariant not satisfied\")\n                || log.contains(\"requires not satisfied\")\n                || log.contains(\"assertion failed\")\n                || (name == \"brotli-m1-cursor-context-owner-skips-terminal-action\"\n                    && log.to_lowercase().contains(\"error: expression simplifies to false\")\n                    && log.contains(\"by (compute_only)\")),\n            \"expected a proof rejection, not a tooling error: {log}\"\n        )",
+      "exact_appended_OR_arm": "\n                || (name == \"brotli-m1-cursor-context-owner-skips-terminal-action\"\n                    && log.to_lowercase().contains(\"error: expression simplifies to false\")\n                    && log.contains(\"by (compute_only)\"))",
+      "all_old_predicate_arms_prefix_exact": true,
+      "original_message_and_assertion_site_retained": true,
+      "scope_only_named_cases_and_both_unchanged_gate_markers": true
+    }
+  ],
+  "new_or_extended_sites_total": 4,
+  "preexisting_three_tree_result_recognizer": {
+    "suite": "the_prover_rejects_six_m1_tree_install_outcome_defects",
+    "entire_original_suite_byte_exact": true,
+    "suite_sha256": "511d0463c98f5f35402ba7133150e387920101ee9df8cd26e3d0687c1b149a06",
+    "counts_as_new_extension": false
+  },
+  "literal_computed_error_occurrences_total_including_old_site": 5
+}

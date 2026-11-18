@@ -1,0 +1,78 @@
+{
+  "status": "UNRESOLVED - STOPPED ON REQUIRED COUPLED POSITIVE RESOURCE FAILURE",
+  "case": "brotli-b3b-tree-field-truncation-needs-input",
+  "selector": "CodeDescriptionDecoder::advance_field",
+  "positive": {
+    "kind": "positive",
+    "started_utc": "2026-11-18T02:47:41.884449+00:00",
+    "finished_utc": "2026-11-18T02:49:15.703885+00:00",
+    "seconds": 93.81794833301683,
+    "exit_code": 1,
+    "verification": {
+      "verified": 2,
+      "errors": 1
+    },
+    "source_hashes": {
+      "brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+      "lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+      "lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+      "percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+      "brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+      "brotli_input.rs": "4d28d9c29cadfeaee484eeb5a6b2eb145a191e36c62e3c1b3bd934c15773a749",
+      "brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+      "composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+      "brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+      "brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2"
+    },
+    "source_unchanged": true,
+    "strict_gate_classifier": {
+      "semantic_rejection": false,
+      "tool_or_resource_failure": true,
+      "syntax_or_type_failure": false,
+      "computed_false": false,
+      "checked_semantic_error": false
+    },
+    "clean_positive": false,
+    "qualified_negative": false,
+    "log_sha256": "4c63f10e12f336bfce9eb72ad545a8ab71f90d2ae394dbb127a95db83653cf64",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/m1-r-field-truncation-computed-diagnostic/positive/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "CodeDescriptionDecoder::advance_field",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "not_full_gate": true
+  },
+  "positive_runs": 1,
+  "negative_runs": 0,
+  "negative_source_materialized": false,
+  "extra_runs": 0,
+  "integration_patch_qualified": false,
+  "source_bound_check": "Actual healthy return status Failed(Truncated) mechanically supplies computed actual operand; fixed expected status is unchanged model-required Failed(Truncated). Boolean normalization if matches then true else false.",
+  "original_field_obligations_runtime_body_models_hides_assertions_requirements_and500_SP_settings_preserved": true,
+  "witness_admission_model_and_replay_remain_checked": "Admission/model2/0 and same-body exact return replay3/0 are supporting witness evidence, not a passing coupled full selected positive.",
+  "strict_policy": "Resource failure is unresolved; no computed negative or integration patch may be qualified without a clean actual coupled positive.",
+  "frozen_core_readback": {
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+    "tests/proof_rejection.rs": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+    "target/m1-r-final-gate/driver.py": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46"
+  },
+  "immutable_supplement_manifest_sha256": "89734c8f58d911da782ae47adea4169eb15f963855ba450680804fae6667b8d8",
+  "shared_source_test_gate_evidence_canary_supplement_edits": 0,
+  "no_full_gate_native_or_negative_smt_completion_claim": true
+}

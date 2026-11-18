@@ -1,0 +1,50 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_b3b_inverse_mtf_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:43:02.561808+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 79.27144133301044,
+  "finished_utc": "2026-11-17T02:44:21.833177+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_four_b3b_inverse_mtf_defects.log",
+  "log_sha256": "5ef8ca495ef62c19b302e75f597a7878f96fb639160ccc25e24b3a30451bb7b0",
+  "suite": "the_prover_rejects_four_b3b_inverse_mtf_defects",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-mtf-initializes-list-to-zero",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-mtf-initializes-list-to-zero.log",
+      "sha256": "5851512c81bf16a01c91fcf92f32ab48d0ecba38411fa81be97f5bd1fab6e98d",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-mtf-shifts-from-current-cell",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-mtf-shifts-from-current-cell.log",
+      "sha256": "e9d13ca7c04ee442292867bd974e42d03fd23c5d74d9b9ca392a2db3b6690e2d",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-mtf-undercharges-each-rank",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-mtf-undercharges-each-rank.log",
+      "sha256": "e4bb900379f6a51f2600bdd4b0e735e5f01e4b1c06e05ede344837adb869b680",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-mtf-reuses-too-little-list-prefix",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-mtf-reuses-too-little-list-prefix.log",
+      "sha256": "439d58c3e42bb7c91050379cd8eeb9ff159ca4440427872382b8799f613b4ef1",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

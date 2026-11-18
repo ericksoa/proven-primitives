@@ -1,0 +1,40 @@
+{
+  "status": "Source coupling specified; positive-only execution authorized; NO new cursor negative authorized/materialized/run",
+  "case": {
+    "name": "brotli-m1-cursor-context-owner-skips-terminal-action",
+    "function": "advance_planned_compressed_action",
+    "old": "                return ({ let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::ContextModes, &input[..initial_allowed],\n                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result }, Ghost(r_header_action_source_units));",
+    "new": "                return ({ let (r_child_result, Ghost(r_child_units)) = (Err::<usize, CompressedStep>(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) }), Ghost(0nat)); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result }, Ghost(r_header_action_source_units));"
+  },
+  "healthy_only_insertion": "                proof { assert(if 5nat == 5nat { true } else { false }) by (compute_only); }\n",
+  "proposed_negative_only_insertion": "                proof { assert(if 0nat == 5nat { true } else { false }) by (compute_only); }\n",
+  "healthy_computed_operand": {
+    "value": "5nat",
+    "basis": "Actual original child receipt5 is independently proved in owner01: captured r_child_units from unchanged executor call, valid-plan conservation and actual post-budget0; precall ledger0/work5. This literal is a normalized witnessed actual receipt, not a replacement Ghost/count or reservation estimate.",
+    "proof": {
+      "path": "target/m1-r-cursor-context-witness/attempts/owner01/result.json",
+      "sha256": "cd5c83995b1a1647d9017c1c7dbee15d0987fb4d5d0846bbd69988a7a96145c6"
+    },
+    "ordinary_call_binding": {
+      "path": "target/m1-r-cursor-context-witness/ordinary-correspondence.json",
+      "sha256": "882c35a2a16b224318dd9594774ffdf3712a386c3dec2d7cfe9c362bb32c167b"
+    }
+  },
+  "negative_computed_operand": {
+    "value": "0nat",
+    "basis": "Extracted mechanically from the existing unchanged fault tuple explicit child Ghost(0nat); required exactly one numeric Ghost constructor. Original stub remains byte-for-byte unchanged and never calls skipped executor."
+  },
+  "fixed_expected5_basis": "Unchanged caller fixed-bad-cursor effect requires finalwork0 at validwork5; unchanged receipt conservation and precall accumulated0 require child/returned source receipt5. Actual healthy call additionally checked5.",
+  "generation_guards": [
+    "Exact core3e/daf and original selected call/case tuple hashes must match witness.",
+    "Healthy actual executor call and returned/captured Ghost flow remain unchanged; no Ghost(5nat) replacement.",
+    "Negative numeric operand must equal the parsed actual fault Ghost literal0nat.",
+    "Removing only the proof assertion from negative must restore exact original skipped-executor fault source.",
+    "All old root guarantees/assertions/models/flags remain; strict classifier unchanged."
+  ],
+  "healthy_input_sha256": "153dd3a1ea9f7b32ebb41fa4af9e1dc4963ef01d9fece2a42e8c8055c1e18c6e",
+  "proposed_negative_input_sha256_IN_MEMORY_ONLY": "b0c03a308a0177a9c438b80f114640256aecef5e500f514694b7094085b5d1a1",
+  "original_fault_input_sha256": "8ee8d5ceaca8846ea19e156df837b399dec78eba806323e24df9623f03e9561b",
+  "new_cursor_negative_runs": 0,
+  "no_main_tests_gate_evidence_edits": true
+}

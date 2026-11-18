@@ -1,0 +1,22 @@
+{
+  "status": "PASS: exact original-prefix correspondence and checked witness prerequisites",
+  "original_prefix_sha256": "fb99b01b7552d6e9c211434497fdf87393339f0a078943470abe7ebb555bcef9",
+  "original_noncomment_tokens_including_proof_and_ghost": 3950,
+  "same_all_tokens_after_removing_checked_exit_adapters_and_added_entry_proof": true,
+  "same_ordinary_calls_and_all_original_proof_assertions_as_consequence": true,
+  "original_return_expressions_retained_verbatim": 28,
+  "all_28_exit_adapters_checked_unreachable_in_actual_prefix01_pass": true,
+  "no_original_helper_body_inlining_or_contract_change": true,
+  "existing_original_production_declarations_byte_identical_after_appended_validation_entries_removed": true,
+  "owning_budget_module_byte_identical_after_private_existence_proof_removed": true,
+  "no_new_assumptions_or_trust_bypass": true,
+  "prefix_replay_stops_before_original_reservation": true,
+  "prefix_replay_proves_budget_unchanged_at5_and_ledger0": true,
+  "checked_components": {
+    "budget01": "1/0",
+    "prefix01": "1/0",
+    "criterion01": "1/0"
+  },
+  "control_negative_runs": 0,
+  "counts_as_control_or_full_gate": false
+}

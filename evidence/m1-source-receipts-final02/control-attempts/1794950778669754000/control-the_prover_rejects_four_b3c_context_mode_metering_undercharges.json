@@ -1,0 +1,74 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 77.85296920800465,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 4,
+  "finished_utc": "2026-11-17T21:37:39.488532+00:00",
+  "log": "controls-the_prover_rejects_four_b3c_context_mode_metering_undercharges.log",
+  "log_sha256": "3a7f9896d3d624c315886caee6d969d1301cade74cb21d734190a63644f89b94",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "893a3b64f13dd799de747ef99ff8c2192273e058a3a289626d53eafa99c949d3",
+      "log": "canary-brotli-b3c-context-mode-complete-undercharge.log",
+      "name": "brotli-b3c-context-mode-complete-undercharge",
+      "semantic_rejection": true,
+      "sha256": "4ca17ba03c6fe44a3df924d36d37939aa4124863340a34a59262f163be644247",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "ade2df71007cc41996464c06f5fdebf0bad1ef772c09fb2eeb443f8cce2b66e1",
+      "log": "canary-brotli-b3c-context-mode-queue-undercharge.log",
+      "name": "brotli-b3c-context-mode-queue-undercharge",
+      "semantic_rejection": true,
+      "sha256": "92c6515ecc538e8efa50c112780839ce63907967edb8441df8f2a12b02154b10",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "26836d39adacf66fb04bf0124b2e29562e5750155e6bac39362fa65676345822",
+      "log": "canary-brotli-b3c-context-mode-terminal-undercharge.log",
+      "name": "brotli-b3c-context-mode-terminal-undercharge",
+      "semantic_rejection": true,
+      "sha256": "3b29b6981f06ab9fa3bd72130e841d655c7fff9d6da35d1521860535d9956714",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "56ed5538e401e1529b15b83811a1e6011cd5d0ab444fea34c3d320115084056b",
+      "log": "canary-brotli-b3c-context-mode-value-undercharge.log",
+      "name": "brotli-b3c-context-mode-value-undercharge",
+      "semantic_rejection": true,
+      "sha256": "380a7383f7288ab21b21b9bfe1694492145e4c731e5fd782b131252b0d2725a3",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794951381634584000,
+  "started_utc": "2026-11-17T21:36:21.634592+00:00",
+  "suite": "the_prover_rejects_four_b3c_context_mode_metering_undercharges",
+  "suite_source_sha256": "fe72c8bc917d50b3105e5b83fcfdb2f04e5d41025029cf3c2c1f926ba795656f",
+  "validation_errors": []
+}

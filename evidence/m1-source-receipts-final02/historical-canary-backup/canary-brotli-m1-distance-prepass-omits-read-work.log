@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-33842/src/brotli_input.rs:29339:1
+      |
+29339 | / fn distance_planning_work(
+29340 | |     workspace: &[u8],
+29341 | |     window_bytes: u32,
+29342 | |     input_len: usize,
+29343 | | ) -> (r: Result<u64, CompressedHeaderError>)
+      | |___________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-33842/src/brotli_input.rs:29348:12
+      |
+29348 |           }, r.is_ok() ==> distance_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+      |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+29349 | / {
+29350 | |     reveal(fixed_phase_bad_cursor); reveal(context_mode_pending);
+29351 | |     reveal(distance_planning_read_valid); reveal(distance_read_units);
+29352 | |     let queue = load_b3b_queue(workspace, window_bytes)?;
+...     |
+29360 | |     Ok(0)
+29361 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

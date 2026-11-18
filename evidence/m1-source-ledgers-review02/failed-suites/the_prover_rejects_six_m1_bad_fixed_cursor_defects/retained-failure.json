@@ -1,0 +1,33 @@
+{
+  "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+  "exit_code": 101,
+  "fresh_case_logs": [
+    {
+      "name": "brotli-m1-cursor-tag-rejects-with-wrong-error",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-tag-rejects-with-wrong-error.log",
+      "sha256": "53acd34a153fab6ccb749081852eda2f3cc6105c41a0febf6526f57074e13114"
+    },
+    {
+      "name": "brotli-m1-cursor-distance-prepass-forgets-rejection",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-distance-prepass-forgets-rejection.log",
+      "sha256": "88792c57f283b486e5528ccc2b788816cad95b8d9d1366edda5f59510639f234"
+    },
+    {
+      "name": "brotli-m1-cursor-block-prepass-forgets-var-rejection",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-block-prepass-forgets-var-rejection.log",
+      "sha256": "35b01c596859ef653708279f81dc3612a1a3f61e6c40d6d56982d84d8ac208f9"
+    },
+    {
+      "name": "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-block-forecast-omits-terminal-work.log",
+      "sha256": "1d88ca87bd7b1d0aae55eafe04b615f42499a330e8256e304ec9a690e1f273c5"
+    }
+  ],
+  "source_at_failure_bundles": [
+    {
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/source-at-failure-0.tar.gz",
+      "sha256": "119991d842cf7419a85940f9c19a4acda0eeb004f6ee21698cfac0f6e90277f0"
+    }
+  ],
+  "not_semantic_closure": true
+}

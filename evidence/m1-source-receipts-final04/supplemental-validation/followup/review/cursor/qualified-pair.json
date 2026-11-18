@@ -1,0 +1,144 @@
+{
+  "status": "QUALIFIED isolated coupled cursor control repair; TARGET-ONLY UNAPPLIED; not a full gate",
+  "case": {
+    "name": "brotli-m1-cursor-context-owner-skips-terminal-action",
+    "function": "advance_planned_compressed_action",
+    "old": "                return ({ let (r_child_result, Ghost(r_child_units)) = execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::ContextModes, &input[..initial_allowed],\n                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result }, Ghost(r_header_action_source_units));",
+    "new": "                return ({ let (r_child_result, Ghost(r_child_units)) = (Err::<usize, CompressedStep>(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) }), Ghost(0nat)); proof { r_header_action_source_units = r_header_action_source_units + r_child_units; } r_child_result }, Ghost(r_header_action_source_units));"
+  },
+  "positive": {
+    "result": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/positive/result.json",
+      "sha256": "7480a4ed470c6c5fdf1b43833df758ac332b224cc445726c958e012b26aca63f"
+    },
+    "command": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/positive/command.json",
+      "sha256": "5f80a0c17373f09a08461a846c23dfb5a89b47186eb303b462f8a46c4b491f66"
+    },
+    "log": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/positive/verifier.log",
+      "sha256": "3a39425f9600c017ccef834dccd689e43fb28aef895edeb4f0d05e05767eb26e"
+    },
+    "source_sha256": "153dd3a1ea9f7b32ebb41fa4af9e1dc4963ef01d9fece2a42e8c8055c1e18c6e",
+    "actual_verification": {
+      "verified": 1,
+      "errors": 0
+    },
+    "seconds": 59.002493999985745,
+    "all_original_selected_root_obligations_retained_and_checked": true
+  },
+  "negative": {
+    "result": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/negative/result.json",
+      "sha256": "1ffdba879b53dce0b2ca7817f8a4ce168c14e15306b76fe87dadd6cd4a699a9d"
+    },
+    "command": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/negative/command.json",
+      "sha256": "81f7ef7ce1c95f465080968428f6610f0cfb39f2aeb58994f4c7a33dd203236e"
+    },
+    "log": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/negative/verifier.log",
+      "sha256": "1c367511b01962a2c84a1286e5f044e96610148ee4ac9d1266456c9488dfe600"
+    },
+    "source_sha256": "b0c03a308a0177a9c438b80f114640256aecef5e500f514694b7094085b5d1a1",
+    "strict_classification": {
+      "semantic_rejection": true,
+      "tool_or_resource_failure": false,
+      "syntax_or_type_failure": false,
+      "computed_false": true,
+      "checked_semantic_error": false
+    },
+    "seconds": 12.631847207987448,
+    "verification_summary": null,
+    "mathematical_ground_check_of_same_old_owner_obligation": true,
+    "generic_negative_SMT_success_claimed": false
+  },
+  "source_coupling": {
+    "proposal": {
+      "path": "target/m1-r-cursor-context-witness/computed-receipt-source-coupling.json",
+      "sha256": "32c0483b68fcfba874372e563c1b5693223eef65ab7c49dbf1d47939512fc789"
+    },
+    "negative_materialization": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/negative-source-manifest.json",
+      "sha256": "b469436775e88eb119a7d94d31763aa7d3513692f98e41740e59278d11181d7f"
+    },
+    "healthy_actual_operand": "5nat normalized from independently checked actual captured child receipt5; actual original call/Ghost fold unchanged",
+    "authoritative_fault_operand": "0nat parsedfrom exactly one numeric original stub Ghost(0nat), which remains byte-exact; no substituted fake receipt",
+    "fixed_expected5": "Joint OLD caller finalwork0 +unconditional conservation +checked priorledger0 +actual parent-child fold, independently proved1/0",
+    "assertion_removal_restores_original_fault_source": "8ee8d5ceaca8846ea19e156df837b399dec78eba806323e24df9623f03e9561b",
+    "runtime_fault_preserved_in_all_states": true
+  },
+  "proof_bindings": {
+    "nonvacuous_image_and_actual_executor_call": {
+      "path": "target/m1-r-cursor-context-witness/witness-result.json",
+      "sha256": "53a2e7e7a9ef84a8552ed4d46bc4204ef25adaeab229619ad6e84b42f94f3c8a"
+    },
+    "ordinary_source_correspondence": {
+      "path": "target/m1-r-cursor-context-witness/ordinary-correspondence.json",
+      "sha256": "882c35a2a16b224318dd9594774ffdf3712a386c3dec2d7cfe9c362bb32c167b"
+    },
+    "old_guarantee_required_receipt_criterion": {
+      "path": "target/m1-r-cursor-required-receipt-proof/criterion-binding.json",
+      "sha256": "2cb69c7c70ded839f3b4b91b59efc97462011cc964857b94bf98a3a51573680c"
+    },
+    "required_receipt_actual_result": {
+      "path": "target/m1-r-cursor-required-receipt-proof/attempts/criterion01/result.json",
+      "sha256": "37e6f5716734bd62004041b88a034bacb43c7fc82b8fb97d55bde25a56d33ff5"
+    },
+    "byte_independent_assessment": {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/byte-independent-assessment-message.txt",
+      "sha256": "828f27986807ae2e93cfac496480cbb4260b27dd34336ccf038fa4e5e9aaffc9"
+    },
+    "assessment_provenance": "Message-only independent PASS delivered to root before explicit one-negative authorization; quoted verbatim above."
+  },
+  "minimal_harness_patch": {
+    "path": "target/m1-r-cursor-computed-receipt-diagnostic/minimal-harness.patch",
+    "sha256": "3c1d71cfdc11e94f123f9763fe8c995327b2b20b8a13a4a821dddfde515fafa6"
+  },
+  "target_test_file_for_review_only": {
+    "path": "target/m1-r-cursor-computed-receipt-diagnostic/harness-patch/tests/proof_rejection.rs",
+    "sha256": "d6f7aaa579419f160b7e6e0b538cbe011dcf7c777eec6d7f87af8bdc68968caa"
+  },
+  "native_static_validation": {
+    "path": "target/m1-r-cursor-computed-receipt-diagnostic/harness-static-validation.json",
+    "sha256": "d68860bc695ff78622a7b148119f90aa2dc73e8d5a717c38e52a4d8aa6b2c1ca"
+  },
+  "native_scope": {
+    "case_only": "brotli-m1-cursor-context-owner-skips-terminal-action",
+    "old_tuples_and_all_existing_semantic_OR_arms_retained": true,
+    "healthy_preflight_and_negative_generated_at_same_qualified_old_anchor": true,
+    "negative_operand_parsed_from_stub_ghost": true,
+    "computedFalse_OR_requires_case_name_and_both_original_gate_markers": true,
+    "outer_strict_gate_unchanged_and_rejects_mixed_tool_syntax_errors": true,
+    "old_source_reset_and_logwrite_sites_retained": true,
+    "native_harness_executed": false,
+    "static_inventory": {
+      "suites": 48,
+      "cases": 318,
+      "same_all_ordered_old_case_identities": true
+    }
+  },
+  "settings": {
+    "function": "advance_planned_compressed_action",
+    "function_attrs": [
+      "#[verifier::spinoff_prover]",
+      "#[verifier::rlimit(1000)]"
+    ],
+    "global_rlimit": 1000,
+    "multiple_errors": 0,
+    "num_threads": 1,
+    "seed": "unchanged default",
+    "no_cheating": true,
+    "no_extra_solver_options": true
+  },
+  "disposition": {
+    "new_negative_invocations": 1,
+    "further_checker_runs": 0,
+    "shared_source_test_gate_evidence_canary_edits": 0,
+    "patch_applied": false,
+    "apply_only_reviewed_patch_hunks_not_entire_target_test_copy": true,
+    "native_harness_requires_real_fresh_gate_after_integration": true,
+    "counts_as_final_gate": false,
+    "human_architectural_authority_inferred": false
+  }
+}

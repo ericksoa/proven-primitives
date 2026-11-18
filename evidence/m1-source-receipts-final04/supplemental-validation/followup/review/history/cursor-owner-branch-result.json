@@ -1,0 +1,27 @@
+{
+  "status": "UNRESOLVED; one equivalent-fault negative remained resource-only",
+  "case": "brotli-m1-cursor-context-owner-skips-terminal-action",
+  "actual_matching_positive_reused": {
+    "path": "target/m1-r-cursor-owner-branch-diagnostic/positive-reuse-binding.json",
+    "sha256": "bdaa6cbc43e921ead2813df1a13b4ce4d95a4d5a29dde1433abc328a9edf32d0"
+  },
+  "negative": {
+    "path": "target/m1-r-cursor-owner-branch-diagnostic/negative/result.json",
+    "sha256": "b85ab255565a72106cd28e78055a21a5f298c9a9bdf4385b325ac8309be367b2"
+  },
+  "preparation": {
+    "path": "target/m1-r-cursor-owner-branch-diagnostic/preparation.json",
+    "sha256": "862a9763cb1f3ce02dc279ab083997de58ce8434eb89ad09f011084449d78a9a"
+  },
+  "original_immutable_failure_copy": {
+    "path": "target/m1-r-cursor-owner-branch-diagnostic/original-failed-canary.log",
+    "sha256": "cc0009a0011391085446e8502e50d9fe488c2ced05967e468b1a5226afa1b042"
+  },
+  "semantic_rejection": false,
+  "literal_fix_qualified_or_applied": false,
+  "new_checker_runs": 1,
+  "extra_settings_or_retries": 0,
+  "shared_writes": 0,
+  "production_unchanged": true,
+  "counts_as_full_gate": false
+}

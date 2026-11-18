@@ -1,0 +1,57 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-30250/src/brotli_input.rs:21294:29
+      |
+21294 | ...                   while initialized < active_len
+      |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-30250/src/brotli_input.rs:21059:1
+      |
+21059 | / fn advance_context_tree_count_phase(
+21060 | |     workspace: &mut [u8],
+21061 | |     window_bytes: u32,
+21062 | |     kind_tag: u8,
+...     |
+21066 | |     end_of_input: bool,
+21067 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+      | |______________________________________________^
+
+error: precondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-30250/src/brotli_input.rs:21389:37
+      |
+ 8995 | /         after == before.update(
+ 8996 | |             crate::brotli_prefix::context_entry_at(window_bytes, kind, initialized) as int,
+ 8997 | |             value,
+ 8998 | |         ),
+      | |_________- failed precondition
+...
+21389 | /                                     context_map_update_extends_valid_prefix(
+21390 | |                                         before_entry,
+21391 | |                                         workspace@,
+21392 | |                                         window_bytes,
+...     |
+21396 | |                                         1,
+21397 | |                                     );
+      | |_____________________________________^
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-30250/src/brotli_input.rs:21341:48
+      |
+21341 |   ...                   == after_tree_count[
+      |  __________________________^
+21342 | | ...                       b3b_scalar_base(window_bytes) + i
+21343 | | ...                   ],
+      | |_______________________^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+error: aborting due to 1 previous error
+

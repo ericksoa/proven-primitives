@@ -1,0 +1,17 @@
+{
+  "raw_structural_finding": {
+    "caller": "brotli_input::HeaderDecoder::reset",
+    "callee": "reset",
+    "resolved_callees": [
+      "brotli_input::BitQueue::reset",
+      "brotli_input::HeaderDecoder::reset"
+    ],
+    "source_line": 1224,
+    "receipt_discarded_by_projection": false
+  },
+  "receiver_type_evidence": "struct HeaderDecoder {\n    queue: BitQueue,\n    phase: HeaderPhase,\n}",
+  "resolved_callee": "brotli_input::BitQueue::reset",
+  "reason": "HeaderDecoder.queue is statically BitQueue; reset invokes the queue receiver. This ordinary unpaired B1 reset is outside the158paired producers and unchanged from main25.",
+  "receipt_ambiguity": false,
+  "approval_conclusion": null
+}

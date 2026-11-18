@@ -1,0 +1,57 @@
+{
+  "status": "CHECKED old-guarantee necessary receipt5, actual-call witness and healthy computed positive; new negative still unauthorized/unrun",
+  "necessary_theorem": {
+    "path": "target/m1-r-cursor-required-receipt-proof/required-receipt.rs.txt",
+    "sha256": "95aa59f953a98c575f326f7e58c9a9cc278b0df265e0e0624624d40bfeed1023"
+  },
+  "theorem_source": {
+    "path": "target/m1-r-cursor-required-receipt-proof/attempts/criterion01/src/brotli_input.rs",
+    "sha256": "698da5a2f13ad2342c69d4eb243bb706460add7ccd054c5a553b29fd793ef719"
+  },
+  "actual_result": {
+    "path": "target/m1-r-cursor-required-receipt-proof/attempts/criterion01/result.json",
+    "sha256": "37e6f5716734bd62004041b88a034bacb43c7fc82b8fb97d55bde25a56d33ff5"
+  },
+  "actual_command": {
+    "path": "target/m1-r-cursor-required-receipt-proof/attempts/criterion01/command.json",
+    "sha256": "5801f13cfb890725c33a99122ec6f94d9a1747e3e0d159392c420c244d5b25e1"
+  },
+  "actual_log": {
+    "path": "target/m1-r-cursor-required-receipt-proof/attempts/criterion01/verifier.log",
+    "sha256": "6a2e7b7cae34394ab355d6afa4a6a1d89cb362970605cd5bd4e5dfe23f0746cc"
+  },
+  "old_effect_clause_exact_after_endpoint_variable_substitution": true,
+  "old_unconditional_receipt_guarantee_retained": "parent_receipt + after_budget.work_remaining as nat == before_budget.work_remaining as nat",
+  "actual_fold_relation": "parent_receipt == prior_receipt + actual_child_receipt",
+  "witness_premises": [
+    "original root domain predicates",
+    "outer5/fixedPhaseBadCursor(ContextModes)",
+    "beforework5",
+    "priorledger0"
+  ],
+  "derivation": "Old fixed cursor effect entails endwork0; old conservation entails parent5; prior0 and actual fold entail child5 for ANY implementation satisfying those old guarantees. No healthy-body behavior used in this implication proof.",
+  "nonvacuity_and_actual_child": {
+    "path": "target/m1-r-cursor-context-witness/witness-result.json",
+    "sha256": "53a2e7e7a9ef84a8552ed4d46bc4204ef25adaeab229619ad6e84b42f94f3c8a"
+  },
+  "source_correspondence": {
+    "path": "target/m1-r-cursor-context-witness/ordinary-correspondence.json",
+    "sha256": "882c35a2a16b224318dd9594774ffdf3712a386c3dec2d7cfe9c362bb32c167b"
+  },
+  "computed_source_coupling": {
+    "path": "target/m1-r-cursor-context-witness/computed-receipt-source-coupling.json",
+    "sha256": "32c0483b68fcfba874372e563c1b5693223eef65ab7c49dbf1d47939512fc789"
+  },
+  "healthy_actual_computed_positive": {
+    "path": "target/m1-r-cursor-computed-receipt-diagnostic/positive/result.json",
+    "sha256": "7480a4ed470c6c5fdf1b43833df758ac332b224cc445726c958e012b26aca63f"
+  },
+  "healthy_source_sha256": "153dd3a1ea9f7b32ebb41fa4af9e1dc4963ef01d9fece2a42e8c8055c1e18c6e",
+  "healthy5_justification": "The independently checked actual original call supplies5; necessity is independently established from unchanged old caller guarantees. The actual call/captured Ghost is never replaced by a constant.",
+  "negative0_justification": "Parsed from existing original faulty child tuple Ghost(0nat), which remains unchanged; expected5 stays fixed by the old-contract theorem.",
+  "new_cursor_negative_materialized_or_run": false,
+  "main_tests_gate_evidence_canary_edits": 0,
+  "models_contracts_existing_helpers_unchanged": true,
+  "counts_as_final_gate": false,
+  "witness_snapshot_pending_healthy_note_superseded_by_this_actual_record": true
+}

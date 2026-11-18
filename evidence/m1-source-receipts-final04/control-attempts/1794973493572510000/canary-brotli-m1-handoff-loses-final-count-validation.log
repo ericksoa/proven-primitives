@@ -1,0 +1,31 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-52521/src/brotli_input.rs:36353:1
+      |
+36353 | / fn plan_tree_group_handoff(workspace: &[u8], window_bytes: u32,
+36354 | |     budget: &mut crate::brotli::RequestBudget, group: u8, next: u16, count: u16,
+36355 | | ) -> (r: (Result<CompressedActionPlan, CoreFailure>, Ghost<nat>))
+      | |________________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-52521/src/brotli_input.rs:36367:9
+      |
+36367 | /         r.0.is_ok() ==> {
+36368 | |             let class = m1_group_handoff_class(workspace@, window_bytes, group, next, count);
+36369 | |             &&& r.0.unwrap().consumed == 0
+36370 | |             &&& r.0.unwrap().planning_work as nat == m1_group_handoff_planning_units(class)
+...     |
+36374 | |                 == old(budget).work_remaining as nat
+36375 | |         },
+      | |_________^ failed this postcondition
+...
+36420 |           return (Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 5, consumed: 0, status: failed }), Ghost(r_tree_wrapper_plan_source_reads));
+      |           --------------------------------------------------------------------------------------------------------------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

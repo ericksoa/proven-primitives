@@ -1,0 +1,36 @@
+{
+  "case": "brotli-b3b-tree-field-truncation-needs-input",
+  "selector": "CodeDescriptionDecoder::advance_field",
+  "prior_healthy_sha256": "39c5f69300b2352683fc4f85149aa8e23b15452fb210c0e2809f5b1bd87799ce",
+  "prior_bad_sha256": "028495248b5c276cd7b1322932d12c0fbfc11ace158e7e3dd13cd68a019324e2",
+  "positive_input_sha256": "666cc26857ef99009471d3b583dc6f267a37539ee8c1004714022fcd65b65252",
+  "prior_healthy_site": "proof { assert(if matches!(CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated), CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)) { true } else { false }) by (compute_only); }\n                return (CodeDescriptionStep {\n                    consumed: read.consumed,\n                    status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),\n                }, Ghost(source_reads));",
+  "prior_fault_site": "proof { assert(if matches!(CodeDescriptionStatus::NeedInput, CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)) { true } else { false }) by (compute_only); }\n                return (CodeDescriptionStep {\n                    consumed: read.consumed,\n                    status: CodeDescriptionStatus::NeedInput,\n                }, Ghost(source_reads));",
+  "healthy_site": "proof {\n                    assert(if matches!(\n                        CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),\n                        CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)\n                    ) { true } else { false }) by (compute_only);\n                }\n                return (CodeDescriptionStep {\n                    consumed: read.consumed,\n                    status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),\n                }, Ghost(source_reads));",
+  "fault_site": "proof {\n                    assert(if matches!(\n                        CodeDescriptionStatus::NeedInput,\n                        CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)\n                    ) { true } else { false }) by (compute_only);\n                }\n                return (CodeDescriptionStep {\n                    consumed: read.consumed,\n                    status: CodeDescriptionStatus::NeedInput,\n                }, Ghost(source_reads));",
+  "source_old_anchor": "return (CodeDescriptionStep {\n                    consumed: read.consumed,\n                    status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),\n                }, Ghost(source_reads));",
+  "original_bad_return": "return (CodeDescriptionStep {\n                    consumed: read.consumed,\n                    status: CodeDescriptionStatus::NeedInput,\n                }, Ghost(source_reads));",
+  "same_full_positive_and_negative_tokens_modulo_whitespace": true,
+  "positive_tokens_sha256": "f3467ba4f613dc2daa29fc38ec2c032046bca2255879785d2e558611be5463bf",
+  "negative_preview_tokens_sha256": "964a7dcebc7225e0a6bad0ed629ad3d55b06d89797840e0246f5013a00adcb2a",
+  "formatting_only_no_ast_or_runtime_change": true,
+  "test_copy_function_rlimit": 1000,
+  "production_function_rlimit": 500,
+  "same_SP_global1000_ME0_default": true,
+  "strict_classifier_unchanged": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+  "no_log_augmentation": true,
+  "old_failed500_and_singleline_evidence_retained": true,
+  "only_after_clean_positive_one_formatted_negative": true,
+  "negative_materialized": false,
+  "core_readback": {
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+    "tests/proof_rejection.rs": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+    "target/m1-r-final-gate/driver.py": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46"
+  },
+  "immutable_supplement_manifest_sha256": "89734c8f58d911da782ae47adea4169eb15f963855ba450680804fae6667b8d8",
+  "copied_annotation_delta": {
+    "old": "    #[verifier::rlimit(500)]\n    #[verifier::spinoff_prover]\n    fn advance_field(",
+    "new": "    #[verifier::rlimit(1000)]\n    #[verifier::spinoff_prover]\n    fn advance_field("
+  }
+}

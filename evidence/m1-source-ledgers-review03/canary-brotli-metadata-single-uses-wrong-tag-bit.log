@@ -1,0 +1,21 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-92903/src/brotli_prefix.rs:2432:9
+     |
+2432 | /         r.is_ok() ==> {
+2433 | |             let at = tree_metadata_at(window_bytes, region, tree);
+2434 | |             let descriptor = tree_metadata_descriptor(meta);
+2435 | |             &&& tree < tree_region_count(region)
+...    |
+2441 | |                 .update(at as int + 3, (descriptor / 256) as u8)
+2442 | |         },
+     | |_________^ failed this postcondition
+...
+2468 |       Ok(())
+     |       ------ at the end of the function body
+
+error: aborting due to 1 previous error
+

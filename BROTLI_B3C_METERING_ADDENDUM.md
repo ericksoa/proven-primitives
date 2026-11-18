@@ -68,10 +68,9 @@ separately**. The scope and examples are recorded in
 `BROTLI_M1_TRANSITION_RULE_DECISION.md`. C1's 425-unit construction/reset charge
 remains fixed.
 
-## Implementation checkpoint
+## Historical implementation checkpoints
 
-M1 remains **incomplete**. The current implementation is a reviewable B3c
-checkpoint, not an exact-resource or complete-decoder claim.
+At the following checkpoint M1 remained incomplete. The implementation was a reviewable B3c checkpoint, not an exact-resource or complete-decoder claim. The latest M1 source-receipt status is recorded in `BROTLI_M1_SOURCE_RECEIPTS_CHECKPOINT.md`.
 
 Candidate read-only planners and prepaid executors cover block counts, initial
 block-length symbols and suffixes, distance parameters, literal context modes,
@@ -304,7 +303,7 @@ error, consumption and validation timing. Tests also cover malformed queue,
 region, alphabet and code-description state, and exact/one-short terminal
 reservation for an unknown initial block-length subphase.
 
-Current remaining M1 obligations:
+Remaining M1 obligations at that historical checkpoint:
 
 - Complete serialized-tree, block-count/suffix, distance/context-mode,
   tree-group, tail and terminal plan/action state and byte-frame refinement.
@@ -937,3 +936,16 @@ the actual returned simple status directly to the helper status. See
 `evidence/brotli-b3c-m1-tree-error-agreement.json`. Complete source ledgers,
 outcome byte frames, block/group composition, full M1 controls, later B3 work
 and independent human specification review remain open.
+
+## Current M1 source-receipt checkpoint
+
+The named M1 compressed-header source-receipt and prepaid-action refinement
+scope is complete on the frozen source in
+`evidence/brotli-b3c-m1-source-receipts.json`: 1397 whole-crate
+checks with zero errors, 116 runtime tests, and all 48 suites /
+318 semantic defect rejections. See
+`BROTLI_M1_SOURCE_RECEIPTS_CHECKPOINT.md` for the exact admitted domains and
+conditional installed-tree geometry. The earlier incomplete statuses and
+counts in this chronology remain historical. Remaining B3c, B3d/B4, F2
+native disagreement, independent human specification review and decoder/release
+obligations remain separate. No new architectural authority follows.

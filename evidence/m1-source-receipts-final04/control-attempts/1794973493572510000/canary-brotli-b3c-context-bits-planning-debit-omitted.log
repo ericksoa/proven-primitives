@@ -1,0 +1,25 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-43096/src/brotli_input.rs:38152:1
+      |
+38152 | / fn plan_context_bits_action(workspace: &[u8], window_bytes: u32,
+38153 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+38154 | | ) -> (r: (Result<ContextBitsPlan, CoreFailure>, Ghost<nat>))
+      | |___________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-43096/src/brotli_input.rs:38157:9
+      |
+38157 |         r.1@ + final(budget).work_remaining as nat == old(budget).work_remaining as nat,
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+38244 |     (ordinary_result, Ghost(r_readonly_plan_source_reads))
+      |     ------------------------------------------------------ at the end of the function body
+
+error: aborting due to 1 previous error
+

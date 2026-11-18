@@ -1,0 +1,36 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-72599/src/brotli_input.rs:31480:1
+      |
+31480 | / fn initial_symbol_execution_work(
+31481 | |     planning_work: u64,
+31482 | |     status: InstalledSymbolStatus,
+31483 | | ) -> (r: Result<u64, CoreFailure>)
+      | |_________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-72599/src/brotli_input.rs:31485:9
+      |
+31485 | /         ({
+31486 | |             let amount: nat = planning_work as nat + 10 + 5 + 1
+31487 | |                 + match status {
+31488 | |                     InstalledSymbolStatus::Symbol(_) => 1nat + 3 + 1,
+...     |
+31493 | |             &&& r.is_ok() ==> r.unwrap() as nat == amount
+31494 | |         }),
+      | |__________^ failed this postcondition
+31495 | / {
+31496 | |     let base = checked_planned_work_add(planning_work, 10 + 4 + 1)?;
+31497 | |     match status {
+31498 | |         InstalledSymbolStatus::Symbol(_) => checked_planned_work_add(base, 1 + 3 + 1),
+...     |
+31504 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

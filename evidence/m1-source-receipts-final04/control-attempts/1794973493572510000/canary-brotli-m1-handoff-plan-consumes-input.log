@@ -1,0 +1,58 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-51046/src/brotli_input.rs:31458:1
+      |
+31458 | / fn plan_context_mode_action(
+31459 | |     workspace: &[u8],
+31460 | |     window_bytes: u32,
+31461 | |     input: &[u8],
+31462 | |     end_of_input: bool,
+31463 | | ) -> (r: (Result<CompressedActionPlan, CompressedHeaderError>, Ghost<nat>))
+      | |__________________________________________________________________________^
+
+note: function body check finished in 2 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-51046/src/brotli_input.rs:31458:1
+      |
+31458 | / fn plan_context_mode_action(
+31459 | |     workspace: &[u8],
+31460 | |     window_bytes: u32,
+31461 | |     input: &[u8],
+31462 | |     end_of_input: bool,
+31463 | | ) -> (r: (Result<CompressedActionPlan, CompressedHeaderError>, Ghost<nat>))
+      | |__________________________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-51046/src/brotli_input.rs:31467:9
+      |
+31467 | /         b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+31468 | |             && context_mode_handoff_domain(workspace@, window_bytes) ==>
+31469 | |                 r.0.is_ok() && context_mode_handoff_plan_valid(workspace@, window_bytes, r.0.unwrap()),
+      | |______________________________________________________________________________________________________^ failed this postcondition
+...
+31493 | /         return (Ok(CompressedActionPlan {
+31494 | |             planning_work: 0,
+31495 | |             execution_work: context_mode_complete_execution_work(),
+31496 | |             consumed: 1,
+31497 | |             status: None,
+31498 | |         }), Ghost(r_readonly_plan_source_reads));
+      | |________________________________________________- at this exit
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-handoff-canary-51046/src/brotli_input.rs:31458:1
+      |
+31458 | / fn plan_context_mode_action(
+31459 | |     workspace: &[u8],
+31460 | |     window_bytes: u32,
+31461 | |     input: &[u8],
+31462 | |     end_of_input: bool,
+31463 | | ) -> (r: (Result<CompressedActionPlan, CompressedHeaderError>, Ghost<nat>))
+      | |__________________________________________________________________________^
+
+error: aborting due to 1 previous error
+

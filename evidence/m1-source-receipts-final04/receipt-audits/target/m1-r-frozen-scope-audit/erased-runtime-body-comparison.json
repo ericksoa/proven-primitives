@@ -1,0 +1,25 @@
+{
+  "method": "Source normalization only: explicitly remove proof blocks, let ghost/tracked declarations, reveal/hide calls, comments, whitespace. This is not a compiled erasure or equivalence proof.",
+  "changed": [
+    {
+      "function": "brotli_input::advance_context_map",
+      "old_line": 21623,
+      "new_line": 21634,
+      "diff": "target/m1-r-frozen-scope-audit/runtime-diffs/brotli_input__advance_context_map.diff"
+    },
+    {
+      "function": "brotli_input::advance_planned_context_tree_count",
+      "old_line": 35175,
+      "new_line": 35442,
+      "diff": "target/m1-r-frozen-scope-audit/runtime-diffs/brotli_input__advance_planned_context_tree_count.diff"
+    },
+    {
+      "function": "brotli_input::advance_planned_context_bits",
+      "old_line": 35628,
+      "new_line": 35926,
+      "diff": "target/m1-r-frozen-scope-audit/runtime-diffs/brotli_input__advance_planned_context_bits.diff"
+    }
+  ],
+  "status": "SUPERSEDED preliminary projection: loop invariants were retained. Use scope-comparison.json and projected-runtime-diffs for final static classification.",
+  "known_false_positive": "advance_context_map differs only in loop invariant/proof text; no runtime delta."
+}

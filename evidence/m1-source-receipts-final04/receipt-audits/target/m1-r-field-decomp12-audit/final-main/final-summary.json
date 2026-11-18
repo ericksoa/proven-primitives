@@ -1,0 +1,57 @@
+{
+  "all_actual_paired_receipt_producers": 158,
+  "audit_result_sha256": "a0e302e839365c4cd438013cdb97abc155691d458eed3ed80f19d99750d5df52",
+  "authority_conclusion": "None; no source approval inference",
+  "candidate_core_hashes": {
+    "brotli_input": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "brotli_prefix": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15"
+  },
+  "counts": {
+    "exec": 323,
+    "proof": 368,
+    "spec": 445
+  },
+  "discarded_receipts_inside_paired_functions": 0,
+  "e10c_existing_specs_preserved": 424,
+  "f1a_existing_specs_preserved": 416,
+  "field_body_static_projection2456tokens_equal": true,
+  "field_literal_header_exact": true,
+  "field_nonreturned_table_subtotal": "literal0 +same reached table1increments/actual child table receipts; no forecast/reservation/debit assignments",
+  "field_returned_receipt_constructor_child_bindings_and_updates_unchanged": true,
+  "gate_bundle_unchanged": true,
+  "main25_existing_specs_preserved": 444,
+  "mutant_runs": 0,
+  "new_ordinary_execs": 0,
+  "new_private_opaque_spec": "brotli_input::r_m1_field_table_receipt",
+  "new_proof_helpers": 15,
+  "old_exec_headers_args_requires_returns_guarantees_preserved": true,
+  "old_proof_headers_and_bodies_unchanged_vs_main25": true,
+  "old_spec_body_changes": 0,
+  "only_existing_attribute_additions": [
+    "brotli_input::CompressedMetaBlockDecoder::apply_block_count_value",
+    "brotli_input::store_complex_code_description_payload"
+  ],
+  "only_preR_spec_header_exception": "brotli_prefix::m1_canonical_nonzero_index_sum",
+  "ordinary_static_receiver_finding_resolution": "ordinary-receiver-resolution.json",
+  "original_allowance_attributes_unchanged": true,
+  "producer_budget_formula_findings": 0,
+  "projection_limit": "Byte audit explicit proof-validity normalization retained; this is not compiler-erasure/source-to-binary proof",
+  "raw_ordinary_receiver_ambiguity_retained": [
+    {
+      "callee": "reset",
+      "caller": "brotli_input::HeaderDecoder::reset",
+      "receipt_discarded_by_projection": false,
+      "resolved_callees": [
+        "brotli_input::BitQueue::reset",
+        "brotli_input::HeaderDecoder::reset"
+      ],
+      "source_line": 1224
+    }
+  ],
+  "script_sha256": "518c83183fccf9dc454319697f0cde0726d8e56b11ca6f5060387a191b699910",
+  "source_mutations": 0,
+  "status": "Read-only CORE audit passed on exact whole-positive3e2f/daf; final test hash still separate",
+  "tests_final_hash_bound": false,
+  "unresolved_paired_receipt_edges": 0,
+  "whole_paired_function_bodies_byte_exact_vs_main25": 157
+}

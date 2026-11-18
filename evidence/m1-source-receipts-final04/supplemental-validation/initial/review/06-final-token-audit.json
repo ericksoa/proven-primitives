@@ -1,0 +1,143 @@
+{
+  "kind": "Mechanical static ordinary-token/call comparison; not compiler-erasure/source-to-binary proof",
+  "ordinary_token_count": 1073,
+  "ordinary_tokens_exact": true,
+  "expected_tokens_sha256": "9968f253696de01c4138fa8cde7af3b6bd576304ca6f08a1520fcc0018e4421d",
+  "actual_tokens_sha256": "9968f253696de01c4138fa8cde7af3b6bd576304ca6f08a1520fcc0018e4421d",
+  "expansion": "Original planner prefix through let mut iterations=0; its sole auxiliary-load call is expanded with the exact unchanged auxiliary-scan body.",
+  "explicit_original_inferred_type_restored": {
+    "old": "    let ordinary_result = {\n        Ok((18, true))",
+    "new": "    let ordinary_result: Result<(u64, bool), CoreFailure> = {\n        Ok((18, true))",
+    "reason": "Inlining and proving all Err exits unreachable removes contextual error-type inference; this explicitly preserves the original helper return type."
+  },
+  "normalization": "Existing proof-erasure tokenizer removes proof/ghost statements, hide/reveal, and loop invariant/decreases clauses; all changes listed separately.",
+  "mapped_failure_invalid_returns": 17,
+  "checked_assert_false_at_each_mapped_exit": 17,
+  "all_mapped_old_return_expressions_have_no_embedded_proof_obligation": true,
+  "entry_ensures_true_reach_marker": true,
+  "actual_checked_result": "attempts/startup02/result.json",
+  "return_mappings": [
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,\n            status: SerializedTreeStatus::Failed(error) }), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,\n            status: SerializedTreeStatus::Failed(CompressedHeaderError::InternalState) }), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,\n            status: SerializedTreeStatus::Failed(error) }), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,\n            status: SerializedTreeStatus::Failed(error) }), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Err(error), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Err(error), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Err(CoreFailure::ResourceLimit), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Ok(SerializedTreePlan { planning_work: initial_planning_work,\n            execution_work: loader_reads, consumed: 0,\n            status: SerializedTreeStatus::Failed(error) }), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Ok(SerializedTreePlan { planning_work: 0, execution_work: 0, consumed: 0,\n            status: SerializedTreeStatus::Failed(error) }), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Err(CoreFailure::ResourceLimit), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "plan_serialized_tree startup",
+      "original": "return (Err(core_state_failure()), Ghost(r_tree_planning_source_units))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "inlined plan_saved_aux_load",
+      "original": "return (Err(error), Ghost(r_saved_forecast_source_reads))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "inlined plan_saved_aux_load",
+      "original": "return (Err(error), Ghost(r_saved_forecast_source_reads))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "inlined plan_saved_aux_load",
+      "original": "return (Ok((0, false)), Ghost(r_saved_forecast_source_reads))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "inlined plan_saved_aux_load",
+      "original": "return (Err(CoreFailure::ResourceLimit), Ghost(r_saved_forecast_source_reads))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "inlined plan_saved_aux_load",
+      "original": "return (Err(error), Ghost(r_saved_forecast_source_reads))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    },
+    {
+      "owner": "inlined plan_saved_aux_load",
+      "original": "return (Ok((i as u64 + 1, false)), Ghost(r_saved_forecast_source_reads))",
+      "replacement": "{ proof { assert(false); } return (false, Ghost(r_tree_planning_source_units)); }",
+      "reason": "This exit must be proved unreachable under the concrete workspace and budget; validation return false contradicts required reached=true."
+    }
+  ],
+  "pure_proof_additions": [
+    "checked concrete image/cost theorem calls",
+    "specific queue rebasing and loaded704 Selector equality",
+    "auxiliary-loop invariants:window1024,entrybudget64,all18auxcells0",
+    "builder-copy-loop invariant:copy_len0",
+    "17 assert(false) obligations at mapped exits",
+    "endpointactualrank5695 and original bound5696 assertion"
+  ],
+  "all_original_prefix_assertions_loop_invariants_decreases_retained": true,
+  "all_existing_input_prefix_headers_bodies_attributes_exact": true,
+  "existing_qualified_declarations": 1136,
+  "removing_only_temporary_validation_additions_restores_exact_original_input_and_budget_modules": true,
+  "original_root_contract_not_replaced_or_weakened": true,
+  "new_public_or_cross_module_API": false,
+  "inlined_old_budget_is_caller_old_budget": "No budget mutation occurs before the inlined scan; preceding original operations are scalar/queue reads.",
+  "cap_control_runs": 0,
+  "source": {
+    "path": "attempts/startup02/src/brotli_input.rs",
+    "sha256": "aa7390fc9b78412518da829c16f2e48a864145fc5579b587bc7326a14200759b"
+  }
+}

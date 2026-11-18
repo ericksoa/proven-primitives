@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60576,13): 'if' cannot be used in patterns.
+WARNING: (68400,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-52521/src/brotli_input.rs:39505:1
+      |
+39505 | / fn advance_planned_context_map_tail(
+39506 | |     workspace: &mut [u8],
+39507 | |     window_bytes: u32,
+39508 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+39511 | |     end_of_input: bool,
+39512 | | ) -> (r: (Result<usize, CompressedStep>, Ghost<nat>))
+      | |____________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-52521/src/brotli_input.rs:39527:9
+      |
+39527 |         r.1@ + final(budget).work_remaining as nat == old(budget).work_remaining as nat,
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+39670 |     (ordinary_result, Ghost(r_tail_owner_source_units))
+      |     --------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

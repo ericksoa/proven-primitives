@@ -1,0 +1,26 @@
+{
+  "status": "QUALIFIED isolated selected pair; minimal native harness patch staged only",
+  "base_tests_sha256": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+  "proposed_tests_sha256": "745ac4971e3dced309acb10a0136cd0f2787c97d1c775fbd4f3a51725329876f",
+  "patch_sha256": "f397c2f0864e65f4e24930fed4cabc4b4c48fda9dcdf0524697da6e90353ff12",
+  "case_tuple_unchanged": [
+    "brotli-b3b-tree-field-truncation-needs-input",
+    "CodeDescriptionDecoder::advance_field",
+    "return (CodeDescriptionStep {\n                    consumed: read.consumed,\n                    status: CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated),\n                }, Ghost(source_reads));",
+    "return (CodeDescriptionStep {\n                    consumed: read.consumed,\n                    status: CodeDescriptionStatus::NeedInput,\n                }, Ghost(source_reads));"
+  ],
+  "positive_native_assembly_sha256": "666cc26857ef99009471d3b583dc6f267a37539ee8c1004714022fcd65b65252",
+  "negative_native_assembly_sha256": "53ec53efed6262524cce5fab519c7cf4e301f08847756e97388aa63fe3b41bc2",
+  "matches_actual_checked_sources_byte_for_byte": true,
+  "native_harness_executed": false,
+  "both_copies_function_rlimit": 1000,
+  "production_function_rlimit": 500,
+  "global_flags_and_SP_unchanged": true,
+  "actual_status_operands_extracted_from_unchanged_old_new_return_literals": true,
+  "expectedFailedTruncated_fixed": true,
+  "old_return_consumed_and_actualGhost_retained": true,
+  "native_semantic_extension": "Only this FIELD case, literal computed-false AND by(compute_only), matching unchanged strict gate. All four old diagnostic arms and original assertion site/message retained.",
+  "other_cases_same_mutation_path": true,
+  "negative_loop_smt_completion_claimed": false,
+  "no_shared_edits": true
+}

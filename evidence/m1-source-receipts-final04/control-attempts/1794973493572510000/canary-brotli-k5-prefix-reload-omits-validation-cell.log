@@ -1,0 +1,45 @@
+verification results:: 2 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-39524/src/brotli_input.rs:3792:17
+     |
+3792 |                 assert(22nat + index as nat * index as nat <= 38nat) by (nonlinear_arith)
+     |                 ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-39524/src/brotli_input.rs:3825:17
+     |
+3825 |                 assert(code.count as u64 * code.count as u64 <= 16) by (nonlinear_arith) requires code.count <= 4;
+     |                 ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-39524/src/brotli_input.rs:3777:1
+     |
+3777 | fn valid_code_loader_read_units(decoder: &CodeDescriptionDecoder) -> (r: u64)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-39524/src/brotli_input.rs:3779:13
+     |
+3779 |       ensures r as nat == 22 + phase_validation_read_units(decoder.phase, decoder.alphabet_max, decoder.alphabet_limit),
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+3787 | /     match decoder.phase {
+3788 | |         CodeDescriptionPhase::SimpleSymbols { index, symbols, .. } => {
+3789 | |             proof {
+3790 | |                 valid_simple_scan_is_square(symbols@, index as nat, decoder.alphabet_limit);
+...    |
+3835 | |         _ => 22,
+3836 | |     }
+     | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

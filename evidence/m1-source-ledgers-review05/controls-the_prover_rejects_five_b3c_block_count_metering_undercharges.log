@@ -1,0 +1,461 @@
+warning: unused variable: `window_bytes`
+   --> src/brotli.rs:958:13
+    |
+958 |         let window_bytes = self.window_bytes();
+    |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_window_bytes`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:1478:13
+     |
+1478 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `output`
+    --> src/brotli.rs:1438:9
+     |
+1438 |         output: &mut [u8],
+     |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:1709:13
+     |
+1709 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: unused variable: `output`
+    --> src/brotli.rs:1669:9
+     |
+1669 |         output: &mut [u8],
+     |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:2167:13
+     |
+2167 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:2168:13
+     |
+2168 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:2257:13
+     |
+2257 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: unused variable: `output`
+    --> src/brotli.rs:2217:9
+     |
+2217 |         output: &mut [u8],
+     |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:2999:13
+     |
+2999 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3232:13
+     |
+3232 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3233:13
+     |
+3233 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3292:13
+     |
+3292 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3293:13
+     |
+3293 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3350:13
+     |
+3350 |         let mut consumed = consumed;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> src/brotli.rs:3351:13
+     |
+3351 |         let mut produced = produced;
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: unused variable: `old_position`
+    --> src/brotli_data.rs:1826:17
+     |
+1826 |             let old_position = position;
+     |                 ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_old_position`
+
+warning: unused variable: `symbols`
+    --> src/brotli_input.rs:3148:54
+     |
+3148 |         CodeDescriptionPhase::SimpleSymbols { index, symbols, .. } => {
+     |                                                      ^^^^^^^ help: try ignoring the field: `symbols: _`
+
+warning: unused variable: `symbols`
+    --> src/brotli_input.rs:3157:45
+     |
+3157 |         CodeDescriptionPhase::SimpleShape { symbols } => {
+     |                                             ^^^^^^^ help: try ignoring the field: `symbols: _`
+
+warning: unused variable: `progress`
+    --> src/brotli_input.rs:3161:46
+     |
+3161 |         CodeDescriptionPhase::ComplexPrefix2(progress)
+     |                                              ^^^^^^^^
+3162 |         | CodeDescriptionPhase::ComplexPrefix3(progress)
+     |                                                ^^^^^^^^
+3163 |         | CodeDescriptionPhase::ComplexPrefix4(progress) => {
+     |                                                ^^^^^^^^
+     |
+help: if this is intentional, prefix it with an underscore
+     |
+3161 ~         CodeDescriptionPhase::ComplexPrefix2(_progress)
+3162 ~         | CodeDescriptionPhase::ComplexPrefix3(_progress)
+3163 ~         | CodeDescriptionPhase::ComplexPrefix4(_progress) => {
+     |
+
+warning: unused variable: `code`
+    --> src/brotli_input.rs:3177:47
+     |
+3177 |             ComplexAfterSpan::TrailingZeros { code, .. } | ComplexAfterSpan::Complete { code, .. } => {
+     |                                               ^^^^                                      ^^^^
+     |
+help: try ignoring the field
+     |
+3177 |             ComplexAfterSpan::TrailingZeros { code: _, .. } | ComplexAfterSpan::Complete { code: _, .. } => {
+     |                                                   +++                                          +++
+
+warning: unused variable: `code`
+    --> src/brotli_input.rs:3190:55
+     |
+3190 |         CodeDescriptionPhase::CompleteComplexAlphabet(code)
+     |                                                       ^^^^
+3191 |         | CodeDescriptionPhase::CompleteComplex { code, .. } => {
+     |                                                   ^^^^
+     |
+help: try ignoring the field
+     |
+3190 ~         CodeDescriptionPhase::CompleteComplexAlphabet(_)
+3191 ~         | CodeDescriptionPhase::CompleteComplex { code: _, .. } => {
+     |
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:4344:13
+     |
+4344 |         let equal = simple_symbol_pair_metered(symbols, 0, 1, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:4348:13
+     |
+4348 |         let equal = simple_symbol_pair_metered(symbols, 0, 2, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:4350:13
+     |
+4350 |         let equal = simple_symbol_pair_metered(symbols, 1, 2, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:4354:13
+     |
+4354 |         let equal = simple_symbol_pair_metered(symbols, 0, 3, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:4356:13
+     |
+4356 |         let equal = simple_symbol_pair_metered(symbols, 1, 3, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `equal`
+    --> src/brotli_input.rs:4358:13
+     |
+4358 |         let equal = simple_symbol_pair_metered(symbols, 2, 3, budget)?;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_equal`
+
+warning: unused variable: `selected`
+    --> src/brotli_input.rs:4458:18
+     |
+4458 |             let (selected, reads) = decode_auxiliary_symbol_metered(&progress.code, bits, width, budget)?;
+     |                  ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_selected`
+
+warning: unused variable: `source_value`
+    --> src/brotli_input.rs:5704:9
+     |
+5704 |     let source_value = value;
+     |         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_source_value`
+
+warning: unused variable: `limit`
+     --> src/brotli_input.rs:16808:5
+      |
+16808 |     limit: u16,
+      |     ^^^^^ help: if this is intentional, prefix it with an underscore: `_limit`
+
+warning: unused variable: `start_step`
+     --> src/brotli_input.rs:17661:17
+      |
+17661 |             let start_step = decoder.advance_field(&start_input, false);
+      |                 ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_step`
+
+warning: unused variable: `kind_tag`
+     --> src/brotli_input.rs:19874:5
+      |
+19874 |     kind_tag: u8,
+      |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_kind_tag`
+
+warning: unused variable: `kind_tag`
+     --> src/brotli_input.rs:20334:5
+      |
+20334 |     kind_tag: u8,
+      |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_kind_tag`
+
+warning: unused variable: `old_initialized`
+     --> src/brotli_input.rs:20806:37
+      |
+20806 | ...                   let old_initialized = initialized;
+      |                           ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_old_initialized`
+
+warning: unused variable: `kind_tag`
+     --> src/brotli_input.rs:21062:5
+      |
+21062 |     kind_tag: u8,
+      |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_kind_tag`
+
+warning: unused variable: `old_initialized`
+     --> src/brotli_input.rs:21367:37
+      |
+21367 | ...                   let old_initialized = initialized;
+      |                           ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_old_initialized`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:24407:9
+      |
+24407 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:24910:9
+      |
+24910 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:25124:9
+      |
+25124 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:25260:9
+      |
+25260 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase`
+     --> src/brotli_input.rs:25724:9
+      |
+25724 |         phase: CompressedOuterPhase,
+      |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_phase`
+
+warning: unused variable: `phase_at`
+     --> src/brotli_input.rs:28676:9
+      |
+28676 |     let phase_at = window_bytes as usize + B3C_STATE_OFFSET as usize
+      |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_phase_at`
+
+warning: unused variable: `old_index`
+     --> src/brotli_input.rs:28727:13
+      |
+28727 |         let old_index = index;
+      |             ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_old_index`
+
+warning: unused variable: `stored`
+     --> src/brotli_input.rs:31184:9
+      |
+31184 |     let stored = store_terminal_error(workspace, window_bytes, error);
+      |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_stored`
+
+warning: variable does not need to be mutable
+     --> src/brotli_input.rs:31793:9
+      |
+31793 |     let mut queue = match load_b3b_queue(workspace, window_bytes) {
+      |         ----^^^^^
+      |         |
+      |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+     --> src/brotli_input.rs:31798:9
+      |
+31798 |     let mut prefix = match load_installed_prefix_state(workspace, window_bytes) {
+      |         ----^^^^^^
+      |         |
+      |         help: remove this `mut`
+
+warning: unused variable: `alphabet_max`
+     --> src/brotli_input.rs:31951:5
+      |
+31951 |     alphabet_max: u16,
+      |     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_alphabet_max`
+
+warning: unused variable: `start_step`
+     --> src/brotli_input.rs:33292:18
+      |
+33292 |             let (start_step, start_planning, start_reads) = plan_code_description_field(
+      |                  ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_step`
+
+warning: unused variable: `planning_work`
+     --> src/brotli_input.rs:36348:55
+      |
+36348 |     input_was_limited: bool, plan: ContextSymbolPlan, planning_work: u64,
+      |                                                       ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_planning_work`
+
+warning: unused variable: `stored`
+     --> src/brotli_input.rs:36406:17
+      |
+36406 |             let stored = store_terminal_error(workspace, window_bytes, error);
+      |                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_stored`
+
+warning: unused variable: `context_kind`
+     --> src/brotli_input.rs:36597:13
+      |
+36597 |         let context_kind = if kind == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+      |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context_kind`
+
+warning: unused variable: `context_kind`
+     --> src/brotli_input.rs:36665:13
+      |
+36665 |         let context_kind = if kind == 0 { crate::brotli_prefix::ContextMapKind::Literal }
+      |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context_kind`
+
+warning: value assigned to `execution_work` is never read
+     --> src/brotli_input.rs:36591:30
+      |
+36591 |       let mut execution_work = 0u64;
+      |                                ^^^^ this value is reassigned later and never used
+...
+36788 | /                 execution_work = if kind == 0 { 2 + serialized_map_start_work() + 1 + 1 }
+36789 | |                     else { 2 + tree_group_start_work() };
+      | |________________________________________________________- `execution_work` is overwritten here before the previous value is read
+      |
+      = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `already_consumed` is never read
+     --> src/brotli_input.rs:37194:32
+      |
+37194 |     let mut already_consumed = 0usize;
+      |                                ^^^^^^ this value is reassigned later and never used
+...
+37644 |             Ok(used) => already_consumed = used,
+      |                         ----------------------- `already_consumed` is overwritten here before the previous value is read
+
+warning: unused variable: `bits_base`
+     --> src/brotli_input.rs:37806:9
+      |
+37806 |     let bits_base = window_bytes as usize + B3C_DISTANCE_BITS_OFFSET as usize;
+      |         ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bits_base`
+
+warning: unused variable: `offsets_base`
+     --> src/brotli_input.rs:37807:9
+      |
+37807 |     let offsets_base = window_bytes as usize + B3C_DISTANCE_OFFSETS_OFFSET as usize;
+      |         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_offsets_base`
+
+warning: unused variable: `phase_at`
+     --> src/brotli_input.rs:37808:9
+      |
+37808 |     let phase_at = window_bytes as usize + B3C_STATE_OFFSET as usize
+      |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_phase_at`
+
+warning: unused variable: `phase_at`
+     --> src/brotli_input.rs:38068:9
+      |
+38068 |     let phase_at = window_bytes as usize + B3C_STATE_OFFSET as usize
+      |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_phase_at`
+
+warning: value assigned to `exact_work` is never read
+     --> src/brotli_input.rs:38457:5
+      |
+38457 |     exact_work = exact_work + TREE_METADATA_WORK;
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+38509 |     exact_work = work_before - budget.work_remaining;
+      |     ------------------------------------------------ `exact_work` is overwritten here before the previous value is read
+
+warning: value assigned to `exact_work` is never read
+     --> src/brotli_input.rs:38509:5
+      |
+38509 |     exact_work = work_before - budget.work_remaining;
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+38520 |     exact_work = work_before - budget.work_remaining;
+      |     ------------------------------------------------ `exact_work` is overwritten here before the previous value is read
+
+warning: value assigned to `exact_work` is never read
+     --> src/brotli_input.rs:38520:5
+      |
+38520 |     exact_work = work_before - budget.work_remaining;
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |
+      = help: maybe it is overwritten before being read?
+
+warning: unused variable: `num_htrees`
+    --> src/brotli_prefix.rs:4389:5
+     |
+4389 |     num_htrees: u16,
+     |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_num_htrees`
+
+warning: `proven-primitives` (lib) generated 63 warnings (run `cargo fix --lib -p proven-primitives` to apply 58 suggestions)
+    Finished `release` profile [optimized] target(s) in 0.08s
+     Running tests/proof_rejection.rs (target/release/deps/proof_rejection-3aa537053cca6f16)
+
+running 1 test
+test the_prover_rejects_five_b3c_block_count_metering_undercharges has been running for over 60 seconds
+test the_prover_rejects_five_b3c_block_count_metering_undercharges ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 58 filtered out; finished in 87.97s
+

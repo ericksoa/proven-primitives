@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_b3b_metadata_map_and_coverage_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T01:45:14.055447+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 161.84888774999126,
+  "finished_utc": "2026-11-17T01:47:55.906789+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_six_b3b_metadata_map_and_coverage_defects.log",
+  "log_sha256": "daab395216e44c9813a3759e19f08ee85387f04c44ae2805b889f0c647017991",
+  "suite": "the_prover_rejects_six_b3b_metadata_map_and_coverage_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-metadata-single-uses-wrong-tag-bit",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-metadata-single-uses-wrong-tag-bit.log",
+      "sha256": "f226d635a148de4986910d1aff7c210ad53a49e506c6ea5624e5a1ec88a4b720",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-metadata-block-length-overlaps-block-type",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-metadata-block-length-overlaps-block-type.log",
+      "sha256": "46c898fd3c9c0b67ad1c8ced087d3ed5b6d81c40ea56d0bd19f1bfffbfebfd7a",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-metadata-reads-first-inactive-record",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-metadata-reads-first-inactive-record.log",
+      "sha256": "090939a863576e7825a40e5f01fcd73f9fcd51370bc958faa21208f8493cd62f",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-distance-context-map-uses-literal-region",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-distance-context-map-uses-literal-region.log",
+      "sha256": "c7971906705e5a14696d5cb32fb332428f4a162a99f9c291ed84bb084b1d4b85",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-context-map-reads-first-uninitialized-entry",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-context-map-reads-first-uninitialized-entry.log",
+      "sha256": "f338d9fe4090cdfe664befe294d8924f46b2b37d0849cf43ab689d61cbac9cec",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-context-coverage-accepts-any-present-tree",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-context-coverage-accepts-any-present-tree.log",
+      "sha256": "ba41b9486aa83d762395ea32f0bdbd6bdd1e2c17cc865567f81e873c0f112d93",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

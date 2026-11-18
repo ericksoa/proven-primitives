@@ -1,0 +1,45 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-72630/src/brotli_input.rs:21283:29
+      |
+21283 | ...                   while initialized < active_len
+      |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-72630/src/brotli_input.rs:21053:1
+      |
+21053 | / fn advance_context_tree_count_phase(
+21054 | |     workspace: &mut [u8],
+21055 | |     window_bytes: u32,
+21056 | |     kind_tag: u8,
+...     |
+21060 | |     end_of_input: bool,
+21061 | | ) -> (r: (usize, Option<ContextAdvanceStatus>))
+      | |______________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-72630/src/brotli_input.rs:21245:36
+      |
+21245 | ...                   assert(num_trees == 1 <==> raw == 0);
+      |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-72630/src/brotli_input.rs:21330:48
+      |
+21330 |   ...                   == after_tree_count[
+      |  __________________________^
+21331 | | ...                       b3b_scalar_base(window_bytes) + i
+21332 | | ...                   ],
+      | |_______________________^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+error: aborting due to 1 previous error
+

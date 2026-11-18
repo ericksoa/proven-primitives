@@ -1,0 +1,30 @@
+verification results:: 2 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-40498/src/brotli_prefix.rs:4536:1
+     |
+4536 | / pub(crate) fn inverse_mtf_context_map(
+4537 | |     workspace: &mut [u8],
+4538 | |     window_bytes: u32,
+4539 | |     kind: ContextMapKind,
+...    |
+4542 | |     mtf_upper_bound: u8,
+4543 | | ) -> (r: (Result<(u8, u64), WorkspaceError>, Ghost<nat>))
+     | |________________________________________________________^
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-40498/src/brotli_prefix.rs:4853:16
+     |
+4853 |         assert(next_bound <= 63);
+     |                ^^^^^^^^^^^^^^^^ assertion failed
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-mtf-canaries-40498/src/brotli_prefix.rs:4855:13
+     |
+4855 |             (ranks[j] as nat) < 4 * (next_bound as nat + 1) by {
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 2 previous errors
+

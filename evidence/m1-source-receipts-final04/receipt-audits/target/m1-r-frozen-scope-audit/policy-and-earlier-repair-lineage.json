@@ -1,0 +1,280 @@
+{
+  "status": "Read-only retained policy/source evidence; no assertion of fresh human approval.",
+  "policy_excerpts": [
+    {
+      "path": "BROTLI_B3B_PROPOSAL.md",
+      "source_sha256": "266e9edceff96e18bb97933d75c88bc3835baabb467546ee267e69807ded9cc5",
+      "lines": [
+        64,
+        80
+      ],
+      "purpose": "W1 ordinary interface and retained terminal states",
+      "source_kind": "proposal policy",
+      "exact_text": "    fn from_meta(\n        workspace: &'w mut [u8],\n        window_bytes: u32,\n        meta: MetaBlockDecoder,\n    ) -> Result<Self, CompressedHeaderError>;\n\n    fn step(&mut self, input: &[u8], end_of_input: bool)\n        -> CompressedHeaderStep;\n}\n```\n\n`CompressedHeader` contains the three block counts, initial block lengths,\ndistance postfix/direct counts, distance alphabet size, literal/distance map\ntree counts and active initialized lengths. It contains no pointer or view into\nuninitialized workspace. `NeedInput`, `Complete` and `Failed` are sticky under\nthe same retained-bit rules already checked in B1/B3a. The final public B3 core\nwill own this private component; no public API changes."
+    },
+    {
+      "path": "BROTLI_B3B_PROPOSAL.md",
+      "source_sha256": "266e9edceff96e18bb97933d75c88bc3835baabb467546ee267e69807ded9cc5",
+      "lines": [
+        231,
+        235
+      ],
+      "purpose": "Permanent invalid values and terminal no-further-effects rule",
+      "source_kind": "proposal policy",
+      "exact_text": "Final exhaustion at any required field is `Truncated`; nonfinal exhaustion\npreserves the exact partial phase and is `NeedInput`; malformed trees, repeat\noverflow and invalid values are permanent. Terminal states read and write\nnothing further.\n"
+    },
+    {
+      "path": "BROTLI_B3B_W1_ADDENDUM.md",
+      "source_sha256": "6141a0d7d8999e97df3f7d1136a7e613cd916d418159ec423a37dcb9f1835810",
+      "lines": [
+        1,
+        19
+      ],
+      "purpose": "E1 status record and invalid serialized tags cause terminal InternalState",
+      "source_kind": "approval record and proposal policy text; no approval inferred by this audit",
+      "exact_text": "# B3b W1 serialized-state and error-tag addendum\n\nStatus: the human approved Candidate E1 exactly as written on 2026-10-26.\nCandidate W1 was approved on the same date, but its proposal fixed byte\npositions without enumerating every serialized tag, error mapping, reset value,\nresult field, work formula or cross-module helper. This addendum supplies those\nexact decisions. Alternatives remain unapproved.\n\nImplementation then reached the existing B2 module boundary: E1 authorized\nmodule-private B2 adapters but did not freeze their callable shape. Candidate\nE2 below supplies that one remaining cross-module API and a bounded rule for\ninput-local implementation helpers. The human approved Candidate E2 exactly as\nwritten on 2026-10-26.\n\n## E1 serialized tag tables\n\nAll tags are `u8`. Values not listed for a field are invalid serialized state,\ncause terminal `InternalState`, and are proved unreachable from a valid\nconstructor and valid transitions."
+    },
+    {
+      "path": "BROTLI_B3B_W1_ADDENDUM.md",
+      "source_sha256": "6141a0d7d8999e97df3f7d1136a7e613cd916d418159ec423a37dcb9f1835810",
+      "lines": [
+        91,
+        106
+      ],
+      "purpose": "Existing terminal tag and detail encoding",
+      "source_kind": "proposal policy",
+      "exact_text": "State byte 11 is the terminal tag:\n\n| Tag | Meaning |\n|---:|---|\n| 0 | no terminal error |\n| 1 | `InvalidFormat(detail)` |\n| 2 | `Truncated` |\n| 3 | `UnsupportedMode` |\n| 4 | `Workspace(detail)` |\n| 5 | `InternalState` |\n\nThe detailed `u16` at bytes 172..174 is zero when the terminal tag is 0, 2, 3\nor 5. For `InvalidFormat`, detail values 1 through 12 follow the\n`CompressedFormatError` declaration order above. For `Workspace`, detail values\n1 through 6 are `InvalidWindowBits`, `WorkspaceTooSmall`, `InvalidTree`,\n`InvalidSymbol`, `InvalidCodeLength`, `UninitializedRecord` in existing"
+    },
+    {
+      "path": "BROTLI_B3B_W1_ADDENDUM.md",
+      "source_sha256": "6141a0d7d8999e97df3f7d1136a7e613cd916d418159ec423a37dcb9f1835810",
+      "lines": [
+        121,
+        127
+      ],
+      "purpose": "Existing InternalState/public invalid-format mapping",
+      "source_kind": "proposal policy",
+      "exact_text": "\n`from_meta` wrong-phase or impossible valid-state failures are `InternalState`.\nWorkspace errors remain private construction/component errors. The later public\ncore maps every format detail and defensively maps `InternalState` to\n`StreamError::InvalidFormat`, maps `Truncated` and `UnsupportedMode` directly,\nand maps construction `WorkspaceTooSmall` to `InitError::WorkspaceTooSmall`.\nThe invariant proves `InternalState` unreachable from valid initialized state."
+    },
+    {
+      "path": "BROTLI_B3B_W1_ADDENDUM.md",
+      "source_sha256": "6141a0d7d8999e97df3f7d1136a7e613cd916d418159ec423a37dcb9f1835810",
+      "lines": [
+        160,
+        175
+      ],
+      "purpose": "Existing W1 permanent-error stopping condition",
+      "source_kind": "proposal policy",
+      "exact_text": "## E1 step granularity\n\n`step` performs bounded zero-input/internal transitions until one of these is\ntrue:\n\n- a required input field cannot complete from the retained queue and supplied\n  bytes;\n- the compressed header completes; or\n- a permanent error occurs.\n\nIt therefore has no public `Progress` result. `NeedInput` implies nonfinal input\nand `consumed == input.len()`. Final exhaustion at any required field is\n`Truncated`. Span draining, trivial-map fill, atomic MTF, coverage, installation\nand tree handoff continue in the same call without manufacturing `NeedInput`.\nEvery loop has a decreasing bound from the fixed state and capacities.\n"
+    },
+    {
+      "path": "BROTLI_B3B_W1_ADDENDUM.md",
+      "source_sha256": "6141a0d7d8999e97df3f7d1136a7e613cd916d418159ec423a37dcb9f1835810",
+      "lines": [
+        374,
+        388
+      ],
+      "purpose": "Existing module ownership and no-new-public-interface boundary",
+      "source_kind": "proposal boundary",
+      "exact_text": "\n`brotli_input.rs` owns the scalar-state offsets, typed tag serializers,\nconstructor/reset image, all parser phases and the outer private API. Scalar\nhelpers remain module-private and are not callable across the prefix/input\nboundary. `brotli_block.rs` retains B2 logic; B3b serializes/reconstructs its\nexact logical state through module-private adapters and propagates its results.\nNo new Rust module or public API is introduced.\n\n## E1 approval requested\n\nApproval of **Candidate E1 as written** authorizes only these exact tag/error\ntables, complete-result representation, step granularity, initialization image,\nB1/B3a serialization relation, simple-tree mapping, temporary-state lifecycle,\nMTF/coverage work formulas and helper ownership/signatures as an addendum to\napproved W1. It does not alter W1's public API, workspace size, dependencies,"
+    },
+    {
+      "path": "BROTLI_B3B_W1_ADDENDUM.md",
+      "source_sha256": "6141a0d7d8999e97df3f7d1136a7e613cd916d418159ec423a37dcb9f1835810",
+      "lines": [
+        513,
+        527
+      ],
+      "purpose": "E2 private-helper limits, including unchanged status/effects/work and human boundary",
+      "source_kind": "proposal boundary; not authority for an unverified architectural decision",
+      "exact_text": "E2 also authorizes refactoring names and signatures of other\n`brotli_input.rs`-private executable helpers without repeated architectural\napproval only when all of these remain true:\n\n- the helper is not callable from another module or public API;\n- it introduces no persistent Rust field or shadow state;\n- it reads/writes only the exact W1/E1 scalar bytes assigned to its logical\n  state, through exact framed accessors;\n- it refines the already-approved B1/B2/B3a or W1/E1 transition contract; and\n- it does not change statuses, effects, work accounting, dependencies, tools,\n  component ownership or trust boundaries.\n\nAny cross-module helper, persistent field, changed byte ownership or changed\ncontract remains a new architectural decision.\n"
+    },
+    {
+      "path": "BROTLI_B3C_PROPOSAL.md",
+      "source_sha256": "2ee3344863a50465bcd1d820468537f1dce391c2bf26af67ee29e9566537974a",
+      "lines": [
+        1,
+        20
+      ],
+      "purpose": "C1 status record and fixed architecture/dependency/trust boundary",
+      "source_kind": "approval record and proposal policy text; no approval inferred by this audit",
+      "exact_text": "# Brotli B3c body, resource, and public-core proposal\n\nStatus: **Candidate C1 approved exactly as written by the human on 2026-10-26**.\nThe approved B3 architecture fixes\nthe supported format, public API shape, dictionary identity, workspace ceiling,\nsafe bytewise algorithms and resource categories. B3b intentionally leaves\n13,028 workspace bytes unassigned until a concrete B3c layout is approved.\nThis document fixes that exact assignment and the remaining body-level choices.\nAlternatives C2 through C5 remain unapproved.\n\nB3c is not B3d or B4. It does not claim arbitrary call-sequence induction,\ncomplete supported-format refinement, source-observation equality, an adopted\nsecurity profile, independent review, or supported Brotli.\n\n## Candidate C1: serialized body state with fixed data modules\n\nCandidate C1 keeps all persistent decoder state in caller-owned storage and\nuses the already approved API without adding a dependency, runtime, build tool,\nunsafe code, heap allocation, I/O, executable recursion, proof assumption or\ntrusted component."
+    },
+    {
+      "path": "BROTLI_B3C_PROPOSAL.md",
+      "source_sha256": "2ee3344863a50465bcd1d820468537f1dce391c2bf26af67ee29e9566537974a",
+      "lines": [
+        191,
+        194
+      ],
+      "purpose": "Exact reservation before mutation and existing component refinement",
+      "source_kind": "proposal policy",
+      "exact_text": "Each metered adapter either reserves its exact next-action work before mutation\nor executes one fixed-cost source action. The existing unmetered component roots\nremain checked and unchanged; new refinement roots connect each metered adapter\nto them."
+    },
+    {
+      "path": "BROTLI_B3C_PROPOSAL.md",
+      "source_sha256": "2ee3344863a50465bcd1d820468537f1dce391c2bf26af67ee29e9566537974a",
+      "lines": [
+        443,
+        449
+      ],
+      "purpose": "Malformed input is not NeedInput; sticky failure/reset-only recovery",
+      "source_kind": "proposal policy",
+      "exact_text": "`NeedInput` means the supplied input was fully consumed, EOF is not committed,\nand the serialized state remains a viable prefix. `NeedOutput` means the next\njustified action is an emission and the supplied output has no remaining slot.\nIt never stands for malformed input or exhausted request credit.\n\nEvery public failure and `Finished` state is sticky and consumes/produces zero\non later `step` calls. `reset` is the only recovery operation."
+    },
+    {
+      "path": "BROTLI_B3C_PROPOSAL.md",
+      "source_sha256": "2ee3344863a50465bcd1d820468537f1dce391c2bf26af67ee29e9566537974a",
+      "lines": [
+        458,
+        467
+      ],
+      "purpose": "Existing terminal-call and call-credit priority",
+      "source_kind": "proposal policy",
+      "exact_text": "The general B3 text both charges every `step` entry and requires terminal states\nto return the same result forever. Candidate C1 resolves that conflict as\nfollows:\n\n1. A nonterminal `step` must debit one call credit before any parser action.\n2. If no call credit remains, it uses the reserved terminal-work escrow to\n   enter sticky `ResourceLimit` without consuming input or producing output.\n3. A decoder already in `Finished` or `Failed` returns that exact stored status\n   before consulting the call counter. This preserves terminal identity.\n4. The raw-core cumulative theorem ends at its first terminal result. B4 proves"
+    },
+    {
+      "path": "BROTLI_B3C_PROPOSAL.md",
+      "source_sha256": "2ee3344863a50465bcd1d820468537f1dce391c2bf26af67ee29e9566537974a",
+      "lines": [
+        474,
+        505
+      ],
+      "purpose": "Existing425 initialization and source-unit/prepayment rules",
+      "source_kind": "proposal policy",
+      "exact_text": "## Exact resource policy\n\nSuccessful construction or reset precharges **425 work units**: 292 existing\nB3b initialization byte writes, 128 B3c scalar writes, one logical reset\ntransition, and four escrowed units for a future `ResourceLimit` transition\n(phase byte, error family, error detail, and logical transition). If the\ninitialization or work credit is unavailable, the operation returns\n`InitError::ResourceLimit`, consumes the attempted initialization credit when\none existed, and leaves workspace unchanged. Unused escrow is never refunded,\nincluding on reset or drop.\n\nFor parsing, the ledger charges the already approved units:\n\n- accepted input bytes;\n- provisional output bytes;\n- each bit inspected and prefix/tree/table/context/dictionary/window cell read;\n- each workspace, window and caller-output byte write;\n- each logical state transition; and\n- calls and initialization/reset attempts in their separate counters.\n\nMulti-cell B3a/B3b operations expose a proved exact next-work formula. B3c\nreserves that complete amount before the first write. The existing MTF and\ncoverage formulas remain unchanged. Single-byte emissions reserve their full\nread/write/update amount before reading the source byte. Failure to reserve\nenters `ResourceLimit` through escrow before the unpaid action.\n\nInput is offered to parser helpers only up to `input_remaining`; actual consumed\nbytes are then debited. If a helper needs another byte while the caller supplied\none beyond the budget-limited prefix, the result is terminal `ResourceLimit`,\nnot `NeedInput`. Output credit exhaustion is likewise `ResourceLimit`; an empty\ncaller output with remaining output credit is `NeedOutput`.\n"
+    },
+    {
+      "path": "BROTLI_B3C_METERING_ADDENDUM.md",
+      "source_sha256": "3d21b6df369247e0393e06d25478cd33a2370f924438ddd50f20711b48481e2c",
+      "lines": [
+        1,
+        40
+      ],
+      "purpose": "M1 status record, unchanged W1 interface, B3c ownership and exact read-only planning/reservation",
+      "source_kind": "approval record and proposal policy text; no approval inferred by this audit",
+      "exact_text": "# Brotli B3c compressed-header metering addendum\n\nStatus: **Candidate M1 approved exactly as written by the human on\n2026-10-29.** Candidate M2 remains unapproved.\n\nCandidate C1 requires every B3c adapter to reserve exact B3a/B3b action work\nbefore the first mutation. Candidate W1 separately fixes the private\n`CompressedMetaBlockDecoder::step(input, end_of_input) -> CompressedHeaderStep`\ninterface, and `CompressedHeaderStep` contains only `consumed` and `status`.\nThe current unpublished C1 adapter bridges that mismatch with the deliberately\nconservative reservation\n`17_728_416 + 5_640 * budget-limited-input-bytes`. That bound is not an exact\nledger and cannot be used as completion evidence.\n\nBoth candidates below preserve the public Brotli API, caller-owned workspace,\nW1/E1 serialized bytes and tags, C1 workspace assignment, status/error mapping,\ndependencies, safe-Rust boundary, bounded loops and proof trust boundary. Both\nremove the conservative constants and add unchanged-specification undercharge\ncontrols for every newly exposed formula. Neither candidate changes supported\nformat claims or completes B3d/B4.\n\n## Candidate M1: B3c-owned read-only planning and reservation\n\nKeep the exact W1 `CompressedMetaBlockDecoder` and `CompressedHeaderStep`\ninterfaces unchanged. `advance_serialized_compressed_header` remains the sole\nowner of `RequestBudget` and drives one existing B3b phase action at a time.\n\nBefore a mutating phase action, the adapter performs a read-only plan over the\ncurrent serialized state and the budget-limited input prefix. It charges each\nplanning input-byte, bit, prefix-record, table or context-cell read as it is\nperformed, computes the exact remaining writes/cell visits/state transitions\nfor that one action, reserves that amount, and only then invokes the existing\nphase helper. MTF and coverage retain their approved pre-scan/formula/atomic\nexecution order. The adapter repeats until the existing W1 stopping condition:\n`NeedInput`, `Complete` or permanent failure.\n\nThe consequence is that B3c continues to own resource policy and B3b remains\nindependent of the public budget type. The cost is a larger proof surface:\nread-only plans must be proved to select exactly the same next phase action as\nthe existing mutating helpers, and every plan/execution pair needs an exact"
+    },
+    {
+      "path": "BROTLI_B3C_METERING_ADDENDUM.md",
+      "source_sha256": "3d21b6df369247e0393e06d25478cd33a2370f924438ddd50f20711b48481e2c",
+      "lines": [
+        588,
+        603
+      ],
+      "purpose": "Earlier analogous saved-cursor terminal5 repair",
+      "source_kind": "later implementation checkpoint prose; not a new human approval record",
+      "exact_text": "A runtime comparison found another admitted-state discrepancy: malformed\nsaved queues in block-count, distance and pending context-mode actions, and\nmalformed VAR_UINT8 encoding in block-count, bypassed W1's terminal image and\nspent no work. All 66 exact/short-credit, EOF and error-image comparisons\nfailed before the correction. The actual output, source snapshot and hashes\nare retained in `evidence/m1-finish-bad-cursor-before-fix*`.\n\nThe existing read-only pre-scan now exposes its precise rejection domain. On\nthose rejections the owner forecasts W1's existing four terminal writes and\none transition, reserves five units and executes the original W1 action.\nChecked helper, dispatcher and execution contracts bind the error, zero\nconsumption, terminal image, input preservation and exact work debit. With\nfewer than five units both workspace and budget stay unchanged and the result\nis ResourceLimit. The regression passes after this correction. These are\ninternal admitted-state refinement defects, not demonstrated malformed-wire\nacceptance defects."
+    },
+    {
+      "path": "BROTLI_M1_TRANSITION_RULE_DECISION.md",
+      "source_sha256": "c433e5907befb389a4067d65adda362ef023c63058112e8a0ec180319a8a3844",
+      "lines": [
+        28,
+        37
+      ],
+      "purpose": "Existing separate nested-reset transition unit; scratch bookkeeping zero",
+      "source_kind": "proposal policy",
+      "exact_text": "## Option A: charge nested resets/starts separately\n\nEach explicit nested decoder reset/start adds one transition unit in addition\nto the enclosing transition. Ordinary bookkeeping assignments and scratch\ninitialization do not independently create parser transitions.\n\nFor the two examples, the context-bit formula remains `read_work + 91`, and\nthe block-tree formula becomes `tree_execution_work + 79`. Apply the same rule\nconsistently to the remaining nested parser initializers and bind their exact\nsource events in the checked ledger."
+    }
+  ],
+  "retained_prior_evidence": [
+    {
+      "path": "evidence/m1-source-ledgers-review01/source-start.json",
+      "sha256": "570751776623128fcf04f6911c73aa449e3d4a77797a42699be597ed6e14f1f7",
+      "fs_mtime_utc": "2026-11-17T01:34:01.837933+00:00"
+    },
+    {
+      "path": "evidence/m1-source-ledgers-review02/source-start.json",
+      "sha256": "67c91b513046210bea8f92d01804b61b99cb1dd0afd6d5e2e7eb195d60eb63cd",
+      "fs_mtime_utc": "2026-11-17T01:40:00.226310+00:00"
+    },
+    {
+      "path": "evidence/m1-source-ledgers-review05/source-start.json",
+      "sha256": "b1fbdc4da33043110b491be370c504fe5498cc854ab2acb2c4cb0ebd5222a5e6",
+      "fs_mtime_utc": "2026-11-17T04:45:05.025450+00:00"
+    },
+    {
+      "path": "target/m1-context-cursor-owner-fix/evidence/context-cursor-owner-fix-result.json",
+      "sha256": "7d392539ba4a06f70a42bd41730b3e20a4f79625cc890916d82e88b46bf3fd9f",
+      "fs_mtime_utc": "2026-11-17T03:38:19.027703+00:00"
+    },
+    {
+      "path": "target/m1-context-cursor-owner-fix/evidence/before-fix-runtime-attempt02.log",
+      "sha256": "68b05628c54412ba4ab6cd7ff55f84a5e94ae779fa49e28bc924bfad92e4dd34",
+      "fs_mtime_utc": "2026-11-17T03:10:20.514864+00:00"
+    },
+    {
+      "path": "target/m1-context-cursor-owner-fix/evidence/after-fix-runtime.log",
+      "sha256": "42fb72bb57bf015fe786fc888dc01a97e4d17bf51495c9b820bd1fb53b7ff9f8",
+      "fs_mtime_utc": "2026-11-17T03:12:14.131899+00:00"
+    },
+    {
+      "path": "target/m1-context-cursor-owner-fix/context-cursor-owner-fix.patch",
+      "sha256": "0153b6be1859528a8423b77ccb44aa7031feb0acfd64adcff16025da59ad9074",
+      "fs_mtime_utc": "2026-11-17T03:32:42.245613+00:00"
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/evidence-manifest.json",
+      "sha256": "6ea27542d2b2dddba4414853cd5aa60da8633b2ba2437444932942b16cc35d08",
+      "fs_mtime_utc": "2026-11-17T03:26:32.874209+00:00"
+    },
+    {
+      "path": "target/m1-suffix-closure-agent/malformed-suffix-closure.patch",
+      "sha256": "c20159fbcd106c22ba902a9b307a4e27a38d550596ad6d133198cc2ad5fb6421",
+      "fs_mtime_utc": "2026-11-17T03:26:32.856990+00:00"
+    }
+  ],
+  "prior_context_repair": {
+    "source_sha256": "14bb55b2ca1baa065ed8bc98396d17f27738e7ef0378258a30553ac2e8b4f2d8",
+    "finished_utc": "2026-11-17T03:38:19.026999+00:00",
+    "regression": {
+      "cases": 400,
+      "mismatches_before": 400,
+      "mismatches_after": 0,
+      "before": "target/m1-context-cursor-owner-fix/evidence/before-fix-runtime-attempt02.log",
+      "before_sha256": "68b05628c54412ba4ab6cd7ff55f84a5e94ae779fa49e28bc924bfad92e4dd34",
+      "after": "target/m1-context-cursor-owner-fix/evidence/after-fix-runtime.log",
+      "after_sha256": "42fb72bb57bf015fe786fc888dc01a97e4d17bf51495c9b820bd1fb53b7ff9f8"
+    },
+    "retained_hash_checks": {
+      "before_hash_matches_record": true,
+      "after_hash_matches_record": true,
+      "source_patch_hash_matches_record": true,
+      "test_patch_hash_matches_record": true,
+      "retained_context_clone_source_hash_matches_record": true
+    },
+    "historical_result_only": true,
+    "fresh_test_or_proof_run": false
+  },
+  "timing": [
+    {
+      "label": "f1a source tar-member modification",
+      "utc": "2026-11-17T01:31:49.309370+00:00"
+    },
+    {
+      "label": "review02 manifest started on exact frozen f1a/prefix112 pair",
+      "utc": "2026-11-17T01:40:00.189929+00:00"
+    },
+    {
+      "label": "isolated context cursor repair finished, per retained manifest",
+      "utc": "2026-11-17T03:38:19.026999+00:00"
+    },
+    {
+      "label": "e10c source tar-member modification",
+      "utc": "2026-11-17T04:43:41.122485+00:00"
+    },
+    {
+      "label": "review05 manifest started on actual pre-R e10c baseline",
+      "utc": "2026-11-17T04:45:04.979304+00:00"
+    }
+  ],
+  "distinction": [
+    "The400-mismatch cursor repair is already present in the archived e10c pre-R source. It is an earlier M1 admitted-state refinement repair, not a runtime effect introduced by R receipt transport.",
+    "The exact f1a and e10c snapshots each have322 ordinary executable helpers and zero explicit Approach R paired returns. Their prefix bytes match the proposal's112d frozen hash.",
+    "The two changed owners now use the previously existing W1 terminal action and existing B3c-owned terminal5 reservation. Existing policy text requires permanent internal-state failure and exact prepayment. No new terminal tag/status, storage layout, public/private helper interface, module ownership, dependency/tool or unit classification is introduced by this delta.",
+    "This observation does not substitute for the required human verification of architectural decisions or approve a mismatch with a frozen-source decision. The proposal f1a and actual e10c baselines remain distinct evidence identities.",
+    "C1's four-unit public terminal escrow and M1's four-byte-plus-one-transition private terminal5 are separately recorded policies; the audit does not conflate or change either."
+  ],
+  "timing_limit": "Tar member mtimes and retained manifest timestamps are historical recorded metadata; they are not human approval times."
+}

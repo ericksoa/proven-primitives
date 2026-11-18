@@ -1,0 +1,38 @@
+{
+  "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+  "exit_code": 101,
+  "fresh_case_logs": [
+    {
+      "name": "brotli-m1-cursor-tag-rejects-with-wrong-error",
+      "path": "evidence/m1-source-ledgers-review03/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-tag-rejects-with-wrong-error.log",
+      "sha256": "ebbfbcb9e84716c8eb49391ae0f249458cd79f314124376d20cfab2eced569ba"
+    },
+    {
+      "name": "brotli-m1-cursor-distance-prepass-forgets-rejection",
+      "path": "evidence/m1-source-ledgers-review03/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-distance-prepass-forgets-rejection.log",
+      "sha256": "b0f5d6d445ba9fb85ae8c271b1ffe84d04a3bdbafeb48e4d686008da2506cc11"
+    },
+    {
+      "name": "brotli-m1-cursor-block-prepass-forgets-var-rejection",
+      "path": "evidence/m1-source-ledgers-review03/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-block-prepass-forgets-var-rejection.log",
+      "sha256": "01705ec107f4e0a0dfaa4deee184b2479f4ff896f965b0d3071baddde0eb9622"
+    },
+    {
+      "name": "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "path": "evidence/m1-source-ledgers-review03/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-block-forecast-omits-terminal-work.log",
+      "sha256": "1b33867cd14edc7ac52e73ab33c968588bf7bc2e24c727ea8aacd7f8c9e109fd"
+    },
+    {
+      "name": "brotli-m1-cursor-context-owner-skips-terminal-action",
+      "path": "evidence/m1-source-ledgers-review03/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/canary-brotli-m1-cursor-context-owner-skips-terminal-action.log",
+      "sha256": "0c7df3445320eae994fced9fbdd5bbcae7b7ab5c03319a7895811ce07f56c13d"
+    }
+  ],
+  "source_at_failure_bundles": [
+    {
+      "path": "evidence/m1-source-ledgers-review03/failed-suites/the_prover_rejects_six_m1_bad_fixed_cursor_defects/source-at-failure-0.tar.gz",
+      "sha256": "163e66076d052ccfd512832fdc0742f2336d56175bcc0a5b160fed8c31917d6f"
+    }
+  ],
+  "not_semantic_closure": true
+}

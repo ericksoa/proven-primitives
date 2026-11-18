@@ -1,0 +1,63 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_three_k3_suffix_plan_relation_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 64.38151366700185,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 3,
+  "finished_utc": "2026-11-17T22:26:01.956728+00:00",
+  "log": "controls-the_prover_rejects_three_k3_suffix_plan_relation_defects.log",
+  "log_sha256": "3c05d0fc45ccf0358807da16f0d5d6e58250dc4bb301c1a075c4ab7feb80c874",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "b32c657a1fcab19d9dfd1e38e59ed55788e3430ef6142ce7fea2dde2ec012eda",
+      "log": "canary-brotli-k3-suffix-plan-loses-consumption.log",
+      "name": "brotli-k3-suffix-plan-loses-consumption",
+      "semantic_rejection": true,
+      "sha256": "b223ccc3f63931db205caddc29c87ef6ff53f7d6f84f547c7ad9660b52207f32",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "20a7aa09e97213834ef154c0c7847a6223129011645c2753606b574c6ade5fd0",
+      "log": "canary-brotli-k3-suffix-plan-loses-success.log",
+      "name": "brotli-k3-suffix-plan-loses-success",
+      "semantic_rejection": true,
+      "sha256": "c1f90cd1b82807cb41cda2da885b1bca6c68f602392a89bbafcc22b3d0e447a4",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "ec4e3e98a17e50ab2fc84c4e07e230b1acf6ba243e11082970aeeb4c55698ea7",
+      "log": "canary-brotli-k3-suffix-plan-undercharges-value-tables.log",
+      "name": "brotli-k3-suffix-plan-undercharges-value-tables",
+      "semantic_rejection": true,
+      "sha256": "795dded680e8401d54381145e12323a19d90676e1e69fb366bd556e7512d0afa",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794954297575542000,
+  "started_utc": "2026-11-17T22:24:57.575555+00:00",
+  "suite": "the_prover_rejects_three_k3_suffix_plan_relation_defects",
+  "suite_source_sha256": "76c6319a539e4b11c85ba7efd2109d91c346b52c1a490313cfd4748b7289124a",
+  "validation_errors": []
+}

@@ -1,0 +1,11 @@
+{
+  "all_member_content_hashes_verified": 910,
+  "all_review_copies_exact_plaintext": 25,
+  "archive": "m1-checked-witness-supplement.tar.gz",
+  "byte_identical": true,
+  "checker_runs": 0,
+  "first_archive_sha256": "8fa5afa5df21927c6bd0a1d736a49f03ad6ee5e84c55b1262fb2b75a9c6d1be0",
+  "first_bytes": 32425286,
+  "independent_streamed_rebuild_bytes": 32425286,
+  "independent_streamed_rebuild_sha256": "8fa5afa5df21927c6bd0a1d736a49f03ad6ee5e84c55b1262fb2b75a9c6d1be0"
+}

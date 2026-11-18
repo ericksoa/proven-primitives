@@ -1,0 +1,49 @@
+verification results:: 4 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32639:9
+      |
+32639 |         assert(range_total + distinct_total <= 16) by (nonlinear_arith)
+      |         ^^^^^^
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32644:5
+      |
+32644 |     while i < count
+      |     ^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32691:9
+      |
+32691 |         while j < count
+      |         ^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32670:5
+      |
+32670 |     while i < count
+      |     ^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32612:1
+      |
+32612 | / fn plan_saved_simple_validation_reads(workspace: &[u8], window_bytes: u32,
+32613 | |     budget: &mut crate::brotli::RequestBudget, count: u8, alphabet_limit: u16,
+32614 | | ) -> (r: Result<u64, CoreFailure>)
+      | |_________________________________^
+
+error: invariant not satisfied at end of loop body
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32701:17
+      |
+32701 | /                 inspected as nat + simple_distinct_scan_reads(values, count as nat, i as nat, j as nat)
+32702 | |                     == range_total + distinct_total,
+      | |___________________________________________________^
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,53 @@
+#[verifier::spinoff_prover]
+#[verifier::rlimit(1000)]
+proof fn r_triage_context_cursor_image() -> (w: Seq<u8>)
+    ensures
+        w.len() == 1_177_584,
+        forall|i: int| 0 <= i < w.len() ==> #[trigger] w[i] ==
+            if i == 1_164_308 { 9u8 }
+            else if i == 1_164_310 { 5u8 }
+            else if i == 1_164_316 { 1u8 }
+            else if i == 1_164_459 { 63u8 } else { 0u8 },
+        b3c_workspace_shape(w.len(), 1_024),
+        b3b_workspace_shape(w.len(), 1_024),
+        compressed_decoder_state_ok(w, 1_024),
+        b3b_scalar_byte_at(w, 1_024, B3B_OUTER_PHASE) == 5,
+        b3b_scalar_u16_at(w, 1_024, B3B_BLOCK_COUNTS) == 1,
+        b3b_scalar_u16_at(w, 1_024, B3B_MODES_INITIALIZED) == 0,
+        b3b_scalar_byte_at(w, 1_024, B3B_QUEUE_LEN) == 9,
+        b3b_scalar_byte_at(w, 1_024, B3B_MTF_UPPER_BOUND) == 63,
+        context_mode_pending(w, 1_024),
+        !b3b_queue_encoding_valid(w, 1_024),
+        fixed_phase_bad_cursor(w, 1_024, CompressedOuterPhase::ContextModes),
+        fixed_outer_bad_cursor(w, 1_024),
+{
+    let workspace = Seq::new(1_177_584, |i: int|
+        if i == 1_164_308 { 9u8 }
+        else if i == 1_164_310 { 5u8 }
+        else if i == 1_164_316 { 1u8 }
+        else if i == 1_164_459 { 63u8 } else { 0u8 });
+    assert((1_024u32 & 1_023u32) == 0) by (bit_vector);
+    reveal(b3b_workspace_shape);
+    assert(crate::brotli_prefix::FIXED_SCRATCH_BYTES == 1_176_560);
+    assert(b3b_workspace_shape(workspace.len(), 1_024));
+    assert(b3c_workspace_shape(workspace.len(), 1_024));
+    assert(b3b_scalar_base(1_024) == 1_164_300);
+    assert(b3b_scalar_byte_at(workspace, 1_024, B3B_OUTER_PHASE) == 5);
+    assert(b3b_scalar_u16_at(workspace, 1_024, B3B_BLOCK_COUNTS) == 1);
+    assert(b3b_scalar_u16_at(workspace, 1_024, B3B_MODES_INITIALIZED) == 0);
+    assert(b3b_scalar_byte_at(workspace, 1_024, B3B_QUEUE_LEN) == 9);
+    assert(b3b_scalar_byte_at(workspace, 1_024, B3B_MTF_UPPER_BOUND) == 63);
+    reveal(serialized_mtf_state_ok);
+    assert(serialized_mtf_state_ok(workspace, 1_024));
+    reveal(compressed_decoder_state_ok);
+    assert(compressed_decoder_state_ok(workspace, 1_024));
+    reveal(context_mode_pending);
+    assert(context_mode_pending(workspace, 1_024));
+    reveal(b3b_queue_encoding_valid);
+    assert(!b3b_queue_encoding_valid(workspace, 1_024));
+    reveal(fixed_phase_bad_cursor);
+    reveal(fixed_outer_bad_cursor);
+    assert(fixed_phase_bad_cursor(workspace, 1_024, CompressedOuterPhase::ContextModes));
+    assert(fixed_outer_bad_cursor(workspace, 1_024));
+    workspace
+}

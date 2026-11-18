@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_five_m1_malformed_suffix_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 163.7037392499915,
+  "executed_once": false,
+  "exit_code": 101,
+  "expected_mutants": 5,
+  "finished_utc": "2026-11-17T21:34:49.977595+00:00",
+  "log": "controls-the_prover_rejects_five_m1_malformed_suffix_defects.log",
+  "log_sha256": "5faa35aa1a645904b86d8f0ea8fc17f54fa52d8b8440225b00aae178d59ce21a",
+  "mutants": [],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794951126271845000,
+  "started_utc": "2026-11-17T21:32:06.271853+00:00",
+  "suite": "the_prover_rejects_five_m1_malformed_suffix_defects",
+  "suite_source_sha256": "864f26867090e1eafa6567b7bbd1abc0bcbfba23486e260a80d9c1508359fea8",
+  "validation_errors": []
+}

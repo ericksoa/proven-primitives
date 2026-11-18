@@ -1,0 +1,56 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_five_b3c_block_count_metering_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T01:45:14.055507+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 89.80560958299611,
+  "finished_utc": "2026-11-17T01:46:43.862499+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_five_b3c_block_count_metering_undercharges.log",
+  "log_sha256": "4f4d32959ebb87b4832e8393bcdc611a171780d71d3ba51eccb3fb2bcd611362",
+  "suite": "the_prover_rejects_five_b3c_block_count_metering_undercharges",
+  "expected_mutants": 5,
+  "mutants": [
+    {
+      "name": "brotli-b3c-block-count-planning-bit-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-block-count-planning-bit-undercharge.log",
+      "sha256": "818216b9d59bc33e025b201a1c77f80a2eb91f712824d599155885f4726d0a79",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-block-count-base-write-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-block-count-base-write-undercharge.log",
+      "sha256": "c7a983edb8f7299637bd4dd261a148cbbc46076d7a9b153b8cefbf46e593cdd6",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-block-count-terminal-write-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-block-count-terminal-write-undercharge.log",
+      "sha256": "1b29a1a115ace87d3baebae19b8a45a25fb204d89546edb7c35c506cb2304d67",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-block-count-single-value-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-block-count-single-value-undercharge.log",
+      "sha256": "f7fc35ec7651355c43acf0efa35d9fadcbe1e2244f9796cc96946e08bf940106",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-block-count-tree-start-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-block-count-tree-start-undercharge.log",
+      "sha256": "7762c7bcc1ca087aa41c07d0a2364304ed8c429960ea1995adc10041fd704ab7",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

@@ -1,0 +1,30 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-79418/src/brotli_input.rs:29127:1
+      |
+29127 | / fn distance_planning_work(
+29128 | |     workspace: &[u8],
+29129 | |     window_bytes: u32,
+29130 | |     input_len: usize,
+29131 | | ) -> (r: Result<u64, CompressedHeaderError>)
+      | |___________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-bad-fixed-cursor-canary-79418/src/brotli_input.rs:29133:9
+      |
+29133 | /         b3b_workspace_shape(workspace@.len() as nat, window_bytes) ==> {
+29134 | |             &&& r.is_err() == fixed_phase_bad_cursor(workspace@, window_bytes, CompressedOuterPhase::DistanceParameters)
+29135 | |             &&& (r.is_err() ==> r == Err(CompressedHeaderError::InternalState))
+29136 | |         }, r.is_ok() ==> distance_planning_read_valid(workspace@, window_bytes, input_len as nat, r.unwrap()),
+      | |_________^ failed this postcondition
+...
+29140 |       let queue = match load_b3b_queue(workspace, window_bytes) { Ok(value) => value, Err(_) => return Ok(0) };
+      |                                                                                                 ------------ at this exit
+
+error: aborting due to 1 previous error
+

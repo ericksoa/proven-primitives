@@ -1,0 +1,25 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-77397/src/brotli_input.rs:29390:1
+      |
+29390 | / fn plan_context_mode_action(
+29391 | |     workspace: &[u8],
+29392 | |     window_bytes: u32,
+29393 | |     input: &[u8],
+29394 | |     end_of_input: bool,
+29395 | | ) -> (r: Result<CompressedActionPlan, CompressedHeaderError>)
+      | |____________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-context-mode-relation-canary-77397/src/brotli_input.rs:29464:16
+      |
+29464 |         assert(bit_read_exact_step(start, input@, end_of_input, 2, result.consumed, queue, read.status));
+      |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,34 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-33842/src/brotli_input.rs:25122:5
+      |
+25122 | /     fn advance_distance_parameters_phase(
+25123 | |         &mut self,
+25124 | |         phase: CompressedOuterPhase,
+25125 | |         input: &[u8],
+25126 | |         end_of_input: bool,
+25127 | |     ) -> (r: (usize, Option<CompressedHeaderStatus>))
+      | |____________________________________________________^
+
+error: precondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-distance-relation-canary-33842/src/brotli_input.rs:25250:33
+      |
+22975 | /         match read {
+22976 | |             BitReadStatus::NeedInput => status == Some(CompressedHeaderStatus::NeedInput),
+22977 | |             BitReadStatus::Truncated => status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)),
+22978 | |             BitReadStatus::Value(value) => status.is_none() && value < 64
+22979 | |                 && distance_value_applied(after, window_bytes, value as u8),
+22980 | |         },
+      | |_________- failed precondition
+...
+25250 | /                                 establish_distance_refinement(original, self.workspace@, self.window_bytes,
+25251 | |                                     input@, end_of_input, consumed, None, start_queue, queue, read.status);
+      | |__________________________________________________________________________________________________________^
+
+error: aborting due to 1 previous error
+

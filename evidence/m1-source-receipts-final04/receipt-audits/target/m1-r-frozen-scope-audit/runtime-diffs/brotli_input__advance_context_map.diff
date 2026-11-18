@@ -1,0 +1,20 @@
+--- f1a/brotli_input::advance_context_map
++++ e10/brotli_input::advance_context_map
+@@ -1,4 +1,5 @@
+ {
++    
+     
+     
+     
+@@ -63,6 +64,11 @@
+     let mut transitions: u32 = 0;
+     while transitions < 100_000
+         invariant consumed <= input.len(), transitions <= 100_000,
++            m1_context_bad_saved_cursor(original, window_bytes) ==> workspace@ == original && consumed == 0 && transitions == 0,
++            m1_context_bad_saved_cursor(original, window_bytes) ==> {
++                let p = b3b_scalar_byte_at(original, window_bytes, B3B_CONTEXT_PHASE);
++                p == 0 || p == 1 || p == 2 || p == 5 || p == 6
++            },
+             b3b_scalar_byte_at(original, window_bytes, B3B_CONTEXT_PHASE) == 9 ==>
+                 workspace@ == original && consumed == 0 && transitions == 0,
+             original == old(workspace)@,

@@ -1,0 +1,31 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32738:1
+      |
+32738 | / fn plan_saved_loader_read_units(workspace: &[u8], window_bytes: u32,
+32739 | |     budget: &mut crate::brotli::RequestBudget, aux_reads: u64, aux_valid: bool,
+32740 | | ) -> (r: Result<u64, CoreFailure>)
+      | |_________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32753:9
+      |
+32753 | /         r.is_ok() ==> {
+32754 | |             &&& r.unwrap() as nat == loader_table_read_units(workspace@, window_bytes)
+32755 | |             &&& r.unwrap() <= 58
+32756 | |             &&& old(budget).work_remaining as int - final(budget).work_remaining as int <= 18
+32757 | |             &&& final(budget).work_remaining as nat + loader_forecast_table_reads(workspace@, window_bytes)
+32758 | |                 == old(budget).work_remaining as nat
+32759 | |         },
+      | |_________^ failed this postcondition
+...
+32806 |           return Ok(base + if 1 <= auxiliary_phase && auxiliary_phase <= 3 { 17u64 } else { 0u64 });
+      |           ----------------------------------------------------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

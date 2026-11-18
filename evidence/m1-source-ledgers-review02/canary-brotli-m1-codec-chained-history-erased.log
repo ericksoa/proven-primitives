@@ -1,0 +1,33 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-80354/src/brotli_input.rs:13970:5
+      |
+13970 |     while i < 5
+      |     ^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-80354/src/brotli_input.rs:13925:1
+      |
+13925 | / fn store_complex_progress(
+13926 | |     workspace: &mut [u8],
+13927 | |     window_bytes: u32,
+13928 | |     progress: ComplexSymbolProgress,
+13929 | | ) -> (r: Result<(), CompressedHeaderError>)
+      | |__________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-80354/src/brotli_input.rs:13935:9
+      |
+13935 |         r.is_ok() ==> k4_complex_progress_values(final(workspace)@, window_bytes, progress),
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+14043 |     result
+      |     ------ at the end of the function body
+
+error: aborting due to 1 previous error
+

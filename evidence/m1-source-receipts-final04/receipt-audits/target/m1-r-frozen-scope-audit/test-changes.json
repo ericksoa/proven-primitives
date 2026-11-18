@@ -1,0 +1,279 @@
+{
+  "old_proof_test_function_count": 65,
+  "new_proof_test_function_count": 67,
+  "changed_existing_proof_test_functions": [
+    {
+      "name": "the_prover_rejects_six_m1_block_count_relation_and_debit_defects",
+      "old_line": 3863,
+      "new_line": 3863
+    },
+    {
+      "name": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+      "old_line": 4025,
+      "new_line": 4025
+    },
+    {
+      "name": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+      "old_line": 4508,
+      "new_line": 4508
+    },
+    {
+      "name": "the_prover_rejects_six_k7_k8_result_contract_defects",
+      "old_line": 5112,
+      "new_line": 5112
+    },
+    {
+      "name": "the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects",
+      "old_line": 5441,
+      "new_line": 5441
+    }
+  ],
+  "added_proof_test_functions": [
+    {
+      "name": "the_prover_rejects_four_m1_context_cursor_terminal_defects",
+      "line": 5510
+    },
+    {
+      "name": "the_prover_rejects_five_m1_malformed_suffix_defects",
+      "line": 5565
+    }
+  ],
+  "removed_proof_test_functions": [],
+  "matched_literal_control_counts": {
+    "old": 355,
+    "new": 364
+  },
+  "modified_literal_controls": [
+    {
+      "name": "brotli-m1-block-count-limited-input-is-retryable",
+      "old": [
+        "brotli-m1-block-count-limited-input-is-retryable",
+        "execute_fixed_compressed_plan",
+        "if input_was_limited { CompressedStatus::Failed(CoreFailure::ResourceLimit) }",
+        "if input_was_limited && phase != CompressedOuterPhase::BlockCount { CompressedStatus::Failed(CoreFailure::ResourceLimit) }"
+      ],
+      "new": [
+        "brotli-m1-block-count-limited-input-is-retryable",
+        "execute_fixed_compressed_plan",
+        "if input_was_limited { CompressedStatus::Failed(CoreFailure::ResourceLimit) }",
+        "if input_was_limited && !matches!(phase, CompressedOuterPhase::BlockCount) { CompressedStatus::Failed(CoreFailure::ResourceLimit) }"
+      ]
+    },
+    {
+      "name": "brotli-m1-context-bad-count-owner-skips-action",
+      "old": [
+        "brotli-m1-context-bad-count-owner-skips-action",
+        "advance_planned_compressed_action",
+        "        match execute_fixed_compressed_plan(\n            workspace,\n            window_bytes,\n            budget,\n            CompressedOuterPhase::ContextModes,",
+        "        return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) });\n        match execute_fixed_compressed_plan(\n            workspace,\n            window_bytes,\n            budget,\n            CompressedOuterPhase::ContextModes,"
+      ],
+      "new": [
+        "brotli-m1-context-bad-count-owner-skips-action",
+        "advance_planned_compressed_action",
+        "        match execute_fixed_compressed_plan(\n            workspace,\n            window_bytes,\n            budget,\n            CompressedOuterPhase::ContextModes,\n            &input[..initial_allowed],\n            end_of_input && initial_allowed == input.len(),\n            initial_allowed < input.len(),\n            plan,\n        ) {",
+        "        match Err::<usize, CompressedStep>(CompressedStep { consumed: 0,\n            status: CompressedStatus::Failed(core_state_failure()) }) {"
+      ]
+    },
+    {
+      "name": "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "old": [
+        "brotli-m1-cursor-block-forecast-omits-terminal-work",
+        "advance_planned_compressed_action",
+        "let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,\n                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };\n                return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::BlockCount,",
+        "let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 0,\n                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };\n                return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::BlockCount,"
+      ],
+      "new": [
+        "brotli-m1-cursor-block-forecast-omits-terminal-work",
+        "advance_planned_compressed_action",
+        "let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 4 + 1,\n                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };\n                proof {\n                    assert(failure_plan.execution_work == 5);\n                    assert(fixed_bad_cursor_plan_valid(workspace@, window_bytes,\n                        CompressedOuterPhase::BlockCount, failure_plan));\n                }\n                return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::BlockCount,",
+        "let failure_plan = CompressedActionPlan { planning_work: 0, execution_work: 0,\n                    consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };\n                proof {\n                    assert(failure_plan.execution_work == 5);\n                    assert(fixed_bad_cursor_plan_valid(workspace@, window_bytes,\n                        CompressedOuterPhase::BlockCount, failure_plan));\n                }\n                return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::BlockCount,"
+      ]
+    },
+    {
+      "name": "brotli-m1-cursor-context-owner-skips-terminal-action",
+      "old": [
+        "brotli-m1-cursor-context-owner-skips-terminal-action",
+        "advance_planned_compressed_action",
+        "return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::ContextModes,",
+        "return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) });\n                return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::ContextModes,"
+      ],
+      "new": [
+        "brotli-m1-cursor-context-owner-skips-terminal-action",
+        "advance_planned_compressed_action",
+        "return execute_fixed_compressed_plan(workspace, window_bytes, budget,\n                    CompressedOuterPhase::ContextModes, &input[..initial_allowed],\n                    end_of_input && initial_allowed == input.len(), initial_allowed < input.len(), failure_plan);",
+        "return Err::<usize, CompressedStep>(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) });"
+      ]
+    },
+    {
+      "name": "brotli-k8-invalid-tree-error-replaced",
+      "old": [
+        "brotli-k8-invalid-tree-error-replaced",
+        "prefix",
+        "install_builder_canonical_tree",
+        "if tree >= tree_region_count_exec(region) {\n        return Err(WorkspaceError::InvalidTree);\n    }",
+        "if tree >= tree_region_count_exec(region) {\n        return Err(WorkspaceError::InvalidSymbol);\n    }"
+      ],
+      "new": [
+        "brotli-k8-invalid-tree-error-replaced",
+        "prefix",
+        "install_builder_canonical_tree",
+        "if tree >= tree_region_count_exec(region) {\n        proof { assert(source_validation_reads == 0); }\n        return Err(WorkspaceError::InvalidTree);\n    }",
+        "if tree >= tree_region_count_exec(region) {\n        proof { assert(source_validation_reads == 0); }\n        return Err(WorkspaceError::InvalidSymbol);\n    }"
+      ]
+    },
+    {
+      "name": "brotli-k8-invalid-tree-mutates-metadata",
+      "old": [
+        "brotli-k8-invalid-tree-mutates-metadata",
+        "prefix",
+        "install_builder_canonical_tree",
+        "if tree >= tree_region_count_exec(region) {\n        return Err(WorkspaceError::InvalidTree);\n    }",
+        "if tree >= tree_region_count_exec(region) {\n        meta.storage = TreeStorageState::Unused;\n        return Err(WorkspaceError::InvalidTree);\n    }"
+      ],
+      "new": [
+        "brotli-k8-invalid-tree-mutates-metadata",
+        "prefix",
+        "install_builder_canonical_tree",
+        "if tree >= tree_region_count_exec(region) {\n        proof { assert(source_validation_reads == 0); }\n        return Err(WorkspaceError::InvalidTree);\n    }",
+        "if tree >= tree_region_count_exec(region) {\n        proof { assert(source_validation_reads == 0); }\n        meta.storage = TreeStorageState::Unused;\n        return Err(WorkspaceError::InvalidTree);\n    }"
+      ]
+    },
+    {
+      "name": "brotli-m1-block-tree-execution-reservation-undercharge",
+      "old": [
+        "brotli-m1-block-tree-execution-reservation-undercharge",
+        "advance_planned_block_tree",
+        "budget.charge_work(plan.execution_work)",
+        "budget.charge_work(plan.execution_work - 1)"
+      ],
+      "new": [
+        "brotli-m1-block-tree-execution-reservation-undercharge",
+        "advance_planned_block_tree",
+        "budget.charge_work(plan.execution_work)",
+        "budget.charge_work(plan.execution_work.saturating_sub(1))"
+      ]
+    },
+    {
+      "name": "brotli-m1-tree-group-execution-reservation-undercharge",
+      "old": [
+        "brotli-m1-tree-group-execution-reservation-undercharge",
+        "advance_planned_tree_group",
+        "budget.charge_work(plan.execution_work)",
+        "budget.charge_work(plan.execution_work - 1)"
+      ],
+      "new": [
+        "brotli-m1-tree-group-execution-reservation-undercharge",
+        "advance_planned_tree_group",
+        "budget.charge_work(plan.execution_work)",
+        "budget.charge_work(plan.execution_work.saturating_sub(1))"
+      ]
+    },
+    {
+      "name": "brotli-m1-map-tail-execution-reservation-undercharge",
+      "old": [
+        "brotli-m1-map-tail-execution-reservation-undercharge",
+        "advance_planned_context_map_tail",
+        "budget.charge_work(plan.execution_work)",
+        "budget.charge_work(plan.execution_work - 1)"
+      ],
+      "new": [
+        "brotli-m1-map-tail-execution-reservation-undercharge",
+        "advance_planned_context_map_tail",
+        "budget.charge_work(plan.execution_work)",
+        "budget.charge_work(plan.execution_work.saturating_sub(1))"
+      ]
+    }
+  ],
+  "new_literal_controls": [
+    {
+      "name": "brotli-m1-context-count-cursor-terminal-undercharged",
+      "tuple": [
+        "brotli-m1-context-count-cursor-terminal-undercharged",
+        "advance_planned_context_tree_count",
+        "planning_work: 0, execution_work: 5,",
+        "planning_work: 0, execution_work: 4,"
+      ]
+    },
+    {
+      "name": "brotli-m1-context-bits-cursor-terminal-undercharged",
+      "tuple": [
+        "brotli-m1-context-bits-cursor-terminal-undercharged",
+        "advance_planned_context_bits",
+        "planning_work: 0, execution_work: 5,",
+        "planning_work: 0, execution_work: 4,"
+      ]
+    },
+    {
+      "name": "brotli-m1-context-count-cursor-skips-terminal-action",
+      "tuple": [
+        "brotli-m1-context-count-cursor-skips-terminal-action",
+        "advance_planned_context_tree_count",
+        "return execute_fixed_compressed_plan(workspace, window_bytes, budget, phase,\n                &input[..allowed], end_of_input && allowed == input.len(), allowed < input.len(), failed_plan);",
+        "return Err::<usize, CompressedStep>(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) });"
+      ]
+    },
+    {
+      "name": "brotli-m1-context-bits-cursor-plan-wrong-error",
+      "tuple": [
+        "brotli-m1-context-bits-cursor-plan-wrong-error",
+        "advance_planned_context_bits",
+        "status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };",
+        "status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::Truncated)) };"
+      ]
+    },
+    {
+      "name": "brotli-m1-malformed-suffix-invalid-fields-undercharge",
+      "tuple": [
+        "brotli-m1-malformed-suffix-invalid-fields-undercharge",
+        "plan_initial_suffix_action",
+        "if kind >= 3 || subphase != 1 || symbol >= 26 {\n        return Ok(CompressedActionPlan { planning_work: 0, execution_work: 4 + 1, consumed: 0,\n            status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) });\n    }",
+        "if kind >= 3 || subphase != 1 || symbol >= 26 {\n        return Ok(CompressedActionPlan { planning_work: 0, execution_work: 4, consumed: 0,\n            status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) });\n    }"
+      ]
+    },
+    {
+      "name": "brotli-m1-malformed-suffix-wrong-width-undercharge",
+      "tuple": [
+        "brotli-m1-malformed-suffix-wrong-width-undercharge",
+        "plan_initial_suffix_action",
+        "if width != expected_width {\n        return Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 4 + 1, consumed: 0,\n            status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) });\n    }",
+        "if width != expected_width {\n        return Ok(CompressedActionPlan { planning_work: 1, execution_work: 1 + 4, consumed: 0,\n            status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) });\n    }"
+      ]
+    },
+    {
+      "name": "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+      "tuple": [
+        "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+        "advance_initial_block_length_phase",
+        "if kind >= 3 {\n                        proof { assert(source_units + 5 == m1_bad_initial_suffix_validation_reads(suffix_original, self.window_bytes) + 5); }\n                        return self.fail_phase(consumed, CompressedHeaderError::InternalState);\n                    }",
+        "if kind >= 3 {\n                        proof { assert(source_units + 5 == m1_bad_initial_suffix_validation_reads(suffix_original, self.window_bytes) + 5); }\n                        let malformed_error = match state_byte(self.workspace, self.window_bytes, B3B_BLOCK_LENGTH_PHASE) {\n                            Ok(1) => CompressedHeaderError::Truncated,\n                            _ => CompressedHeaderError::InternalState,\n                        };\n                        return self.fail_phase(consumed, malformed_error);\n                    }"
+      ]
+    },
+    {
+      "name": "brotli-m1-malformed-suffix-fallback-undercharge",
+      "tuple": [
+        "brotli-m1-malformed-suffix-fallback-undercharge",
+        "advance_planned_compressed_action",
+        "if !budget.charge_work(4 + 1) {\n            proof {\n                if initial_outer == 3 && m1_bad_initial_suffix(old(workspace)@, window_bytes) {\n                    reveal(m1_bad_initial_suffix_validation_reads); reveal(m1_bad_initial_suffix_owner_effect);\n                    assert(m1_bad_initial_suffix_validation_reads(old(workspace)@, window_bytes) == 0);\n                    assert(m1_bad_initial_suffix_owner_effect(old(workspace)@, workspace@, window_bytes,\n                        *old(budget), *budget,\n                        Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })));\n                }\n            }\n            return Err(CompressedStep { consumed: 0,\n                status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });\n        }",
+        "if !budget.charge_work(if initial_outer == 3 { 4 } else { 4 + 1 }) {\n            proof {\n                if initial_outer == 3 && m1_bad_initial_suffix(old(workspace)@, window_bytes) {\n                    reveal(m1_bad_initial_suffix_validation_reads); reveal(m1_bad_initial_suffix_owner_effect);\n                    assert(m1_bad_initial_suffix_validation_reads(old(workspace)@, window_bytes) == 0);\n                    assert(m1_bad_initial_suffix_owner_effect(old(workspace)@, workspace@, window_bytes,\n                        *old(budget), *budget,\n                        Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })));\n                }\n            }\n            return Err(CompressedStep { consumed: 0,\n                status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });\n        }"
+      ]
+    },
+    {
+      "name": "brotli-m1-malformed-suffix-fallback-writes-byte175",
+      "tuple": [
+        "brotli-m1-malformed-suffix-fallback-writes-byte175",
+        "advance_planned_compressed_action",
+        "if store_terminal_error(workspace, window_bytes, CompressedHeaderError::InternalState).is_err() {\n            return Err(CompressedStep { consumed: 0,\n                status: CompressedStatus::Failed(core_state_failure()) });\n        }",
+        "if store_terminal_error(workspace, window_bytes, CompressedHeaderError::InternalState).is_err() {\n            return Err(CompressedStep { consumed: 0,\n                status: CompressedStatus::Failed(core_state_failure()) });\n        }\n        if initial_outer == 3 {\n            let _ = put_state_byte(workspace, window_bytes, 175, 1);\n        }"
+      ]
+    }
+  ],
+  "removed_literal_controls": [],
+  "native_tests": {
+    "preexisting_native_module_text_before_final_closing_brace_is_identical_prefix": true,
+    "added": [
+      "m1_context_cursor_failures_match_w1_and_prepay_terminal"
+    ],
+    "removed": []
+  },
+  "limitations": "Static literal/control/test source comparison only. No tests or mutants run. Proof-test function slices use their existing top-level closing-line indentation, avoiding brace character literals in test harnesses."
+}

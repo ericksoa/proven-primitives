@@ -1,0 +1,305 @@
+--- a/src/brotli_input.rs
++++ b/src/brotli_input.rs
+@@ -22990,8 +22990,110 @@
+     &&& b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH)
+         == crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS@[symbol as int]
+     &&& b3b_queue_encoding_valid(before, window_bytes)
++}
++
++#[verifier::opaque]
++spec fn m1_bad_initial_suffix(before: Seq<u8>, window_bytes: u32) -> bool {
++    let kind = b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND);
++    let symbol = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SYMBOL);
++    let width = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SUFFIX_WIDTH);
++    let phase = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_PHASE);
++    &&& phase != 0
++    &&& (phase != 1 || kind >= 3 || symbol >= 26
++        || (symbol < 26 && width != crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS@[symbol as int])
++        || !b3b_queue_encoding_valid(before, window_bytes))
++}
++
++#[verifier::opaque]
++spec fn m1_bad_initial_suffix_validation_reads(before: Seq<u8>, window_bytes: u32) -> nat {
++    if b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_PHASE) == 1
++        && b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND) < 3
++        && b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SYMBOL) < 26 { 1nat } else { 0nat }
++}
++
++#[verifier::opaque]
++spec fn m1_bad_initial_suffix_plan(before: Seq<u8>, window_bytes: u32, plan: CompressedActionPlan) -> bool {
++    &&& m1_bad_initial_suffix(before, window_bytes)
++    &&& plan.planning_work as nat == m1_bad_initial_suffix_validation_reads(before, window_bytes)
++    &&& plan.execution_work as nat == m1_bad_initial_suffix_validation_reads(before, window_bytes) + 5
++    &&& plan.consumed == 0
++    &&& plan.status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState))
++}
++
++proof fn m1_initial_suffix_domain_partition(before: Seq<u8>, window_bytes: u32)
++    ensures
++        m1_bad_initial_suffix(before, window_bytes)
++            == (b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_PHASE) != 0
++                && !initial_suffix_read_domain(before, window_bytes)),
++        m1_bad_initial_suffix_validation_reads(before, window_bytes) <= 1,
++{
++    reveal(m1_bad_initial_suffix); reveal(initial_suffix_read_domain);
++    reveal(m1_bad_initial_suffix_validation_reads);
++}
++
++#[verifier::opaque]
++spec fn m1_bad_initial_suffix_owner_effect(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
++    start: crate::brotli::RequestBudget, end: crate::brotli::RequestBudget,
++    result: Result<usize, CompressedStep>) -> bool {
++    let planning = m1_bad_initial_suffix_validation_reads(before, window_bytes);
++    let execution = planning + 5;
++    &&& end.limits == start.limits
++    &&& end.input_remaining == start.input_remaining
++    &&& end.output_remaining == start.output_remaining
++    &&& end.calls_remaining == start.calls_remaining
++    &&& end.initializations_remaining == start.initializations_remaining
++    &&& if start.work_remaining as nat >= planning + execution {
++        &&& result == Err(CompressedStep { consumed: 0,
++            status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
++        &&& end.work_remaining as nat + planning + execution == start.work_remaining as nat
++        &&& terminal_error_frame(before, after, window_bytes)
++        &&& serialized_terminal_error(after, window_bytes, CompressedHeaderError::InternalState)
++    } else {
++        &&& result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
++        &&& after == before
++        &&& end.work_remaining as nat
++            + if start.work_remaining as nat >= planning { planning } else { 0nat }
++                == start.work_remaining as nat
++        &&& (planning == 0 || (start.work_remaining as nat) < planning ==> end == start)
++    }
+ }
+ 
++proof fn m1_bad_initial_suffix_owner_without_plan(before: Seq<u8>, window_bytes: u32,
++    start: crate::brotli::RequestBudget)
++    requires (start.work_remaining as nat) < m1_bad_initial_suffix_validation_reads(before, window_bytes),
++    ensures m1_bad_initial_suffix_owner_effect(before, before, window_bytes, start, start,
++        Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })),
++{
++    reveal(m1_bad_initial_suffix_owner_effect);
++}
++
++proof fn m1_bad_initial_suffix_owner_from_execution(before: Seq<u8>, after: Seq<u8>, window_bytes: u32,
++    start: crate::brotli::RequestBudget, end: crate::brotli::RequestBudget,
++    plan: CompressedActionPlan, execution_credit: u64, result: Result<usize, CompressedStep>)
++    requires
++        m1_bad_initial_suffix_plan(before, window_bytes, plan),
++        end.limits == start.limits,
++        end.input_remaining == start.input_remaining,
++        end.output_remaining == start.output_remaining,
++        end.calls_remaining == start.calls_remaining,
++        end.initializations_remaining == start.initializations_remaining,
++        execution_credit as nat + plan.planning_work as nat == start.work_remaining as nat,
++        if execution_credit >= plan.execution_work {
++            &&& result == Err(CompressedStep { consumed: 0,
++                status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
++            &&& terminal_error_frame(before, after, window_bytes)
++            &&& serialized_terminal_error(after, window_bytes, CompressedHeaderError::InternalState)
++            &&& end.work_remaining as nat + plan.execution_work as nat == execution_credit as nat
++        } else {
++            &&& result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
++            &&& after == before
++            &&& end.work_remaining == execution_credit
++        },
++    ensures m1_bad_initial_suffix_owner_effect(before, after, window_bytes, start, end, result),
++{
++    reveal(m1_bad_initial_suffix_plan); reveal(m1_bad_initial_suffix_owner_effect);
++}
++
+ spec fn initial_suffix_value_applied(before: Seq<u8>, after: Seq<u8>, window_bytes: u32, suffix: u32) -> bool {
+     let kind = b3b_scalar_byte_at(before, window_bytes, B3B_CURRENT_KIND);
+     let symbol = b3b_scalar_byte_at(before, window_bytes, B3B_BLOCK_LENGTH_SYMBOL);
+@@ -24733,6 +24835,11 @@
+                 B3B_OUTER_PHASE,
+             ) == compressed_outer_phase_tag_spec(phase),
+         ensures
++            m1_bad_initial_suffix(old(self).workspace@, old(self).window_bytes) ==> {
++                &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
++                &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
++                &&& serialized_terminal_error(final(self).workspace@, old(self).window_bytes, CompressedHeaderError::InternalState)
++            },
+             initial_suffix_read_domain(old(self).workspace@, old(self).window_bytes) ==> {
+                 &&& initial_suffix_phase_refines(old(self).workspace@, final(self).workspace@,
+                     old(self).window_bytes, input@, end_of_input, r.0, r.1)
+@@ -24771,6 +24878,7 @@
+                 _ => true,
+             },
+     {
++        reveal(m1_bad_initial_suffix); reveal(m1_bad_initial_suffix_validation_reads);
+         proof {
+             reveal(initial_suffix_read_domain); reveal(initial_suffix_value_applied);
+             reveal(initial_suffix_action_frame); reveal(outer_phase_byte_frame);
+@@ -24785,6 +24893,7 @@
+                         Err(error) => return self.fail_phase(consumed, error),
+                     };
+                     if kind >= 3 {
++                        proof { assert(source_units + 5 == m1_bad_initial_suffix_validation_reads(suffix_original, self.window_bytes) + 5); }
+                         return self.fail_phase(consumed, CompressedHeaderError::InternalState);
+                     }
+                     let subphase = match state_byte(
+@@ -24808,8 +24917,10 @@
+                         proof { if symbol < 26 { source_units = source_units + 1; } }
+                         if symbol >= 26 || width != crate::brotli_prefix::BLOCK_LENGTH_EXTRA_BITS[
+                             symbol as usize] {
++                            proof { assert(source_units + 5 == m1_bad_initial_suffix_validation_reads(suffix_original, self.window_bytes) + 5); }
+                             return self.fail_phase(consumed, CompressedHeaderError::InternalState);
+                         }
++                        proof { assert(source_units + 5 == m1_bad_initial_suffix_validation_reads(suffix_original, self.window_bytes) + 5); }
+                         let mut queue = match load_b3b_queue(self.workspace, self.window_bytes) {
+                             Ok(value) => value,
+                             Err(error) => return self.fail_phase(consumed, error),
+@@ -24917,6 +25028,7 @@
+                             }
+                         }
+                     } else {
++                        proof { assert(source_units + 5 == m1_bad_initial_suffix_validation_reads(suffix_original, self.window_bytes) + 5); }
+                         return self.fail_phase(consumed, CompressedHeaderError::InternalState);
+                     }
+                         (consumed, None)
+@@ -25782,6 +25894,12 @@
+                 B3B_OUTER_PHASE,
+             ) == compressed_outer_phase_tag_spec(phase),
+         ensures
++            phase == CompressedOuterPhase::InitialBlockLength
++                && m1_bad_initial_suffix(old(self).workspace@, old(self).window_bytes) ==> {
++                    &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
++                    &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
++                    &&& serialized_terminal_error(final(self).workspace@, old(self).window_bytes, CompressedHeaderError::InternalState)
++                },
+             (phase == CompressedOuterPhase::LiteralContextMap || phase == CompressedOuterPhase::DistanceContextMap)
+                 && b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_CONTEXT_PHASE) == 9 ==>
+                     r == (0usize, m1_context_handoff_status(old(self).workspace@, old(self).window_bytes, phase)),
+@@ -29678,6 +29796,14 @@
+ ) -> (r: Result<CompressedActionPlan, CoreFailure>)
+     requires old(budget).valid(),
+     ensures
++        b3b_workspace_shape(workspace@.len() as nat, window_bytes)
++            && m1_bad_initial_suffix(workspace@, window_bytes) ==> {
++                &&& r.is_ok() == (old(budget).work_remaining as nat
++                    >= m1_bad_initial_suffix_validation_reads(workspace@, window_bytes))
++                &&& (r.is_ok() ==> m1_bad_initial_suffix_plan(workspace@, window_bytes, r.unwrap()))
++                &&& (r.is_err() ==> r == Err(CoreFailure::ResourceLimit))
++                &&& (r.is_err() ==> *final(budget) == *old(budget))
++            },
+         initial_suffix_read_domain(workspace@, window_bytes) ==>
+             r.is_ok() == (old(budget).work_remaining as nat >= initial_suffix_planning_units(workspace@, window_bytes, input@.len())),
+         initial_suffix_read_domain(workspace@, window_bytes) && old(budget).work_remaining >= 66 ==> r.is_ok(),
+@@ -29693,6 +29819,8 @@
+         r.is_ok() ==> r.unwrap().consumed <= input.len(),
+         r.is_ok() ==> final(budget).work_remaining == old(budget).work_remaining - r.unwrap().planning_work,
+ {
++    reveal(m1_bad_initial_suffix); reveal(m1_bad_initial_suffix_validation_reads);
++    reveal(m1_bad_initial_suffix_plan);
+     reveal(initial_suffix_read_domain); reveal(initial_suffix_plan_valid);
+     reveal(initial_suffix_planning_units); reveal(initial_suffix_field_complete);
+     proof {
+@@ -34229,6 +34357,14 @@
+         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE)
+             == compressed_outer_phase_tag_spec(phase),
+     ensures
++        phase == CompressedOuterPhase::InitialBlockLength
++            && m1_bad_initial_suffix_plan(old(workspace)@, window_bytes, plan)
++            && old(budget).work_remaining >= plan.execution_work ==> {
++                &&& r == Err(CompressedStep { consumed: 0,
++                    status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
++                &&& terminal_error_frame(old(workspace)@, final(workspace)@, window_bytes)
++                &&& serialized_terminal_error(final(workspace)@, window_bytes, CompressedHeaderError::InternalState)
++            },
+         m1_context_handoff_plan_valid(old(workspace)@, window_bytes, phase, plan)
+             && old(budget).work_remaining >= plan.execution_work ==>
+                 m1_context_handoff_owner_result(old(workspace)@, window_bytes, phase, r),
+@@ -34327,6 +34463,7 @@
+             },
+         },
+ {
++    proof { reveal(m1_bad_initial_suffix_plan); }
+     proof { reveal(fixed_bad_cursor_plan_valid); reveal(m1_context_handoff_plan_valid);
+         reveal(m1_context_handoff_owner_result); reveal(m1_context_handoff_status); }
+     proof { reveal(initial_suffix_plan_valid); reveal(initial_suffix_result_matches); }
+@@ -36756,6 +36893,10 @@
+         b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+         compressed_decoder_state_ok(old(workspace)@, window_bytes),
+     ensures
++        b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 3
++            && m1_bad_initial_suffix(old(workspace)@, window_bytes) ==>
++                m1_bad_initial_suffix_owner_effect(old(workspace)@, final(workspace)@, window_bytes,
++                    *old(budget), *final(budget), r),
+         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 3
+             && initial_suffix_read_domain(old(workspace)@, window_bytes) ==>
+             exists|plan: CompressedActionPlan| #[trigger] initial_suffix_owner_effect(
+@@ -36833,6 +36974,7 @@
+         reveal(fixed_outer_bad_cursor); reveal(fixed_bad_cursor_plan_valid);
+     }
+     proof { reveal(m1_input_prefix_len); }
++    proof { m1_initial_suffix_domain_partition(workspace@, window_bytes); }
+     let initial_allowed = if budget.input_remaining > usize::MAX as u64 {
+         input.len()
+     } else {
+@@ -37017,6 +37159,11 @@
+             Ok(value) => value,
+             Err(error) => {
+                 proof {
++                    if m1_bad_initial_suffix(suffix_owner_before, window_bytes) {
++                        assert(error == CoreFailure::ResourceLimit);
++                        assert(*budget == *old(budget));
++                        m1_bad_initial_suffix_owner_without_plan(suffix_owner_before, window_bytes, *old(budget));
++                    }
+                     if initial_suffix_read_domain(suffix_owner_before, window_bytes) {
+                         establish_initial_suffix_owner_effect(suffix_owner_before, workspace@, window_bytes,
+                             *old(budget), *budget, input@, end_of_input,
+@@ -37077,6 +37224,21 @@
+             }
+         }
+         proof {
++            if m1_bad_initial_suffix(suffix_owner_before, window_bytes) {
++                reveal(m1_bad_initial_suffix_plan);
++                assert(suffix_execution_credit as nat + plan.planning_work as nat == old(budget).work_remaining as nat);
++                if suffix_execution_credit >= plan.execution_work {
++                    assert(result == Err(CompressedStep { consumed: 0,
++                        status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) }));
++                    assert(budget.work_remaining as nat + plan.execution_work as nat == suffix_execution_credit as nat);
++                } else {
++                    assert(result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) }));
++                    assert(workspace@ == suffix_owner_before);
++                    assert(budget.work_remaining == suffix_execution_credit);
++                }
++                m1_bad_initial_suffix_owner_from_execution(suffix_owner_before, workspace@, window_bytes,
++                    *old(budget), *budget, plan, suffix_execution_credit, result);
++            }
+             if initial_suffix_read_domain(suffix_owner_before, window_bytes) {
+                 establish_initial_suffix_owner_effect(suffix_owner_before, workspace@, window_bytes,
+                     *old(budget), *budget, input@, end_of_input, result, plan);
+@@ -37310,12 +37472,31 @@
+         // W1 rejects unknown initial-length/context subphases without reading
+         // input. Preserve that terminal action and prepay its four writes.
+         if !budget.charge_work(4 + 1) {
++            proof {
++                if initial_outer == 3 && m1_bad_initial_suffix(old(workspace)@, window_bytes) {
++                    reveal(m1_bad_initial_suffix_validation_reads); reveal(m1_bad_initial_suffix_owner_effect);
++                    assert(m1_bad_initial_suffix_validation_reads(old(workspace)@, window_bytes) == 0);
++                    assert(m1_bad_initial_suffix_owner_effect(old(workspace)@, workspace@, window_bytes,
++                        *old(budget), *budget,
++                        Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })));
++                }
++            }
+             return Err(CompressedStep { consumed: 0,
+                 status: CompressedStatus::Failed(CoreFailure::ResourceLimit) });
+         }
+         if store_terminal_error(workspace, window_bytes, CompressedHeaderError::InternalState).is_err() {
+             return Err(CompressedStep { consumed: 0,
+                 status: CompressedStatus::Failed(core_state_failure()) });
++        }
++        proof {
++            if initial_outer == 3 && m1_bad_initial_suffix(old(workspace)@, window_bytes) {
++                reveal(m1_bad_initial_suffix_validation_reads); reveal(m1_bad_initial_suffix_owner_effect);
++                assert(m1_bad_initial_suffix_validation_reads(old(workspace)@, window_bytes) == 0);
++                assert(m1_bad_initial_suffix_owner_effect(old(workspace)@, workspace@, window_bytes,
++                    *old(budget), *budget,
++                    Err(CompressedStep { consumed: 0,
++                        status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })));
++            }
+         }
+         return Err(CompressedStep { consumed: 0,
+             status: CompressedStatus::Failed(core_state_failure()) });

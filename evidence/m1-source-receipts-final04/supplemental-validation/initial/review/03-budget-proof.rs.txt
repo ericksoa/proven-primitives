@@ -1,0 +1,23 @@
+proof fn r_triage_concrete_selector_budget_witness() -> (out: RequestBudget)
+    ensures
+        out.valid(),
+        out.work_remaining == 64,
+        out.limits.max_work == 64,
+        out.input_remaining == 0,
+        out.output_remaining == 0,
+        out.calls_remaining == 1,
+        out.initializations_remaining == 0,
+        out.limits.max_window_bits == 10,
+{
+    let limits = RequestLimits {
+        max_input: 0, max_output: 0, max_work: 64,
+        max_calls: 1, max_initializations: 0, max_window_bits: 10,
+    };
+    let budget = RequestBudget {
+        limits, input_remaining: 0, output_remaining: 0,
+        work_remaining: 64, calls_remaining: 1, initializations_remaining: 0,
+    };
+    reveal(RequestBudget::valid);
+    assert(budget.valid());
+    budget
+}

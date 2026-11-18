@@ -1,0 +1,225 @@
+{
+  "status": "INDEPENDENT TECHNICAL AUDIT PASSED: positive and admitted reached-rank witness; not cap-negative or full-gate completion",
+  "created_utc": "2026-11-18T01:30:45.820032+00:00",
+  "auditor": "/root/m1_byte_frames",
+  "scope": "Read-only independent inspection and mechanical comparisons; only this requested target report is written. No new checker or native execution, and no shared source/test/gate/evidence/canary edits.",
+  "architecture_authority": "Technical validation only. This report is not human approval of an architectural decision.",
+  "evidence": {
+    "positive_source": {
+      "path": "target/m1-r-planner-cap-concrete-rank-diagnostic/positive/src/brotli_input.rs",
+      "sha256": "927f0566449cb27f7b922eddf661156bea56157db7c234a5b3c84c007910f0e0"
+    },
+    "positive_record": {
+      "path": "target/m1-r-planner-cap-concrete-rank-diagnostic/positive-result.json",
+      "sha256": "54fa189a9ddd918c2b6e69d739526efbc0609bdacebd3c9e9f7a5ccfaa47f312"
+    },
+    "positive_log": {
+      "path": "target/m1-r-planner-cap-concrete-rank-diagnostic/positive/positive-concrete-rank.log",
+      "sha256": "e58f5d4acad630ced80f39c7cf3d402ffac4b96bef673add31e80094cefc9599"
+    },
+    "positive_source_manifest": {
+      "path": "target/m1-r-planner-cap-concrete-rank-diagnostic/source-manifest.json",
+      "sha256": "252cfeb8793abbb3fa1635332d90e50cbf932f6825dba0e3ea9f21ac02817b7f"
+    },
+    "witness_record": {
+      "path": "target/m1-r-concrete-cap-rank-witness/witness-result.json",
+      "sha256": "22bfa50596424342e2878b589bb9777ab3b000851aec1c23ccf5783fd98719ac"
+    },
+    "witness_manifest": {
+      "path": "target/m1-r-concrete-cap-rank-witness/artifact-sha256.json",
+      "sha256": "392ca911988a99184b9acb12af232357a3a29678fa927f74f5c78f1643526d77"
+    },
+    "startup_source": {
+      "path": "target/m1-r-concrete-cap-rank-witness/attempts/startup02/src/brotli_input.rs",
+      "sha256": "aa7390fc9b78412518da829c16f2e48a864145fc5579b587bc7326a14200759b"
+    },
+    "startup_result": {
+      "path": "target/m1-r-concrete-cap-rank-witness/attempts/startup02/result.json",
+      "sha256": "422a769c4a94e36958f6c3dc9232b953e6e21ef6c7ebd8ee5b7672d9dece1468"
+    },
+    "startup_log": {
+      "path": "target/m1-r-concrete-cap-rank-witness/attempts/startup02/verifier.log",
+      "sha256": "084020a8bb9b6d7e29c21ec788a6d785bdf110b8053a6811980f476caa7a8832"
+    },
+    "startup_command": {
+      "path": "target/m1-r-concrete-cap-rank-witness/attempts/startup02/command.json",
+      "sha256": "d58fe8bc7a4b9979d0e60ce40871d6e59390f88abd6b1a7116ea97248dfa844e"
+    },
+    "supplied_token_correspondence": {
+      "path": "target/m1-r-concrete-cap-rank-witness/startup-token-correspondence-final.json",
+      "sha256": "c1df1a6df7641bdfdaa03b2a0274663fd7d93d37f8df3f112a468e3c222c05a9"
+    },
+    "startup_return_maps": {
+      "path": "target/m1-r-concrete-cap-rank-witness/startup-replay-preparation.json",
+      "sha256": "8cf46de5905e50f01a8e0b44dc750c3b1783d7fecff3e55186233619ecf2d513"
+    }
+  },
+  "checked_components": [
+    {
+      "attempt": "image03",
+      "verification": {
+        "verified": 2,
+        "errors": 0
+      },
+      "result_sha256": "961e057e14077cc2c9610e8b5a885bd3afdbbf8868c67d3045b1dba1832d2b24",
+      "log_sha256": "fb589623548f204290dc1a18e99b044f7f1d3ec99c5ad59725664bf2a33a4484",
+      "checked_source_sha256": "bb66c6992f266691ae623746f5214bfa254c433e851f2f58c6fdc6dfc6898c99",
+      "checked_lemma_identical_in_startup_snapshot": true
+    },
+    {
+      "attempt": "budget01",
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      },
+      "result_sha256": "87d4b513a32b805bf5e5d541120cfc2724b46e26106aa6f875c01b22da0d21ca",
+      "log_sha256": "7c5d7b080a93a28a4b4c714cf9507fbeb32b071ae1b46f08446a3b362e9d7cd3",
+      "checked_source_sha256": "88918def495d56337ceca09fff376b207bb287475ede9d9ec9e03183e6d3cb24",
+      "checked_lemma_identical_in_startup_snapshot": true
+    },
+    {
+      "attempt": "costs01",
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      },
+      "result_sha256": "13f5bf90aafd43254553dd3591e7f31f1f45c67941e11c81454a0ad9c9feae4d",
+      "log_sha256": "7951fa4efe4b4011040eb5c12faa69f34721f35ff7b7b2bf01572bfa124cc059",
+      "checked_source_sha256": "6722849f5ffc51b69cb8bfca3d23d79df3708273ea19b66d820178e795c50aab",
+      "checked_lemma_identical_in_startup_snapshot": true
+    },
+    {
+      "attempt": "startup02",
+      "verification": {
+        "verified": 3,
+        "errors": 0
+      },
+      "result_sha256": "422a769c4a94e36958f6c3dc9232b953e6e21ef6c7ebd8ee5b7672d9dece1468",
+      "log_sha256": "084020a8bb9b6d7e29c21ec788a6d785bdf110b8053a6811980f476caa7a8832",
+      "checked_source_sha256": "aa7390fc9b78412518da829c16f2e48a864145fc5579b587bc7326a14200759b",
+      "checked_lemma_identical_in_startup_snapshot": true
+    }
+  ],
+  "positive": {
+    "actual_verification": "4 verified, 0 errors",
+    "source_sha256": "927f0566449cb27f7b922eddf661156bea56157db7c234a5b3c84c007910f0e0",
+    "immutable_positive_record_sha256": "54fa189a9ddd918c2b6e69d739526efbc0609bdacebd3c9e9f7a5ccfaa47f312",
+    "attrs": [
+      "#[verifier::rlimit(600)]",
+      "#[verifier::spinoff_prover]"
+    ],
+    "checker_flags": [
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "plan_serialized_tree",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "seed": "default",
+    "loop_isolation": "unchanged default",
+    "exact_concrete_assertion": "proof { assert(code_phase_rank(CodeDescriptionPhase::Selector, 704) < 5_696nat) by (compute_only); }",
+    "exact_symbolic_assertion": "proof { assert(initial_rank < 5_696nat); }",
+    "actual_guard": "while iterations < 5_696",
+    "remove_concrete_restores_810d_sha256": "810d40166f744871d63b88d38afb76e3d039f88e9f98559c18237aee2a96ea9b",
+    "remove_both_added_assertions_restores_frozen_3e_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "all_original_models_requires_guarantees_assertions_invariants_decreases_runtime_operations_retained": true
+  },
+  "cap_binding": {
+    "number_of_coupled_sites": 3,
+    "positive_cap": 5696,
+    "static_negative_cap": 2000,
+    "static_negative_source_sha256": "66e9c5ffc7e00f48a881c13463e64ea20d9a0694f8538652b58db41f0edf891e",
+    "sites": [
+      "code_phase_rank(Selector,704) < CAPnat by (compute_only)",
+      "initial_rank < CAPnat",
+      "actual executable while iterations < CAP"
+    ],
+    "original_initial_rank_le5695_invariant_count": 1,
+    "original_initial_rank_le5695_invariant_retained": true,
+    "added_duplicate_or_tagged_invariants": 0,
+    "four_way_binding_not_applicable": "There is no duplicate invariant to bind. The original bound 5695 remains unchanged.",
+    "negative_result_reviewed": false,
+    "negative_execution_status": "Excluded from this audit; root separately authorized one group run after the audit."
+  },
+  "preservation": {
+    "frozen_core_sha256": {
+      "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+      "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+      "tests/proof_rejection.rs": "18b4b2c15c6dcc89e92fd2ec6af51d05bb986da78c2c50916a992f9c8010fc5f",
+      "target/m1-r-final-gate/driver.py": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46"
+    },
+    "positive_exact_inverse_restores_core_source": true,
+    "startup_snapshot_original_input_and_budget_text_exact_except_appended_validation_declarations_before_outer_verus_close": true,
+    "existing_exec_declarations_headers_bodies_exact": 323,
+    "existing_input_prefix_declarations": 1136,
+    "all_other_source_files_exact": true,
+    "old_helpers_contracts_apis_models_unchanged": true,
+    "new_public_or_cross_module_api": false,
+    "no_new_trust_bypass_assumption_or_policy": true
+  },
+  "independent_ordinary_token_audit": {
+    "endpoint": "Through original let mut iterations=0, immediately before original main loop and added control receipts.",
+    "expansion": "Only the original plan_saved_aux_load call is replaced with its exact original body in the temporary validation entry.",
+    "return_mappings": 17,
+    "checked_assert_false_at_every_mapped_exit": true,
+    "entry_ensures_reached_true": true,
+    "normalization": "Remove proof and ghost statements, hide/reveal, loop invariant/decreases clauses; normalize the explicit Result<(u64,bool),CoreFailure> annotation to the same original inferred type; tokenize ordinary operations.",
+    "token_count": 976,
+    "hash_encoding": "SHA256 of compact JSON token array, UTF8",
+    "expected_tokens_sha256": "0c029bd171f4169b9fcbb74dabed35b1a342e1b6295fe8d0387709170cbe045e",
+    "actual_tokens_sha256": "0c029bd171f4169b9fcbb74dabed35b1a342e1b6295fe8d0387709170cbe045e",
+    "tokens_identical": true,
+    "supplied_audit_distinct_token_representation": {
+      "count": 1073,
+      "expected_and_actual_tokens_sha256": "9968f253696de01c4138fa8cde7af3b6bd576304ca6f08a1520fcc0018e4421d",
+      "record_sha256": "c1df1a6df7641bdfdaa03b2a0274663fd7d93d37f8df3f112a468e3c222c05a9"
+    },
+    "not_a_compiler_erasure_or_source_to_binary_proof": true
+  },
+  "admission_and_actual_receipt_bridge": {
+    "unchanged_admitted_models": [
+      "b3b_workspace_shape",
+      "b3b_queue_encoding_valid",
+      "saved_aux_load_valid",
+      "m1_code_decoder_image",
+      "serialized_b3b_queue",
+      "m1_tree_has_decodable_start",
+      "code_phase_rank"
+    ],
+    "witness": "Command saved region, active tree0, window1024, empty valid queue, Selector with alphabet_max=alphabet_limit704, builder_initialized0, exact concrete 1177584-byte image.",
+    "budget_existence": "Independently checked valid RequestBudget with work64/max_work64/max_window_bits10, zero input/output, calls1, initializations0.",
+    "startup_input": "empty input, end_of_input=false",
+    "actual_path": "All17 original invalid/error/resource exits are checked unreachable under the witnessed entry; all original guards, reads, debits, helper calls and ordering remain source-corresponding.",
+    "no_pre_aux_budget_mutation": true,
+    "work_equation": "18 saved-aux scan + 0 forecast + 22 loader + 0 builder-copy = 40 actual units; valid64 -> valid24.",
+    "actual_loaded_decoder": "Selector, maximum704, limit704",
+    "actual_reached_initial_rank": 5695,
+    "original_symbolic_rank_lt5696_checked": true,
+    "copy_count": 0
+  },
+  "criterion_assessment": {
+    "same_existing_criterion_legitimately_witnessed": true,
+    "reason": "The existing criterion quantifies admitted saved starts reaching the receipt. The checked concrete start reaches that receipt at rank5695, so universal rank<CAP necessarily implies5695<CAP. The existing checked rank-bounded theorem also bounds all valid decoders by5695. The concrete computation is a necessary instance of the same uniform certificate-adequacy bound, not an arbitrary unrelated false assertion.",
+    "limitation": "This establishes the insufficiency of the selected rank certificate for cap2000. It does not establish that an execution requires2000 actions or violates an original runtime guarantee."
+  },
+  "explicit_exclusions": [
+    "No 2000-action execution or trace claim.",
+    "No native runtime validation claim.",
+    "No source-to-binary proof claim.",
+    "No negative main-loop SMT completion claim; genuine compute_only false may reject before those queries start.",
+    "No negative-run result or full gate completion claim.",
+    "Any mixed resource/tool/type failure remains unresolved under the unchanged strict classifier."
+  ],
+  "new_checker_runs_by_auditor": 0,
+  "shared_source_test_gate_evidence_canary_edits_by_auditor": 0
+}

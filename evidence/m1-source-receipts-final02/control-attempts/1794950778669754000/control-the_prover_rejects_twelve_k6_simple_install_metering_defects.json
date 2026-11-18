@@ -1,0 +1,162 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_twelve_k6_simple_install_metering_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 224.89891304200864,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 12,
+  "finished_utc": "2026-11-17T22:28:44.035767+00:00",
+  "log": "controls-the_prover_rejects_twelve_k6_simple_install_metering_defects.log",
+  "log_sha256": "b4823ae0f3a4f860daf4c760a4287c513895c6ec5368fe454ea97192218257b9",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "a5d1bb02cfed9c4eb6969ab2adc28e7aea00e781b1a1469c0da170dee7969b05",
+      "log": "canary-brotli-k6-singleton-reservation-restores-five.log",
+      "name": "brotli-k6-singleton-reservation-restores-five",
+      "semantic_rejection": true,
+      "sha256": "d01f83f66727c8264d0423565431ba7994e657631fa7fdee88d299264a3a8f21",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "bce81f1ab3080d1d9bf53a45c199e769c1a87601b3b1f03baf01cef3cb941d02",
+      "log": "canary-brotli-k6-selector-four-uses-three-symbols.log",
+      "name": "brotli-k6-selector-four-uses-three-symbols",
+      "semantic_rejection": true,
+      "sha256": "12d7afff39f647366f2dc1b93a7bcba1eae89f709039075c45612d937e713ab0",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "64123d4ecec5eb7b5a3311b14d4e759e4f6adbc75a3cda177e836a607cb9d5ff",
+      "log": "canary-brotli-k6-install-omits-validation-reads.log",
+      "name": "brotli-k6-install-omits-validation-reads",
+      "semantic_rejection": true,
+      "sha256": "5faa4a295223a370aaf05f2ccf43d8dc5113e9e92f7b1affdb2e425953467bc5",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "8eeb286cd5722aca2733e855c2ac47ad753ce73b4bc11d682266103eb644e068",
+      "log": "canary-brotli-k6-install-omits-record-probes.log",
+      "name": "brotli-k6-install-omits-record-probes",
+      "semantic_rejection": true,
+      "sha256": "659f4f614e41cfbecfe73c4c5f10e85904ba0d90b3275417b2c1ac571ebec308",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "ff0d7aa03bac1fcbe81f3141b49b41ae1b3b79371e562e76209dde88f9118cb9",
+      "log": "canary-brotli-k6-triangular-correction-undercharged.log",
+      "name": "brotli-k6-triangular-correction-undercharged",
+      "semantic_rejection": true,
+      "sha256": "87976e53939bbe300829108fe7543daec2d133810dfb3031bd059eed3e4c292f",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "852e80f96cf30e13bea625d19855c24347d9117ee76e9a3ce13bb01fa0f132e4",
+      "log": "canary-brotli-k6-first-record-probe-unpaid.log",
+      "name": "brotli-k6-first-record-probe-unpaid",
+      "semantic_rejection": true,
+      "sha256": "d862e55327b67f3ea2a87bfffbaae8f28246841be73d745c0268dc216b20e24a",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "8df7c969ce65b87cb58d68cc44f849a670cf50fe05d6088629e620b99419538f",
+      "log": "canary-brotli-k6-fourth-record-probe-unpaid.log",
+      "name": "brotli-k6-fourth-record-probe-unpaid",
+      "semantic_rejection": true,
+      "sha256": "d862e55327b67f3ea2a87bfffbaae8f28246841be73d745c0268dc216b20e24a",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "feb18905932113ac33678d146362a4186b1cc038f87692a81bd282c4d9fc6321",
+      "log": "canary-brotli-k6-range-validation-read-unpaid.log",
+      "name": "brotli-k6-range-validation-read-unpaid",
+      "semantic_rejection": true,
+      "sha256": "8c63bea445fb499a6805c4e8d406dfaf71145047586bc91b4335a70b0d899fdd",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "04ed85256582c21e007eeb8b7673c8df97a51fd2fb3439a100aeafb441b76b52",
+      "log": "canary-brotli-k6-distinctness-right-read-unpaid.log",
+      "name": "brotli-k6-distinctness-right-read-unpaid",
+      "semantic_rejection": true,
+      "sha256": "10501d1d80371f05b808f1e287f6690779f60b4a4bc83dba92eb0dc70d8de6bb",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "a3649c82d2ecc7b6cb2ec11257091b09b9eb26d51028aaed8ba533596fd01b3e",
+      "log": "canary-brotli-k6-singleton-final-read-unpaid.log",
+      "name": "brotli-k6-singleton-final-read-unpaid",
+      "semantic_rejection": true,
+      "sha256": "da820624bfd720680036a9a1ba37b42c20898591458c8eb882174c1559559005",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "ba19804b603e524d31f5d832cffd2f6e71848ba0cad671a87f46d65a6394214f",
+      "log": "canary-brotli-k6-adapter-omits-installation-reservation.log",
+      "name": "brotli-k6-adapter-omits-installation-reservation",
+      "semantic_rejection": true,
+      "sha256": "01eaf2a3b109600cf05fbe243bec2d34f20e41817a30a0885ef87e5ab9beaf38",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "316144c42540094a39c1ce2191ded624190a4aa1c4fd962fa3e1a141ab8d0e9e",
+      "log": "canary-brotli-k6-installer-reads-before-destination-guard.log",
+      "name": "brotli-k6-installer-reads-before-destination-guard",
+      "semantic_rejection": true,
+      "sha256": "b46bdb28cac0c3d3606e727b1d7a319594561f2cb7298c6244b39b834e956923",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794954299136712000,
+  "started_utc": "2026-11-17T22:24:59.136722+00:00",
+  "suite": "the_prover_rejects_twelve_k6_simple_install_metering_defects",
+  "suite_source_sha256": "81c39d654132e0491a7e293b341b01f4ef7db01935fba5c5978547a37c7a5655",
+  "validation_errors": []
+}

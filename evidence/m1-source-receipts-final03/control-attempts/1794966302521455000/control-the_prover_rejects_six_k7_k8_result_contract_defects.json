@@ -1,0 +1,96 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_k7_k8_result_contract_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 82.8671304580057,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 6,
+  "finished_utc": "2026-11-18T01:54:30.056413+00:00",
+  "log": "controls-the_prover_rejects_six_k7_k8_result_contract_defects.log",
+  "log_sha256": "7e1f30d044e05925e74b27556280011e073d3efcbc036661b7de07c1bf126cba",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "ab730c6786846528992bccb7f47c8c519fe7194bdaef9c4709586e42fa87ec9c",
+      "log": "canary-brotli-k7-canonical-constructor-spurious-error.log",
+      "name": "brotli-k7-canonical-constructor-spurious-error",
+      "semantic_rejection": true,
+      "sha256": "6236dbb6a9bd3c7f48ed96c23f8c2e031526e84033527fe07ee8235a0327fce7",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "d7ab90f39c12fea49ef0d14aa1826d985cbb928d5c3443ea58e5b95f6bee47cd",
+      "log": "canary-brotli-k8-single-constructor-spurious-error.log",
+      "name": "brotli-k8-single-constructor-spurious-error",
+      "semantic_rejection": true,
+      "sha256": "b084d372a4d5119149e94f85861073066456c06d793a86e6ba96c8ab85e6f3c4",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "f50d9004f89ee026acc9c640fe580f8a0943c9ab56ef30f2e29884d7e756795a",
+      "log": "canary-brotli-k7-singleton-install-spurious-error.log",
+      "name": "brotli-k7-singleton-install-spurious-error",
+      "semantic_rejection": true,
+      "sha256": "0707d9c624b695ad4fb01453f4772cdccb113b808cceda532eb791c425a221a0",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "8c71190c22d38f7f63cbdca8defa9a732c90496d2f526c40bac8e7f458415ef2",
+      "log": "canary-brotli-k7-multi-install-spurious-error.log",
+      "name": "brotli-k7-multi-install-spurious-error",
+      "semantic_rejection": true,
+      "sha256": "44987252ec2e92b91df008c1b569a57c373a840cc53bebcfb49d3d20ece0073c",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "01bebdbcb34a939306bea5193d364e701d0cf027cf1c32b4c39cedb2f3e990d0",
+      "log": "canary-brotli-k8-invalid-tree-error-replaced.log",
+      "name": "brotli-k8-invalid-tree-error-replaced",
+      "semantic_rejection": true,
+      "sha256": "715bbefb3cf267a4a210b14eada81550e63fd3b10304bd4e54dd61d7edc3d5f8",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "48871d829bd288799dbdae2c6ed96b54bdaec79dee94194b3b28e7ba9105ed48",
+      "log": "canary-brotli-k8-invalid-tree-mutates-metadata.log",
+      "name": "brotli-k8-invalid-tree-mutates-metadata",
+      "semantic_rejection": true,
+      "sha256": "47477e73a791820a172771b58570261991391b7b5a09fedb44e7dd92f01450ac",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794966787188458000,
+  "started_utc": "2026-11-18T01:53:07.188464+00:00",
+  "suite": "the_prover_rejects_six_k7_k8_result_contract_defects",
+  "suite_source_sha256": "45b731679e3d7a6dbecc68660586f191ac20803715f93eea77d5ba262a1dcaf0",
+  "validation_errors": []
+}

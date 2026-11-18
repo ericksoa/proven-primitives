@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-39089/src/brotli_input.rs:34119:1
+      |
+34119 | fn code_description_payload_writes(phase: CodeDescriptionPhase) -> (r: u64)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-tree-metering-canary-39089/src/brotli_input.rs:34120:22
+      |
+34120 |       ensures r <= 35, r == code_description_payload_writes_spec(phase),
+      |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+34121 |   {
+34122 | /     match phase {
+34123 | |         CodeDescriptionPhase::Selector | CodeDescriptionPhase::SimpleSize => 0,
+34124 | |         CodeDescriptionPhase::SimpleSymbols { .. } => 12,
+34125 | |         CodeDescriptionPhase::SimpleShape { .. }
+...     |
+34139 | |         CodeDescriptionPhase::Failed(_) => 1,
+34140 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

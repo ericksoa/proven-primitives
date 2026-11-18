@@ -1,0 +1,98 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_twelve_m1_general_codec_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T03:02:41.939170+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 257.65404829099134,
+  "finished_utc": "2026-11-17T03:06:59.592236+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_twelve_m1_general_codec_defects.log",
+  "log_sha256": "756e1e17cedc51d5b57aa0fe96f91d3d45c3d6578a788abff94e9a0eb10a0e76",
+  "suite": "the_prover_rejects_twelve_m1_general_codec_defects",
+  "expected_mutants": 12,
+  "mutants": [
+    {
+      "name": "brotli-m1-codec-simple-index-erased",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-simple-index-erased.log",
+      "sha256": "8a2f5aace4d346531a47a6fb4043d45bdf758f29ec25a26c0b038ef2abe220ce",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-shape-selector-lost",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-shape-selector-lost.log",
+      "sha256": "8a2f5aace4d346531a47a6fb4043d45bdf758f29ec25a26c0b038ef2abe220ce",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-symbol-array-alias",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-symbol-array-alias.log",
+      "sha256": "055ef68f70907be7b19820d4aeb55089b336e008d5d8a8ae77007bfed8cfb25b",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-aux-array-erased",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-aux-array-erased.log",
+      "sha256": "ba84f753fe6ae3dce5bf392925c9a7da003542c9f896e5f602a9dff9a926d5c9",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-prefix-phase-alias",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-prefix-phase-alias.log",
+      "sha256": "0c18a5d67ad98090e8099776df1afd68ff29a12c54397dc8d311592534d3bd31",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-prefix-nonzero-erased",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-prefix-nonzero-erased.log",
+      "sha256": "46bf303b8eca94bbd8bc4a5891ca78d28595f1fad436f48ff437ec6f7d8ce905",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-aux-skip-erased",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-aux-skip-erased.log",
+      "sha256": "32b3bacc6918000ddad1e8bc03e648529edff385f2bb15f2d5f667f1e2b11259",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-chained-history-erased",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-chained-history-erased.log",
+      "sha256": "5feb6531d193c41a7602af5e19186cfeae7f2fba5411f1e4e9741fc673354dc8",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-parent-tag-erased",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-parent-tag-erased.log",
+      "sha256": "2c9002962c622f14b3f8859c75d800a2801fe20bc9f64f8c2e73d466ba99cd4c",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-failed-error-tag-alias",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-failed-error-tag-alias.log",
+      "sha256": "204d34f599cee49a1fa2c5f57bf82d458ef119f34501fcd55cd0d56adf727a48",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-simple-write-undercharge",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-simple-write-undercharge.log",
+      "sha256": "db8e7464a065bb9ec79753b206b7ebfd9b82e04aed87c128e35709683446effe",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-complex-write-undercharge",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-codec-complex-write-undercharge.log",
+      "sha256": "fc8e19e380a500f0c9e44263c551cae5430ca87dcc8849f3a950287c71480d45",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

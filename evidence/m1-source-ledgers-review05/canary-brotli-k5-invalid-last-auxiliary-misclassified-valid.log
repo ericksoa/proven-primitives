@@ -1,0 +1,36 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32868:5
+      |
+32868 |     while i < 18
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32844:1
+      |
+32844 | / fn plan_saved_aux_load(workspace: &[u8], window_bytes: u32,
+32845 | |     budget: &mut crate::brotli::RequestBudget,
+32846 | | ) -> (r: Result<(u64, bool), CoreFailure>)
+      | |_________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-35886/src/brotli_input.rs:32856:9
+      |
+32856 | /         r.is_ok() ==> {
+32857 | |             &&& r.unwrap().1 == saved_aux_load_valid(workspace@, window_bytes)
+32858 | |             &&& r.unwrap().0 <= 18
+32859 | |             &&& r.unwrap().0 as nat == saved_aux_copy_read_units(workspace@, window_bytes)
+32860 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().0
+32861 | |         },
+      | |_________^ failed this postcondition
+...
+32900 |               return Ok((i as u64 + 1, true));
+      |               ------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

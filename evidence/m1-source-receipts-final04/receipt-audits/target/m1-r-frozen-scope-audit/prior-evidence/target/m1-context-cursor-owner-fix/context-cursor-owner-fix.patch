@@ -1,0 +1,415 @@
+--- a/src/brotli_input.rs
++++ b/src/brotli_input.rs
+@@ -20349,6 +20349,10 @@
+         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) == active_len,
+         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
+     ensures
++        m1_context_bad_saved_cursor(old(workspace)@, window_bytes) ==> {
++            &&& r == (0usize, Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InternalState)))
++            &&& final(workspace)@ == old(workspace)@
++        },
+         b3b_queue_encoding_valid(old(workspace)@, window_bytes) ==> match r.1 {
+             Some(ContextAdvanceStatus::Failed(error)) => error == CompressedHeaderError::Truncated
+                 || error == CompressedHeaderError::InvalidFormat(CompressedFormatError::ContextMapRepeat),
+@@ -20388,6 +20392,7 @@
+             r.1,
+         ),
+ {
++    reveal(m1_context_bad_saved_cursor);
+     let ghost mut source_units: nat = 0;
+     let ghost original = workspace@;
+     proof { assert(original == old(workspace)@); }
+@@ -21071,6 +21076,10 @@
+         b3b_scalar_u16_at(old(workspace)@, window_bytes, B3B_MAP_SIZE) == active_len,
+         active_len as nat <= crate::brotli_prefix::context_map_capacity(kind),
+     ensures
++        m1_context_bad_saved_cursor(old(workspace)@, window_bytes) ==> {
++            &&& r == (0usize, Some(ContextAdvanceStatus::Failed(CompressedHeaderError::InternalState)))
++            &&& final(workspace)@ == old(workspace)@
++        },
+         b3b_queue_encoding_valid(old(workspace)@, window_bytes)
+             && var_uint8_encoding_valid(old(workspace)@, window_bytes) ==> {
+             &&& (r.1.is_none() || r.1 == Some(ContextAdvanceStatus::NeedInput)
+@@ -21111,6 +21120,7 @@
+             r.1,
+         ),
+ {
++    reveal(m1_context_bad_saved_cursor);
+     let ghost mut source_units: nat = 0;
+     let ghost original = workspace@;
+     proof { assert(original == old(workspace)@); }
+@@ -21628,6 +21638,10 @@
+ ) -> (r: ContextAdvanceStep)
+     requires serialized_context_state_ok(old(workspace)@, window_bytes),
+     ensures
++        m1_context_bad_saved_cursor(old(workspace)@, window_bytes) ==> {
++            &&& r == ContextAdvanceStep { consumed: 0, status: ContextAdvanceStatus::Failed(CompressedHeaderError::InternalState) }
++            &&& final(workspace)@ == old(workspace)@
++        },
+         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE) == 9 ==> {
+             &&& final(workspace)@ == old(workspace)@
+             &&& r == ContextAdvanceStep { consumed: 0, status: ContextAdvanceStatus::Complete {
+@@ -21692,6 +21706,7 @@
+             _ => true,
+         },
+ {
++    reveal(m1_context_bad_saved_cursor);
+     let ghost original = workspace@;
+     proof { assert(original == old(workspace)@); }
+     reveal(compressed_decoder_state_ok);
+@@ -21771,6 +21786,11 @@
+     let mut transitions: u32 = 0;
+     while transitions < 100_000
+         invariant consumed <= input.len(), transitions <= 100_000,
++            m1_context_bad_saved_cursor(original, window_bytes) ==> workspace@ == original && consumed == 0 && transitions == 0,
++            m1_context_bad_saved_cursor(original, window_bytes) ==> {
++                let p = b3b_scalar_byte_at(original, window_bytes, B3B_CONTEXT_PHASE);
++                p == 0 || p == 1 || p == 2 || p == 5 || p == 6
++            },
+             b3b_scalar_byte_at(original, window_bytes, B3B_CONTEXT_PHASE) == 9 ==>
+                 workspace@ == original && consumed == 0 && transitions == 0,
+             original == old(workspace)@,
+@@ -23061,6 +23081,42 @@
+                 && initial_suffix_value_applied(before, after, window_bytes, value as u32),
+         }
+     });
++}
++
++#[verifier::opaque]
++spec fn m1_context_bad_saved_cursor(w: Seq<u8>, window: u32) -> bool {
++    let outer = b3b_scalar_byte_at(w, window, B3B_OUTER_PHASE);
++    let phase = b3b_scalar_byte_at(w, window, B3B_CONTEXT_PHASE);
++    &&& 6 <= outer <= 7
++    &&& ((phase == 0 && (!b3b_queue_encoding_valid(w, window) || !var_uint8_encoding_valid(w, window)))
++        || ((phase == 1 || phase == 2 || phase == 5 || phase == 6) && !b3b_queue_encoding_valid(w, window)))
++}
++
++#[verifier::opaque]
++spec fn m1_context_cursor_failure_plan(w: Seq<u8>, window: u32, plan: CompressedActionPlan) -> bool {
++    &&& m1_context_bad_saved_cursor(w, window)
++    &&& plan.planning_work == 0 && plan.execution_work == 5 && plan.consumed == 0
++    &&& plan.status == Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState))
++}
++
++#[verifier::opaque]
++spec fn m1_context_cursor_owner_effect(before: Seq<u8>, after: Seq<u8>, window: u32,
++    start: crate::brotli::RequestBudget, end: crate::brotli::RequestBudget,
++    result: Result<usize, CompressedStep>) -> bool {
++    &&& end.input_remaining == start.input_remaining
++    &&& end.output_remaining == start.output_remaining
++    &&& end.calls_remaining == start.calls_remaining
++    &&& end.initializations_remaining == start.initializations_remaining
++    &&& if start.work_remaining >= 5 {
++        &&& result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(
++            CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
++        &&& end.work_remaining == start.work_remaining - 5
++        &&& terminal_error_frame(before, after, window)
++        &&& serialized_terminal_error(after, window, CompressedHeaderError::InternalState)
++    } else {
++        &&& result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
++        &&& after == before && end == start
++    }
+ }
+ 
+ spec fn fixed_phase_bad_cursor(before: Seq<u8>, window_bytes: u32, phase: CompressedOuterPhase) -> bool {
+@@ -25305,6 +25361,10 @@
+                 B3B_OUTER_PHASE,
+             ) == compressed_outer_phase_tag_spec(phase),
+         ensures
++            m1_context_bad_saved_cursor(old(self).workspace@, old(self).window_bytes) ==> {
++                &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
++                &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
++            },
+             b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_CONTEXT_PHASE) == 9 ==>
+                 r == (0usize, m1_context_handoff_status(old(self).workspace@, old(self).window_bytes, phase)),
+             final(old(self).workspace)@ == final(final(self).workspace)@,
+@@ -25782,6 +25842,11 @@
+                 B3B_OUTER_PHASE,
+             ) == compressed_outer_phase_tag_spec(phase),
+         ensures
++            (phase == CompressedOuterPhase::LiteralContextMap || phase == CompressedOuterPhase::DistanceContextMap)
++                && m1_context_bad_saved_cursor(old(self).workspace@, old(self).window_bytes) ==> {
++                &&& r == (0usize, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)))
++                &&& terminal_error_frame(old(self).workspace@, final(self).workspace@, old(self).window_bytes)
++            },
+             (phase == CompressedOuterPhase::LiteralContextMap || phase == CompressedOuterPhase::DistanceContextMap)
+                 && b3b_scalar_byte_at(old(self).workspace@, old(self).window_bytes, B3B_CONTEXT_PHASE) == 9 ==>
+                     r == (0usize, m1_context_handoff_status(old(self).workspace@, old(self).window_bytes, phase)),
+@@ -34229,6 +34294,14 @@
+         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE)
+             == compressed_outer_phase_tag_spec(phase),
+     ensures
++        (phase == CompressedOuterPhase::LiteralContextMap || phase == CompressedOuterPhase::DistanceContextMap)
++            && m1_context_cursor_failure_plan(old(workspace)@, window_bytes, plan)
++            && old(budget).work_remaining >= plan.execution_work ==> {
++                &&& r == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
++                &&& terminal_error_frame(old(workspace)@, final(workspace)@, window_bytes)
++                &&& serialized_terminal_error(final(workspace)@, window_bytes, CompressedHeaderError::InternalState)
++                &&& final(budget).input_remaining == old(budget).input_remaining
++            },
+         m1_context_handoff_plan_valid(old(workspace)@, window_bytes, phase, plan)
+             && old(budget).work_remaining >= plan.execution_work ==>
+                 m1_context_handoff_owner_result(old(workspace)@, window_bytes, phase, r),
+@@ -34327,6 +34400,7 @@
+             },
+         },
+ {
++    proof { reveal(m1_context_cursor_failure_plan); }
+     proof { reveal(fixed_bad_cursor_plan_valid); reveal(m1_context_handoff_plan_valid);
+         reveal(m1_context_handoff_owner_result); reveal(m1_context_handoff_status); }
+     proof { reveal(initial_suffix_plan_valid); reveal(initial_suffix_result_matches); }
+@@ -34471,6 +34545,13 @@
+         _ => planned_status != plan.status,
+     };
+     proof {
++        if (phase == CompressedOuterPhase::LiteralContextMap || phase == CompressedOuterPhase::DistanceContextMap)
++            && m1_context_cursor_failure_plan(before_planned_action, window_bytes, plan) {
++            assert(used == plan.consumed && planned_status == plan.status);
++            assert(!statuses_disagree);
++        }
++    }
++    proof {
+         if m1_context_handoff_plan_valid(before_planned_action, window_bytes, phase, plan) {
+             assert(used == plan.consumed && planned_status == plan.status);
+             assert(!statuses_disagree);
+@@ -34738,6 +34819,17 @@
+ ) -> (r: Result<ContextTreeCountPlan, CoreFailure>)
+     requires old(budget).valid(),
+     ensures
++        b3c_workspace_shape(workspace@.len() as nat, window_bytes)
++            && compressed_decoder_state_ok(workspace@, window_bytes)
++            && 6 <= b3b_scalar_byte_at(workspace@, window_bytes, B3B_OUTER_PHASE) <= 7
++            && b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_PHASE) == 0 ==> {
++                &&& (r == Err(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) <==> m1_context_bad_saved_cursor(workspace@, window_bytes))
++                &&& (m1_context_bad_saved_cursor(workspace@, window_bytes) ==> *final(budget) == *old(budget))
++                &&& (r.is_err() ==> r == Err(CoreFailure::ResourceLimit)
++                    || r == Err(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)))
++                &&& (!m1_context_bad_saved_cursor(workspace@, window_bytes)
++                    && old(budget).work_remaining >= 63 ==> r.is_ok())
++            },
+         final(budget).valid(),
+         final(budget).limits == old(budget).limits,
+         final(budget).input_remaining == old(budget).input_remaining,
+@@ -34753,6 +34845,9 @@
+                 == old(budget).work_remaining - r.unwrap().read_work
+         },
+ {
++    reveal(m1_context_bad_saved_cursor);
++    proof { reveal(compressed_decoder_state_ok); reveal(serialized_context_state_ok);
++        reveal(serialized_context_data_ok); reveal(serialized_context_map_prefix_ok); reveal(serialized_context_phase_payload_ok); }
+     let active_len = match state_u16(workspace, window_bytes, B3B_MAP_SIZE) {
+         Ok(value) if 1 <= value && value <= 16_384 => value,
+         _ => return Err(core_state_failure()),
+@@ -35192,6 +35287,10 @@
+         6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE) == 0,
+     ensures
++        m1_context_bad_saved_cursor(old(workspace)@, window_bytes) ==>
++            m1_context_cursor_owner_effect(old(workspace)@, final(workspace)@, window_bytes,
++                *old(budget), *final(budget), r),
++       
+         final(budget).valid(),
+         final(budget).limits == old(budget).limits,
+         final(budget).work_remaining <= old(budget).work_remaining,
+@@ -35208,6 +35307,7 @@
+             },
+         },
+ {
++    reveal(m1_context_cursor_owner_effect); reveal(m1_context_cursor_failure_plan);
+     let allowed = if budget.input_remaining > usize::MAX as u64 {
+         input.len()
+     } else { input.len().min(budget.input_remaining as usize) };
+@@ -35216,6 +35316,18 @@
+         end_of_input && allowed == input.len(),
+     ) {
+         Ok(value) => value,
++        Err(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) => {
++            let phase = match state_byte(workspace, window_bytes, B3B_OUTER_PHASE) {
++                Ok(6) => CompressedOuterPhase::LiteralContextMap,
++                Ok(7) => CompressedOuterPhase::DistanceContextMap,
++                _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
++            };
++            let failed_plan = CompressedActionPlan { planning_work: 0, execution_work: 5,
++                consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
++            proof { assert(m1_context_cursor_failure_plan(workspace@, window_bytes, failed_plan)); }
++            return execute_fixed_compressed_plan(workspace, window_bytes, budget, phase,
++                &input[..allowed], end_of_input && allowed == input.len(), allowed < input.len(), failed_plan);
++        },
+         Err(error) => return Err(CompressedStep { consumed: 0,
+             status: CompressedStatus::Failed(error) }),
+     };
+@@ -35306,6 +35418,17 @@
+ ) -> (r: Result<ContextBitsPlan, CoreFailure>)
+     requires old(budget).valid(),
+     ensures
++        b3c_workspace_shape(workspace@.len() as nat, window_bytes)
++            && compressed_decoder_state_ok(workspace@, window_bytes)
++            && 6 <= b3b_scalar_byte_at(workspace@, window_bytes, B3B_OUTER_PHASE) <= 7
++            && ({ let p = b3b_scalar_byte_at(workspace@, window_bytes, B3B_CONTEXT_PHASE); p == 1 || p == 2 || p == 5 || p == 6 }) ==> {
++                &&& (r == Err(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) <==> m1_context_bad_saved_cursor(workspace@, window_bytes))
++                &&& (m1_context_bad_saved_cursor(workspace@, window_bytes) ==> *final(budget) == *old(budget))
++                &&& (r.is_err() ==> r == Err(CoreFailure::ResourceLimit)
++                    || r == Err(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)))
++                &&& (!m1_context_bad_saved_cursor(workspace@, window_bytes)
++                    && old(budget).work_remaining >= 63 ==> r.is_ok())
++            },
+         final(budget).valid(), final(budget).limits == old(budget).limits,
+         final(budget).input_remaining == old(budget).input_remaining,
+         final(budget).output_remaining == old(budget).output_remaining,
+@@ -35317,6 +35440,9 @@
+             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().read_work
+         },
+ {
++    reveal(m1_context_bad_saved_cursor);
++    proof { reveal(compressed_decoder_state_ok); reveal(serialized_context_state_ok);
++        reveal(serialized_context_data_ok); reveal(serialized_context_map_prefix_ok); reveal(serialized_context_phase_payload_ok); }
+     let phase = match state_byte(workspace, window_bytes, B3B_CONTEXT_PHASE) {
+         Ok(value) if value == 1 || value == 2 || value == 5 || value == 6 => value,
+         _ => return Err(core_state_failure()),
+@@ -35640,7 +35766,11 @@
+         6 <= b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) <= 7,
+         ({ let phase = b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_CONTEXT_PHASE);
+             phase == 1 || phase == 2 || phase == 5 || phase == 6 }),
+-    ensures final(budget).valid(), final(budget).limits == old(budget).limits,
++    ensures
++        m1_context_bad_saved_cursor(old(workspace)@, window_bytes) ==>
++            m1_context_cursor_owner_effect(old(workspace)@, final(workspace)@, window_bytes,
++                *old(budget), *final(budget), r),
++        final(budget).valid(), final(budget).limits == old(budget).limits,
+         final(budget).work_remaining <= old(budget).work_remaining,
+         final(workspace)@.len() == old(workspace)@.len(),
+         match r {
+@@ -35649,11 +35779,24 @@
+                 compressed_decoder_state_ok(final(workspace)@, window_bytes)),
+         },
+ {
++    reveal(m1_context_cursor_owner_effect); reveal(m1_context_cursor_failure_plan);
+     let allowed = if budget.input_remaining > usize::MAX as u64 { input.len() }
+         else { input.len().min(budget.input_remaining as usize) };
+     let plan = match plan_context_bits_action(workspace, window_bytes, budget, &input[..allowed],
+         end_of_input && allowed == input.len()) {
+         Ok(value) => value,
++        Err(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) => {
++            let phase = match state_byte(workspace, window_bytes, B3B_OUTER_PHASE) {
++                Ok(6) => CompressedOuterPhase::LiteralContextMap,
++                Ok(7) => CompressedOuterPhase::DistanceContextMap,
++                _ => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(core_state_failure()) }),
++            };
++            let failed_plan = CompressedActionPlan { planning_work: 0, execution_work: 5,
++                consumed: 0, status: Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState)) };
++            proof { assert(m1_context_cursor_failure_plan(workspace@, window_bytes, failed_plan)); }
++            return execute_fixed_compressed_plan(workspace, window_bytes, budget, phase,
++                &input[..allowed], end_of_input && allowed == input.len(), allowed < input.len(), failed_plan);
++        },
+         Err(error) => return Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(error) }),
+     };
+     execute_planned_context_bits(workspace, window_bytes, budget, &input[..allowed],
+@@ -36756,6 +36899,9 @@
+         b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes),
+         compressed_decoder_state_ok(old(workspace)@, window_bytes),
+     ensures
++        m1_context_bad_saved_cursor(old(workspace)@, window_bytes) ==>
++            m1_context_cursor_owner_effect(old(workspace)@, final(workspace)@, window_bytes,
++                *old(budget), *final(budget), r),
+         b3b_scalar_byte_at(old(workspace)@, window_bytes, B3B_OUTER_PHASE) == 3
+             && initial_suffix_read_domain(old(workspace)@, window_bytes) ==>
+             exists|plan: CompressedActionPlan| #[trigger] initial_suffix_owner_effect(
+@@ -36828,6 +36974,7 @@
+     hide(serialized_mtf_state_ok);
+     hide(serialized_context_state_ok);
+     hide(tree_group_payload_ok);
++    proof { reveal(m1_context_bad_saved_cursor); }
+     proof {
+         reveal(context_mode_bad_count_plan_valid); reveal(context_mode_handoff_plan_valid);
+         reveal(fixed_outer_bad_cursor); reveal(fixed_bad_cursor_plan_valid);
+@@ -44074,4 +44221,89 @@
+         }
+     }
+ 
+-}
++    #[test]
++    fn m1_context_cursor_failures_match_w1_and_prepay_terminal() {
++        use crate::brotli::{RequestBudget, RequestLimits};
++        let window = 1024u32;
++        let bytes = crate::brotli_prefix::required_workspace_bytes(10).unwrap() as usize;
++        let base = window as usize + B3B_SCALAR_OFFSET as usize;
++        let mut cases = 0usize;
++        let mut mismatches = 0usize;
++        for outer in [6u8, 7] {
++            for kind in [0u8, 1] {
++                for phase in [0u8, 1, 2, 5, 6] {
++                    // Four queue encodings plus every invalid var-int encoding
++                    // class. The latter are active only in count phase zero.
++                    let faults = if phase == 0 { 9u8 } else { 4u8 };
++                    for fault in 0..faults {
++                        let mut original = vec![0u8; bytes];
++                        original[base + B3B_MTF_UPPER_BOUND as usize] = 63;
++                        original[base + B3B_OUTER_PHASE as usize] = outer;
++                        original[base + B3B_CONTEXT_KIND as usize] = kind;
++                        original[base + B3B_CONTEXT_PHASE as usize] = phase;
++                        original[base + B3B_MAP_SIZE as usize] = 1;
++                        if phase != 0 { original[base + B3B_MAP_TREES as usize] = 1; }
++                        if phase == 5 { original[base + B3B_PENDING_RUN as usize] = 1; }
++                        if phase == 6 {
++                            original[base + B3B_MAP_INDEX as usize] = 1;
++                            original[base + B3B_MAP_INITIALIZED as usize] = 1;
++                        }
++                        match fault {
++                            0 => original[base + B3B_QUEUE_LEN as usize] = 9,
++                            1 => original[base + B3B_QUEUE_OFFSET_BYTE as usize] = 1,
++                            2 => {
++                                original[base + B3B_QUEUE_LEN as usize] = 1;
++                                original[base + B3B_QUEUE_OFFSET_BYTE as usize] = 8;
++                            },
++                            3 => original[base + 7] = 1,
++                            4 => original[base + B3B_VAR_PHASE as usize] = 255,
++                            5 => original[base + B3B_VAR_WIDTH as usize] = 1,
++                            6 => {
++                                original[base + B3B_VAR_PHASE as usize] = 1;
++                                original[base + B3B_VAR_WIDTH as usize] = 1;
++                            },
++                            7 => original[base + B3B_VAR_PHASE as usize] = 2,
++                            _ => {
++                                original[base + B3B_VAR_PHASE as usize] = 2;
++                                original[base + B3B_VAR_WIDTH as usize] = 8;
++                            },
++                        }
++                        let phase_enum = if outer == 6 { CompressedOuterPhase::LiteralContextMap }
++                            else { CompressedOuterPhase::DistanceContextMap };
++                        let mut expected = original.clone();
++                        let w1 = CompressedMetaBlockDecoder { workspace: &mut expected, window_bytes: window }
++                            .advance_outer_phase_once(phase_enum, &[], false);
++                        assert_eq!(w1, (0, Some(CompressedHeaderStatus::Failed(CompressedHeaderError::InternalState))));
++                        for work in [5u64, 4, 0, 6] {
++                            cases += 1;
++                            let mut actual = original.clone();
++                            let mut budget = RequestBudget::new(RequestLimits {
++                                max_input: 3, max_output: 5, max_work: work, max_calls: 7,
++                                max_initializations: 11, max_window_bits: 16,
++                            }).unwrap();
++                            let got = advance_planned_compressed_action(&mut actual, window, &mut budget, &[], false);
++                            let wanted = Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(
++                                if work < 5 { CoreFailure::ResourceLimit } else { core_state_failure() }) });
++                            let expected_workspace = if work < 5 { &original } else { &expected };
++                            let expected_work = if work < 5 { work } else { work - 5 };
++                            let matching = got == wanted && actual == *expected_workspace
++                                && budget.work_remaining == expected_work
++                                && (budget.input_remaining, budget.output_remaining, budget.calls_remaining,
++                                    budget.initializations_remaining) == (3, 5, 7, 11);
++                            if !matching {
++                                if mismatches == 0 {
++                                    let first = actual.iter().zip(expected_workspace).position(|(a, b)| a != b);
++                                    println!("first cursor mismatch outer={outer} kind={kind} phase={phase} fault={fault} credit={work}: result={got:?}, work={}, first_byte_difference={first:?}", budget.work_remaining);
++                                }
++                                mismatches += 1;
++                            }
++                        }
++                    }
++                }
++            }
++        }
++        println!("cursor comparisons={cases}, mismatches={mismatches}");
++        assert_eq!(mismatches, 0);
++    }
++
++}

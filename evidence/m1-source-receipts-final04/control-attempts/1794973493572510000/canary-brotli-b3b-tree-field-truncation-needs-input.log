@@ -1,0 +1,15 @@
+
+note: verifying module brotli_input, function lib::brotli_input::CodeDescriptionDecoder::advance_field (selected functions)
+
+error: expression simplifies to false
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-stride-init-exhaustion-canaries-43030/src/brotli_input.rs:6020:28
+     |
+6020 |                       assert(if matches!(
+     |  ____________________________^
+6021 | |                         CodeDescriptionStatus::NeedInput,
+6022 | |                         CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)
+6023 | |                     ) { true } else { false }) by (compute_only);
+     | |_____________________________________________^
+
+error: aborting due to 1 previous error
+

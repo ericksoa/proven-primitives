@@ -1,0 +1,93 @@
+{
+  "created_utc": "2026-11-18T02:54:03.928445+00:00",
+  "status": "PASS independent technical necessity/nonvacuity/source-coupling assessment; not architectural approval",
+  "bound_receipts": [
+    {
+      "path": "target/m1-r-cursor-context-witness/witness-result.json",
+      "sha256": "53a2e7e7a9ef84a8552ed4d46bc4204ef25adaeab229619ad6e84b42f94f3c8a"
+    },
+    {
+      "path": "target/m1-r-cursor-context-witness/ordinary-correspondence.json",
+      "sha256": "882c35a2a16b224318dd9594774ffdf3712a386c3dec2d7cfe9c362bb32c167b"
+    },
+    {
+      "path": "target/m1-r-cursor-context-witness/computed-receipt-source-coupling.json",
+      "sha256": "32c0483b68fcfba874372e563c1b5693223eef65ab7c49dbf1d47939512fc789"
+    },
+    {
+      "path": "target/m1-r-cursor-required-receipt-proof/required-receipt.rs.txt",
+      "sha256": "95aa59f953a98c575f326f7e58c9a9cc278b0df265e0e0624624d40bfeed1023"
+    }
+  ],
+  "actual_checks_reverified": [
+    {
+      "path": "target/m1-r-cursor-context-witness/attempts/image01/result.json",
+      "sha256": "10c822c84c92de711765255dc8d55a445d151f020376c3556ff431ea061c3eb2",
+      "verification": {
+        "verified": 2,
+        "errors": 0
+      },
+      "source_sha256": "21400410de8a45488771bad16b888828b5409d22f3d7a3b1a27e04ff0d7cd6ee",
+      "log_sha256": "254eb29ce6201dd9e494dd0c001f4b94c1fd3ac22b8c97d5db5a32f4a10aca40"
+    },
+    {
+      "path": "target/m1-r-cursor-context-witness/attempts/owner01/result.json",
+      "sha256": "cd5c83995b1a1647d9017c1c7dbee15d0987fb4d5d0846bbd69988a7a96145c6",
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      },
+      "source_sha256": "43975e4601c16e1f3b0be8b2b75f81dfcdf6d19d10b6181a135390adb218e85f",
+      "log_sha256": "328a941ab6f9c3835bcd8706ddaa31ce8e35cbc803cc23b279d3a78de137cd33"
+    },
+    {
+      "path": "target/m1-r-cursor-required-receipt-proof/attempts/criterion01/result.json",
+      "sha256": "37e6f5716734bd62004041b88a034bacb43c7fc82b8fb97d55bde25a56d33ff5",
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      },
+      "source_sha256": "698da5a2f13ad2342c69d4eb243bb706460add7ccd054c5a553b29fd793ef719",
+      "log_sha256": "6a2e7b7cae34394ab355d6afa4a6a1d89cb362970605cd5bd4e5dfe23f0746cc"
+    },
+    {
+      "path": "target/m1-r-cursor-computed-receipt-diagnostic/positive/result.json",
+      "sha256": "7480a4ed470c6c5fdf1b43833df758ac332b224cc445726c958e012b26aca63f",
+      "verification": {
+        "verified": 1,
+        "errors": 0
+      },
+      "source_sha256": "153dd3a1ea9f7b32ebb41fa4af9e1dc4963ef01d9fece2a42e8c8055c1e18c6e",
+      "log_sha256": "3a39425f9600c017ccef834dccd689e43fb28aef895edeb4f0d05e05767eb26e"
+    }
+  ],
+  "necessary_old_property": "The exact unchanged caller fixed-bad-cursor implication gives finalwork0 from beforework5. Old unconditional receipt conservation then gives parent receipt5; checked prior0 and the unchanged parent += actual_child fold require actual child5. The implication theorem assumes no healthy implementation behavior or preassigned afterwork0.",
+  "old_effect_clause_exact_after_only_endpoint_variable_substitution": true,
+  "old_conservation_and_actual_fold_relations_retained": true,
+  "nonvacuity": "No-requires image constructor proves original root predicates and ContextModes bad cursor; checked validBudget5 exists privately. Same ordinary owner body actually reaches original Err fallback with same image/work5/ledger0; real executor call captures actual Ghost receipt5, leavesbudget0 and proves terminal effect/frame.",
+  "source_preservation": {
+    "all_old_caller_postconditions_token_identical_suffix": true,
+    "all_original_module_declarations_unchanged_except_appended_private_validation_entries": true,
+    "ordinary_body_tokens_equal_after_erasing_only_proof_blocks_and_one_new_ghost_binding_and_undoing_checked_value_brace_normalization": true,
+    "real_ContextModes_executor_call_and_Ghost_capture_fold_preserved": true,
+    "no_fake_Ghost5_or_new_model_helper_API_contract": true
+  },
+  "coupling": {
+    "healthy_operand5": "Justified by independently checked actual captured child5 AND necessary old-contract child5, never assigned as a replacement Ghost.",
+    "negative_operand0": "Mechanically parsed exact sole numeric Ghost(0nat) in original unchanged skipped-executor stub.",
+    "fixed_expected5": "Old-caller-contract consequence, not new accounting policy.",
+    "healthy_source_replay_matches_actual153d": true,
+    "negative_in_memory_hash_matches_proposal_and_proof_removal_restores_exact_old_bad8ee8": true,
+    "actual_skipped_executor_fault_scope_and_return_stub_preserved": true,
+    "no_narrowed_input_domain_or_runtime_witness_guard": true
+  },
+  "next_gate": "Root-reviewed separately authorized ONE exact negative; unchanged strict classifier must accept real computedfalse without tool/resource/type failure. Native predicate extension, if needed, must retain existing assertion sites/arms.",
+  "limits": [
+    "No checker invocation or shared edit during this audit.",
+    "No negative control qualification yet.",
+    "No native/source-to-binary/full-gate or negative-body-SMT completion claim.",
+    "Technical validation is not human architectural approval."
+  ],
+  "checker_invocations": 0,
+  "shared_edits": 0
+}

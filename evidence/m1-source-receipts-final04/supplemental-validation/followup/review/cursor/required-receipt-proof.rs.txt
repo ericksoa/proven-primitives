@@ -1,0 +1,47 @@
+#[verifier::spinoff_prover]
+#[verifier::rlimit(1000)]
+proof fn r_triage_context_cursor_required_receipt(
+    before_image: Seq<u8>, after_image: Seq<u8>, window_bytes: u32,
+    before_budget: crate::brotli::RequestBudget, after_budget: crate::brotli::RequestBudget,
+    result: Result<usize, CompressedStep>, parent_receipt: nat,
+    prior_receipt: nat, actual_child_receipt: nat,
+)
+    requires
+        before_budget.valid(),
+        b3c_workspace_shape(before_image.len(), window_bytes),
+        compressed_decoder_state_ok(before_image, window_bytes),
+        before_budget.work_remaining == 5,
+        b3b_scalar_byte_at(before_image, window_bytes, B3B_OUTER_PHASE) == 5,
+        fixed_phase_bad_cursor(before_image, window_bytes, CompressedOuterPhase::ContextModes),
+        fixed_outer_bad_cursor(before_image, window_bytes) ==> {
+            &&& after_budget.input_remaining == before_budget.input_remaining
+            &&& after_budget.output_remaining == before_budget.output_remaining
+            &&& after_budget.calls_remaining == before_budget.calls_remaining
+            &&& after_budget.initializations_remaining == before_budget.initializations_remaining
+            &&& if before_budget.work_remaining >= 5 {
+                &&& result == Err(CompressedStep { consumed: 0,
+                    status: CompressedStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding)) })
+                &&& after_budget.work_remaining == before_budget.work_remaining - 5
+                &&& terminal_error_frame(before_image, after_image, window_bytes)
+                &&& serialized_terminal_error(after_image, window_bytes, CompressedHeaderError::InternalState)
+            } else {
+                &&& result == Err(CompressedStep { consumed: 0, status: CompressedStatus::Failed(CoreFailure::ResourceLimit) })
+                &&& after_image == before_image
+                &&& after_budget == before_budget
+            }
+        },
+        parent_receipt + after_budget.work_remaining as nat == before_budget.work_remaining as nat,
+        prior_receipt == 0,
+        parent_receipt == prior_receipt + actual_child_receipt,
+    ensures
+        fixed_outer_bad_cursor(before_image, window_bytes),
+        after_budget.work_remaining == 0,
+        parent_receipt == 5,
+        actual_child_receipt == 5,
+{
+    reveal(fixed_outer_bad_cursor);
+    assert(fixed_outer_bad_cursor(before_image, window_bytes));
+    assert(after_budget.work_remaining == 0);
+    assert(parent_receipt == 5);
+    assert(actual_child_receipt == 5);
+}

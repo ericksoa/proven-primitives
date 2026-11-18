@@ -1,0 +1,17 @@
+{
+  "canary-brotli-b3b-tree-field-truncation-needs-input.log": "9677e8c7328fc55816c2222a979137a95ea11d41ae0a94dc6e1ea466a60652b6",
+  "canary-brotli-m1-cursor-context-owner-skips-terminal-action.log": "cc0009a0011391085446e8502e50d9fe488c2ced05967e468b1a5226afa1b042",
+  "canary-brotli-m1-malformed-suffix-fallback-undercharge.log": "d985e3eafc521e5419db8530609e64f473e0af867214838f38eb5038b57709ed",
+  "control-the_prover_rejects_five_m1_malformed_suffix_defects.json": "d8700e0b256d66947e962bb3a2d91d423ea54fd889e2b517d79c3c16eac5dbf5",
+  "control-the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects.json": "dbbb0b70389ea4fc0fe9183361354476038f937c3b71bf2ee4f0d37563b9b8d2",
+  "control-the_prover_rejects_six_m1_bad_fixed_cursor_defects.json": "7d343982432d0c39c8585d7577dd969431a45e85bd0b3fcf64b6060e23188a05",
+  "controls-results.json": "488a6b934d7aa0e9e96258b054ee239edda19e100e58b9e91f95eab64c7ccec1",
+  "controls-the_prover_rejects_five_m1_malformed_suffix_defects.log": "3ce33a1257f4b81b06cac0aba9c2b2b3f91cc2ce7b4303ff2bc761a5d300de0f",
+  "controls-the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects.log": "5b9da7dc8778a25e8f6a3242ca5fb225b58d770ef8faecfcb5a453b57caa9511",
+  "controls-the_prover_rejects_six_m1_bad_fixed_cursor_defects.log": "8eb004b1ac62db2f2595f31d8ddeda7e0e6cd1ffe44802786fedc05936271e8e",
+  "mutant--brotli-b3b-tree-field-truncation-needs-input.rs.txt": "00028b2eeed1af39c4e9d5016b2175a3cdf574febbfe5db9b911c1bd7bd15f73",
+  "mutant--brotli-m1-cursor-context-owner-skips-terminal-action.rs.txt": "8ee8d5ceaca8846ea19e156df837b399dec78eba806323e24df9623f03e9561b",
+  "mutant--brotli-m1-malformed-suffix-fallback-undercharge.rs.txt": "617a2c40aa2ad364afd0e0238e542ec09a1b49e2c076459454ec66f98e16a218",
+  "selected-controls.json": "cae71d4aacf66362bcbdefbf1c4ac184ee041e7a5db70b8f82d306e68e276a61",
+  "summary.json": "40fa29929ce5919a0ab44a1f750542b45d2acfd08bebb670f26324db88edb260"
+}

@@ -1,0 +1,36 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59783,13): 'if' cannot be used in patterns.
+WARNING: (67570,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:34822:1
+      |
+34822 | / fn advance_planned_terminal_header(
+34823 | |     workspace: &mut [u8], window_bytes: u32,
+34824 | |     budget: &mut crate::brotli::RequestBudget, outer: u8,
+34825 | | ) -> (r: CompressedStep)
+      | |_______________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:34831:13
+      |
+34831 |       ensures {
+      |  _____________^
+34832 | |             let work = m1_terminal_header_units(old(workspace)@, window_bytes, outer);
+34833 | |             if old(budget).work_remaining as nat >= work {
+34834 | |                 &&& final(budget).work_remaining as nat + work == old(budget).work_remaining as nat
+...     |
+34841 | |         },
+      | |_________^ failed this postcondition
+...
+34891 | /     CompressedStep { consumed: step.consumed, status: match step.status {
+34892 | |         CompressedHeaderStatus::Complete(_) => CompressedStatus::Complete,
+34893 | |         CompressedHeaderStatus::Failed(error) => CompressedStatus::Failed(map_compressed_error(error)),
+34894 | |         CompressedHeaderStatus::NeedInput => CompressedStatus::Failed(core_state_failure()),
+34895 | |     } }
+      | |_______- at the end of the function body
+
+error: aborting due to 1 previous error
+

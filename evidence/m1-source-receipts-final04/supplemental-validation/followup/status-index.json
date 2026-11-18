@@ -1,0 +1,481 @@
+{
+  "native_fullgate_finaltest_closure": "Outside this supplement; actual04 receipt must bind final integrated tests.",
+  "qualified_pairs": {
+    "target/m1-r-cursor-computed-receipt-diagnostic/qualified-case-result.json": "CURSOR actual child receipt",
+    "target/m1-r-field-truncation-computed-multiline-diagnostic/coupled-diagnostic-result.json": "FIELD status mapping",
+    "target/m1-r-suffix-fallback-computed-byte175-diagnostic/coupled-diagnostic-result.json": "SUFFIX byte175 frame",
+    "target/m1-r-suffix-fallback-computed-debit-diagnostic/coupled-diagnostic-result.json": "SUFFIX fallback debit"
+  },
+  "records": [
+    {
+      "original_path": "target/m1-r-controls03-updates/focused03-execution-result.json",
+      "recorded_fields": {
+        "phase": "focused03 failed; full gate never launched"
+      },
+      "sha256": "7343c077183c2ee91901f4c02d122653b999e7252345900e366d7ab0f0fda4f1",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-cursor-computed-receipt-diagnostic/negative/result.json",
+      "recorded_fields": {
+        "exit_code": 1
+      },
+      "sha256": "1ffdba879b53dce0b2ca7817f8a4ce168c14e15306b76fe87dadd6cd4a699a9d",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-cursor-computed-receipt-diagnostic/positive/result.json",
+      "recorded_fields": {
+        "exit_code": 0,
+        "negative_runs": 0
+      },
+      "sha256": "7480a4ed470c6c5fdf1b43833df758ac332b224cc445726c958e012b26aca63f",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-cursor-computed-receipt-diagnostic/qualified-case-result.json",
+      "recorded_fields": {
+        "status": "QUALIFIED isolated coupled cursor control repair; TARGET-ONLY UNAPPLIED; not a full gate"
+      },
+      "sha256": "5bec4a0de70c3c65d83b4a0ba93103afbf90c3ce58164724d63c5272b6d9804a",
+      "supplement_classification": "QUALIFIED ISOLATED PAIR ONLY"
+    },
+    {
+      "original_path": "target/m1-r-cursor-context-witness/attempts/image01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "10c822c84c92de711765255dc8d55a445d151f020376c3556ff431ea061c3eb2",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-cursor-context-witness/attempts/owner01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "cd5c83995b1a1647d9017c1c7dbee15d0987fb4d5d0846bbd69988a7a96145c6",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-cursor-context-witness/retained-budget5/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "4ec1e88a720e8f84d08bd6f0439c002bf990cf39c19517a8197694a140256886",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-cursor-context-witness/witness-result.json",
+      "recorded_fields": {
+        "status": "CHECKED concrete ContextModes cursor image/domain and actual-call receipt/effect witness; no new cursor negative"
+      },
+      "sha256": "53a2e7e7a9ef84a8552ed4d46bc4204ef25adaeab229619ad6e84b42f94f3c8a",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-cursor-owner-branch-diagnostic/diagnostic-result.json",
+      "recorded_fields": {
+        "status": "UNRESOLVED; one equivalent-fault negative remained resource-only"
+      },
+      "sha256": "c622c48a096a74471200d3d84e7eba5cadd07bd55dcb973a5b2964d3b14c5213",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-cursor-owner-branch-diagnostic/negative/result.json",
+      "recorded_fields": {
+        "exit_code": 1
+      },
+      "sha256": "b85ab255565a72106cd28e78055a21a5f298c9a9bdf4385b325ac8309be367b2",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-cursor-owner-branch-diagnostic/retained-positive/positive-result.json",
+      "recorded_fields": {
+        "exit_code": 0,
+        "scope": "Actual unchanged selected advance_planned_compressed_action positive; all original root obligations checked."
+      },
+      "sha256": "312bc4f1caccdc03f068b1ade9059bb6164b6efbb429668216ce8e94dd4da27c",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-cursor-required-receipt-proof/attempts/criterion01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "37e6f5716734bd62004041b88a034bacb43c7fc82b8fb97d55bde25a56d33ff5",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-cursor-required-receipt-proof/criterion-binding.json",
+      "recorded_fields": {
+        "status": "CHECKED old-guarantee necessary receipt5, actual-call witness and healthy computed positive; new negative still unauthorized/unrun"
+      },
+      "sha256": "2cb69c7c70ded839f3b4b91b59efc97462011cc964857b94bf98a3a51573680c",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-diagnostic/diagnostic-result.json",
+      "recorded_fields": {
+        "negative_runs": 0,
+        "positive_runs": 1,
+        "status": "UNRESOLVED - STOPPED ON REQUIRED COUPLED POSITIVE RESOURCE FAILURE"
+      },
+      "sha256": "22d3a771b97207d7debc22e286d448acde3623cf4115fb630ceaefcf30812949",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-diagnostic/positive/result.json",
+      "recorded_fields": {
+        "exit_code": 1,
+        "qualified_negative": false
+      },
+      "sha256": "b76e06b2cbc5d18abef8421f94c768f54e01064ddb137ebd9ed9b425ba1bfb8b",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-effort1000-diagnostic/diagnostic-result.json",
+      "recorded_fields": {
+        "negative_runs": 1,
+        "positive_runs": 1,
+        "status": "UNRESOLVED - ACTUAL POSITIVE3/0; GENUINE LITERAL COMPUTED FALSE BUT UNCHANGED CLASSIFIER FORMAT CHECK DID NOT MATCH",
+        "strict_gate_accepted": false
+      },
+      "sha256": "af658098c1116eafecabe9ee92d6b60969c88ced50a4a1713dca48285d12376a",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-effort1000-diagnostic/negative/result.json",
+      "recorded_fields": {
+        "exit_code": 1,
+        "qualified_negative": false
+      },
+      "sha256": "d4a3d0fb862f8d73bf9a861486a5c85d7d30a4806c8b310f27b24c3b2c446f1e",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-effort1000-diagnostic/positive/result.json",
+      "recorded_fields": {
+        "exit_code": 0,
+        "qualified_negative": false
+      },
+      "sha256": "3524f3469a006da14423f0e82bc7bafee86e872d0efbf4b3aedf773db82af7fc",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-effort1000-diagnostic/prior500-positive-result.json",
+      "recorded_fields": {
+        "exit_code": 1,
+        "qualified_negative": false
+      },
+      "sha256": "b76e06b2cbc5d18abef8421f94c768f54e01064ddb137ebd9ed9b425ba1bfb8b",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-multiline-diagnostic/coupled-diagnostic-result.json",
+      "recorded_fields": {
+        "negative_runs": 1,
+        "positive_runs": 1,
+        "status": "QUALIFIED ISOLATED full-selected positive3/0 and one source-coupled genuine computed-false negative; minimal patch STAGED ONLY"
+      },
+      "sha256": "698e973584c8f949142e6121d19d468d991555f42647fadd30aef440b86a97ee",
+      "supplement_classification": "QUALIFIED ISOLATED PAIR ONLY"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-multiline-diagnostic/negative/result.json",
+      "recorded_fields": {
+        "exit_code": 1,
+        "qualified_negative": true
+      },
+      "sha256": "e96d5b3166e82dd15bb541016291c8cff5ffd35ce8bb592941308c20f12e809a",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-computed-multiline-diagnostic/positive/result.json",
+      "recorded_fields": {
+        "exit_code": 0,
+        "qualified_negative": false
+      },
+      "sha256": "2ec0cc37e994584ee2c91fd000c76f38e09cdc693015de5366edbef4cfac4c17",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-split-diagnostic/diagnostic-result.json",
+      "recorded_fields": {
+        "negative_runs": 1,
+        "positive_runs": 1,
+        "status": "UNRESOLVED - ONE EQUIVALENT-FAULT SPLIT NEGATIVE RESOURCE-FAILED; STOPPED"
+      },
+      "sha256": "f35db714460f5fb63d4d06109886633ee1557d02a6e5d9048f26d5f48a268e1b",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-split-diagnostic/negative/result.json",
+      "recorded_fields": {
+        "exit_code": 1,
+        "qualified_negative": false
+      },
+      "sha256": "c8ac1ebec68901859d423d0d3c7bab3fac660c27fb15e7ccbbf92964c2c5a62c",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-split-diagnostic/positive/result.json",
+      "recorded_fields": {
+        "exit_code": 0,
+        "qualified_negative": false
+      },
+      "sha256": "3957a92c355224a43de1179790a423c947e901e1b36872659b61e90abf655c9d",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-witness/attempts/admission-model01/result.json",
+      "recorded_fields": {
+        "exit_code": 1
+      },
+      "sha256": "5435e9f364c886f35a5cb73ff488a038153ccba107684cf67f73a90e61bed890",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-witness/attempts/admission-model02/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "143dc8ec9010d3dc3a186d0cee444707acbb47f8ab36f38a6a2244320d5e0cba",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-witness/attempts/replay01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "381e9f0873f31d0e17af2e13701a9c2a2ccf98f5f97584f53fec777fd08d94c9",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-field-truncation-witness/witness-result.json",
+      "recorded_fields": {
+        "status": "CHECKED admitted witness + original-model status consequence2/0 + SAME-BODY reached-return replay3/0; proposed computed control NOT authorized or run"
+      },
+      "sha256": "9018e0842373ce193473eafcb73443e37ffb3704d90a0bc0a2f5764133053a22",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-independent-cursor-receipt-audit/audit.json",
+      "recorded_fields": {
+        "status": "PASS independent technical necessity/nonvacuity/source-coupling assessment; not architectural approval"
+      },
+      "sha256": "6991d6a86b86925df24b0b76fe91cbb1d53d595c1ef8fdc6eb9cbc2377f19410",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-independent-field-truncation-audit/audit.json",
+      "recorded_fields": {
+        "status": "PASS independent technical assessment; no checker/control invocation or architectural approval"
+      },
+      "sha256": "9f9a4cc50b603bbf07d1031f4e6a9fb871932f5ea1610d9c9b798ef15709cf76",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/bad-byte175/result.json",
+      "recorded_fields": {
+        "exit_code": 1,
+        "negative_runs": 1
+      },
+      "sha256": "44823e6b5e294e4e4cb70ff3d2f205911b30279cca9acc98c83e06f906f56e05",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/coupled-diagnostic-result.json",
+      "recorded_fields": {
+        "status": "QUALIFIED actual normalized healthy1/0 plus sole root-authorized exact byte175 computedfalse negative under unchanged1c98"
+      },
+      "sha256": "3ea7139a3edb79daaf6c4892d95d7545cf6f3d0460e6a3d3477aac15d0e27651",
+      "supplement_classification": "QUALIFIED ISOLATED PAIR ONLY"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/negative-classification.json",
+      "recorded_fields": {
+        "status": "QUALIFIED genuine computedfalse of actual extra-put value1 against old frame-required0"
+      },
+      "sha256": "732e70a75a4e10a1e9ca821ba08ac4b17b1ae90a018433848b82eed452b3d223",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive-normalized/result.json",
+      "recorded_fields": {
+        "exit_code": 0,
+        "scope": "Root-authorized normalized full selected true positive only; no byte175 negative authorized."
+      },
+      "sha256": "b65cfd78953d7bdc3fc25038b99bc88d57f4eb5f2ea5164faa3c073216a1c692",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-byte175-diagnostic/positive/result.json",
+      "recorded_fields": {
+        "exit_code": 1,
+        "scope": "Full selected true positive only; no byte175 negative authorized."
+      },
+      "sha256": "f12885f594845c8213cf3504da8995c3b1d19d22d9870df261f3aedd794d2337",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/bad-undercharge/result.json",
+      "recorded_fields": {
+        "exit_code": 1,
+        "negative_runs": 1
+      },
+      "sha256": "d8f11c221396e82f5d70a8ed4337828c6a1e5ad681859f8a92072670f01f8f25",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/coupled-diagnostic-result.json",
+      "recorded_fields": {
+        "status": "QUALIFIED actual positive1/0 and one exact conditional-undercharge computed-false negative under unchanged1c98"
+      },
+      "sha256": "a3b49025ca52d48310b6a7a3d5f4320bf3f8c4ed4a1faa8feb1f88274123b983",
+      "supplement_classification": "QUALIFIED ISOLATED PAIR ONLY"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/negative-classification.json",
+      "recorded_fields": {
+        "status": "QUALIFIED necessary admitted-witness consequence of same existing debit obligation"
+      },
+      "sha256": "54a563e66a20795f8b96535bb7b75e8843a074195cf266e12c63c0cb5cd5104c",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-computed-debit-diagnostic/positive/result.json",
+      "recorded_fields": {
+        "exit_code": 0,
+        "scope": "Full selected actual positive only; no control qualification, no negative authorized."
+      },
+      "sha256": "6b58ad47e9f6c6d053441ab78e2cbd465da287e3be762436090cfc5cc932bd75",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-distributed-charge-diagnostic/diagnostic-result.json",
+      "recorded_fields": {
+        "status": "UNQUALIFIED: unchanged selected positive1/0; one equivalent branch-distributed negative resource-only0/1 at108s. Stop; no further variants."
+      },
+      "sha256": "44254b81ae28a518450f0a592172fb5213d34f103b3e26a6167ba7e8c83e1550",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-distributed-charge-diagnostic/negative-result.json",
+      "recorded_fields": {
+        "classification": "resource-only failure; exact-equivalent-fault distribution unresolved and not accepted",
+        "exit_code": 1,
+        "negative_runs": 1,
+        "positive_runs": 1,
+        "strict_gate_accepted": false
+      },
+      "sha256": "f6ad763003977db278dbf9f3edc2b20ed46661f364ffa3f2e2a6ed63c73ecc2b",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-distributed-charge-diagnostic/positive-result.json",
+      "recorded_fields": {
+        "exit_code": 0,
+        "scope": "Actual unchanged selected advance_planned_compressed_action positive; all original root obligations checked."
+      },
+      "sha256": "312bc4f1caccdc03f068b1ade9059bb6164b6efbb429668216ce8e94dd4da27c",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-witness/attempts/budget01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "4ec1e88a720e8f84d08bd6f0439c002bf990cf39c19517a8197694a140256886",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-witness/attempts/criterion01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "4056f97cccadc2480c2cb8c7e91bc9c1a75a67b335cca59d8003544e5504b17e",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-witness/attempts/frame-criterion01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "8252be3186a1b3c7a91317fe87a1f1a3c4a3cbe28ed6fde8dda19a8be203d6a9",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-witness/attempts/prefix01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "9604422ef99fe0f1de1301afdc7d2de7b76254ab2e22de9c5bac7d780143d150",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-witness/attempts/terminal01/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "d562956c522e9cb25d61bd0646a30daa040b51a248c7610313202f9341354962",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-witness/terminal-witness-result.json",
+      "recorded_fields": {
+        "status": "CHECKED reached insertion point + old-frame required-value consequence + actual normalized fullselected positive; byte175 negative unapproved/unrun"
+      },
+      "sha256": "01f4a2d6dbb10a8d54eaa0f5c5293dc90dda87b1ac7637cf16656a653a3c7865",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-fallback-witness/witness-result.json",
+      "recorded_fields": {
+        "status": "CHECKED pre-reservation fallback witness and same-old-owner debit necessity; terminal/byte175 extension is separate"
+      },
+      "sha256": "6d7c57e87ebe1b5e173208d1db6b6e4f665e0a8303a2fa494704f32e0d79a55e",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-suffix-family-computed-controls-final/family-result.json",
+      "recorded_fields": {
+        "status": "BOTH suffix-family computed controls qualified; combined minimal harness patch delivered to sole test owner for fixed04"
+      },
+      "sha256": "a2f694bc93135eab1f1c882259c576fd55d092e7b5d2f37e29434c1106b9f2bc",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-unreached03-controls-diagnostic/diagnostic-result.json",
+      "recorded_fields": {
+        "scope": "Two separately reported old cases only; isolated diagnostics, not final gate"
+      },
+      "sha256": "b256a9a0ffe9e21c0870e1360efa2101dc68119359c21ada95c4a07bbe02c380",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-unreached03-controls-diagnostic/executor-debit-negative/result.json",
+      "recorded_fields": {
+        "exit_code": 1
+      },
+      "sha256": "a89c113243568493e67dc238510174bfa87d76f1e8107e4a2076cb1bdab7cae0",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    },
+    {
+      "original_path": "target/m1-r-unreached03-controls-diagnostic/executor-positive/result.json",
+      "recorded_fields": {
+        "exit_code": 0
+      },
+      "sha256": "e3ad40f1be648044e3ba188ef2259900fe83cb3ca0d56409c86c9a432959206f",
+      "supplement_classification": "SUPPORTING/HISTORICAL COMPONENT; NOT A STANDALONE GATE RESULT"
+    },
+    {
+      "original_path": "target/m1-r-unreached03-controls-diagnostic/suffix-byte175-negative/result.json",
+      "recorded_fields": {
+        "exit_code": 1
+      },
+      "sha256": "e8387a67f34f83e244a37d091a7cb58b941fc812d98a167cebc4bb20cdca86c4",
+      "supplement_classification": "UNQUALIFIED FAILED INTERMEDIATE OR FAILED FOCUSED RUN"
+    }
+  ],
+  "rule": "Only four sealed pair packets are marked qualified. Nonzero exit, failed tool/type/resource outcomes, format/opaque-computation failures, masks and unrun proposals are never promoted into semantic acceptance. Original records remain verbatim; earlier pending/unapplied notes are historical."
+}

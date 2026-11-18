@@ -1,0 +1,361 @@
+verification results:: 28 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25375:9
+      |
+25375 |         while i < meta.queue.len
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25321:5
+      |
+25321 | /     fn initialize_from_meta(
+25322 | |         workspace: &mut [u8],
+25323 | |         window_bytes: u32,
+25324 | |         meta: MetaBlockDecoder,
+25325 | |     ) -> (r: Result<(), CompressedHeaderError>)
+      | |______________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25721:5
+      |
+25721 |     fn fail(&mut self, consumed: usize, error: CompressedHeaderError) -> (r: (CompressedHeaderStep, Ghost<nat>))
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25850:5
+      |
+25850 | /     fn fail_phase(
+25851 | |         &mut self,
+25852 | |         consumed: usize,
+25853 | |         error: CompressedHeaderError,
+25854 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25528:5
+      |
+25528 | /     fn store_outer_phase(
+25529 | |         &mut self,
+25530 | |         phase: CompressedOuterPhase,
+25531 | |     ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |____________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26097:5
+      |
+26097 | /     fn advance_block_count_phase(
+26098 | |         &mut self,
+26099 | |         phase: CompressedOuterPhase,
+26100 | |         input: &[u8],
+26101 | |         end_of_input: bool,
+26102 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25816:5
+      |
+25816 | /     fn store_installed_prefix(
+25817 | |         &mut self,
+25818 | |         prefix: InstalledPrefixState,
+25819 | |     ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |____________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26468:5
+      |
+26468 | /     fn advance_block_tree_phase(
+26469 | |         &mut self,
+26470 | |         phase: CompressedOuterPhase,
+26471 | |         input: &[u8],
+26472 | |         end_of_input: bool,
+26473 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26613:5
+      |
+26613 | /     fn advance_initial_block_length_phase(
+26614 | |         &mut self,
+26615 | |         phase: CompressedOuterPhase,
+26616 | |         input: &[u8],
+26617 | |         end_of_input: bool,
+26618 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check finished in 56 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26613:5
+      |
+26613 | /     fn advance_initial_block_length_phase(
+26614 | |         &mut self,
+26615 | |         phase: CompressedOuterPhase,
+26616 | |         input: &[u8],
+26617 | |         end_of_input: bool,
+26618 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26613:5
+      |
+26613 | /     fn advance_initial_block_length_phase(
+26614 | |         &mut self,
+26615 | |         phase: CompressedOuterPhase,
+26616 | |         input: &[u8],
+26617 | |         end_of_input: bool,
+26618 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26843:5
+      |
+26843 | /     fn advance_distance_parameters_phase(
+26844 | |         &mut self,
+26845 | |         phase: CompressedOuterPhase,
+26846 | |         input: &[u8],
+26847 | |         end_of_input: bool,
+26848 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check finished in 2 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26843:5
+      |
+26843 | /     fn advance_distance_parameters_phase(
+26844 | |         &mut self,
+26845 | |         phase: CompressedOuterPhase,
+26846 | |         input: &[u8],
+26847 | |         end_of_input: bool,
+26848 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26843:5
+      |
+26843 | /     fn advance_distance_parameters_phase(
+26844 | |         &mut self,
+26845 | |         phase: CompressedOuterPhase,
+26846 | |         input: &[u8],
+26847 | |         end_of_input: bool,
+26848 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26982:5
+      |
+26982 | /     fn advance_context_modes_phase(
+26983 | |         &mut self,
+26984 | |         phase: CompressedOuterPhase,
+26985 | |         input: &[u8],
+26986 | |         end_of_input: bool,
+26987 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check finished in 2 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26982:5
+      |
+26982 | /     fn advance_context_modes_phase(
+26983 | |         &mut self,
+26984 | |         phase: CompressedOuterPhase,
+26985 | |         input: &[u8],
+26986 | |         end_of_input: bool,
+26987 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26982:5
+      |
+26982 | /     fn advance_context_modes_phase(
+26983 | |         &mut self,
+26984 | |         phase: CompressedOuterPhase,
+26985 | |         input: &[u8],
+26986 | |         end_of_input: bool,
+26987 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28274:21
+      |
+28274 |                     assert(alphabet >= 64) by (bit_vector)
+      |                     ^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28203:5
+      |
+28203 | /     fn group_parameters(
+28204 | |         &self,
+28205 | |         group: u8,
+28206 | |     ) -> (r: Result<(crate::brotli_prefix::TreeRegion, u16, u16), CompressedHeaderError>)
+      | |________________________________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28301:5
+      |
+28301 |     fn start_group_tree(&mut self, group: u8, tree: u16) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28490:5
+      |
+28490 | /     fn start_tree_group(
+28491 | |         &mut self,
+28492 | |         group: u8,
+28493 | |         phase: CompressedOuterPhase,
+28494 | |     ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |____________________________________________________________^
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:27217:5
+      |
+27217 | /     fn advance_context_maps_phase(
+27218 | |         &mut self,
+27219 | |         phase: CompressedOuterPhase,
+27220 | |         input: &[u8],
+27221 | |         end_of_input: bool,
+27222 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check finished in 2 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:27217:5
+      |
+27217 | /     fn advance_context_maps_phase(
+27218 | |         &mut self,
+27219 | |         phase: CompressedOuterPhase,
+27220 | |         input: &[u8],
+27221 | |         end_of_input: bool,
+27222 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:27217:5
+      |
+27217 | /     fn advance_context_maps_phase(
+27218 | |         &mut self,
+27219 | |         phase: CompressedOuterPhase,
+27220 | |         input: &[u8],
+27221 | |         end_of_input: bool,
+27222 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28588:5
+      |
+28588 |     fn complete_tree_groups(&mut self) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:27453:5
+      |
+27453 | /     fn advance_tree_groups_phase(
+27454 | |         &mut self,
+27455 | |         phase: CompressedOuterPhase,
+27456 | |         input: &[u8],
+27457 | |         end_of_input: bool,
+27458 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:27712:5
+      |
+27712 | /     fn advance_outer_phase_once(
+27713 | |         &mut self,
+27714 | |         phase: CompressedOuterPhase,
+27715 | |         input: &[u8],
+27716 | |         end_of_input: bool,
+27717 | |     ) -> (r: ((usize, Option<CompressedHeaderStatus>), Ghost<nat>))
+      | |__________________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25494:5
+      |
+25494 |     fn load_outer_phase(&self) -> (r: Result<CompressedOuterPhase, CompressedHeaderError>)
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25777:5
+      |
+25777 | /     fn repeat_terminal_failure(
+25778 | |         &mut self,
+25779 | |         error: CompressedHeaderError,
+25780 | |     ) -> (r: CompressedHeaderStep)
+      | |_________________________________^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28843:9
+      |
+28843 |         while i < 3
+      |         ^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28803:5
+      |
+28803 |     fn finish_header(&mut self, consumed: usize) -> (r: (CompressedHeaderStep, Ghost<nat>))
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28062:9
+      |
+28062 |         while transitions < 100_000
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28005:5
+      |
+28005 |     fn step_with_receipt(&mut self, input: &[u8], end_of_input: bool) -> (r: (CompressedHeaderStep, Ghost<nat>))
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25477:5
+      |
+25477 | /     fn from_meta(
+25478 | |         workspace: &'w mut [u8],
+25479 | |         window_bytes: u32,
+25480 | |         meta: MetaBlockDecoder,
+25481 | |     ) -> (r: Result<Self, CompressedHeaderError>)
+      | |________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25806:5
+      |
+25806 |     fn load_installed_prefix(&self) -> (r: Result<InstalledPrefixState, CompressedHeaderError>)
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:28151:5
+      |
+28151 |     fn step(&mut self, input: &[u8], end_of_input: bool) -> (r: CompressedHeaderStep)
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: verifying module brotli_input, function lib::brotli_input::CompressedMetaBlockDecoder::apply_block_count_value (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:25896:5
+      |
+25896 | /     fn apply_block_count_value(
+25897 | |         &mut self,
+25898 | |         kind: u8,
+25899 | |         raw: u16,
+25900 | |         _queue: BitQueue,
+25901 | |         _var_phase: VarUint8Phase,
+25902 | |     ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |____________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-block-count-canary-34818/src/brotli_input.rs:26035:24
+      |
+26035 |                   assert(b3b_scalar_byte_at(
+      |  ________________________^
+26036 | |                     self.workspace@,
+26037 | |                     self.window_bytes,
+26038 | |                     B3B_CURRENT_KIND,
+26039 | |                 ) == kind + 1);
+      | |_____________________________^ assertion failed
+
+error: aborting due to 1 previous error
+

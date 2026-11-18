@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 182.15608424998936,
+  "executed_once": false,
+  "exit_code": 101,
+  "expected_mutants": 13,
+  "finished_utc": "2026-11-17T22:23:53.779214+00:00",
+  "log": "controls-the_prover_rejects_thirteen_b3c_context_tree_count_defects.log",
+  "log_sha256": "6a5937c3556d0ebf4533a5cd78050f3727469e22cefb5ded71f737fe37ff1d50",
+  "mutants": [],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794954051621002000,
+  "started_utc": "2026-11-17T22:20:51.621011+00:00",
+  "suite": "the_prover_rejects_thirteen_b3c_context_tree_count_defects",
+  "suite_source_sha256": "a2712068d30b27d45b6bd9109dcf3c20aebacde4c7715481355d5c74d0cb72b1",
+  "validation_errors": []
+}

@@ -1,0 +1,100 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_twelve_m1_general_codec_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T05:11:17.474587+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 245.583770792,
+  "finished_utc": "2026-11-17T05:15:23.061877+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_twelve_m1_general_codec_defects.log",
+  "log_sha256": "35f8b2d39e789b2452e85609cb7d01801eee8ed7794b326c0846f48f26b1dfa4",
+  "suite": "the_prover_rejects_twelve_m1_general_codec_defects",
+  "expected_mutants": 12,
+  "mutants": [
+    {
+      "name": "brotli-m1-codec-simple-index-erased",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-simple-index-erased.log",
+      "sha256": "fe8b7e246db94d307e07a0a39273afe60738ab3899c8facd6d9647f5be8ff285",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-shape-selector-lost",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-shape-selector-lost.log",
+      "sha256": "fe8b7e246db94d307e07a0a39273afe60738ab3899c8facd6d9647f5be8ff285",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-symbol-array-alias",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-symbol-array-alias.log",
+      "sha256": "f0ccedb336885bd2db95935d232f8865bcb59332f3e2cf60b8417bd4d7465924",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-aux-array-erased",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-aux-array-erased.log",
+      "sha256": "0deb468407200561ba85dd77e92ed454f126f78ded08205c012709f767f05e1d",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-prefix-phase-alias",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-prefix-phase-alias.log",
+      "sha256": "e19c4bfa8eb062658e70ab8312214f0960c875e5e5c0a1c25c604abf12745c29",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-prefix-nonzero-erased",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-prefix-nonzero-erased.log",
+      "sha256": "0a49f6a22c8e5c9a86e7786daf86ea76ac044b8cbad3ca02a6569833d01731ef",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-aux-skip-erased",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-aux-skip-erased.log",
+      "sha256": "7187744da3927329a89408f1041d3fa42eec5e72edca58f25c631184e59daa74",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-chained-history-erased",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-chained-history-erased.log",
+      "sha256": "944249af0693b1c8499795bcd1d2c6d07b257d99f9d5be56b0fa985a6152e2d0",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-parent-tag-erased",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-parent-tag-erased.log",
+      "sha256": "fcec85dcf235095be21a0aca2ee87c1a9896f550701a6d46749581f2caa8e1ed",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-failed-error-tag-alias",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-failed-error-tag-alias.log",
+      "sha256": "707c644c1c74b73e4d486d7870fbf764d340ab316ea4b4356dfecb77cfa8b6d2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-simple-write-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-simple-write-undercharge.log",
+      "sha256": "6d4a33cd80bc30cce6874bee7f3e175a8f4c54e660d89ff1744da027fa8905c4",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-codec-complex-write-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-codec-complex-write-undercharge.log",
+      "sha256": "278a49232bd6bb351d19552709bdc812b5910ca0ff4c0dd9b8be8475a017c5a0",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

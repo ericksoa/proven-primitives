@@ -1,0 +1,15 @@
+{
+  "proposal_f1a-qualified-catalog.json": "79793520e3273c9d262f1c47105b888d4d976ec946c993210b52667c6a485bb4",
+  "preimplementation_e10c-qualified-catalog.json": "f8da43b7f908a4fe96396d36466fadb808736f3b2fe46cf8972d249bea7a9bb2",
+  "proposal_f1a-specs.json": "8b41b024959f8a4a325f0c64317ac21d13d499c362e524a7e88ae5d85e7adf79",
+  "final-summary.json": "c3cbd49e36dcfd3051a4da25e4fa0e05e274d749a5562af0474465321d09cd94",
+  "preimplementation_e10c-specs.json": "7f8e8b72e56d03feb2695caaed1aa766db0ebdc07ddca7263bfb0a07d26eb6e0",
+  "proposal_f1a-contracts.json": "c012f0a108159664533eb0346047f5f8aaf1ab407cddc396ab2fc39b543042cc",
+  "preimplementation_e10c-contracts.json": "6d8ba7e57d7d1e209896b662963076e69fa0a9ebd2f6b67a78a6521ea01fe50d",
+  "audit-result.json": "faa64bd4a003e84afd8088335bde1b98523b07f8680bd3ee0bec42d0abfc3da3",
+  "candidate-qualified-catalog.json": "ca52e79e3601d7b75c70b3238bd78b5667adef8129ea08cdb8be8d5a9382f951",
+  "proposal_f1a-attribute-changes.json": "82ab942ca4e7f4f9fca0de990b4dcf601a3715a2ecd235a473827918a6cd14e6",
+  "preimplementation_e10c-attribute-changes.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+  "candidate-snapshot/src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+  "candidate-snapshot/src/brotli_input.rs": "25c4718fb0f7debeecf6d1cf0f1de604c77e09ff30a344b8cbf662316bc511aa"
+}

@@ -1,0 +1,26 @@
+{
+  "status": "COMBINED BOTH qualified suffix cases; all four generated sources replay exact actual checked sources. Native harness not run by this agent.",
+  "base_tests_sha256": "33f26d7577991fd9d05cbe94c0fce5121abd16b4d5e44acf40fe213aff9eb62e",
+  "proposed_tests_sha256": "6b48d12480dfe596ab106fbb6076892f87245ca46d987d7384d878b4449b1816",
+  "combined_patch_sha256": "5dc0d801c8003f2d815cd52dba92da1521f10936f83588493bd6ca5cd2fabf82",
+  "replayed_actual_sources": {
+    "undercharge": {
+      "positive_sha256": "15fc4ed779bd2e4d293eeaa38590169024ef6999e3247f69e8662333feb9bbd0",
+      "negative_sha256": "55e8c5e0e6fc5862588afced12f245181c7cec64bacd1bada7ffeaf2a236205d",
+      "actual_replay_matches": true
+    },
+    "byte175": {
+      "positive_sha256": "1ffeaee26397ae7944efa5a2af040b923b15acecd6b4dbc7dd9f14675b147331",
+      "negative_sha256": "0ca6d8ffb1b2e85a01c09a4d14c0a42fa045baff6532ad76f29c15b44ba4daf7",
+      "actual_replay_matches": true
+    }
+  },
+  "all_five_original_case_tuples_byte_identical": true,
+  "all_original_Rust_assertion_sites_and_diagnostic_arms_retained": true,
+  "only_one_native_semantic_predicate_extended_and_limited_to_two_exact_case_names": true,
+  "all_Rust_assertion_text_byte_identical": false,
+  "all_existing_tool_resource_exclusion_assertions_retained_byte_exact": true,
+  "all_production_specs_models_assertions_contracts_ABI_unchanged": true,
+  "no_new_native_or_verifier_runs": true,
+  "shared_edits": 0
+}

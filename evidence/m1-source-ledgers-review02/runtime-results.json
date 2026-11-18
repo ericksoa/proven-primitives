@@ -1,0 +1,72 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--lib"
+    ],
+    "started_utc": "2026-11-17T01:40:00.226358+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 23.810201000000234,
+    "finished_utc": "2026-11-17T01:40:24.036936+00:00",
+    "log": "evidence/m1-source-ledgers-review02/runtime-library.log",
+    "log_sha256": "753ac154708ba6ceadc0ed779bd1e52d5307abcfff97d51ba17db93d95a404e5",
+    "passed": 102
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "primitives"
+    ],
+    "started_utc": "2026-11-17T01:40:24.047991+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 5.787637082990841,
+    "finished_utc": "2026-11-17T01:40:29.835734+00:00",
+    "log": "evidence/m1-source-ledgers-review02/runtime-primitives.log",
+    "log_sha256": "e3cc7f6f579aeb10ed263d2166c92e66dbe13c57ba87983d4c1117e9ab3ead53",
+    "passed": 9
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "upstream_comparison"
+    ],
+    "started_utc": "2026-11-17T01:40:29.861389+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.951263499999186,
+    "finished_utc": "2026-11-17T01:40:30.812688+00:00",
+    "log": "evidence/m1-source-ledgers-review02/runtime-comparison.log",
+    "log_sha256": "a40400394897fda43c300e7617ca1de35e867cc08eb42d4f840a817463a0d8fb",
+    "passed": 1
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "project_source_contains_no_proof_trust_bypasses",
+      "--",
+      "--exact"
+    ],
+    "started_utc": "2026-11-17T01:40:30.845579+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 5.032461374998093,
+    "finished_utc": "2026-11-17T01:40:35.878137+00:00",
+    "log": "evidence/m1-source-ledgers-review02/runtime-trust.log",
+    "log_sha256": "dba1933d483caeed876995608fbf31901035b30e7b6e0faf2a78e084db66fe3a",
+    "passed": 1
+  }
+]

@@ -1,0 +1,56 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:21982:1
+      |
+21982 | / fn advance_context_bits_phase(
+21983 | |     workspace: &mut [u8],
+21984 | |     window_bytes: u32,
+21985 | |     phase: u8,
+...     |
+21990 | |     end_of_input: bool,
+21991 | | ) -> (r: ((usize, Option<ContextAdvanceStatus>), Ghost<nat>))
+      | |____________________________________________________________^
+
+note: function body check finished in 20 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:21982:1
+      |
+21982 | / fn advance_context_bits_phase(
+21983 | |     workspace: &mut [u8],
+21984 | |     window_bytes: u32,
+21985 | |     phase: u8,
+...     |
+21990 | |     end_of_input: bool,
+21991 | | ) -> (r: ((usize, Option<ContextAdvanceStatus>), Ghost<nat>))
+      | |____________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:22101:28
+      |
+22101 |                       assert(width as nat == context_bits_width(
+      |  ____________________________^
+22102 | |                         original,
+22103 | |                         window_bytes,
+22104 | |                         phase,
+22105 | |                     ));
+      | |_____________________^ assertion failed
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:21982:1
+      |
+21982 | / fn advance_context_bits_phase(
+21983 | |     workspace: &mut [u8],
+21984 | |     window_bytes: u32,
+21985 | |     phase: u8,
+...     |
+21990 | |     end_of_input: bool,
+21991 | | ) -> (r: ((usize, Option<ContextAdvanceStatus>), Ghost<nat>))
+      | |____________________________________________________________^
+
+error: aborting due to 1 previous error
+

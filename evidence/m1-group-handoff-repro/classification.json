@@ -1,0 +1,17 @@
+{
+  "classification": "Reproduced mismatch on a state whose complete scalar/domain premises were checked by pinned Verus and runtime assertions",
+  "admission": {
+    "verified": 1,
+    "errors": 0
+  },
+  "runtime_result": {
+    "next_command_count": 0,
+    "plan_consumed": 0,
+    "plan_status": "None",
+    "plan_execution_work": 128,
+    "actual_consumed": 0,
+    "actual_status": "Failed(InternalState)"
+  },
+  "scope": "Independent diagnostic; main and checkpoint controls unchanged",
+  "proposed_correction": "M1 read-only forecast mirrors existing invalid next-command-count branch and existing 4+1 terminal charge; no new work-unit policy or decoder algorithm"
+}

@@ -1,0 +1,44 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-stride-init-exhaustion-canaries-29799/src/brotli_input.rs:22385:29
+      |
+22385 | ...                   while initialized < target
+      |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-stride-init-exhaustion-canaries-29799/src/brotli_input.rs:21981:1
+      |
+21981 | / fn advance_context_bits_phase(
+21982 | |     workspace: &mut [u8],
+21983 | |     window_bytes: u32,
+21984 | |     phase: u8,
+...     |
+21989 | |     end_of_input: bool,
+21990 | | ) -> (r: ((usize, Option<ContextAdvanceStatus>), Ghost<nat>))
+      | |____________________________________________________________^
+
+error: precondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-stride-init-exhaustion-canaries-29799/src/brotli_input.rs:22150:33
+      |
+20544 | /         match read_status {
+20545 | |             BitReadStatus::NeedInput => status == Some(ContextAdvanceStatus::NeedInput),
+20546 | |             BitReadStatus::Truncated => status == Some(
+20547 | |                 ContextAdvanceStatus::Failed(CompressedHeaderError::Truncated),
+...     |
+20556 | |             ),
+20557 | |         },
+      | |_________- failed precondition
+...
+22150 |                           proof { establish_context_bits_refinement(original, workspace@,
+      |  _________________________________^
+22151 | |                             window_bytes, phase, input@, end_of_input, result.0, result.1,
+22152 | |                             start_queue, queue, read.status); }
+      | |____________________________________________________________^
+
+error: aborting due to 1 previous error
+

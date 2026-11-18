@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T01:59:13.523429+00:00",
+  "exit_code": 101,
+  "elapsed_seconds": 225.6906035830034,
+  "finished_utc": "2026-11-17T02:02:59.217401+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_six_m1_bad_context_count_failure_defects.log",
+  "log_sha256": "d6ee0f320d9d63272dca6d91cbf7029ec6c709be926e9b1fc788130817ab9ff5",
+  "suite": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+  "expected_mutants": 6,
+  "mutants": [],
+  "source_unchanged": true
+}

@@ -1,0 +1,24 @@
+#[verifier::spinoff_prover]
+#[verifier::rlimit(1000)]
+proof fn r_triage_suffix_fallback_required_byte_value(after: Seq<u8>, written: u8)
+    requires
+        terminal_error_frame(m1_suffix_fallback_image(), after, 1024),
+        after[b3b_scalar_base(1024) + 175] == written,
+    ensures
+        after[b3b_scalar_base(1024) + 175] == 0,
+        written == 0,
+{
+    m1_suffix_fallback_image_is_admitted();
+    let at = b3b_scalar_base(1024) + 175;
+    assert(0 <= at < m1_suffix_fallback_image().len()) by {
+        reveal(m1_suffix_fallback_image);
+        reveal(b3b_scalar_base);
+    }
+    assert(at != b3b_scalar_base(1024) + B3B_OUTER_PHASE as int);
+    assert(at != b3b_scalar_base(1024) + B3B_TERMINAL_ERROR as int);
+    assert(!(b3b_scalar_base(1024) + B3B_ERROR_DETAIL as int <= at
+        < b3b_scalar_base(1024) + B3B_ERROR_DETAIL as int + 2));
+    reveal(terminal_error_frame);
+    assert(after[at] == m1_suffix_fallback_image()[at]);
+    assert(m1_suffix_fallback_image()[at] == 0);
+}

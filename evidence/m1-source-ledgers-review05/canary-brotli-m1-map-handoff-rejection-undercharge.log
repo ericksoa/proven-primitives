@@ -1,0 +1,40 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:36601:9
+      |
+36601 |         while index < len
+      |         ^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:36670:9
+      |
+36670 |         while index < len
+      |         ^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:36725:9
+      |
+36725 |         while tree < trees
+      |         ^^^^^^^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:36515:1
+      |
+36515 | / fn plan_context_map_tail(workspace: &[u8], window_bytes: u32,
+36516 | |     budget: &mut crate::brotli::RequestBudget, outer_phase: CompressedOuterPhase,
+36517 | | ) -> (r: Result<CompressedActionPlan, CoreFailure>)
+      | |__________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-final-handoff-canary-41047/src/brotli_input.rs:36798:20
+      |
+36798 |             assert(execution_work as nat == m1_context_handoff_execution_units(workspace@, window_bytes, outer_phase));
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

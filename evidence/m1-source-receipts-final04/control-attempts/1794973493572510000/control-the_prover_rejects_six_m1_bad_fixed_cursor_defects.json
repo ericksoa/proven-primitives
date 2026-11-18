@@ -1,0 +1,96 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 177.63984979098313,
+  "executed_once": true,
+  "exit_code": 0,
+  "expected_mutants": 6,
+  "finished_utc": "2026-11-18T04:48:24.877328+00:00",
+  "log": "controls-the_prover_rejects_six_m1_bad_fixed_cursor_defects.log",
+  "log_sha256": "8b304891461b428662d17832f324feddaf04ff10619a21cf38d2cf5aad1543b2",
+  "mutants": [
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "1f43421d6b1487cbcb41c16cf8335285a6c024b9e7a56642745a11cb81439afe",
+      "log": "canary-brotli-m1-cursor-tag-rejects-with-wrong-error.log",
+      "name": "brotli-m1-cursor-tag-rejects-with-wrong-error",
+      "semantic_rejection": true,
+      "sha256": "46b30ee9aa2481782284b7b78783a5b0a8ef2c2a6acdfe4aacc726f0a730717d",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "28aee96eeb8e0648212f35b3c3adbc2b8d08fe2ae3aa603dded9239fb70ac728",
+      "log": "canary-brotli-m1-cursor-distance-prepass-forgets-rejection.log",
+      "name": "brotli-m1-cursor-distance-prepass-forgets-rejection",
+      "semantic_rejection": true,
+      "sha256": "91f3b011fe2daf24fe358f6ab94fbf8cb06ac7c5c94bf1964299de7d65bad698",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "3e9e448616a0fb78358be90dc75c09f17a6bc7a094f994be4ed7a62c3896d7c1",
+      "log": "canary-brotli-m1-cursor-block-prepass-forgets-var-rejection.log",
+      "name": "brotli-m1-cursor-block-prepass-forgets-var-rejection",
+      "semantic_rejection": true,
+      "sha256": "1d47a60d70991edffa28da3a0ee7a96a3385654aac2769dab5f733fab8fba61f",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "a551102b8f9c523304a904d4a43dd7135ac108e02883a6e055814d723e185b0b",
+      "log": "canary-brotli-m1-cursor-block-forecast-omits-terminal-work.log",
+      "name": "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "semantic_rejection": true,
+      "sha256": "94ba10e9d72cbced28b14fe753bae64b81d757e3e0bdc6285105786645c2eac7",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": false,
+      "computed_false": true,
+      "identity_sha256": "5e3caac6a39236b47f1cd32471e69518889336f3be939d42ebc80a1c511c983d",
+      "log": "canary-brotli-m1-cursor-context-owner-skips-terminal-action.log",
+      "name": "brotli-m1-cursor-context-owner-skips-terminal-action",
+      "semantic_rejection": true,
+      "sha256": "c573371693b074525a20a3a91b17444631a9e7e564e1195af5e0711f37c43f29",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "identity_sha256": "c401162fd52a0e466128065fdfbaa215d071486f8ef555a8b70f95a6e4dde962",
+      "log": "canary-brotli-m1-cursor-executor-forgets-terminal-work-debit.log",
+      "name": "brotli-m1-cursor-executor-forgets-terminal-work-debit",
+      "semantic_rejection": true,
+      "sha256": "611c6001adb9cf80b4ba1f5b38158b0b13f78906402895f6e82148cb64bd18ed",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    }
+  ],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794977127237439000,
+  "started_utc": "2026-11-18T04:45:27.237444+00:00",
+  "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+  "suite_source_sha256": "a50eba7b9d51b42bc844dbfc4299d89bef77af0b3debdca80f99a20023f44773",
+  "validation_errors": []
+}

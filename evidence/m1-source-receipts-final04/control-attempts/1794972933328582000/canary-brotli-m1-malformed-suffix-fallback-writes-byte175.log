@@ -1,0 +1,11 @@
+
+note: verifying module brotli_input, function lib::brotli_input::advance_planned_compressed_action (selected functions)
+
+error: expression simplifies to false
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-malformed-suffix-canary-29798/src/brotli_input.rs:40371:24
+      |
+40371 |         proof { assert(if 1u8 == 0u8 { true } else { false }) by (compute_only); }
+      |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

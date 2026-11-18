@@ -1,0 +1,58 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_five_b3c_tree_formula_undercharges",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T04:55:51.863655+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 89.24583962500037,
+  "finished_utc": "2026-11-17T04:57:21.110795+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_five_b3c_tree_formula_undercharges.log",
+  "log_sha256": "4bb21afa7b3643733425a14114252a3ce0d332985bee43afd69efe73c3ef3ff0",
+  "suite": "the_prover_rejects_five_b3c_tree_formula_undercharges",
+  "expected_mutants": 5,
+  "mutants": [
+    {
+      "name": "brotli-b3c-simple-install-formula-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-simple-install-formula-undercharge.log",
+      "sha256": "a0cbac33e7a993ee06ed828e4b1ec72ec0178b65d3164dd4ec32c03cbd46a59a",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-canonical-install-formula-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-canonical-install-formula-undercharge.log",
+      "sha256": "24430b05225c81e1b5cfaab3945746a3fc1a6d61065b1ead019fc78bd3008e67",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-repeat-serialization-formula-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-repeat-serialization-formula-undercharge.log",
+      "sha256": "0c0b40ecb51ec47d705e2f74077f72ef3892c615f3ee4e76958c57bc2ff1e0f2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-initial-symbol-formula-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-initial-symbol-formula-undercharge.log",
+      "sha256": "4d971502e752c176895d489d4137540933b4928e0b9edbcb0ea0af029151d9aa",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-serialization-base-formula-undercharge",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-b3c-serialization-base-formula-undercharge.log",
+      "sha256": "8be947e09590a1ebafc5a9c99ee5fc507561390368dc528d3540f92358a1b434",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

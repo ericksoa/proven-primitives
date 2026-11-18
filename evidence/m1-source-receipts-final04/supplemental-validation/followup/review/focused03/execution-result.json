@@ -1,0 +1,99 @@
+{
+  "phase": "focused03 failed; full gate never launched",
+  "driver_exit_code": 1,
+  "owned_session_id": 97704,
+  "attempt": "evidence/m1-source-receipts-final03/control-attempts/1794966302521455000",
+  "positive_sha256": "03c4b1ddbd3238dba9b8a3fc1ee903ea6ec6ccad3e10629b8034d883b8c92ce3",
+  "summary_sha256": "40fa29929ce5919a0ab44a1f750542b45d2acfd08bebb670f26324db88edb260",
+  "controls_results_sha256": "488a6b934d7aa0e9e96258b054ee239edda19e100e58b9e91f95eab64c7ccec1",
+  "selected_suites": 11,
+  "selected_cases": 88,
+  "strictly_passed_suites": 8,
+  "failed_suites": 3,
+  "accepted_cases_in_passed_suites": 70,
+  "fresh_partial_semantic_cases": 83,
+  "resource_failures": 3,
+  "unreached_cases": 2,
+  "failures": [
+    {
+      "suite": "the_prover_rejects_five_m1_malformed_suffix_defects",
+      "exit_code": 101,
+      "suite_log": "evidence/m1-source-receipts-final03/control-attempts/1794966302521455000/controls-the_prover_rejects_five_m1_malformed_suffix_defects.log",
+      "row": "evidence/m1-source-receipts-final03/control-attempts/1794966302521455000/control-the_prover_rejects_five_m1_malformed_suffix_defects.json",
+      "bad_fresh_canaries": [
+        {
+          "case": "brotli-m1-malformed-suffix-fallback-undercharge",
+          "log": "evidence/canary-brotli-m1-malformed-suffix-fallback-undercharge.log",
+          "sha256": "d985e3eafc521e5419db8530609e64f473e0af867214838f38eb5038b57709ed",
+          "semantic_rejection": false,
+          "tool_or_resource_failure": true,
+          "syntax_or_type_failure": false,
+          "computed_false": false,
+          "checked_semantic_error": false
+        }
+      ],
+      "printed_rejections": [
+        "brotli-m1-malformed-suffix-invalid-fields-undercharge",
+        "brotli-m1-malformed-suffix-wrong-width-undercharge",
+        "brotli-m1-malformed-suffix-bad-kind-is-truncated"
+      ],
+      "validation_errors": []
+    },
+    {
+      "suite": "the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects",
+      "exit_code": 101,
+      "suite_log": "evidence/m1-source-receipts-final03/control-attempts/1794966302521455000/controls-the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects.log",
+      "row": "evidence/m1-source-receipts-final03/control-attempts/1794966302521455000/control-the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects.json",
+      "bad_fresh_canaries": [
+        {
+          "case": "brotli-b3b-tree-field-truncation-needs-input",
+          "log": "evidence/canary-brotli-b3b-tree-field-truncation-needs-input.log",
+          "sha256": "9677e8c7328fc55816c2222a979137a95ea11d41ae0a94dc6e1ea466a60652b6",
+          "semantic_rejection": false,
+          "tool_or_resource_failure": true,
+          "syntax_or_type_failure": false,
+          "computed_false": false,
+          "checked_semantic_error": false
+        }
+      ],
+      "printed_rejections": [
+        "brotli-b3b-literal-context-row-stride-is-63",
+        "brotli-b3b-distance-context-row-stride-is-three",
+        "brotli-b3b-serialized-tree-skips-builder-reset",
+        "brotli-b3b-context-tree-starts-in-literal-region",
+        "brotli-b3b-installed-symbol-truncation-needs-input",
+        "brotli-b3b-context-bit-truncation-needs-input"
+      ],
+      "validation_errors": []
+    },
+    {
+      "suite": "the_prover_rejects_six_m1_bad_fixed_cursor_defects",
+      "exit_code": 101,
+      "suite_log": "evidence/m1-source-receipts-final03/control-attempts/1794966302521455000/controls-the_prover_rejects_six_m1_bad_fixed_cursor_defects.log",
+      "row": "evidence/m1-source-receipts-final03/control-attempts/1794966302521455000/control-the_prover_rejects_six_m1_bad_fixed_cursor_defects.json",
+      "bad_fresh_canaries": [
+        {
+          "case": "brotli-m1-cursor-context-owner-skips-terminal-action",
+          "log": "evidence/canary-brotli-m1-cursor-context-owner-skips-terminal-action.log",
+          "sha256": "cc0009a0011391085446e8502e50d9fe488c2ced05967e468b1a5226afa1b042",
+          "semantic_rejection": false,
+          "tool_or_resource_failure": true,
+          "syntax_or_type_failure": false,
+          "computed_false": false,
+          "checked_semantic_error": false
+        }
+      ],
+      "printed_rejections": [],
+      "validation_errors": []
+    }
+  ],
+  "stable_failure_archive": "target/m1-r-controls03-updates/failed03-retained/1794966302521455000",
+  "stable_archive_map_sha256": "c04dec0827bdb4e9b17a61a0093cf6c2b8a61739d79847dcdf8488a64de45196",
+  "all_frozen_closure_fields_match_positive": true,
+  "live_source_matches_positive": true,
+  "controls_complete_exists": false,
+  "evidence_package_exists": false,
+  "full48_launched": false,
+  "canaries_restored": false,
+  "shared_edits": 0
+}

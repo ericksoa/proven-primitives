@@ -1,0 +1,11 @@
+PASS: independent final integrated04 preservation audit
+
+Reviewed frozen tests557a1cb1, production3e/daf, strict gate1c98. Exact in-memory application of the three immutable patches to historical33f reproduces557a byte for byte. No checker/native test or live gate status was inspected or inferred.
+
+All318 cases/48suites retain final02 names, arities, selectors and module routes; all318 effective original anchors are unique. Every current case tuple, including all old/new fault literals, is byte-identical to historical33f. Production sources, models, contracts, assertions, code, ABI, unit policies, build/fixtures and allowances remain byte-identical to final02. Production field500/SP is retained.
+
+All243 original native assertion sites and original diagnostic arms/messages remain. Four predicates are intentionally extended: cap, field, suffix-family(two names at one site), cursor. The pre-existing separate three-tree-result computed recognizer remains byte-exact and is NOT counted as new.
+
+Actual integrated source generation replays exactly to all TEN immutable selected-positive/negative source snapshots: cap, field, suffixdebit, suffixbyte175, cursor. Source-bound operands, fixed old-model consequences and full original faults remain. Only the field control copy uses1000 for BOTH positive/negative; production stays500. Other new cases retain original settings.
+
+Both publication supplements remain immutable and hash-verified. This is a separate technical audit artifact, not native/fullgate/M1 completion, negative-SMT completion, a source-to-binary theorem, or human architecture approval. Actual04 gate receipt must establish execution/closure.

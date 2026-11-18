@@ -1,0 +1,6 @@
+{
+  "main_source_sha256": "cb6a2725d8798c41743db11b3f935010e4f734ae1da3f16bbc368630b092e73e",
+  "diagnostic_source_sha256": "0cb16205b77ed6a215d886931e07aa301827e79c9af0fbe055cc1e7dd0595454",
+  "scope": "Independent runtime reproducer only; main source and active checkpoint controls unchanged; formal admissibility still to be established before implementation changes",
+  "compile_attempt01": "Missing test-only type qualification; fixed only inside isolated diagnostic, no runtime result claimed"
+}

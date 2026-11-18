@@ -1,0 +1,72 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--lib"
+    ],
+    "started_utc": "2026-11-17T04:04:17.304151+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 24.19038941699546,
+    "finished_utc": "2026-11-17T04:04:41.494938+00:00",
+    "log": "evidence/m1-source-ledgers-review04/runtime-library.log",
+    "log_sha256": "fd695b70889f2a680ef879360c61bedc54d1f3ae4f77715b6f8723e5d0c1307d",
+    "passed": 103
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "primitives"
+    ],
+    "started_utc": "2026-11-17T04:04:41.507128+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 6.225044249993516,
+    "finished_utc": "2026-11-17T04:04:47.732289+00:00",
+    "log": "evidence/m1-source-ledgers-review04/runtime-primitives.log",
+    "log_sha256": "99e0884c7b3725a30c003f6fe6188a49ea355e2c455a73355b373655b3076afc",
+    "passed": 9
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "upstream_comparison"
+    ],
+    "started_utc": "2026-11-17T04:04:47.753935+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 1.0114680830010911,
+    "finished_utc": "2026-11-17T04:04:48.765437+00:00",
+    "log": "evidence/m1-source-ledgers-review04/runtime-comparison.log",
+    "log_sha256": "2184d0c0e33e3bfd160165a983cd4520db3f9a472f44b13edca7a283814027ca",
+    "passed": 1
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "project_source_contains_no_proof_trust_bypasses",
+      "--",
+      "--exact"
+    ],
+    "started_utc": "2026-11-17T04:04:48.787861+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 5.324971874986659,
+    "finished_utc": "2026-11-17T04:04:54.112936+00:00",
+    "log": "evidence/m1-source-ledgers-review04/runtime-trust.log",
+    "log_sha256": "9fc9316afc8139e54d4d6f4cca4c4a0b447b696ada3b0188f74bcecbae28eea3",
+    "passed": 1
+  }
+]

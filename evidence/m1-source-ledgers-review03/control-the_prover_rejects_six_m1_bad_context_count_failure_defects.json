@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:56:32.802663+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 265.06022949999897,
+  "finished_utc": "2026-11-17T03:00:57.861916+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_six_m1_bad_context_count_failure_defects.log",
+  "log_sha256": "98765de05acc250b5158658899660e37f0e5b7a7d15565c22fca84e906f7bb77",
+  "suite": "the_prover_rejects_six_m1_bad_context_count_failure_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-m1-context-bad-count-prepass-skips-terminal-plan",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-bad-count-prepass-skips-terminal-plan.log",
+      "sha256": "2f2f210828d5b13ccbcc11c70cdccd85cf09a10f6d5d539ad01d1bafbd29da9d",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-bad-count-plan-omits-terminal-work",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-bad-count-plan-omits-terminal-work.log",
+      "sha256": "4e01b3aadc8d7d13cfee117177fa1fe9e34a59f99b0834fcb0a4570c341fae64",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-bad-count-plan-loses-failure",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-bad-count-plan-loses-failure.log",
+      "sha256": "645640d8f0dab6b0814ca7811a44b7fcbe78b21c350a54627024a94e7bf02734",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-bad-count-plan-consumes-input",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-bad-count-plan-consumes-input.log",
+      "sha256": "80333d2c01d055b1212b69ec79f46352c4dd50d397012a10473e4cab83855ea7",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-bad-count-executor-wrong-error",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-bad-count-executor-wrong-error.log",
+      "sha256": "1b2e21842c3c270484cc2ff41559b77f8bf1990175248b86c2369759a7fd13f3",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-context-bad-count-owner-skips-action",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-context-bad-count-owner-skips-action.log",
+      "sha256": "a7462bc283b114aa5c848dcf83d8546065b30088a27c37e84eac216006fc0467",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

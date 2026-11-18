@@ -1,0 +1,13 @@
+{
+  "action": "Cancelled this task-owned obsolete control process group after its whole positive passed",
+  "reason": "The new malformed-suffix fallback control requires an additional proof-only handoff; final controls will run on the repaired snapshot",
+  "whole_positive_retained": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "success": true,
+    "verified": 1338,
+    "errors": 0,
+    "is-verifying-entire-crate": true
+  },
+  "control_closure_claimed": false
+}

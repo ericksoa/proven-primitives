@@ -1,0 +1,59 @@
+{
+  "completed_utc": "2026-11-18T01:39:51.243598+00:00",
+  "exit_code": 1,
+  "classification": "genuine literal computed-false rejection; qualifies under unchanged strict classifier",
+  "actual_primary_error": "error: expression simplifies to false",
+  "verification_summary_present": false,
+  "verified": null,
+  "errors": null,
+  "source_sha256": "3d8831d9b413743c78b9a7dbed5afb95ab9e4cfba887a03004e82a9daf4639f0",
+  "source_unchanged": true,
+  "log": "bad-cap/bad-cap-normalized-concrete-rank.log",
+  "log_sha256": "7fc084ce383df8302ab9141225ab9c2b2d5d9a316e73f94629b404eb500aa97c",
+  "source_manifest_sha256": "e800f005dbf50f8c6490fb19420657425646fdfdc91d603c8681284158283780",
+  "bound_positive_result_sha256": "2e7e4e26e7e60c5e4e0edd8945c277c02c527a0d9fb9016785ba20b3612b24ca",
+  "witness_receipt_binding_sha256": "d04bf8aad5aa39e7b1f34b2e2c1d107862269c6929c670c31b769f474e9e65fc",
+  "strict_gate_classifier": {
+    "semantic_rejection": true,
+    "tool_or_resource_failure": false,
+    "syntax_or_type_failure": false,
+    "computed_false": true,
+    "checked_semantic_error": false
+  },
+  "strict_gate_driver_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+  "strict_gate_accepted": true,
+  "attributes": [
+    "#[verifier::rlimit(600)]",
+    "#[verifier::spinoff_prover]"
+  ],
+  "checker_flags": [
+    "--crate-type",
+    "lib",
+    "--verify-only-module",
+    "brotli_input",
+    "--verify-function",
+    "plan_serialized_tree",
+    "--no-cheating",
+    "--num-threads",
+    "1",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "1000",
+    "--multiple-errors",
+    "0"
+  ],
+  "environment": {
+    "DEVELOPER_DIR": "/Library/Developer/CommandLineTools",
+    "RUSTUP_TOOLCHAIN": "1.99.1"
+  },
+  "positive_runs": 1,
+  "negative_runs": 1,
+  "formatter_checker_runs": 0,
+  "extra_verifier_runs": 0,
+  "negative_original_source_obligations_retained": true,
+  "negative_loop_smt_completion_claimed": false,
+  "all_original_production_assertions_contracts_models_invariants_decreases_attributes_retained": true,
+  "shared_writes_by_this_agent": 0,
+  "claim_scope": "Necessary admitted-witness instance of same universal rank-certificate adequacy criterion; early rejection need not run negative-loop SMT and is not an actual2000-action runtime trace."
+}

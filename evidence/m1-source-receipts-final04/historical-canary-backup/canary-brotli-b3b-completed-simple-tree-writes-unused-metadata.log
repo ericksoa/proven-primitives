@@ -1,0 +1,67 @@
+verification results:: 6 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::install_completed_simple_tree (selected functions)
+
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-50428/src/brotli_input.rs:17060:17
+      |
+17060 |                 assert(record_end <= window_bytes as nat
+      |                 ^^^^^^
+
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-50428/src/brotli_input.rs:17079:17
+      |
+17079 |                 assert(record_end <= window_bytes as nat
+      |                 ^^^^^^
+
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-50428/src/brotli_input.rs:17098:17
+      |
+17098 |                 assert(record_end <= window_bytes as nat
+      |                 ^^^^^^
+
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-50428/src/brotli_input.rs:17116:17
+      |
+17116 |                 assert(record_end <= window_bytes as nat
+      |                 ^^^^^^
+
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-50428/src/brotli_input.rs:17133:17
+      |
+17133 |                 assert(record_end <= window_bytes as nat
+      |                 ^^^^^^
+
+note: assert_nonlinear_by: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-50428/src/brotli_input.rs:17149:17
+      |
+17149 |                 assert(record_end <= window_bytes as nat
+      |                 ^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-50428/src/brotli_input.rs:16915:1
+      |
+16915 | / fn install_completed_simple_tree(
+16916 | |     workspace: &mut [u8],
+16917 | |     window_bytes: u32,
+16918 | |     region: crate::brotli_prefix::TreeRegion,
+...     |
+16921 | |     code: SimpleCodeDescription,
+16922 | | ) -> (r: (Result<crate::brotli_prefix::TreeMetadata, CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-tree-group-canary-50428/src/brotli_input.rs:17232:16
+      |
+17232 |           assert(completed_simple_tree_installation(
+      |  ________________^
+17233 | |             original,
+17234 | |             workspace@,
+17235 | |             window_bytes,
+...     |
+17240 | |             meta,
+17241 | |         ));
+      | |_________^ assertion failed
+
+error: aborting due to 1 previous error
+

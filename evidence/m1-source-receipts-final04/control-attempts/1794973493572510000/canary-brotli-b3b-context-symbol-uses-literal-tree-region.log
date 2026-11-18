@@ -1,0 +1,46 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:21501:1
+      |
+21501 | / fn advance_context_symbol_phase(
+21502 | |     workspace: &mut [u8],
+21503 | |     window_bytes: u32,
+21504 | |     kind_tag: u8,
+...     |
+21508 | |     end_of_input: bool,
+21509 | | ) -> (r: ((usize, Option<ContextAdvanceStatus>), Ghost<nat>))
+      | |____________________________________________________________^
+
+error: precondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:21671:83
+      |
+ 8065 |       requires old(queue).valid(), old(prefix).valid(), meta.valid_for(region),
+      |                                                         ---------------------- failed precondition
+...
+21671 |                       let symbol_step = { let (r_child_2, Ghost(r_child_units_2)) = advance_installed_tree_symbol(
+      |  ___________________________________________________________________________________^
+21672 | |                         workspace,
+21673 | |                         window_bytes,
+21674 | |                         crate::brotli_prefix::TreeRegion::Literal,
+...     |
+21680 | |                         end_of_input,
+21681 | |                     ); proof { r_source_units = r_source_units + r_child_units_2; r_actual_symbol_reads = r_child_units_2; } r_...
+      | |_____________________^
+
+note: recommendation not met: cannot prove that there exists values that satisfy the condition of the choose expression
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:21699:29
+      |
+21699 |                           &&& #[trigger] installed_symbol_full_step(original, window_bytes,
+      |  _____________________________^
+21700 | |                             crate::brotli_prefix::TreeRegion::TemporaryContext, 0, meta,
+21701 | |                             start_queue, start_prefix, input@, end_of_input, symbol_step, queue, prefix, cost)
+21702 | |                         &&& cost <= 10_575 + symbol_step.consumed as nat
+      | |________________________________________________________________________^
+
+error: aborting due to 1 previous error
+

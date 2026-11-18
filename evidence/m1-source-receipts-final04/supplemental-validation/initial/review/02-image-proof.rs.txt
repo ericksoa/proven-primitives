@@ -1,0 +1,71 @@
+proof fn r_triage_concrete_selector_rank_witness() -> (out: (Seq<u8>, CodeDescriptionDecoder))
+    ensures
+        out.0.len() == 1_177_584,
+        forall|i: int| 0 <= i < out.0.len() ==> #[trigger] out.0[i] ==
+            if i == 1_164_418 || i == 1_164_420 { 192u8 }
+            else if i == 1_164_419 || i == 1_164_421 { 2u8 }
+            else if i == 1_164_414 { 1u8 } else { 0u8 },
+        out.1.phase == CodeDescriptionPhase::Selector,
+        out.1.alphabet_max == 704,
+        out.1.alphabet_limit == 704,
+        out.1.queue.len == 0,
+        out.1.queue.offset == 0,
+        b3b_workspace_shape(out.0.len(), 1_024),
+        b3b_queue_encoding_valid(out.0, 1_024),
+        saved_aux_load_valid(out.0, 1_024),
+        m1_code_decoder_image(out.0, 1_024, out.1.queue, out.1),
+        serialized_b3b_queue(out.0, 1_024, out.1.queue),
+        m1_tree_has_decodable_start(out.0, 1_024),
+        b3b_scalar_byte_at(out.0, 1_024, B3B_ACTIVE_REGION)
+            == tree_region_tag_spec(crate::brotli_prefix::TreeRegion::Command),
+        b3b_scalar_u16_at(out.0, 1_024, B3B_ACTIVE_TREE) == 0,
+        b3b_scalar_u16_at(out.0, 1_024, B3B_BUILDER_INITIALIZED) == 0,
+        code_phase_rank(out.1.phase, out.1.alphabet_limit) == 5_695,
+{
+    let workspace: Seq<u8> = Seq::new(1_177_584, |i: int|
+        if i == 1_164_418 || i == 1_164_420 { 192u8 }
+        else if i == 1_164_419 || i == 1_164_421 { 2u8 }
+        else if i == 1_164_414 { 1u8 } else { 0u8 });
+    let queue = BitQueue { pending: [0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8], len: 0, offset: 0 };
+    let decoder = CodeDescriptionDecoder {
+        queue, alphabet_max: 704, alphabet_limit: 704,
+        phase: CodeDescriptionPhase::Selector,
+    };
+    reveal(b3b_workspace_shape);
+    assert((1_024u32 & 1_023u32) == 0) by (bit_vector);
+    assert(crate::brotli_prefix::FIXED_SCRATCH_BYTES == 1_176_560);
+    assert(workspace.len() == 1_177_584);
+    assert(b3b_workspace_shape(workspace.len(), 1_024));
+    assert(b3b_scalar_base(1_024) == 1_164_300);
+    assert(b3b_scalar_u16_at(workspace, 1_024, B3B_ALPHABET_MAX) == 704);
+    assert(b3b_scalar_u16_at(workspace, 1_024, B3B_ALPHABET_LIMIT) == 704);
+    assert forall|i: int| 0 <= i < 18 implies #[trigger]
+        workspace[b3b_scalar_base(1_024) + B3B_AUX_LENGTHS as int + i] == 0 by {}
+    reveal(saved_aux_load_valid);
+    reveal(saved_aux_load_eligible);
+    reveal(saved_aux_copy_prefix);
+    assert(saved_aux_load_valid(workspace, 1_024));
+    reveal(BitQueue::valid);
+    assert(queue.valid());
+    assert forall|i: int| 0 <= i < 8 implies #[trigger]
+        workspace[b3b_scalar_base(1_024) + B3B_QUEUE_OFFSET as int + i] == 0 by {}
+    reveal(serialized_b3b_queue);
+    assert(serialized_b3b_queue(workspace, 1_024, queue));
+    reveal(b3b_queue_encoding_valid);
+    assert(b3b_queue_encoding_valid(workspace, 1_024));
+    reveal(CodeDescriptionDecoder::valid);
+    assert(decoder.valid());
+    reveal(code_rank_aligned);
+    reveal(m1_description_storage_tag);
+    reveal(m1_description_payload_values);
+    reveal(m1_simple_description_values);
+    reveal(m1_code_decoder_image);
+    assert(m1_code_decoder_image(workspace, 1_024, queue, decoder));
+    assert(b3b_scalar_byte_at(workspace, 1_024, B3B_ACTIVE_REGION)
+        == tree_region_tag_spec(crate::brotli_prefix::TreeRegion::Command));
+    m1_tree_decodable_start_intro(workspace, 1_024, decoder,
+        crate::brotli_prefix::TreeRegion::Command);
+    reveal(code_phase_rank);
+    assert(code_phase_rank(decoder.phase, decoder.alphabet_limit) == 5_695);
+    (workspace, decoder)
+}

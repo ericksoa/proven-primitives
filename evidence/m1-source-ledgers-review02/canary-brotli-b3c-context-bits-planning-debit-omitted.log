@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-72906/src/brotli_input.rs:35298:1
+      |
+35298 | / fn plan_context_bits_action(workspace: &[u8], window_bytes: u32,
+35299 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+35300 | | ) -> (r: Result<ContextBitsPlan, CoreFailure>)
+      | |_____________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-bits-canary-72906/src/brotli_input.rs:35309:9
+      |
+35309 | /         r.is_ok() ==> {
+35310 | |             &&& context_bits_plan_valid(workspace@, window_bytes, input@, end_of_input, r.unwrap())
+35311 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().read_work
+35312 | |         },
+      | |_________^ failed this postcondition
+...
+35368 | /     Ok(ContextBitsPlan { phase, start_queue, end_queue: queue, status: step.status,
+35369 | |         consumed: step.consumed, repeat, read_work: read.work, execution_work })
+      | |________________________________________________________________________________- at the end of the function body
+
+error: aborting due to 1 previous error
+

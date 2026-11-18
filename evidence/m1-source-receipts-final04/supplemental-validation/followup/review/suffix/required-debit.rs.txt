@@ -1,0 +1,26 @@
+#[verifier::spinoff_prover]
+#[verifier::rlimit(1000)]
+proof fn r_triage_suffix_fallback_required_debit(
+    before: crate::brotli::RequestBudget, after: crate::brotli::RequestBudget,
+    after_image: Seq<u8>, result: Result<usize, CompressedStep>, amount: u64,
+)
+    requires
+        before.valid(), before.work_remaining == 5,
+        amount <= 5,
+        after.work_remaining == before.work_remaining - amount,
+        m1_bad_initial_suffix_owner_effect(m1_suffix_fallback_image(), after_image, 1024,
+            before, after, result),
+    ensures
+        m1_bad_initial_suffix(m1_suffix_fallback_image(), 1024),
+        m1_bad_initial_suffix_validation_reads(m1_suffix_fallback_image(), 1024) == 0,
+        after.work_remaining == 0,
+        amount == 5,
+{
+    m1_suffix_fallback_image_is_admitted();
+    reveal(m1_bad_initial_suffix);
+    reveal(m1_bad_initial_suffix_validation_reads);
+    assert(m1_bad_initial_suffix(m1_suffix_fallback_image(), 1024));
+    assert(m1_bad_initial_suffix_validation_reads(m1_suffix_fallback_image(), 1024) == 0);
+    reveal(m1_bad_initial_suffix_owner_effect);
+    assert(after.work_remaining as nat + 5 == 5);
+}

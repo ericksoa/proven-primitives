@@ -1,0 +1,23 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59741,13): 'if' cannot be used in patterns.
+WARNING: (67094,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-initial-suffix-metering-canary-94004/src/brotli_input.rs:29489:1
+      |
+29489 | fn initial_suffix_base_execution_work(read_work: u64) -> (r: u64)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-initial-suffix-metering-canary-94004/src/brotli_input.rs:29491:13
+      |
+29491 |     ensures r == read_work + 1 + 10 + 1,
+      |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+29492 | {
+29493 |     read_work + 1 + 9 + 1
+      |     --------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

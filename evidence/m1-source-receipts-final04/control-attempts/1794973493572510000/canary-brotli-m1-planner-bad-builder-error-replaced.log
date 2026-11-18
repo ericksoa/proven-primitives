@@ -1,0 +1,77 @@
+verification results:: 3 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input, function lib::brotli_input::plan_serialized_tree (selected functions)
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-31885/src/brotli_input.rs:35377:5
+      |
+35377 |     while copied < copy_len
+      |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-31885/src/brotli_input.rs:35612:17
+      |
+35612 |                 while at < start + span_count
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-31885/src/brotli_input.rs:35447:5
+      |
+35447 |     while iterations < 5_696
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-31885/src/brotli_input.rs:35718:32
+      |
+35718 |                         assert(failed_result.status == SerializedTreeStatus::Failed(CompressedHeaderError::InternalState));
+      |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-31885/src/brotli_input.rs:35219:1
+      |
+35219 | / fn plan_serialized_tree(
+35220 | |     workspace: &[u8],
+35221 | |     window_bytes: u32,
+35222 | |     budget: &mut crate::brotli::RequestBudget,
+35223 | |     input: &[u8],
+35224 | |     end_of_input: bool,
+35225 | | ) -> (r: (Result<SerializedTreePlan, CoreFailure>, Ghost<nat>))
+      | |______________________________________________________________^
+
+note: function body check finished in 2 seconds
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-31885/src/brotli_input.rs:35219:1
+      |
+35219 | / fn plan_serialized_tree(
+35220 | |     workspace: &[u8],
+35221 | |     window_bytes: u32,
+35222 | |     budget: &mut crate::brotli::RequestBudget,
+35223 | |     input: &[u8],
+35224 | |     end_of_input: bool,
+35225 | | ) -> (r: (Result<SerializedTreePlan, CoreFailure>, Ghost<nat>))
+      | |______________________________________________________________^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-31885/src/brotli_input.rs:35219:1
+      |
+35219 | / fn plan_serialized_tree(
+35220 | |     workspace: &[u8],
+35221 | |     window_bytes: u32,
+35222 | |     budget: &mut crate::brotli::RequestBudget,
+35223 | |     input: &[u8],
+35224 | |     end_of_input: bool,
+35225 | | ) -> (r: (Result<SerializedTreePlan, CoreFailure>, Ghost<nat>))
+      | |______________________________________________________________^
+
+note: recommendation not met
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-executor-parser-failure-canary-31885/src/brotli_input.rs:35384:20
+      |
+35384 |                 == workspace@[window_bytes as int + crate::brotli_prefix::BUILDER_CODE_LENGTHS_OFFSET as int + i],
+      |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |
+     --> seq.rs:980:12
+      |
+      = note: recommendation not met
+
+error: aborting due to 1 previous error
+

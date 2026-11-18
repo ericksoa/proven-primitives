@@ -1,0 +1,31 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34752:5
+      |
+34752 |     while i < 17
+      |     ^^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34717:1
+      |
+34717 | / fn plan_saved_singleton_validation_reads(workspace: &[u8], window_bytes: u32,
+34718 | |     budget: &mut crate::brotli::RequestBudget, singleton: u8,
+34719 | | ) -> (r: (Result<u64, CoreFailure>, Ghost<nat>))
+      | |_______________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k5-loader-canary-44969/src/brotli_input.rs:34723:9
+      |
+34723 |         r.0.is_ok() ==> r.1@ == singleton_value_reads(saved_aux_length_values(workspace@, window_bytes), singleton),
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+34784 |     (ordinary_result, Ghost(r_saved_forecast_source_reads))
+      |     ------------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

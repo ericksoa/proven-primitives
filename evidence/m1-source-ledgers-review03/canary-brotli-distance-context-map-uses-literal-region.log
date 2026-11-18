@@ -1,0 +1,19 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-92903/src/brotli_prefix.rs:2651:9
+     |
+2651 | /         r.is_ok() ==> {
+2652 | |             &&& index < context_map_capacity(kind)
+2653 | |             &&& r.unwrap() as nat == context_entry_at(window_bytes, kind, index)
+2654 | |             &&& (r.unwrap() as nat) < window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+2655 | |         },
+     | |_________^ failed this postcondition
+...
+2672 |       Ok((window_bytes + base + index as u32) as usize)
+     |       ------------------------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

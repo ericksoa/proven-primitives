@@ -1,0 +1,2271 @@
+{
+  "cases": [
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-mode-prepass-omits-read-work.log",
+      "existed": true,
+      "name": "brotli-m1-context-mode-prepass-omits-read-work",
+      "path": "evidence/canary-brotli-m1-context-mode-prepass-omits-read-work.log",
+      "sha256": "e9c1afbdb0512a69ed31c7f13c62512f0dc8d8f149b7f40b14067047e47f2bf0"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-mode-plan-loses-need-input.log",
+      "existed": true,
+      "name": "brotli-m1-context-mode-plan-loses-need-input",
+      "path": "evidence/canary-brotli-m1-context-mode-plan-loses-need-input.log",
+      "sha256": "d03eab7ec32fec89fc196d2a6c0687bc2ae5c903548d1403c3f686c3411464d8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-mode-plan-loses-consumption.log",
+      "existed": true,
+      "name": "brotli-m1-context-mode-plan-loses-consumption",
+      "path": "evidence/canary-brotli-m1-context-mode-plan-loses-consumption.log",
+      "sha256": "7812392d7db2486a57941df623c68e53226ee06d316e9558ffe460b77056c49f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-mode-plan-omits-value-writes.log",
+      "existed": true,
+      "name": "brotli-m1-context-mode-plan-omits-value-writes",
+      "path": "evidence/canary-brotli-m1-context-mode-plan-omits-value-writes.log",
+      "sha256": "96cc70034d05555da2b8ed72162b02793215a93f79e74995f735cc2e80fef3a1"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-mode-action-writes-wrong-value.log",
+      "existed": true,
+      "name": "brotli-m1-context-mode-action-writes-wrong-value",
+      "path": "evidence/canary-brotli-m1-context-mode-action-writes-wrong-value.log",
+      "sha256": "65b602b83e26934b40aa0fec049b4a947b7970e65f96ebab089885e31989786f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-mode-action-loses-initialized-count.log",
+      "existed": true,
+      "name": "brotli-m1-context-mode-action-loses-initialized-count",
+      "path": "evidence/canary-brotli-m1-context-mode-action-loses-initialized-count.log",
+      "sha256": "5e748e2972604fa4c72d43fa5eaf5efb9c036be3e43a72e20e8ee9b0ce4482b7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-mode-executor-omits-input-debit.log",
+      "existed": true,
+      "name": "brotli-m1-context-mode-executor-omits-input-debit",
+      "path": "evidence/canary-brotli-m1-context-mode-executor-omits-input-debit.log",
+      "sha256": "153fc9724e3407df190fdb85e963037e565a92dc399cd2308fbf4f1898c36bf4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-mode-limited-input-is-retryable.log",
+      "existed": true,
+      "name": "brotli-m1-context-mode-limited-input-is-retryable",
+      "path": "evidence/canary-brotli-m1-context-mode-limited-input-is-retryable.log",
+      "sha256": "7b867677baaed34d103aa6a111a22aea96511d7fbbfbd97e7b12816325ce58c7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-executor-parser-error-replaced.log",
+      "existed": true,
+      "name": "brotli-m1-executor-parser-error-replaced",
+      "path": "evidence/canary-brotli-m1-executor-parser-error-replaced.log",
+      "sha256": "229573ad77bd7c4da9ddba023284ff8591e571640b4a3982f938969477cbf010"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-executor-bad-span-error-replaced.log",
+      "existed": true,
+      "name": "brotli-m1-executor-bad-span-error-replaced",
+      "path": "evidence/canary-brotli-m1-executor-bad-span-error-replaced.log",
+      "sha256": "1a4882bac76fb111568151c4ecad54cd982865d0ef0d6bf38cb029f006166741"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-executor-canonical-error-replaced.log",
+      "existed": true,
+      "name": "brotli-m1-executor-canonical-error-replaced",
+      "path": "evidence/canary-brotli-m1-executor-canonical-error-replaced.log",
+      "sha256": "b9a223e4bf05a533f34630c0d3b78aaa139b779de30c5db25d17cb51c30cbdc4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-executor-empty-input-fabricates-error.log",
+      "existed": true,
+      "name": "brotli-m1-executor-empty-input-fabricates-error",
+      "path": "evidence/canary-brotli-m1-executor-empty-input-fabricates-error.log",
+      "sha256": "c0a0ae24f50c245d8534bacc6ea26b0e53bb0e0ca5303b7c44a1b5175f9c4cd4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-pending-span-wrong-failure-reason.log",
+      "existed": true,
+      "name": "brotli-m1-pending-span-wrong-failure-reason",
+      "path": "evidence/canary-brotli-m1-pending-span-wrong-failure-reason.log",
+      "sha256": "db616a009c8fa6761de34a30f3de170c5a5bd45e4e947c5e886e4ae695eff050"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-planner-parser-error-replaced.log",
+      "existed": true,
+      "name": "brotli-m1-planner-parser-error-replaced",
+      "path": "evidence/canary-brotli-m1-planner-parser-error-replaced.log",
+      "sha256": "394acfba33427cbc6698115eed61efa6dda16c98a000e3a82be45fcd6bc1d5c8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-planner-bad-span-error-replaced.log",
+      "existed": true,
+      "name": "brotli-m1-planner-bad-span-error-replaced",
+      "path": "evidence/canary-brotli-m1-planner-bad-span-error-replaced.log",
+      "sha256": "6f316834e9adbe7c0d7d245e12ccda5ac009fa657786643888724c47893d922e"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-planner-bad-builder-error-replaced.log",
+      "existed": true,
+      "name": "brotli-m1-planner-bad-builder-error-replaced",
+      "path": "evidence/canary-brotli-m1-planner-bad-builder-error-replaced.log",
+      "sha256": "da77ef87b09b29e85c8aeba4f3e1f89527881401db0074d21dd1dc59bde61f16"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-aux-count-read-not-charged.log",
+      "existed": true,
+      "name": "brotli-m1-aux-count-read-not-charged",
+      "path": "evidence/canary-brotli-m1-aux-count-read-not-charged.log",
+      "sha256": "fa667d113c0200a55fe941c52fbf09a169245585b4ec874ebda17bf5590ed507"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-aux-first-code-skips-last-length.log",
+      "existed": true,
+      "name": "brotli-m1-aux-first-code-skips-last-length",
+      "path": "evidence/canary-brotli-m1-aux-first-code-skips-last-length.log",
+      "sha256": "0366d97ed96642b0161b1f2b930b9189a4424b2364faa4d2365fb41ebe663bea"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-aux-canonical-length-read-not-charged.log",
+      "existed": true,
+      "name": "brotli-m1-aux-canonical-length-read-not-charged",
+      "path": "evidence/canary-brotli-m1-aux-canonical-length-read-not-charged.log",
+      "sha256": "16710c169bd9e8ea94789ee852c49e1803430aa239d39b9840b97fc7ac51b3f3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-aux-candidate-read-not-charged.log",
+      "existed": true,
+      "name": "brotli-m1-aux-candidate-read-not-charged",
+      "path": "evidence/canary-brotli-m1-aux-candidate-read-not-charged.log",
+      "sha256": "a228eca7102ed5ffaed03b910ea995e37d292c9e317649ed15ed9cdaf8329584"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-aux-singleton-skips-last-length.log",
+      "existed": true,
+      "name": "brotli-m1-aux-singleton-skips-last-length",
+      "path": "evidence/canary-brotli-m1-aux-singleton-skips-last-length.log",
+      "sha256": "9e6056717dc248d955731ae093372eea6155b1a2e4093f50d3617e1560c2d527"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-simple-pair-second-read-not-charged.log",
+      "existed": true,
+      "name": "brotli-m1-simple-pair-second-read-not-charged",
+      "path": "evidence/canary-brotli-m1-simple-pair-second-read-not-charged.log",
+      "sha256": "f83111ca363f8f1382e1073b775cac230178ec9134d42c66222c83013d7c4d72"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-simple-validation-skips-last-pair.log",
+      "existed": true,
+      "name": "brotli-m1-simple-validation-skips-last-pair",
+      "path": "evidence/canary-brotli-m1-simple-validation-skips-last-pair.log",
+      "sha256": "1d1d37f0ce64c7a21e730a26540b0f49df9f6fbf0c03c70a697e46d00538e6d8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-field-planning-replay-not-charged.log",
+      "existed": true,
+      "name": "brotli-m1-field-planning-replay-not-charged",
+      "path": "evidence/canary-brotli-m1-field-planning-replay-not-charged.log",
+      "sha256": "e6cc67e16d1d006936cdea22c4027c1eb11e94368197c416f2d2fad58614d24b"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-saved-aux-load-not-charged.log",
+      "existed": true,
+      "name": "brotli-m1-saved-aux-load-not-charged",
+      "path": "evidence/canary-brotli-m1-saved-aux-load-not-charged.log",
+      "sha256": "bcbe65dc16c8d1173a2fc003f90fe2e3b7a5c53b08c202082411874d6b13c7bf"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-saved-aux-wrong-partial-count.log",
+      "existed": true,
+      "name": "brotli-m1-saved-aux-wrong-partial-count",
+      "path": "evidence/canary-brotli-m1-saved-aux-wrong-partial-count.log",
+      "sha256": "e89489fe4890ff134e5af442f9c2099492ba1b359a14bbee0e8cb8409aa97b43"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-saved-aux-skips-last-copy.log",
+      "existed": true,
+      "name": "brotli-m1-saved-aux-skips-last-copy",
+      "path": "evidence/canary-brotli-m1-saved-aux-skips-last-copy.log",
+      "sha256": "53edfc8ebf5448f210122124fd3990ee8653ccaeef428bdfae630550ecdac4d6"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-saved-aux-accepts-invalid-length.log",
+      "existed": true,
+      "name": "brotli-m1-saved-aux-accepts-invalid-length",
+      "path": "evidence/canary-brotli-m1-saved-aux-accepts-invalid-length.log",
+      "sha256": "a1463faf95ccc0f09e15028fdfa0ffc4b46472f05e2d53cca38d3da726ddd57f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-canonical-validation-read-not-charged.log",
+      "existed": true,
+      "name": "brotli-m1-canonical-validation-read-not-charged",
+      "path": "evidence/canary-brotli-m1-canonical-validation-read-not-charged.log",
+      "sha256": "42dc83c48ac7f53bce34572623151110775eac7ce00690d86ab051f6113b8888"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-canonical-accepts-invalid-length.log",
+      "existed": true,
+      "name": "brotli-m1-canonical-accepts-invalid-length",
+      "path": "evidence/canary-brotli-m1-canonical-accepts-invalid-length.log",
+      "sha256": "0895e0ca1e4b586c5080ecd8e9087ae3a3160b43fcd0321dcb1372696fbd24ea"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-canonical-accepts-incomplete-space.log",
+      "existed": true,
+      "name": "brotli-m1-canonical-accepts-incomplete-space",
+      "path": "evidence/canary-brotli-m1-canonical-accepts-incomplete-space.log",
+      "sha256": "c3542732b6a00c3a4cfc10cfe38ec76e0902deb0f8f23ba8ec0bc2a2b4ee5ce1"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-block-count-planning-bit-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-block-count-planning-bit-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-planning-bit-undercharge.log",
+      "sha256": "a54b8ff3c1ae539bbd45a840fb6d6b9321aac8665c49d0c199a9faca70641eb1"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-block-count-base-write-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-block-count-base-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-base-write-undercharge.log",
+      "sha256": "70baa1fe1b525bc850a826bf3d9535cf36148f185ff906184b37d585ef5f0881"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-block-count-terminal-write-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-block-count-terminal-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-terminal-write-undercharge.log",
+      "sha256": "3f40fce58838ad744dda1b4f567138ab639d979404b4ae0cb5ec3a74e12a6a9f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-block-count-single-value-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-block-count-single-value-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-single-value-undercharge.log",
+      "sha256": "814b06890d374e6a8ef2cd71f6780445691293e561fb909f79354527bd6ae1ec"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-block-count-tree-start-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-block-count-tree-start-undercharge",
+      "path": "evidence/canary-brotli-b3c-block-count-tree-start-undercharge.log",
+      "sha256": "c8d9a0ad71c4e6005db153a30e25ff98985081fa402d61cccb0128d12fce3db4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-simple-install-formula-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-simple-install-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-simple-install-formula-undercharge.log",
+      "sha256": "bc7d704ce5b1388481b1ae561af2be21377e014ec7ffd3ab7d1aa338d6a6bed8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-canonical-install-formula-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-canonical-install-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-canonical-install-formula-undercharge.log",
+      "sha256": "bb77e82f1772b93bc8c0b8b47e54aa5d225dbb0411eb4a909922a3bb0277d22c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-repeat-serialization-formula-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-repeat-serialization-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-repeat-serialization-formula-undercharge.log",
+      "sha256": "78a0b980ec5da57d902a4e2bb2f14cbaf3caa46b68aae73c1c3e3bfa206046a3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-initial-symbol-formula-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-initial-symbol-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-symbol-formula-undercharge.log",
+      "sha256": "b317e35c3babfc121ca0e9073cc24f697eaccfa82cbb5c76efe76a5bdb5b700c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-serialization-base-formula-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-serialization-base-formula-undercharge",
+      "path": "evidence/canary-brotli-b3c-serialization-base-formula-undercharge.log",
+      "sha256": "b5c713646f88c1419699bebd2d9fa08083d333e827cd0dd82c04741c8737415d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k1-installer-rejects-valid-two-symbol-tree.log",
+      "existed": true,
+      "name": "brotli-k1-installer-rejects-valid-two-symbol-tree",
+      "path": "evidence/canary-brotli-k1-installer-rejects-valid-two-symbol-tree.log",
+      "sha256": "2a79924c31ca10d6e907826d54308c156b8771cdbf7255ef6daca99b3ed9942b"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k1-invalid-length-changes-metadata.log",
+      "existed": true,
+      "name": "brotli-k1-invalid-length-changes-metadata",
+      "path": "evidence/canary-brotli-k1-invalid-length-changes-metadata.log",
+      "sha256": "1efe7b3edf92c8e2f1929b7008899d6e700c1e36846dbfda423cdd9ba9db4934"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k1-invalid-length-changes-builder.log",
+      "existed": true,
+      "name": "brotli-k1-invalid-length-changes-builder",
+      "path": "evidence/canary-brotli-k1-invalid-length-changes-builder.log",
+      "sha256": "9018be5fe833ed99dd93fc82a8508569bc1c08ecc9f30879d57a025c36520195"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k3-rejects-valid-symbol-and-suffix.log",
+      "existed": true,
+      "name": "brotli-k3-rejects-valid-symbol-and-suffix",
+      "path": "evidence/canary-brotli-k3-rejects-valid-symbol-and-suffix.log",
+      "sha256": "c9ba69108134b2da94d9a694a1199e2627267dbb4958348008df286c85e0b066"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k3-decodes-wrong-block-length.log",
+      "existed": true,
+      "name": "brotli-k3-decodes-wrong-block-length",
+      "path": "evidence/canary-brotli-k3-decodes-wrong-block-length.log",
+      "sha256": "b93f3143a5361960127ddc77ca56d026001bf7ce1bd15e8fcc5f643719e25993"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-literal-handoff-accepts-zero-command-count.log",
+      "existed": true,
+      "name": "brotli-m1-literal-handoff-accepts-zero-command-count",
+      "path": "evidence/canary-brotli-m1-literal-handoff-accepts-zero-command-count.log",
+      "sha256": "378b7f47a6739324880459184d1975b7e3a9c3afdd9bc1b2c1509e7df1c4ee18"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-literal-handoff-accepts-large-command-count.log",
+      "existed": true,
+      "name": "brotli-m1-literal-handoff-accepts-large-command-count",
+      "path": "evidence/canary-brotli-m1-literal-handoff-accepts-large-command-count.log",
+      "sha256": "378b7f47a6739324880459184d1975b7e3a9c3afdd9bc1b2c1509e7df1c4ee18"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-literal-handoff-terminal-work-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-literal-handoff-terminal-work-undercharge",
+      "path": "evidence/canary-brotli-m1-literal-handoff-terminal-work-undercharge.log",
+      "sha256": "3f90c708628618f709f27e802c6501b8c8d19759db90ffb92e5576bde19e1267"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-literal-handoff-loses-error.log",
+      "existed": true,
+      "name": "brotli-m1-literal-handoff-loses-error",
+      "path": "evidence/canary-brotli-m1-literal-handoff-loses-error.log",
+      "sha256": "c6cef16ffb1fbeb0a2600439816c81e735ecb46b9d80c7a4472ba02e4fd25d05"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-literal-handoff-loses-planning-debit.log",
+      "existed": true,
+      "name": "brotli-m1-literal-handoff-loses-planning-debit",
+      "path": "evidence/canary-brotli-m1-literal-handoff-loses-planning-debit.log",
+      "sha256": "259579ab15ea61e400c9fea104f5856feef3687e6a937e30896d0cfb01bb901b"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-malformed-suffix-invalid-fields-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-malformed-suffix-invalid-fields-undercharge",
+      "path": "evidence/canary-brotli-m1-malformed-suffix-invalid-fields-undercharge.log",
+      "sha256": "616c43eb0f6e5cce5e3e9883fc5a373abe4efa5304dab7c40a4d7aeb9c256023"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-malformed-suffix-wrong-width-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-malformed-suffix-wrong-width-undercharge",
+      "path": "evidence/canary-brotli-m1-malformed-suffix-wrong-width-undercharge.log",
+      "sha256": "f1c14668896f093a29deab6a7477f0bcbfd03450cb50454c09f331f1d10f4641"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-malformed-suffix-bad-kind-is-truncated.log",
+      "existed": true,
+      "name": "brotli-m1-malformed-suffix-bad-kind-is-truncated",
+      "path": "evidence/canary-brotli-m1-malformed-suffix-bad-kind-is-truncated.log",
+      "sha256": "4ec46d95d9f4ffbbbaa6435b87ca6cf8223ac4e255c252fb7d93f09ad928ed3e"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-malformed-suffix-fallback-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-malformed-suffix-fallback-undercharge",
+      "path": "evidence/canary-brotli-m1-malformed-suffix-fallback-undercharge.log",
+      "sha256": "d985e3eafc521e5419db8530609e64f473e0af867214838f38eb5038b57709ed"
+    },
+    {
+      "existed": false,
+      "name": "brotli-m1-malformed-suffix-fallback-writes-byte175",
+      "path": "evidence/canary-brotli-m1-malformed-suffix-fallback-writes-byte175.log"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-saved-loader-spurious-unsupported-mode.log",
+      "existed": true,
+      "name": "brotli-m1-saved-loader-spurious-unsupported-mode",
+      "path": "evidence/canary-brotli-m1-saved-loader-spurious-unsupported-mode.log",
+      "sha256": "f7f34f74a37dc5793d6fdddb471bc17f7f6fc6961cdb70841a62ce0363eaac68"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-malformed-region-executor-wrong-error.log",
+      "existed": true,
+      "name": "brotli-m1-malformed-region-executor-wrong-error",
+      "path": "evidence/canary-brotli-m1-malformed-region-executor-wrong-error.log",
+      "sha256": "54659e26b30fce1154dc5a53a0bda3cee8a54a4eb987b05875626f37b7b2227a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-malformed-region-planner-wrong-error.log",
+      "existed": true,
+      "name": "brotli-m1-malformed-region-planner-wrong-error",
+      "path": "evidence/canary-brotli-m1-malformed-region-planner-wrong-error.log",
+      "sha256": "45320e966838a51d2447b7664161c627b3f58a129b7c6dea41c8e0a5412ab129"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-malformed-descriptor-plan-wrong-error.log",
+      "existed": true,
+      "name": "brotli-m1-malformed-descriptor-plan-wrong-error",
+      "path": "evidence/canary-brotli-m1-malformed-descriptor-plan-wrong-error.log",
+      "sha256": "496041e9c745ca5fb8ecbe4c4e831d74530f5c75738dbbcb753ea0347a5bf466"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-caller-flags-equal-internal-errors.log",
+      "existed": true,
+      "name": "brotli-m1-tree-caller-flags-equal-internal-errors",
+      "path": "evidence/canary-brotli-m1-tree-caller-flags-equal-internal-errors.log",
+      "sha256": "5d51d89eb96a065c3aff4ae34cead222d692d925363361ffb06a11ab782d4582"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-one-type-initial-length-is-short.log",
+      "existed": true,
+      "name": "brotli-b3b-one-type-initial-length-is-short",
+      "path": "evidence/canary-brotli-b3b-one-type-initial-length-is-short.log",
+      "sha256": "2a1addde4ce6bcce2573b10c0d09c157b9d1edb23ca4c302ad0a8b88a4066397"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-block-count-omits-plus-one.log",
+      "existed": true,
+      "name": "brotli-b3b-block-count-omits-plus-one",
+      "path": "evidence/canary-brotli-b3b-block-count-omits-plus-one.log",
+      "sha256": "f325495e6fec012ae3e69e8d0cab426b9a7d9d38fd9cf754b49c018d3c9e3eda"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-one-type-category-builds-trees.log",
+      "existed": true,
+      "name": "brotli-b3b-one-type-category-builds-trees",
+      "path": "evidence/canary-brotli-b3b-one-type-category-builds-trees.log",
+      "sha256": "07120704a4bfb59ade3e95ea054096f9b97876bc6eff56952681c24e89e27da7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-category-order-skips-command.log",
+      "existed": true,
+      "name": "brotli-b3b-category-order-skips-command",
+      "path": "evidence/canary-brotli-b3b-category-order-skips-command.log",
+      "sha256": "5c13a6119d7b408b5ecbaea1776d5fe5231845113c17bfb3a30144cf983e60f4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-mtf-initializes-list-to-zero.log",
+      "existed": true,
+      "name": "brotli-mtf-initializes-list-to-zero",
+      "path": "evidence/canary-brotli-mtf-initializes-list-to-zero.log",
+      "sha256": "28c1e71141465ea27ede8d2f1461bffe2531997b18bb7d2b5768f9655a7ef739"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-mtf-shifts-from-current-cell.log",
+      "existed": true,
+      "name": "brotli-mtf-shifts-from-current-cell",
+      "path": "evidence/canary-brotli-mtf-shifts-from-current-cell.log",
+      "sha256": "47000a82d6c430ddc633e0f0db7eea6371ea510187f1b58ad3df64f7b088ad16"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-mtf-undercharges-each-rank.log",
+      "existed": true,
+      "name": "brotli-mtf-undercharges-each-rank",
+      "path": "evidence/canary-brotli-mtf-undercharges-each-rank.log",
+      "sha256": "4463643b436677525b4bca3a0618d5a9518eecdec036b038a01c0f19d289fc03"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-mtf-reuses-too-little-list-prefix.log",
+      "existed": true,
+      "name": "brotli-mtf-reuses-too-little-list-prefix",
+      "path": "evidence/canary-brotli-mtf-reuses-too-little-list-prefix.log",
+      "sha256": "dfcb48aa88af1725f81c4f24a02ffe33a4bfff5ad764b10ea4fd39a929d73e28"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-mode-complete-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-mode-complete-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-mode-complete-undercharge.log",
+      "sha256": "4ca17ba03c6fe44a3df924d36d37939aa4124863340a34a59262f163be644247"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-mode-queue-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-mode-queue-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-mode-queue-undercharge.log",
+      "sha256": "92c6515ecc538e8efa50c112780839ce63907967edb8441df8f2a12b02154b10"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-mode-terminal-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-mode-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-mode-terminal-undercharge.log",
+      "sha256": "3b29b6981f06ab9fa3bd72130e841d655c7fff9d6da35d1521860535d9956714"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-mode-value-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-mode-value-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-mode-value-undercharge.log",
+      "sha256": "380a7383f7288ab21b21b9bfe1694492145e4c731e5fd782b131252b0d2725a3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-initial-suffix-planning-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-initial-suffix-planning-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-suffix-planning-undercharge.log",
+      "sha256": "e069ca94896c0debeb7b919acddfaabe6ab069395a629ccde499d2f0a7f52026"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-initial-suffix-queue-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-initial-suffix-queue-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-suffix-queue-undercharge.log",
+      "sha256": "dd8048b9f168095d921f4b8a08fd7495d40b9d013fc6d42368f4f2584f015282"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-initial-suffix-terminal-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-initial-suffix-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-suffix-terminal-undercharge.log",
+      "sha256": "664006c8236526f5563b7dc0ce4583b20008da531b31042a0d820c459d238068"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-initial-suffix-value-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-initial-suffix-value-undercharge",
+      "path": "evidence/canary-brotli-b3c-initial-suffix-value-undercharge.log",
+      "sha256": "29f98b5feb8067904bf89904494c8aaae80d358c0b5bce7f6f8723cc7bd77bf4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-r-bit-selection-receipt-omitted.log",
+      "existed": true,
+      "name": "brotli-m1-r-bit-selection-receipt-omitted",
+      "path": "evidence/canary-brotli-m1-r-bit-selection-receipt-omitted.log",
+      "sha256": "dc00dc73a7b2435542f10a87cfaeb3d89db77f92e9b7727746f6834dc3745b5e"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-r-queue-child-receipt-omitted.log",
+      "existed": true,
+      "name": "brotli-m1-r-queue-child-receipt-omitted",
+      "path": "evidence/canary-brotli-m1-r-queue-child-receipt-omitted.log",
+      "sha256": "c7fde79ba8cca741dfa9f390efb4f324f6f147df4d2a751b3aed33ed88a66730"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-r-fixed-owner-child-receipt-omitted.log",
+      "existed": true,
+      "name": "brotli-m1-r-fixed-owner-child-receipt-omitted",
+      "path": "evidence/canary-brotli-m1-r-fixed-owner-child-receipt-omitted.log",
+      "sha256": "e0be2da40c1d853f70f389df5a3a1abb7f580161059b598f74b939d647cf8cfe"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-r-public-driver-child-receipt-omitted.log",
+      "existed": true,
+      "name": "brotli-m1-r-public-driver-child-receipt-omitted",
+      "path": "evidence/canary-brotli-m1-r-public-driver-child-receipt-omitted.log",
+      "sha256": "ae761ad12bff5e4fad28a74dc76bd63daf7390aeca63063da1f77500c3337b17"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-count-cursor-terminal-undercharged.log",
+      "existed": true,
+      "name": "brotli-m1-context-count-cursor-terminal-undercharged",
+      "path": "evidence/canary-brotli-m1-context-count-cursor-terminal-undercharged.log",
+      "sha256": "33da941a77def935f8a2b322e768ebd6dd06ffd7bea709ea24279fdb54d271be"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-bits-cursor-terminal-undercharged.log",
+      "existed": true,
+      "name": "brotli-m1-context-bits-cursor-terminal-undercharged",
+      "path": "evidence/canary-brotli-m1-context-bits-cursor-terminal-undercharged.log",
+      "sha256": "e14bc04eec5dbc371bda1eed7b1364f6773ed2d64165a428d46148f9f645b71d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-count-cursor-skips-terminal-action.log",
+      "existed": true,
+      "name": "brotli-m1-context-count-cursor-skips-terminal-action",
+      "path": "evidence/canary-brotli-m1-context-count-cursor-skips-terminal-action.log",
+      "sha256": "511cbd038267fdb152d0c979c1383ed3e0e2fa378e0f19b1a498fd809b75e0ee"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-bits-cursor-plan-wrong-error.log",
+      "existed": true,
+      "name": "brotli-m1-context-bits-cursor-plan-wrong-error",
+      "path": "evidence/canary-brotli-m1-context-bits-cursor-plan-wrong-error.log",
+      "sha256": "e14bc04eec5dbc371bda1eed7b1364f6773ed2d64165a428d46148f9f645b71d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-executor-simple-loses-consumption.log",
+      "existed": true,
+      "name": "brotli-m1-executor-simple-loses-consumption",
+      "path": "evidence/canary-brotli-m1-executor-simple-loses-consumption.log",
+      "sha256": "c29013825c63d4796ac10687e55422daa1d1d1d28021a401738e510c3655a9cc"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-executor-canonical-loses-consumption.log",
+      "existed": true,
+      "name": "brotli-m1-executor-canonical-loses-consumption",
+      "path": "evidence/canary-brotli-m1-executor-canonical-loses-consumption.log",
+      "sha256": "65543e6ee1c12fefcb6c254518f6cc2098c4fb6fe22d104524198de278eb80e5"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-executor-simple-false-need-input.log",
+      "existed": true,
+      "name": "brotli-m1-executor-simple-false-need-input",
+      "path": "evidence/canary-brotli-m1-executor-simple-false-need-input.log",
+      "sha256": "024f165f71a5f266673748dd785f7c3958a0b2bddd7f9f9c2f1dc3147d7825c7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-executor-canonical-false-need-input.log",
+      "existed": true,
+      "name": "brotli-m1-executor-canonical-false-need-input",
+      "path": "evidence/canary-brotli-m1-executor-canonical-false-need-input.log",
+      "sha256": "1f62e411c0720be2f0c3cc46327a18bcabf961ac96d6164e1e255ffe7b7cc294"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-invalid-region-consumes-input.log",
+      "existed": true,
+      "name": "brotli-m1-invalid-region-consumes-input",
+      "path": "evidence/canary-brotli-m1-invalid-region-consumes-input.log",
+      "sha256": "c872c0de47fd2cfc6bdd737c526d0aba0f4666983ff26b676431f4b4c7add76c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-invalid-region-mutates-descriptor.log",
+      "existed": true,
+      "name": "brotli-m1-invalid-region-mutates-descriptor",
+      "path": "evidence/canary-brotli-m1-invalid-region-mutates-descriptor.log",
+      "sha256": "344b0a3efa557a1428efb44f34ed0768e2f33d6c9e681f3a47887e7421854693"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-invalid-region-plan-consumes-input.log",
+      "existed": true,
+      "name": "brotli-m1-invalid-region-plan-consumes-input",
+      "path": "evidence/canary-brotli-m1-invalid-region-plan-consumes-input.log",
+      "sha256": "7fd772335833668db35912422b730611370446b5965642c4a859521b891574cc"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-invalid-descriptor-plan-consumes-input.log",
+      "existed": true,
+      "name": "brotli-m1-invalid-descriptor-plan-consumes-input",
+      "path": "evidence/canary-brotli-m1-invalid-descriptor-plan-consumes-input.log",
+      "sha256": "595276cc1dc363658e38b60f5ac0848c8601423df800a1e75d8d4abeadfc12d0"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-parser-restores-too-small-cap.log",
+      "existed": true,
+      "name": "brotli-m1-parser-restores-too-small-cap",
+      "path": "evidence/canary-brotli-m1-parser-restores-too-small-cap.log",
+      "sha256": "208aa009845b1b91b098794ba80165db58a9e66fa4346738884406b6dad8f69d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-planner-restores-too-small-cap.log",
+      "existed": true,
+      "name": "brotli-m1-planner-restores-too-small-cap",
+      "path": "evidence/canary-brotli-m1-planner-restores-too-small-cap.log",
+      "sha256": "4a54e0249e3501b990ba13674123b500204d8c147c675c938b0cdf347e3f3f27"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-parser-skips-pending-span-drain.log",
+      "existed": true,
+      "name": "brotli-m1-parser-skips-pending-span-drain",
+      "path": "evidence/canary-brotli-m1-parser-skips-pending-span-drain.log",
+      "sha256": "b26ed2a382e00e708c26a328d0bcfa1e2f5efa838d863750ea1e80510ee99e3b"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-planner-skips-pending-span-drain.log",
+      "existed": true,
+      "name": "brotli-m1-planner-skips-pending-span-drain",
+      "path": "evidence/canary-brotli-m1-planner-skips-pending-span-drain.log",
+      "sha256": "b843b3cda04d6b56aad9dca98cb65bece659c029ae3e76f71fe3a84e76afeac3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-loader-omits-four-simple-copies.log",
+      "existed": true,
+      "name": "brotli-k5-loader-omits-four-simple-copies",
+      "path": "evidence/canary-brotli-k5-loader-omits-four-simple-copies.log",
+      "sha256": "2b2ddd62a4afa412eb66c6b9b247dd1751e48f4c47438cdfe7d94ba40f5100bb"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-prefix-validation-scan-undercharge.log",
+      "existed": true,
+      "name": "brotli-k5-prefix-validation-scan-undercharge",
+      "path": "evidence/canary-brotli-k5-prefix-validation-scan-undercharge.log",
+      "sha256": "24f3d228c5b4c9b489b19414576251aa79eda97a374e73ad7c8614da986724d7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-singleton-guard-reordered-before-scan.log",
+      "existed": true,
+      "name": "brotli-k5-singleton-guard-reordered-before-scan",
+      "path": "evidence/canary-brotli-k5-singleton-guard-reordered-before-scan.log",
+      "sha256": "9240a8187282ef2fbab49563c9e8133d31408db993f989857c2ea1eea264944c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-selected-singleton-read-unpaid.log",
+      "existed": true,
+      "name": "brotli-k5-selected-singleton-read-unpaid",
+      "path": "evidence/canary-brotli-k5-selected-singleton-read-unpaid.log",
+      "sha256": "5940dbee5466858ea69daf487b5bb8538f34cbdc54c1eaa494719e99971654f9"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-singleton-skips-last-validation-cell.log",
+      "existed": true,
+      "name": "brotli-k5-singleton-skips-last-validation-cell",
+      "path": "evidence/canary-brotli-k5-singleton-skips-last-validation-cell.log",
+      "sha256": "4b70f94afa0388511d0c323cfc8b91772b7e96e8ebd65a54dab002f18314c6a0"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-simple-right-comparison-operand-unpaid.log",
+      "existed": true,
+      "name": "brotli-k5-simple-right-comparison-operand-unpaid",
+      "path": "evidence/canary-brotli-k5-simple-right-comparison-operand-unpaid.log",
+      "sha256": "e528352191c563c13646491137656cea139e97afe155e14ae5553fe121f09af5"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-simple-omits-right-operand-receipt.log",
+      "existed": true,
+      "name": "brotli-k5-simple-omits-right-operand-receipt",
+      "path": "evidence/canary-brotli-k5-simple-omits-right-operand-receipt.log",
+      "sha256": "825ee22da8147c33ab868f624c4528aab570ceaa1260c6013066bf62417bc963"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-selector-reload-keeps-old-eighteen.log",
+      "existed": true,
+      "name": "brotli-k5-selector-reload-keeps-old-eighteen",
+      "path": "evidence/canary-brotli-k5-selector-reload-keeps-old-eighteen.log",
+      "sha256": "ae5ac22f778ca49aa9e7beb4c57247c71a90fc482b0cf6fa98df628e87763db9"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-prefix-reload-omits-validation-cell.log",
+      "existed": true,
+      "name": "brotli-k5-prefix-reload-omits-validation-cell",
+      "path": "evidence/canary-brotli-k5-prefix-reload-omits-validation-cell.log",
+      "sha256": "be37a88dd1dbe8ce287d4054e9475517c17d7902d94c36b663d4ec988f906019"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-singleton-reload-omits-selected-cell.log",
+      "existed": true,
+      "name": "brotli-k5-singleton-reload-omits-selected-cell",
+      "path": "evidence/canary-brotli-k5-singleton-reload-omits-selected-cell.log",
+      "sha256": "be37a88dd1dbe8ce287d4054e9475517c17d7902d94c36b663d4ec988f906019"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-initial-loader-replay-unpaid.log",
+      "existed": true,
+      "name": "brotli-k5-initial-loader-replay-unpaid",
+      "path": "evidence/canary-brotli-k5-initial-loader-replay-unpaid.log",
+      "sha256": "6f340672da980ec9475936549cfea40f65f54caeb63d6112fa0a8b53a96ecef4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-each-reload-restores-old-eighteen.log",
+      "existed": true,
+      "name": "brotli-k5-each-reload-restores-old-eighteen",
+      "path": "evidence/canary-brotli-k5-each-reload-restores-old-eighteen.log",
+      "sha256": "9d459b2a558e6a3089a2e945544097689a7690400d1756c3632ff1c0b9137cd5"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-invalid-last-auxiliary-misclassified-valid.log",
+      "existed": true,
+      "name": "brotli-k5-invalid-last-auxiliary-misclassified-valid",
+      "path": "evidence/canary-brotli-k5-invalid-last-auxiliary-misclassified-valid.log",
+      "sha256": "7fa3fbbe4d5646a4a22c98d1054a491e72defa9a6251b0048f1d17e8e2f75cde"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k5-invalid-alphabet-misclassified-valid.log",
+      "existed": true,
+      "name": "brotli-k5-invalid-alphabet-misclassified-valid",
+      "path": "evidence/canary-brotli-k5-invalid-alphabet-misclassified-valid.log",
+      "sha256": "90ba0625a3ee5471c2adfd3cf1fe341206197f4f590e387262e59a29c8942b95"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-code-field-wrong-width.log",
+      "existed": true,
+      "name": "brotli-m1-code-field-wrong-width",
+      "path": "evidence/canary-brotli-m1-code-field-wrong-width.log",
+      "sha256": "73c19ff8d3f7da2362594c96af13d6661fdea182c449c49f0bd99c4ad49efe79"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-auxiliary-wrong-symbol.log",
+      "existed": true,
+      "name": "brotli-m1-auxiliary-wrong-symbol",
+      "path": "evidence/canary-brotli-m1-auxiliary-wrong-symbol.log",
+      "sha256": "10967abac8665960c6daa2f8f25d9bb19529c8eaf8e208dc04aeda349182b189"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-complex-start-wrong-previous-length.log",
+      "existed": true,
+      "name": "brotli-m1-complex-start-wrong-previous-length",
+      "path": "evidence/canary-brotli-m1-complex-start-wrong-previous-length.log",
+      "sha256": "8ef33a2dfeb05bfc0e8ae573c51d20ce80699fc99b53de6d8c13bc2e1df400bb"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-var-integer-wrong-value.log",
+      "existed": true,
+      "name": "brotli-m1-var-integer-wrong-value",
+      "path": "evidence/canary-brotli-m1-var-integer-wrong-value.log",
+      "sha256": "f275799d5338901f0c795ab064f376373a1a5eecbe7001d81a6d4237cd784aa2"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-body-metadata-read-not-charged.log",
+      "existed": true,
+      "name": "brotli-m1-body-metadata-read-not-charged",
+      "path": "evidence/canary-brotli-m1-body-metadata-read-not-charged.log",
+      "sha256": "14fe9974994141a8e8861eba2064224ab70f2c7e504bc90debac600a1e3155b6"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-body-execution-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-body-execution-undercharge",
+      "path": "evidence/canary-brotli-m1-body-execution-undercharge.log",
+      "sha256": "14fe9974994141a8e8861eba2064224ab70f2c7e504bc90debac600a1e3155b6"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-direct-wrong-value.log",
+      "existed": true,
+      "name": "brotli-m1-context-direct-wrong-value",
+      "path": "evidence/canary-brotli-m1-context-direct-wrong-value.log",
+      "sha256": "d19ee477f97863cf3712efcb50e4ca09f13169ab6276eaca532621d0db278ae5"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-initial-symbol-execution-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-initial-symbol-execution-undercharge",
+      "path": "evidence/canary-brotli-m1-initial-symbol-execution-undercharge.log",
+      "sha256": "84ccceb8b89fd3224893c455b5daa0751214c8dffcef24c41ff5b118b89b4c70"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-symbol-execution-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-context-symbol-execution-undercharge",
+      "path": "evidence/canary-brotli-m1-context-symbol-execution-undercharge.log",
+      "sha256": "c7cb019964bce6256eb27d0622b1d8992f97079f2fdfc28af46130d5bdb2aadb"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-literal-context-row-stride-is-63.log",
+      "existed": true,
+      "name": "brotli-b3b-literal-context-row-stride-is-63",
+      "path": "evidence/canary-brotli-b3b-literal-context-row-stride-is-63.log",
+      "sha256": "32c5a0af5e05690d0408912d146656a39a294614b45408136ff38b253bfb1ed2"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-distance-context-row-stride-is-three.log",
+      "existed": true,
+      "name": "brotli-b3b-distance-context-row-stride-is-three",
+      "path": "evidence/canary-brotli-b3b-distance-context-row-stride-is-three.log",
+      "sha256": "1452bb5b3f58434a485630b73f8fa2db736cbfc07f658bbe9ee86a9ea43df069"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-serialized-tree-skips-builder-reset.log",
+      "existed": true,
+      "name": "brotli-b3b-serialized-tree-skips-builder-reset",
+      "path": "evidence/canary-brotli-b3b-serialized-tree-skips-builder-reset.log",
+      "sha256": "f3d09bac98c88c1b3b86583dcfe33c3180cbe1a17749ea3f7eaca7948b52c171"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-tree-starts-in-literal-region.log",
+      "existed": true,
+      "name": "brotli-b3b-context-tree-starts-in-literal-region",
+      "path": "evidence/canary-brotli-b3b-context-tree-starts-in-literal-region.log",
+      "sha256": "3b37e527d19ae3c7cbcbbd1db6c760c144d701de179dc2a274357bd7e01f0f26"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-installed-symbol-truncation-needs-input.log",
+      "existed": true,
+      "name": "brotli-b3b-installed-symbol-truncation-needs-input",
+      "path": "evidence/canary-brotli-b3b-installed-symbol-truncation-needs-input.log",
+      "sha256": "1d8dc0c1f78e80d4505ff949c7b02afbfc7c5d6c542b497bf4861fa8edafff5c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-bit-truncation-needs-input.log",
+      "existed": true,
+      "name": "brotli-b3b-context-bit-truncation-needs-input",
+      "path": "evidence/canary-brotli-b3b-context-bit-truncation-needs-input.log",
+      "sha256": "1adbc49faec60ccdee5212819a13154e8a3c15ac5311712d1506d867f747b018"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-tree-field-truncation-needs-input.log",
+      "existed": true,
+      "name": "brotli-b3b-tree-field-truncation-needs-input",
+      "path": "evidence/canary-brotli-b3b-tree-field-truncation-needs-input.log",
+      "sha256": "9677e8c7328fc55816c2222a979137a95ea11d41ae0a94dc6e1ea466a60652b6"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-queue-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-queue-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-queue-undercharge.log",
+      "sha256": "6144ea2c2a32fae0cb0d9922c44e328377e41cde75bf122b98a723c16adee2a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-start-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-start-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-start-undercharge.log",
+      "sha256": "6144ea2c2a32fae0cb0d9922c44e328377e41cde75bf122b98a723c16adee2a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-prefix-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-prefix-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-prefix-undercharge.log",
+      "sha256": "6144ea2c2a32fae0cb0d9922c44e328377e41cde75bf122b98a723c16adee2a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-map-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-map-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-map-undercharge.log",
+      "sha256": "6144ea2c2a32fae0cb0d9922c44e328377e41cde75bf122b98a723c16adee2a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-progress-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-progress-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-progress-undercharge.log",
+      "sha256": "6144ea2c2a32fae0cb0d9922c44e328377e41cde75bf122b98a723c16adee2a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-reset-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-reset-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-reset-undercharge.log",
+      "sha256": "6144ea2c2a32fae0cb0d9922c44e328377e41cde75bf122b98a723c16adee2a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-phase-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-phase-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-phase-undercharge.log",
+      "sha256": "6144ea2c2a32fae0cb0d9922c44e328377e41cde75bf122b98a723c16adee2a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-terminal-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-terminal-undercharge.log",
+      "sha256": "7ded83ebcaaaa564c666fd4eb8572d6990874b9b62f94379df6206b3de4f4913"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-planning-debit-omitted.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-planning-debit-omitted",
+      "path": "evidence/canary-brotli-b3c-context-bits-planning-debit-omitted.log",
+      "sha256": "519c8ead6efdbe528c4f6a135f4438df292404c7157f5acf432b2b09ac5d865f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-execution-debit-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-execution-debit-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-execution-debit-undercharge.log",
+      "sha256": "1fc338dbac11f265f4eee745de25b122c796dcfbd0ab03c7bb5f045b2e2825a9"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-execution-reserved-after-writes.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-execution-reserved-after-writes",
+      "path": "evidence/canary-brotli-b3c-context-bits-execution-reserved-after-writes.log",
+      "sha256": "82cff2789faf7464aeea9b85cad08d83e451e4188bc19bc1d992ec36f02c7149"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-wrong-prefix.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-wrong-prefix",
+      "path": "evidence/canary-brotli-b3c-context-bits-wrong-prefix.log",
+      "sha256": "3ff4afb7fa7201a6ae9b98435b536de041a4ecadd4be2b066c3a91009dfc8af2"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-wrong-zero.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-wrong-zero",
+      "path": "evidence/canary-brotli-b3c-context-bits-wrong-zero.log",
+      "sha256": "993e6ae3fce2d117d625af2ac6dbaf2666c1ebcfa07266057bc29a0da6531399"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-start-writes-unrelated-byte.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-start-writes-unrelated-byte",
+      "path": "evidence/canary-brotli-b3c-context-bits-start-writes-unrelated-byte.log",
+      "sha256": "3d56989463eae1273945f5f984b285d7b5d7f47248e978a6c500140ebecd8b2f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-overshoot-terminal-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-overshoot-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-bits-overshoot-terminal-undercharge.log",
+      "sha256": "6144ea2c2a32fae0cb0d9922c44e328377e41cde75bf122b98a723c16adee2a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-skips-overshoot-check.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-skips-overshoot-check",
+      "path": "evidence/canary-brotli-b3c-context-bits-skips-overshoot-check.log",
+      "sha256": "000a1534c9e31886d295d4d4a7a220a8c6927301b38ac4786f2af83c077b883c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-bits-reads-wrong-width.log",
+      "existed": true,
+      "name": "brotli-b3c-context-bits-reads-wrong-width",
+      "path": "evidence/canary-brotli-b3c-context-bits-reads-wrong-width.log",
+      "sha256": "bb14bbe0ba04cff85878516c6f88f0cadee520741888502846f7e81e196baeee"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-builder-code-length-write-shifts-region.log",
+      "existed": true,
+      "name": "brotli-builder-code-length-write-shifts-region",
+      "path": "evidence/canary-brotli-builder-code-length-write-shifts-region.log",
+      "sha256": "27fce6b3a2dc6ed473295a4a91ff585571dbe1b1bb1951bbac77c3ef5623e071"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-builder-code-length-reads-uninitialized-entry.log",
+      "existed": true,
+      "name": "brotli-builder-code-length-reads-uninitialized-entry",
+      "path": "evidence/canary-brotli-builder-code-length-reads-uninitialized-entry.log",
+      "sha256": "6d59716e08cabf2e86a48b16566f86efb7e9d59994189d46a6f9e29c368d3e63"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-builder-count-write-swaps-low-byte.log",
+      "existed": true,
+      "name": "brotli-builder-count-write-swaps-low-byte",
+      "path": "evidence/canary-brotli-builder-count-write-swaps-low-byte.log",
+      "sha256": "ff673dfd9260e3c96eb70c08caa697fe21b66c5538390e4e228f701ada1ae48c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-builder-next-code-writes-wrong-third-byte.log",
+      "existed": true,
+      "name": "brotli-builder-next-code-writes-wrong-third-byte",
+      "path": "evidence/canary-brotli-builder-next-code-writes-wrong-third-byte.log",
+      "sha256": "170ddb0034e32381ca0dedceeeaf099fd5dad97d816e96488dec3093b253f053"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-canonical-record-rejects-unused-zero-length.log",
+      "existed": true,
+      "name": "brotli-canonical-record-rejects-unused-zero-length",
+      "path": "evidence/canary-brotli-canonical-record-rejects-unused-zero-length.log",
+      "sha256": "1f087d0d53384c7d663f2c84c3218a124c7db262c0a9082a31f56ff31c3fa8c5"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-canonical-installation-assigns-next-code.log",
+      "existed": true,
+      "name": "brotli-canonical-installation-assigns-next-code",
+      "path": "evidence/canary-brotli-canonical-installation-assigns-next-code.log",
+      "sha256": "ba986aa9e3e45b5734cfec521f58e1ff09770556ac7373e5b87319c7d0905e12"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-code-selector-misclassifies-simple.log",
+      "existed": true,
+      "name": "brotli-code-selector-misclassifies-simple",
+      "path": "evidence/canary-brotli-code-selector-misclassifies-simple.log",
+      "sha256": "42bb0fa4c01924aa36ab80c066f6e98b4db7b7859872db2bedc68b074187955c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-simple-code-accepts-limit-value.log",
+      "existed": true,
+      "name": "brotli-simple-code-accepts-limit-value",
+      "path": "evidence/canary-brotli-simple-code-accepts-limit-value.log",
+      "sha256": "cfe34132251f4ca6bc28a8ba54b3f71c6882dbce2c22bb97c7a2cb1cca3aae13"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-simple-code-accepts-duplicate-symbol.log",
+      "existed": true,
+      "name": "brotli-simple-code-accepts-duplicate-symbol",
+      "path": "evidence/canary-brotli-simple-code-accepts-duplicate-symbol.log",
+      "sha256": "3676ad69956472748dbe4591aa4d0bb3a628d3a6fa15ece0fd507959ef58eda6"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-complex-static-prefix-maps-four-to-five.log",
+      "existed": true,
+      "name": "brotli-complex-static-prefix-maps-four-to-five",
+      "path": "evidence/canary-brotli-complex-static-prefix-maps-four-to-five.log",
+      "sha256": "38cb1a90575a70a83137c92bfd57ae4bd02b019154b9eb6f51ba5b890d753d94"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-complex-code-misclassifies-space-overflow.log",
+      "existed": true,
+      "name": "brotli-complex-code-misclassifies-space-overflow",
+      "path": "evidence/canary-brotli-complex-code-misclassifies-space-overflow.log",
+      "sha256": "8273690606b9d0ca9f616a6d7dc2d7817535acd99aab330d23f47af94600d9d4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-code-length-order-starts-at-zero.log",
+      "existed": true,
+      "name": "brotli-code-length-order-starts-at-zero",
+      "path": "evidence/canary-brotli-code-length-order-starts-at-zero.log",
+      "sha256": "eadcb05d2688598c09e178d31199b8ac03028ff718ed007212ea849d4ddef4d1"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-pending-span-is-not-drained.log",
+      "existed": true,
+      "name": "brotli-b3b-pending-span-is-not-drained",
+      "path": "evidence/canary-brotli-b3b-pending-span-is-not-drained.log",
+      "sha256": "8a22a625a1d6927b8f17816099b4eb6a1a831b0b0d64db994478139ed43f435d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-sticky-failure-consumes-one-byte.log",
+      "existed": true,
+      "name": "brotli-b3b-sticky-failure-consumes-one-byte",
+      "path": "evidence/canary-brotli-b3b-sticky-failure-consumes-one-byte.log",
+      "sha256": "55dce2ab0f271f5851f3efb7b960a4bf9bbd3698de332d4b1cb8c9d0bd1d00fb"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-sticky-failure-becomes-need-input.log",
+      "existed": true,
+      "name": "brotli-b3b-sticky-failure-becomes-need-input",
+      "path": "evidence/canary-brotli-b3b-sticky-failure-becomes-need-input.log",
+      "sha256": "a4abc3726c25ae98d8cfaf066fe36a8c3cdb8b1c7016b86f10b5a97b8f1028ca"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-step-bypasses-sticky-failure-helper.log",
+      "existed": true,
+      "name": "brotli-b3b-step-bypasses-sticky-failure-helper",
+      "path": "evidence/canary-brotli-b3b-step-bypasses-sticky-failure-helper.log",
+      "sha256": "6bb57143791976a62a1bf8640b0fddf7cd8b3d990cfe8082ad3746622ce7c269"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-progress-leaves-stale-initialized-length.log",
+      "existed": true,
+      "name": "brotli-b3b-context-progress-leaves-stale-initialized-length",
+      "path": "evidence/canary-brotli-b3b-context-progress-leaves-stale-initialized-length.log",
+      "sha256": "5e8e63c4ec2cbb3094afa4eee5f8cce7dab4413bda272466b0af5c226023ae21"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-mtf-leaves-stale-reuse-bound.log",
+      "existed": true,
+      "name": "brotli-b3b-context-mtf-leaves-stale-reuse-bound",
+      "path": "evidence/canary-brotli-b3b-context-mtf-leaves-stale-reuse-bound.log",
+      "sha256": "d05953be2fde77873c7b6373fd8789f03e97c2674ed6c210466223c1b7c33548"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-metadata-single-uses-wrong-tag-bit.log",
+      "existed": true,
+      "name": "brotli-metadata-single-uses-wrong-tag-bit",
+      "path": "evidence/canary-brotli-metadata-single-uses-wrong-tag-bit.log",
+      "sha256": "539a73548748a9f4b1a08d0ea69fd9a0bde713122fe79d8d56bcafe300ddffbc"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-metadata-block-length-overlaps-block-type.log",
+      "existed": true,
+      "name": "brotli-metadata-block-length-overlaps-block-type",
+      "path": "evidence/canary-brotli-metadata-block-length-overlaps-block-type.log",
+      "sha256": "ca2fa44fdd7ec89333b918f1901a9a05edab11be752189b0fe2b28886134d01b"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-metadata-reads-first-inactive-record.log",
+      "existed": true,
+      "name": "brotli-metadata-reads-first-inactive-record",
+      "path": "evidence/canary-brotli-metadata-reads-first-inactive-record.log",
+      "sha256": "eccbe335074acad4a35534867b1d44ac30602be280b176df0fe77b336ba9d89a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-distance-context-map-uses-literal-region.log",
+      "existed": true,
+      "name": "brotli-distance-context-map-uses-literal-region",
+      "path": "evidence/canary-brotli-distance-context-map-uses-literal-region.log",
+      "sha256": "1c6718750c6f8388bbb2e159a4dc023b03f57da055f97029ca1d1033ecf6846e"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-context-map-reads-first-uninitialized-entry.log",
+      "existed": true,
+      "name": "brotli-context-map-reads-first-uninitialized-entry",
+      "path": "evidence/canary-brotli-context-map-reads-first-uninitialized-entry.log",
+      "sha256": "489cf759a62278f2e002e8b5bb53970057ba6166b5fb2096135478fdaa4ce94e"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-context-coverage-accepts-any-present-tree.log",
+      "existed": true,
+      "name": "brotli-context-coverage-accepts-any-present-tree",
+      "path": "evidence/canary-brotli-context-coverage-accepts-any-present-tree.log",
+      "sha256": "41665d245b1ed6c978c03700cd14d46db5d36c04ca33c3829d1c0e4f0e5551ca"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-context-repeat-uses-half-base.log",
+      "existed": true,
+      "name": "brotli-context-repeat-uses-half-base",
+      "path": "evidence/canary-brotli-context-repeat-uses-half-base.log",
+      "sha256": "3c887a9f452ed058942c672812f8d869f73aed15efb1fc4c519c0edc0dee0086"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-state-address-shifts-scalar-block.log",
+      "existed": true,
+      "name": "brotli-b3b-state-address-shifts-scalar-block",
+      "path": "evidence/canary-brotli-b3b-state-address-shifts-scalar-block.log",
+      "sha256": "62cc6da6c1a2b0110e20da345aaacbb88536b40af7c7797da647a88d0fe84e35"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-u16-writes-low-byte-twice.log",
+      "existed": true,
+      "name": "brotli-b3b-u16-writes-low-byte-twice",
+      "path": "evidence/canary-brotli-b3b-u16-writes-low-byte-twice.log",
+      "sha256": "4f202dfee882df7ec64fc3da4a8450dbf323b11871c2fdc47d9de7e6ba01e8e4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-tag-accepts-first-invalid-value.log",
+      "existed": true,
+      "name": "brotli-b3b-tag-accepts-first-invalid-value",
+      "path": "evidence/canary-brotli-b3b-tag-accepts-first-invalid-value.log",
+      "sha256": "d7eb88e04c3e01551ef816e47caea6b6d886abb3e396b50a8e6b8501d2846c56"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-terminal-store-marks-state-complete.log",
+      "existed": true,
+      "name": "brotli-terminal-store-marks-state-complete",
+      "path": "evidence/canary-brotli-terminal-store-marks-state-complete.log",
+      "sha256": "495bb85eb2eed1b1bf3fbaaf5fdcc68467fc750cfa74a5473ac2b052121e0392"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-terminal-load-turns-truncation-unsupported.log",
+      "existed": true,
+      "name": "brotli-terminal-load-turns-truncation-unsupported",
+      "path": "evidence/canary-brotli-terminal-load-turns-truncation-unsupported.log",
+      "sha256": "dcc68481628b1fc650a46df70eb6d4b491a9c3709f5a55150be8589d9acc7f68"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-completed-simple-tree-writes-unused-metadata.log",
+      "existed": true,
+      "name": "brotli-b3b-completed-simple-tree-writes-unused-metadata",
+      "path": "evidence/canary-brotli-b3b-completed-simple-tree-writes-unused-metadata.log",
+      "sha256": "ea17a6026059f79996e771fadd9339bab57e38785397cdc97e0cc58fd1cfc172"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-tree-group-order-skips-command.log",
+      "existed": true,
+      "name": "brotli-b3b-tree-group-order-skips-command",
+      "path": "evidence/canary-brotli-b3b-tree-group-order-skips-command.log",
+      "sha256": "4c82654c39167ef6cda6c8dae1cfa23116b08d8ac37aa2066a5d64f0d477cfe4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-command-group-uses-distance-count.log",
+      "existed": true,
+      "name": "brotli-b3b-command-group-uses-distance-count",
+      "path": "evidence/canary-brotli-b3b-command-group-uses-distance-count.log",
+      "sha256": "85820edebf95caa9c3e1f8ab792abde21687babd4fb0289a278be57a2f28111a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-tree-group-index-advances-by-two.log",
+      "existed": true,
+      "name": "brotli-b3b-tree-group-index-advances-by-two",
+      "path": "evidence/canary-brotli-b3b-tree-group-index-advances-by-two.log",
+      "sha256": "139791e415ee034f4255da8a9d52fe12cf52424e7d63cd124f0b1a202a7de2a7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-command-group-alphabet-is-703.log",
+      "existed": true,
+      "name": "brotli-b3b-command-group-alphabet-is-703",
+      "path": "evidence/canary-brotli-b3b-command-group-alphabet-is-703.log",
+      "sha256": "82cf82d5d8c8bb19a0b74c867d6192a98bfaeb34a3ed7a98a0e64f71a10b1bde"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-active-command-tree-starts-at-one.log",
+      "existed": true,
+      "name": "brotli-b3b-active-command-tree-starts-at-one",
+      "path": "evidence/canary-brotli-b3b-active-command-tree-starts-at-one.log",
+      "sha256": "0bc2e2c41e615218c71cc16db21f1847963c2e148beb8ba6b65184740791abb6"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k4-repeat-store-overwrites-history.log",
+      "existed": true,
+      "name": "brotli-k4-repeat-store-overwrites-history",
+      "path": "evidence/canary-brotli-k4-repeat-store-overwrites-history.log",
+      "sha256": "4d9cdfeb792669760f1fff319b3e68bbb448118dd0374aa6df4814baae3564d3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k4-repeat-load-current-from-history.log",
+      "existed": true,
+      "name": "brotli-k4-repeat-load-current-from-history",
+      "path": "evidence/canary-brotli-k4-repeat-load-current-from-history.log",
+      "sha256": "a66c92a779cd2256bf975b76cb39fcd7c0c8c4190efb0308615c481b9f08f70f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k4-progress-stores-previous-code-in-history.log",
+      "existed": true,
+      "name": "brotli-k4-progress-stores-previous-code-in-history",
+      "path": "evidence/canary-brotli-k4-progress-stores-previous-code-in-history.log",
+      "sha256": "397e181ae293b46b26da571df2dfa59eb1dfe68468f00a437247433bae846067"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k4-repeat-load-history-from-current.log",
+      "existed": true,
+      "name": "brotli-k4-repeat-load-history-from-current",
+      "path": "evidence/canary-brotli-k4-repeat-load-history-from-current.log",
+      "sha256": "a66c92a779cd2256bf975b76cb39fcd7c0c8c4190efb0308615c481b9f08f70f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k4-repeat-width-uses-old-class.log",
+      "existed": true,
+      "name": "brotli-k4-repeat-width-uses-old-class",
+      "path": "evidence/canary-brotli-k4-repeat-width-uses-old-class.log",
+      "sha256": "ab3d3a5a6af8dd4d71b1abd647ad766a0f35e70bcf12d567614a74ea6babaad9"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k4-repeat-rejects-valid-length-fifteen.log",
+      "existed": true,
+      "name": "brotli-k4-repeat-rejects-valid-length-fifteen",
+      "path": "evidence/canary-brotli-k4-repeat-rejects-valid-length-fifteen.log",
+      "sha256": "016eefc161da632ddaa7c2adb5d3bd073af208ff61cee04edbd0e523ba7a3185"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k7-canonical-constructor-spurious-error.log",
+      "existed": true,
+      "name": "brotli-k7-canonical-constructor-spurious-error",
+      "path": "evidence/canary-brotli-k7-canonical-constructor-spurious-error.log",
+      "sha256": "6236dbb6a9bd3c7f48ed96c23f8c2e031526e84033527fe07ee8235a0327fce7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k8-single-constructor-spurious-error.log",
+      "existed": true,
+      "name": "brotli-k8-single-constructor-spurious-error",
+      "path": "evidence/canary-brotli-k8-single-constructor-spurious-error.log",
+      "sha256": "b084d372a4d5119149e94f85861073066456c06d793a86e6ba96c8ab85e6f3c4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k7-singleton-install-spurious-error.log",
+      "existed": true,
+      "name": "brotli-k7-singleton-install-spurious-error",
+      "path": "evidence/canary-brotli-k7-singleton-install-spurious-error.log",
+      "sha256": "0707d9c624b695ad4fb01453f4772cdccb113b808cceda532eb791c425a221a0"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k7-multi-install-spurious-error.log",
+      "existed": true,
+      "name": "brotli-k7-multi-install-spurious-error",
+      "path": "evidence/canary-brotli-k7-multi-install-spurious-error.log",
+      "sha256": "44987252ec2e92b91df008c1b569a57c373a840cc53bebcfb49d3d20ece0073c"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k8-invalid-tree-error-replaced.log",
+      "existed": true,
+      "name": "brotli-k8-invalid-tree-error-replaced",
+      "path": "evidence/canary-brotli-k8-invalid-tree-error-replaced.log",
+      "sha256": "715bbefb3cf267a4a210b14eada81550e63fd3b10304bd4e54dd61d7edc3d5f8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k8-invalid-tree-mutates-metadata.log",
+      "existed": true,
+      "name": "brotli-k8-invalid-tree-mutates-metadata",
+      "path": "evidence/canary-brotli-k8-invalid-tree-mutates-metadata.log",
+      "sha256": "47477e73a791820a172771b58570261991391b7b5a09fedb44e7dd92f01450ac"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-bad-count-prepass-skips-terminal-plan.log",
+      "existed": true,
+      "name": "brotli-m1-context-bad-count-prepass-skips-terminal-plan",
+      "path": "evidence/canary-brotli-m1-context-bad-count-prepass-skips-terminal-plan.log",
+      "sha256": "5562a4e137c9a8a9e975929768ca7974160b507cc25f4365b9ffd96d58ba9a9a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-bad-count-plan-omits-terminal-work.log",
+      "existed": true,
+      "name": "brotli-m1-context-bad-count-plan-omits-terminal-work",
+      "path": "evidence/canary-brotli-m1-context-bad-count-plan-omits-terminal-work.log",
+      "sha256": "3921dfd31c2d944f6fc6eadd5b713c8e5900b018049980be6c2f60d3e5aea619"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-bad-count-plan-loses-failure.log",
+      "existed": true,
+      "name": "brotli-m1-context-bad-count-plan-loses-failure",
+      "path": "evidence/canary-brotli-m1-context-bad-count-plan-loses-failure.log",
+      "sha256": "e783fb26cffa5a9cc39fe6d16bfac3e3048ad89abedc08bfaee95751a83c9a61"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-bad-count-plan-consumes-input.log",
+      "existed": true,
+      "name": "brotli-m1-context-bad-count-plan-consumes-input",
+      "path": "evidence/canary-brotli-m1-context-bad-count-plan-consumes-input.log",
+      "sha256": "e9a453733f58baf4e5b1045c15cb06f8148d71ecd4161e815e8deccbf73a0b12"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-bad-count-executor-wrong-error.log",
+      "existed": true,
+      "name": "brotli-m1-context-bad-count-executor-wrong-error",
+      "path": "evidence/canary-brotli-m1-context-bad-count-executor-wrong-error.log",
+      "sha256": "23dda78524433cc3939136f9846e54b7616f9d4107a3d3872165e47f969fa712"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-context-bad-count-owner-skips-action.log",
+      "existed": true,
+      "name": "brotli-m1-context-bad-count-owner-skips-action",
+      "path": "evidence/canary-brotli-m1-context-bad-count-owner-skips-action.log",
+      "sha256": "a9133d4675d2aaf47d03e270c2a4d2ac62d001a737d31ebb9d4957ecb1aa8fe7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-cursor-tag-rejects-with-wrong-error.log",
+      "existed": true,
+      "name": "brotli-m1-cursor-tag-rejects-with-wrong-error",
+      "path": "evidence/canary-brotli-m1-cursor-tag-rejects-with-wrong-error.log",
+      "sha256": "e21701912668bca520d91c980181d99d5a0a6afd6bf66b6b7a75f971587869ca"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-cursor-distance-prepass-forgets-rejection.log",
+      "existed": true,
+      "name": "brotli-m1-cursor-distance-prepass-forgets-rejection",
+      "path": "evidence/canary-brotli-m1-cursor-distance-prepass-forgets-rejection.log",
+      "sha256": "71ff235a727d639e0c961723fa2edafe8b8729c647ed041585580237517a93ac"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-cursor-block-prepass-forgets-var-rejection.log",
+      "existed": true,
+      "name": "brotli-m1-cursor-block-prepass-forgets-var-rejection",
+      "path": "evidence/canary-brotli-m1-cursor-block-prepass-forgets-var-rejection.log",
+      "sha256": "ee5f9816d71dacd663801eb2a59cc0b5da1d464fda799ce98e523ba9c588b3e3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-cursor-block-forecast-omits-terminal-work.log",
+      "existed": true,
+      "name": "brotli-m1-cursor-block-forecast-omits-terminal-work",
+      "path": "evidence/canary-brotli-m1-cursor-block-forecast-omits-terminal-work.log",
+      "sha256": "f1b0d9cd5f4fc06d79079397908c636a2888bcb3895a4f1d6a5034407e988a19"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-cursor-context-owner-skips-terminal-action.log",
+      "existed": true,
+      "name": "brotli-m1-cursor-context-owner-skips-terminal-action",
+      "path": "evidence/canary-brotli-m1-cursor-context-owner-skips-terminal-action.log",
+      "sha256": "cc0009a0011391085446e8502e50d9fe488c2ced05967e468b1a5226afa1b042"
+    },
+    {
+      "existed": false,
+      "name": "brotli-m1-cursor-executor-forgets-terminal-work-debit",
+      "path": "evidence/canary-brotli-m1-cursor-executor-forgets-terminal-work-debit.log"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-block-count-prepass-omits-read-work.log",
+      "existed": true,
+      "name": "brotli-m1-block-count-prepass-omits-read-work",
+      "path": "evidence/canary-brotli-m1-block-count-prepass-omits-read-work.log",
+      "sha256": "8a3393087fbafd696c15e90903708b69c5a9199f7d8b604a346389e98d1cafaf"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-block-count-plan-loses-need-input.log",
+      "existed": true,
+      "name": "brotli-m1-block-count-plan-loses-need-input",
+      "path": "evidence/canary-brotli-m1-block-count-plan-loses-need-input.log",
+      "sha256": "f874c5c09f05314330541d8cc3cc054a302c1944a896c41d32d721128408d100"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-block-count-plan-loses-consumption.log",
+      "existed": true,
+      "name": "brotli-m1-block-count-plan-loses-consumption",
+      "path": "evidence/canary-brotli-m1-block-count-plan-loses-consumption.log",
+      "sha256": "3677ceb339b3d6195e727d25e867bbf82b550a31cebfd758b43e6e7dabcbd91e"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-block-count-executor-omits-input-debit.log",
+      "existed": true,
+      "name": "brotli-m1-block-count-executor-omits-input-debit",
+      "path": "evidence/canary-brotli-m1-block-count-executor-omits-input-debit.log",
+      "sha256": "e6afaee442c2b69c262cabd1ee11c88f995952491b85c50f382cd886162c6f02"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-block-count-limited-input-is-retryable.log",
+      "existed": true,
+      "name": "brotli-m1-block-count-limited-input-is-retryable",
+      "path": "evidence/canary-brotli-m1-block-count-limited-input-is-retryable.log",
+      "sha256": "3847ea8764717d801e0271471dd73c580d18966954276bbd51e690d0ab0a80c7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-block-count-value-writes-padding.log",
+      "existed": true,
+      "name": "brotli-m1-block-count-value-writes-padding",
+      "path": "evidence/canary-brotli-m1-block-count-value-writes-padding.log",
+      "sha256": "ffcbd1368db71e40283b1dd49104942e49ec0884bae033b082316b9584927d1d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-reset-writes-wrong-var-phase.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-reset-writes-wrong-var-phase",
+      "path": "evidence/canary-brotli-m1-handoff-reset-writes-wrong-var-phase.log",
+      "sha256": "e1fd6994ad5f8409b3ffe82d23713f0bcb42a95c37bf3ce6d14fcfd90150c9d6"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-reset-writes-wrong-pending-run.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-reset-writes-wrong-pending-run",
+      "path": "evidence/canary-brotli-m1-handoff-reset-writes-wrong-pending-run.log",
+      "sha256": "e1fd6994ad5f8409b3ffe82d23713f0bcb42a95c37bf3ce6d14fcfd90150c9d6"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-plan-undercharges-one.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-plan-undercharges-one",
+      "path": "evidence/canary-brotli-m1-handoff-plan-undercharges-one.log",
+      "sha256": "d5dde639c3a297b1752040e184dceebca6b53bcf38978170c92fa5361d453a64"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-plan-consumes-input.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-plan-consumes-input",
+      "path": "evidence/canary-brotli-m1-handoff-plan-consumes-input.log",
+      "sha256": "ddddf5b4048f57c0a05a6c0c47586c57b49d644eaf01e2ca7b586c50465e4e57"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-action-skips-literal-map.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-action-skips-literal-map",
+      "path": "evidence/canary-brotli-m1-handoff-action-skips-literal-map.log",
+      "sha256": "5dc612f9e42c7a0c786164d28b400d581177f9cd9095aa5a2274e626ee0de203"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-reset-writes-padding.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-reset-writes-padding",
+      "path": "evidence/canary-brotli-m1-handoff-reset-writes-padding.log",
+      "sha256": "05072edcde4d042121ca7ece8b84d6afeed45fd0d6a276fe073054f5f6d55a9b"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-distance-prepass-omits-read-work.log",
+      "existed": true,
+      "name": "brotli-m1-distance-prepass-omits-read-work",
+      "path": "evidence/canary-brotli-m1-distance-prepass-omits-read-work.log",
+      "sha256": "0a4d5dd3b7b5ca8357899179a172b9caeca85280abda1a151b6018a8d99f2325"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-distance-plan-loses-need-input.log",
+      "existed": true,
+      "name": "brotli-m1-distance-plan-loses-need-input",
+      "path": "evidence/canary-brotli-m1-distance-plan-loses-need-input.log",
+      "sha256": "7555e15cafcb0524dd143b4df3e86f3c4b6ae9b7733e9dbabf7009438d757922"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-distance-plan-loses-consumption.log",
+      "existed": true,
+      "name": "brotli-m1-distance-plan-loses-consumption",
+      "path": "evidence/canary-brotli-m1-distance-plan-loses-consumption.log",
+      "sha256": "81ce3b64689532b12072c708578e384bed888ebb307de2047c60848b9143fe8d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-distance-plan-omits-value-writes.log",
+      "existed": true,
+      "name": "brotli-m1-distance-plan-omits-value-writes",
+      "path": "evidence/canary-brotli-m1-distance-plan-omits-value-writes.log",
+      "sha256": "758e63e7db5473360014045e2aa875088dd746b93c6efdf392a6e5f4c7006782"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-distance-action-writes-wrong-direct-field.log",
+      "existed": true,
+      "name": "brotli-m1-distance-action-writes-wrong-direct-field",
+      "path": "evidence/canary-brotli-m1-distance-action-writes-wrong-direct-field.log",
+      "sha256": "d8693ebe022e62816bf3a8f85fa18fd67890eb1a3e61821e37f973f408b5b4ea"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-distance-action-flips-postfix.log",
+      "existed": true,
+      "name": "brotli-m1-distance-action-flips-postfix",
+      "path": "evidence/canary-brotli-m1-distance-action-flips-postfix.log",
+      "sha256": "d8693ebe022e62816bf3a8f85fa18fd67890eb1a3e61821e37f973f408b5b4ea"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-reset-transition-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-tree-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-tree-reset-transition-undercharge.log",
+      "sha256": "28b2552dd438dc66059e91540041e879a5e1c2ab0ed711f19c56e08464d8a9c5"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-var-reset-transition-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-var-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-var-reset-transition-undercharge.log",
+      "sha256": "15a873d80000be197425373f9865e58141b28c8a14484eb270082d481e4bbd4d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-prefix-reset-transition-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-prefix-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-prefix-reset-transition-undercharge.log",
+      "sha256": "daf1e9b9124e141b9c2970b8c1c4c341fb2f89967388a391feeb11bbb9c90eca"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-group-tree-transition-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-group-tree-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-group-tree-transition-undercharge.log",
+      "sha256": "a9a3425935f93bb59d6eb9c284f51920083ccdebc4b09cd75a6345cf8021a103"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-group-reset-transition-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-group-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-group-reset-transition-undercharge.log",
+      "sha256": "c0cddb5a57922fbcdb6081dd7eda3e04b9d30f4c28d7e27bca243dc921e202bc"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-ready-reset-transition-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-ready-reset-transition-undercharge",
+      "path": "evidence/canary-brotli-m1-ready-reset-transition-undercharge.log",
+      "sha256": "8aa1c429138bd47c76448468858ae0182b1b9fa915795cffb5e60cd876a9321a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-simple-rejection-is-truncated.log",
+      "existed": true,
+      "name": "brotli-m1-tree-simple-rejection-is-truncated",
+      "path": "evidence/canary-brotli-m1-tree-simple-rejection-is-truncated.log",
+      "sha256": "8b0e102455b8d855191dfab554c749efc19c5f1bfd101e1a54b25650bd054202"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-canonical-rejection-is-internal.log",
+      "existed": true,
+      "name": "brotli-m1-tree-canonical-rejection-is-internal",
+      "path": "evidence/canary-brotli-m1-tree-canonical-rejection-is-internal.log",
+      "sha256": "655e3df3804a7b3fb5e61599a8bf88012f87439cf9970244da909e8730e438ee"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-simple-plan-reports-invalid-tree.log",
+      "existed": true,
+      "name": "brotli-m1-tree-simple-plan-reports-invalid-tree",
+      "path": "evidence/canary-brotli-m1-tree-simple-plan-reports-invalid-tree.log",
+      "sha256": "3f2930a1fd9b99d6801c43d338d17d3e40a5eeba7fbeffe0ebb2fa1fd4acf49d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-canonical-plan-loses-tree-priority.log",
+      "existed": true,
+      "name": "brotli-m1-tree-canonical-plan-loses-tree-priority",
+      "path": "evidence/canary-brotli-m1-tree-canonical-plan-loses-tree-priority.log",
+      "sha256": "8c956ec400566311afc8048677f4f63f50c83939fd89bd1ab9cc38c94ab9b1e0"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-canonical-plan-loses-length-error.log",
+      "existed": true,
+      "name": "brotli-m1-tree-canonical-plan-loses-length-error",
+      "path": "evidence/canary-brotli-m1-tree-canonical-plan-loses-length-error.log",
+      "sha256": "7466a4cda763eae7e02e9ac2523348422206d429338924a076fe0cc926b3ef46"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-owner-flags-matching-workspace-error.log",
+      "existed": true,
+      "name": "brotli-m1-tree-owner-flags-matching-workspace-error",
+      "path": "evidence/canary-brotli-m1-tree-owner-flags-matching-workspace-error.log",
+      "sha256": "0e64c92ed351adbd14bbcf552408fc06be5817a7fc6afb3371448db195564473"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-plan-omits-saved-load-planning.log",
+      "existed": true,
+      "name": "brotli-m1-tree-plan-omits-saved-load-planning",
+      "path": "evidence/canary-brotli-m1-tree-plan-omits-saved-load-planning.log",
+      "sha256": "802eb88e5166ba8847be0486f14f1901522185d51210e6c318ff4ccf06080621"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-block-tree-plan-omits-planning-debit.log",
+      "existed": true,
+      "name": "brotli-m1-block-tree-plan-omits-planning-debit",
+      "path": "evidence/canary-brotli-m1-block-tree-plan-omits-planning-debit.log",
+      "sha256": "c018b2135354284e2f60309269ac337d58ca83c1671617a5f31c9408cc5425cf"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-group-tree-plan-omits-planning-debit.log",
+      "existed": true,
+      "name": "brotli-m1-group-tree-plan-omits-planning-debit",
+      "path": "evidence/canary-brotli-m1-group-tree-plan-omits-planning-debit.log",
+      "sha256": "0a6a0996bdcdda75d49c39f1d69596cf880d0e6a834cab11ffdd631eac0403ee"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-pending-span-writes-wrong-length.log",
+      "existed": true,
+      "name": "brotli-m1-pending-span-writes-wrong-length",
+      "path": "evidence/canary-brotli-m1-pending-span-writes-wrong-length.log",
+      "sha256": "0457d4324d57d84ae4436cb28a9d79c0c6507af47dd8c4f56793633631629b40"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-descriptor-store-writes-unrelated-byte.log",
+      "existed": true,
+      "name": "brotli-m1-descriptor-store-writes-unrelated-byte",
+      "path": "evidence/canary-brotli-m1-descriptor-store-writes-unrelated-byte.log",
+      "sha256": "41e8ce511dc0be147251635c6df91d9b947b22ff4f7139cb2a3896bcdb4af508"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-inconsistent-span-mutates-decoder.log",
+      "existed": true,
+      "name": "brotli-m1-inconsistent-span-mutates-decoder",
+      "path": "evidence/canary-brotli-m1-inconsistent-span-mutates-decoder.log",
+      "sha256": "74bfd553d7a9e4293a41af5c9d3a12ea29de38e905c388212a42314efd9c8394"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-loses-distance-parameter-rejection.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-loses-distance-parameter-rejection",
+      "path": "evidence/canary-brotli-m1-handoff-loses-distance-parameter-rejection.log",
+      "sha256": "bfd0382770569163b0e439617634ce48431c047ff3962e0d492070ecd05faaa2"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-loses-final-count-validation.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-loses-final-count-validation",
+      "path": "evidence/canary-brotli-m1-handoff-loses-final-count-validation.log",
+      "sha256": "16f26d11d34051abf1e5d348943b33dbb56236333cfbaece8eeac76bb2aba653"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-accepts-out-of-range-literal-context.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-accepts-out-of-range-literal-context",
+      "path": "evidence/canary-brotli-m1-handoff-accepts-out-of-range-literal-context.log",
+      "sha256": "19c9987bb3de4ea0e51c6ed9586b4e9c80acbd25880d9ff50327d88cd0b0992e"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-accepts-out-of-range-distance-context.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-accepts-out-of-range-distance-context",
+      "path": "evidence/canary-brotli-m1-handoff-accepts-out-of-range-distance-context.log",
+      "sha256": "0890a3186795cc96e2661eaf3113fde09cd8eca4563d0285a211e2e3e319a1af"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-accepts-zero-initial-length.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-accepts-zero-initial-length",
+      "path": "evidence/canary-brotli-m1-handoff-accepts-zero-initial-length.log",
+      "sha256": "6780d843d28f35cab5f878f4cdc2b006f1223971fdcbe5e1a7be673db855d5d7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-first-map-read-not-prepaid.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-first-map-read-not-prepaid",
+      "path": "evidence/canary-brotli-m1-handoff-first-map-read-not-prepaid.log",
+      "sha256": "3f43ff8ccde47685c331b1df9cc7246d0eba22575d3719c4ab10cc19d3d62a51"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-second-map-read-not-prepaid.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-second-map-read-not-prepaid",
+      "path": "evidence/canary-brotli-m1-handoff-second-map-read-not-prepaid.log",
+      "sha256": "a46ef493c72a8dfda8d0a896d92b1ef5e90fffe279d85f36d2533a0a4b8e0a7b"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-handoff-ready-start-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-handoff-ready-start-undercharge",
+      "path": "evidence/canary-brotli-m1-handoff-ready-start-undercharge.log",
+      "sha256": "6780d843d28f35cab5f878f4cdc2b006f1223971fdcbe5e1a7be673db855d5d7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-block-tree-execution-reservation-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-block-tree-execution-reservation-undercharge",
+      "path": "evidence/canary-brotli-m1-block-tree-execution-reservation-undercharge.log",
+      "sha256": "159dc1e45d27eb15a1c4355f1298755d83d02e7f03da4ffa7e52a6db1d33c6b7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-tree-group-execution-reservation-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-tree-group-execution-reservation-undercharge",
+      "path": "evidence/canary-brotli-m1-tree-group-execution-reservation-undercharge.log",
+      "sha256": "eb96d8fd7439166dbae253338b78149d80b382574af03ecfae566deba076d78b"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-map-tail-execution-reservation-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-map-tail-execution-reservation-undercharge",
+      "path": "evidence/canary-brotli-m1-map-tail-execution-reservation-undercharge.log",
+      "sha256": "3d69d4187179b148c47d707f475fd378d7e5d6b64d89bcaf1ba603c92c29dc8a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-terminal-execution-reservation-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-terminal-execution-reservation-undercharge",
+      "path": "evidence/canary-brotli-m1-terminal-execution-reservation-undercharge.log",
+      "sha256": "e00b66333be5130cde870bd10bc8064aef2848a150fc7da2d5535d41f8ef6524"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-terminal-plan-accepts-zero-length.log",
+      "existed": true,
+      "name": "brotli-m1-terminal-plan-accepts-zero-length",
+      "path": "evidence/canary-brotli-m1-terminal-plan-accepts-zero-length.log",
+      "sha256": "31f387076e4308178a594e780fefb1af1f3b88d64ed96812941f6d973550e4e1"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-map-handoff-rejection-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-map-handoff-rejection-undercharge",
+      "path": "evidence/canary-brotli-m1-map-handoff-rejection-undercharge.log",
+      "sha256": "cb4d7cdbf525b916c500bac461b84a4d9d11de9800c7433b65de0f2b5e95c5ce"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-map-tail-replay-consumption-corrupted.log",
+      "existed": true,
+      "name": "brotli-m1-map-tail-replay-consumption-corrupted",
+      "path": "evidence/canary-brotli-m1-map-tail-replay-consumption-corrupted.log",
+      "sha256": "9a7b52658bc5c4942d54c3cafb17e4e431b4cf8d1a1702c15c19a7d8e2220e47"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-map-tail-replay-coverage-error-corrupted.log",
+      "existed": true,
+      "name": "brotli-m1-map-tail-replay-coverage-error-corrupted",
+      "path": "evidence/canary-brotli-m1-map-tail-replay-coverage-error-corrupted.log",
+      "sha256": "1c252695ea2eb43ce29828a5e2f66ba74b7eac1d5d17be5b65050fd2f32dd9ce"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-tree-count-omits-plus-one-for-zero.log",
+      "existed": true,
+      "name": "brotli-b3b-context-tree-count-omits-plus-one-for-zero",
+      "path": "evidence/canary-brotli-b3b-context-tree-count-omits-plus-one-for-zero.log",
+      "sha256": "e2654f212f7a434bf0f7502556edb1e06a89839a75a58741fb82b8a308dee8c3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-phase-one-reads-two-bits.log",
+      "existed": true,
+      "name": "brotli-b3b-context-phase-one-reads-two-bits",
+      "path": "evidence/canary-brotli-b3b-context-phase-one-reads-two-bits.log",
+      "sha256": "cf063b648d9d185198eb9b1af705efef53a6d02b3585b7eb2b58b3482af90c48"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-phase-two-reads-three-bits.log",
+      "existed": true,
+      "name": "brotli-b3b-context-phase-two-reads-three-bits",
+      "path": "evidence/canary-brotli-b3b-context-phase-two-reads-three-bits.log",
+      "sha256": "cf063b648d9d185198eb9b1af705efef53a6d02b3585b7eb2b58b3482af90c48"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-rle-suffix-is-one-bit-short.log",
+      "existed": true,
+      "name": "brotli-b3b-context-rle-suffix-is-one-bit-short",
+      "path": "evidence/canary-brotli-b3b-context-rle-suffix-is-one-bit-short.log",
+      "sha256": "fb03db34a60098eb2d42d49b55c26f13358d550d8240c0f2c154f85474f0ccf4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-phase-six-reads-two-bits.log",
+      "existed": true,
+      "name": "brotli-b3b-context-phase-six-reads-two-bits",
+      "path": "evidence/canary-brotli-b3b-context-phase-six-reads-two-bits.log",
+      "sha256": "e89114e622561934f00b3599bff8f67ae2ed412bd19c2a1b4c206167c546099d"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-need-input-does-not-suspend.log",
+      "existed": true,
+      "name": "brotli-b3b-context-need-input-does-not-suspend",
+      "path": "evidence/canary-brotli-b3b-context-need-input-does-not-suspend.log",
+      "sha256": "1b82369b23591ba6dc863d24d10ac932db151a4e39df98a0ded8400342262dd0"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-exact-fill-is-overflow.log",
+      "existed": true,
+      "name": "brotli-b3b-context-exact-fill-is-overflow",
+      "path": "evidence/canary-brotli-b3b-context-exact-fill-is-overflow.log",
+      "sha256": "e8aea486a6b4547cb4242858fc1e1b29b27ab3eb24a33dadf3d42ce519ddcb24"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-rle-writes-one.log",
+      "existed": true,
+      "name": "brotli-b3b-context-rle-writes-one",
+      "path": "evidence/canary-brotli-b3b-context-rle-writes-one.log",
+      "sha256": "dea1a3d4196eee9a35d72ae2ecbea07676645c8380007ed4a41b315c9ff67940"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-temporary-alphabet-adds-one.log",
+      "existed": true,
+      "name": "brotli-b3b-context-temporary-alphabet-adds-one",
+      "path": "evidence/canary-brotli-b3b-context-temporary-alphabet-adds-one.log",
+      "sha256": "2a2a5bca87dbdfd1e760e7addde6ead90ef65a4eb355cbe1b7deb35a1a09b8e9"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-zero-mtf-flag-routes-to-mtf.log",
+      "existed": true,
+      "name": "brotli-b3b-context-zero-mtf-flag-routes-to-mtf",
+      "path": "evidence/canary-brotli-b3b-context-zero-mtf-flag-routes-to-mtf.log",
+      "sha256": "38af2f8ce548a0ebefde12207e399414f87f9d30dc8537e8a3ab75cf460a9da7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-direct-value-is-one-low.log",
+      "existed": true,
+      "name": "brotli-b3b-context-direct-value-is-one-low",
+      "path": "evidence/canary-brotli-b3b-context-direct-value-is-one-low.log",
+      "sha256": "2ffb86cb4ce2de99cc33b38ba0affc7144745258502036cefd56699bb675cf71"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-symbol-uses-literal-tree-region.log",
+      "existed": true,
+      "name": "brotli-b3b-context-symbol-uses-literal-tree-region",
+      "path": "evidence/canary-brotli-b3b-context-symbol-uses-literal-tree-region.log",
+      "sha256": "052c0ad439fba598fb5d73b0e8f067f1e8f0de29f8314f1c0a0e9f1d21dd9183"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-context-coverage-rejects-covered-map.log",
+      "existed": true,
+      "name": "brotli-b3b-context-coverage-rejects-covered-map",
+      "path": "evidence/canary-brotli-b3b-context-coverage-rejects-covered-map.log",
+      "sha256": "6bdaaa5645eab73fbcc3624b8e5c846c295330ca8c1c614aa12effc06cff71dd"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-queue-write-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-queue-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-queue-write-undercharge.log",
+      "sha256": "ec991cfbb73b9d315c6c3882873ea6183b295a1c33a4cf65d233d1b0eec40ce8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-var-write-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-var-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-var-write-undercharge.log",
+      "sha256": "ec991cfbb73b9d315c6c3882873ea6183b295a1c33a4cf65d233d1b0eec40ce8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-map-cell-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-map-cell-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-map-cell-undercharge.log",
+      "sha256": "cab2f4ffa8ce897ee1c66e083cb34db56de792008e17950a51afd1882423b38a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-map-progress-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-map-progress-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-map-progress-undercharge.log",
+      "sha256": "69e8a711253999d9882f1fea319737c2a8f6106468d9280093828ceb7101afd8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-tree-count-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-tree-count-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-tree-count-undercharge.log",
+      "sha256": "afb117f4811f2fdf02f751f5463d434e62ee142d89de8df949e27ceccbfcd3fc"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-phase-transition-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-phase-transition-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-phase-transition-undercharge.log",
+      "sha256": "ec991cfbb73b9d315c6c3882873ea6183b295a1c33a4cf65d233d1b0eec40ce8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-terminal-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-terminal-undercharge.log",
+      "sha256": "ec991cfbb73b9d315c6c3882873ea6183b295a1c33a4cf65d233d1b0eec40ce8"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-planning-debit-omitted.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-planning-debit-omitted",
+      "path": "evidence/canary-brotli-b3c-context-count-planning-debit-omitted.log",
+      "sha256": "818f8eaabba17a22ba8590610bd00552533b9fa56972b012f13c03604185a410"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-execution-debit-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-execution-debit-undercharge",
+      "path": "evidence/canary-brotli-b3c-context-count-execution-debit-undercharge.log",
+      "sha256": "c20ea0707e8a36eb34e2dce518408daa805996fbfe06bd50118a430039898024"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-execution-reserved-after-writes.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-execution-reserved-after-writes",
+      "path": "evidence/canary-brotli-b3c-context-count-execution-reserved-after-writes.log",
+      "sha256": "8227e2f1fc4f8231edc3ba8cc5278a7657783b473f1a816dc88807638f6107cd"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-wrong-decoded-count.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-wrong-decoded-count",
+      "path": "evidence/canary-brotli-b3c-context-count-wrong-decoded-count.log",
+      "sha256": "3ed4a885c957eee71e2674f6ef8b087508fd15c343271a37b5d959c525315429"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-wrong-zero-map-value.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-wrong-zero-map-value",
+      "path": "evidence/canary-brotli-b3c-context-count-wrong-zero-map-value.log",
+      "sha256": "e0701f0257952af6c9a5d8d2a3eaac8e8e11b072a5c9c8041cf55aead88a6924"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-context-count-progress-writes-map-size.log",
+      "existed": true,
+      "name": "brotli-b3c-context-count-progress-writes-map-size",
+      "path": "evidence/canary-brotli-b3c-context-count-progress-writes-map-size.log",
+      "sha256": "8ba7edaab0834cbd0e5545f2aa540069f302b47e3899b59bc13ba6358772b257"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-distance-queue-write-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-distance-queue-write-undercharge",
+      "path": "evidence/canary-brotli-b3c-distance-queue-write-undercharge.log",
+      "sha256": "7446c235442209e1c93a1d1e17ce4b22dc47c6f91915d38d2aae54a3d2c76396"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-distance-terminal-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-distance-terminal-undercharge",
+      "path": "evidence/canary-brotli-b3c-distance-terminal-undercharge.log",
+      "sha256": "5ff07506729272025bb3b6c29146c11b253bffd8528ca04bc6031fe396616d78"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3c-distance-value-undercharge.log",
+      "existed": true,
+      "name": "brotli-b3c-distance-value-undercharge",
+      "path": "evidence/canary-brotli-b3c-distance-value-undercharge.log",
+      "sha256": "b9c6e071edfb35adaa1d82c69ca7b8899595664777a00cd94d593685b2bd8c74"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k3-suffix-plan-loses-consumption.log",
+      "existed": true,
+      "name": "brotli-k3-suffix-plan-loses-consumption",
+      "path": "evidence/canary-brotli-k3-suffix-plan-loses-consumption.log",
+      "sha256": "b223ccc3f63931db205caddc29c87ef6ff53f7d6f84f547c7ad9660b52207f32"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k3-suffix-plan-loses-success.log",
+      "existed": true,
+      "name": "brotli-k3-suffix-plan-loses-success",
+      "path": "evidence/canary-brotli-k3-suffix-plan-loses-success.log",
+      "sha256": "c1f90cd1b82807cb41cda2da885b1bca6c68f602392a89bbafcc22b3d0e447a4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k3-suffix-plan-undercharges-value-tables.log",
+      "existed": true,
+      "name": "brotli-k3-suffix-plan-undercharges-value-tables",
+      "path": "evidence/canary-brotli-k3-suffix-plan-undercharges-value-tables.log",
+      "sha256": "795dded680e8401d54381145e12323a19d90676e1e69fb366bd556e7512d0afa"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-singleton-reservation-restores-five.log",
+      "existed": true,
+      "name": "brotli-k6-singleton-reservation-restores-five",
+      "path": "evidence/canary-brotli-k6-singleton-reservation-restores-five.log",
+      "sha256": "d01f83f66727c8264d0423565431ba7994e657631fa7fdee88d299264a3a8f21"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-selector-four-uses-three-symbols.log",
+      "existed": true,
+      "name": "brotli-k6-selector-four-uses-three-symbols",
+      "path": "evidence/canary-brotli-k6-selector-four-uses-three-symbols.log",
+      "sha256": "12d7afff39f647366f2dc1b93a7bcba1eae89f709039075c45612d937e713ab0"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-install-omits-validation-reads.log",
+      "existed": true,
+      "name": "brotli-k6-install-omits-validation-reads",
+      "path": "evidence/canary-brotli-k6-install-omits-validation-reads.log",
+      "sha256": "5faa4a295223a370aaf05f2ccf43d8dc5113e9e92f7b1affdb2e425953467bc5"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-install-omits-record-probes.log",
+      "existed": true,
+      "name": "brotli-k6-install-omits-record-probes",
+      "path": "evidence/canary-brotli-k6-install-omits-record-probes.log",
+      "sha256": "659f4f614e41cfbecfe73c4c5f10e85904ba0d90b3275417b2c1ac571ebec308"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-triangular-correction-undercharged.log",
+      "existed": true,
+      "name": "brotli-k6-triangular-correction-undercharged",
+      "path": "evidence/canary-brotli-k6-triangular-correction-undercharged.log",
+      "sha256": "87976e53939bbe300829108fe7543daec2d133810dfb3031bd059eed3e4c292f"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-first-record-probe-unpaid.log",
+      "existed": true,
+      "name": "brotli-k6-first-record-probe-unpaid",
+      "path": "evidence/canary-brotli-k6-first-record-probe-unpaid.log",
+      "sha256": "d862e55327b67f3ea2a87bfffbaae8f28246841be73d745c0268dc216b20e24a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-fourth-record-probe-unpaid.log",
+      "existed": true,
+      "name": "brotli-k6-fourth-record-probe-unpaid",
+      "path": "evidence/canary-brotli-k6-fourth-record-probe-unpaid.log",
+      "sha256": "d862e55327b67f3ea2a87bfffbaae8f28246841be73d745c0268dc216b20e24a"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-range-validation-read-unpaid.log",
+      "existed": true,
+      "name": "brotli-k6-range-validation-read-unpaid",
+      "path": "evidence/canary-brotli-k6-range-validation-read-unpaid.log",
+      "sha256": "8c63bea445fb499a6805c4e8d406dfaf71145047586bc91b4335a70b0d899fdd"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-distinctness-right-read-unpaid.log",
+      "existed": true,
+      "name": "brotli-k6-distinctness-right-read-unpaid",
+      "path": "evidence/canary-brotli-k6-distinctness-right-read-unpaid.log",
+      "sha256": "10501d1d80371f05b808f1e287f6690779f60b4a4bc83dba92eb0dc70d8de6bb"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-singleton-final-read-unpaid.log",
+      "existed": true,
+      "name": "brotli-k6-singleton-final-read-unpaid",
+      "path": "evidence/canary-brotli-k6-singleton-final-read-unpaid.log",
+      "sha256": "da820624bfd720680036a9a1ba37b42c20898591458c8eb882174c1559559005"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-adapter-omits-installation-reservation.log",
+      "existed": true,
+      "name": "brotli-k6-adapter-omits-installation-reservation",
+      "path": "evidence/canary-brotli-k6-adapter-omits-installation-reservation.log",
+      "sha256": "01eaf2a3b109600cf05fbe243bec2d34f20e41817a30a0885ef87e5ab9beaf38"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k6-installer-reads-before-destination-guard.log",
+      "existed": true,
+      "name": "brotli-k6-installer-reads-before-destination-guard",
+      "path": "evidence/canary-brotli-k6-installer-reads-before-destination-guard.log",
+      "sha256": "b46bdb28cac0c3d3606e727b1d7a319594561f2cb7298c6244b39b834e956923"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-simple-index-erased.log",
+      "existed": true,
+      "name": "brotli-m1-codec-simple-index-erased",
+      "path": "evidence/canary-brotli-m1-codec-simple-index-erased.log",
+      "sha256": "d166c39143a6282c1f12c349037554644e8120fbc9c9bc8bd0c099cdc773fd47"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-shape-selector-lost.log",
+      "existed": true,
+      "name": "brotli-m1-codec-shape-selector-lost",
+      "path": "evidence/canary-brotli-m1-codec-shape-selector-lost.log",
+      "sha256": "d166c39143a6282c1f12c349037554644e8120fbc9c9bc8bd0c099cdc773fd47"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-symbol-array-alias.log",
+      "existed": true,
+      "name": "brotli-m1-codec-symbol-array-alias",
+      "path": "evidence/canary-brotli-m1-codec-symbol-array-alias.log",
+      "sha256": "2ab8f9981130a452e00e44fa2f7589f2796eba60842fb39a6eaf33d826aad1d2"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-aux-array-erased.log",
+      "existed": true,
+      "name": "brotli-m1-codec-aux-array-erased",
+      "path": "evidence/canary-brotli-m1-codec-aux-array-erased.log",
+      "sha256": "2fbde33656c0195ebd427c82734d1c708d3bf1aedba61fa6936358a68a598218"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-prefix-phase-alias.log",
+      "existed": true,
+      "name": "brotli-m1-codec-prefix-phase-alias",
+      "path": "evidence/canary-brotli-m1-codec-prefix-phase-alias.log",
+      "sha256": "0cee2e1f07a87af8e00d29ec9480c1e6085ada9aef6d82bf208124c29c0ba4de"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-prefix-nonzero-erased.log",
+      "existed": true,
+      "name": "brotli-m1-codec-prefix-nonzero-erased",
+      "path": "evidence/canary-brotli-m1-codec-prefix-nonzero-erased.log",
+      "sha256": "cdfa0e3e25182e7e9114278b1a13981be1fdd796223dbcaf7ee8134b9b5b8990"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-aux-skip-erased.log",
+      "existed": true,
+      "name": "brotli-m1-codec-aux-skip-erased",
+      "path": "evidence/canary-brotli-m1-codec-aux-skip-erased.log",
+      "sha256": "a9d955e5cd2aaaa1a17138500ba06736a8ce1a99294e2448132f64672260e4b7"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-chained-history-erased.log",
+      "existed": true,
+      "name": "brotli-m1-codec-chained-history-erased",
+      "path": "evidence/canary-brotli-m1-codec-chained-history-erased.log",
+      "sha256": "ce1aa15d37302aa7ecb976cd77ab8c964e6967b7763dd172f0f825e7709c18bd"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-parent-tag-erased.log",
+      "existed": true,
+      "name": "brotli-m1-codec-parent-tag-erased",
+      "path": "evidence/canary-brotli-m1-codec-parent-tag-erased.log",
+      "sha256": "da1060ccc06337ac861a2d8c1be92b767d60c4380dd5c087c2507b52f89deb31"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-failed-error-tag-alias.log",
+      "existed": true,
+      "name": "brotli-m1-codec-failed-error-tag-alias",
+      "path": "evidence/canary-brotli-m1-codec-failed-error-tag-alias.log",
+      "sha256": "6728a10dfb749a69d1dc87e16f7b395464ae6ace1ce43223d1be2312f3861fa3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-simple-write-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-codec-simple-write-undercharge",
+      "path": "evidence/canary-brotli-m1-codec-simple-write-undercharge.log",
+      "sha256": "69c9e9f684b5ea561b8405de75808eb3602f99973bc40ac8372686999224fac2"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-m1-codec-complex-write-undercharge.log",
+      "existed": true,
+      "name": "brotli-m1-codec-complex-write-undercharge",
+      "path": "evidence/canary-brotli-m1-codec-complex-write-undercharge.log",
+      "sha256": "3ee16f7627db31d4ebe12ddf4649c7f8353bc4a8b5f3031e96fa3d8ea8a579ca"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-distance-postfix-uses-upper-four-bits.log",
+      "existed": true,
+      "name": "brotli-distance-postfix-uses-upper-four-bits",
+      "path": "evidence/canary-brotli-distance-postfix-uses-upper-four-bits.log",
+      "sha256": "fc91b09e1b8716be20294e87bd652e03189bbcf96c6ce480822e02c754bbdd39"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-varuint-final-exhaustion-needs-more-input.log",
+      "existed": true,
+      "name": "brotli-varuint-final-exhaustion-needs-more-input",
+      "path": "evidence/canary-brotli-varuint-final-exhaustion-needs-more-input.log",
+      "sha256": "097b796d5e36535d4951412d000d1a26dbf362d930e3a595d51c10bad73d2bc4"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-b3b-outer-phase-overlaps-terminal-tag.log",
+      "existed": true,
+      "name": "brotli-b3b-outer-phase-overlaps-terminal-tag",
+      "path": "evidence/canary-brotli-b3b-outer-phase-overlaps-terminal-tag.log",
+      "sha256": "c8b53db78b249508be507b635d12ee769a219cd843bc7f4377a641b2271cb178"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-installed-code-omits-reversed-head-bit.log",
+      "existed": true,
+      "name": "brotli-installed-code-omits-reversed-head-bit",
+      "path": "evidence/canary-brotli-installed-code-omits-reversed-head-bit.log",
+      "sha256": "2b72e9aa3016b8c7c5848a98ed8ec6de2faac70032e4244eec794b1b81d0d9dc"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k2-writer-rejects-last-valid-index.log",
+      "existed": true,
+      "name": "brotli-k2-writer-rejects-last-valid-index",
+      "path": "evidence/canary-brotli-k2-writer-rejects-last-valid-index.log",
+      "sha256": "9434fae3318b78b90a15c859473543eb1fd46161d5a37b4001f9e38452bbf1a3"
+    },
+    {
+      "backup": "historical-canary-backup/canary-brotli-k2-writer-rejects-valid-window.log",
+      "existed": true,
+      "name": "brotli-k2-writer-rejects-valid-window",
+      "path": "evidence/canary-brotli-k2-writer-rejects-valid-window.log",
+      "sha256": "1e3aaf1af3a325a3cca663e46e6adb353afbe74b0e33c3440142cd2cc955b7ad"
+    }
+  ],
+  "positive_source_sha256": {
+    "Cargo.lock": "9fe91e773038ef916f0cce93d2791f7d8b07a7f8efbcf98a6a39f4c2afdd72e7",
+    "Cargo.toml": "9e60cceaf40707fa344d68961e0d758a22a83252053c30d36fc15cef5e58c52a",
+    "benches/primitives.rs": "c11f379cc14e4c72316c452ae6c93a7eb78f4b13e133779d11778f366a9dcdf5",
+    "rust-toolchain.toml": "f6531bdf8170168d15ac9b81f947d3942a9eee43d7328f98dfe639603046fc2a",
+    "src/base64.rs": "dfd3c385214440136062a517a4eed8f3096f67b40ee367677f84e5ff4a609fcf",
+    "src/brotli.rs": "41fa135658b23941e4dface7b042756772c374c65e81c4febf7b031419f18ee7",
+    "src/brotli_block.rs": "eb61a5ce306adc3985a3fb4719d62a2b1ff65a94752b7507acf6691d9298fca2",
+    "src/brotli_data.rs": "8cb48100be8be12eea7bea4a24de4794a674928232e386e97baaba497fd5b5ee",
+    "src/brotli_dictionary.rs": "39bf1e2290aaeb6767920cdea3892e209bff661a75987038895a915ac7d2bf02",
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "src/brotli_prefix.rs": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15",
+    "src/composition_demo.rs": "6213b3c20764326c2ed62a01338fc2072004632116bdd3b94d55d4772f3c10f9",
+    "src/lib.rs": "e92e4ec2f374584811b33d83d7e12f5abc8c973918cc62733f2df6e613a73fb6",
+    "src/lz4.rs": "0ae3674e5c36c6c8781e3f41bcf0478f8f77872bb077b7f946a2a9f435b0bda7",
+    "src/percent.rs": "cf0aab4bd3d584c33dd938f127372f8563bd1ad9ed485f82401f84e175f2d4c0",
+    "tests/fixtures/brotli/corpus/10x10y": "41bd4c895e9fb36d74bc97db5092872a24267e3b0455ff6152b0d262faa00d49",
+    "tests/fixtures/brotli/corpus/10x10y.compressed": "d666afc0f6c35d8d7796175aa9a68f16ba59afedee946d4bce9167f6c86e0b84",
+    "tests/fixtures/brotli/corpus/64x": "be4d3ed1fc5f5cfa00735b28605a975f3293fa235d23abb1d9dea380fba0fb87",
+    "tests/fixtures/brotli/corpus/64x.compressed": "f0273c38c6a55c1d9ccb047da04bacdc4bb07acc44ff83871e6b3490dfc2c313",
+    "tests/fixtures/brotli/corpus/compression": "d18f849bb8c5ffef9e1b9b8719e3bcbba35f100655be40f035aeace790dec16b",
+    "tests/fixtures/brotli/corpus/compression.compressed": "a87bcbc0f45a2f793c075b26baec65ff9cd551e057c8cdef508231004ba4abf5",
+    "tests/fixtures/brotli/corpus/empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/fixtures/brotli/corpus/empty.compressed": "67586e98fad27da0b9968bc039a1ef34c939b9b8e523a8bef89d478608c5ecf6",
+    "tests/fixtures/brotli/corpus/monkey": "937ad127fe0e373e0e267d11905f2bca154f40fe6fd438b6ddcce40de2ddcd99",
+    "tests/fixtures/brotli/corpus/monkey.compressed": "37bcdd7a42a6c5b119926d5af0f0d4e9162304592a2ded12c8fe9b06bf3908d9",
+    "tests/fixtures/brotli/corpus/quickfox_repeated": "254fdc641d1a65d0b1e427e4b0a1e16a96a5242adb98af71833782ba99c3dd82",
+    "tests/fixtures/brotli/corpus/quickfox_repeated.compressed": "f732c7cfd6e33481e99352ed901b90647a6177dc3e34f5d1de1658c24e2d6e5a",
+    "tests/fixtures/brotli/corpus/x": "4b68ab3847feda7d6c62c1fbcbeebfa35eab7351ed5e78f4ddadea5df64b8015",
+    "tests/fixtures/brotli/corpus/x.compressed": "cd094a625b695542a1d37b3a11ea849d8db9584a2f9df4e60cf6158bb39bbf61",
+    "tests/fixtures/brotli/corpus/xyzzy": "7609128715518308672067aab169e24944ead24e3d732aab8a8f0b7013a65564",
+    "tests/fixtures/brotli/corpus/xyzzy.compressed": "c3f042a6be42887f842324d0e39dabd0d873e1676cd3dd2d7e2824242b318f14",
+    "tests/fixtures/brotli/corpus/zeros": "8a39d2abd3999ab73c34db2476849cddf303ce389b35826850f9a700589b4a90",
+    "tests/fixtures/brotli/corpus/zeros.compressed": "d1236d7fdab24209a747aa471f1bf33765b27adfd676355d4b4b310195dca49f",
+    "tests/fixtures/brotli/reference/command.bin": "fdbc5d5f207a43d34b26441e29b7024f4f3d00be66502d8a73233bcbe9f6c1b4",
+    "tests/fixtures/brotli/reference/context.bin": "0e4abc034ef46244934d117f15876cd477d0fb2ac94a023093338e72e37f7ad9",
+    "tests/fixtures/brotli/reference/dictionary-meta.bin": "1bce8bd7b829f177214697683c3216e836ada1e254bde7582a9111316d9fd0b9",
+    "tests/fixtures/brotli/reference/dictionary.bin": "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70",
+    "tests/fixtures/brotli/reference/transforms.bin": "7682bbd9a2901334c2b47d83aaca99e6d9fc65a2921a7c88180dde12ec3cd6b6",
+    "tests/native/brotli_stream_harness.c": "329bdd752bea49b21f4c82c17b696361543ffa7a35c20d3cefb6f8c19ebdd4be",
+    "tests/primitives.rs": "87960a8cd2fea6ae50d269e08dc43a7263107ea149f3d2c7fcd2d780fc34fb21",
+    "tests/proof_rejection.rs": "557a1cb1c8607c35ac3bce21f55b72985967fbb5ea5bc30d497c78abc687b77e",
+    "tests/test_pipeline.py": "66e85e4338b4b131fd49625fe4c69d618e9e1c84a5aecee5874560e50e789db4",
+    "tests/upstream_comparison.rs": "fc1b21dda506a90ab822c91bc17d890a990271937b14d2d5c5cab555bc2b1a39"
+  }
+}

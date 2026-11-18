@@ -1,0 +1,38 @@
+verification results:: 6 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-55333/src/brotli_prefix.rs:3317:1
+     |
+3317 | / pub(crate) fn install_simple_tree(
+3318 | |     workspace: &mut [u8],
+3319 | |     window_bytes: u32,
+3320 | |     region: TreeRegion,
+...    |
+3325 | |     symbols: [u16; 4],
+3326 | | ) -> (r: (Result<TreeMetadata, WorkspaceError>, Ghost<nat>))
+     | |___________________________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-55333/src/brotli_prefix.rs:3331:9
+     |
+3331 | /         (alphabet_limit == 0 || alphabet_limit as nat > tree_region_symbols(region)
+3332 | |             || tree as nat >= tree_region_count(region)) ==> r.1@ == 0,
+     | |______________________________________________________________________^ failed this postcondition
+...
+3389 |           return (Err(WorkspaceError::InvalidWindowBits), Ghost(source_reads + source_writes));
+     |           ------------------------------------------------------------------------------------ at this exit
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k6-install-canary-55333/src/brotli_prefix.rs:3331:9
+     |
+3331 | /         (alphabet_limit == 0 || alphabet_limit as nat > tree_region_symbols(region)
+3332 | |             || tree as nat >= tree_region_count(region)) ==> r.1@ == 0,
+     | |______________________________________________________________________^ failed this postcondition
+...
+3396 |           return (Err(WorkspaceError::WorkspaceTooSmall), Ghost(source_reads + source_writes));
+     |           ------------------------------------------------------------------------------------ at this exit
+
+error: aborting due to 2 previous errors
+

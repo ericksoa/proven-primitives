@@ -1,0 +1,181 @@
+{
+  "actual_discovered_suites": 59,
+  "affected_older_suites": [
+    "the_prover_rejects_four_b3b_block_count_and_category_defects",
+    "the_prover_rejects_seven_b3b_stride_initialization_and_exhaustion_defects",
+    "the_prover_rejects_six_b3a_builder_storage_defects",
+    "the_prover_rejects_six_b3a_code_description_defects",
+    "the_prover_rejects_six_b3b_cross_call_state_defects",
+    "the_prover_rejects_six_b3b_serialization_and_error_defects",
+    "the_prover_rejects_six_b3b_tree_group_defects",
+    "the_prover_rejects_thirteen_b3b_context_map_defects",
+    "the_prover_rejects_two_b3b_distance_and_exhaustion_defects",
+    "the_prover_rejects_two_b3b_state_layout_and_bit_order_defects"
+  ],
+  "bundle_inputs": {
+    "RESTORE_CANARIES.txt": "8831a895585d80cad8683fbf9b4260207cd23c4a08a4b9bacbf83e6f1436fbb5",
+    "affected-suites.json": "efae38fd5c404b959262b17723eee0471c2763fde736736a004b17cc90fea0ac",
+    "baseline-five-control-updates.json": "49376055684cd9d3a07cc7a2692ea693783fa942b2bffc0a93e4c6ed2078cbeb",
+    "frozen-scope-audit.json": "66a03d1a9bb02eef95a73666df8f53fd1d148e51879f42c8e7cb2fda334f7b03",
+    "original-driver.py.txt": "3f289ac7939cb128aff56c404f0e29ddaa7a50053c8bc108aafb412ebf78c5ab",
+    "original-suite-inventory.json": "06f48d0b9b4d8d8637981b9693184637a75d99a9f70883dff457e29952f4fc63",
+    "prior37-control-manifest.json": "0adc938c187b3671e7bc5e25c26f9bc1160168d157e8cbcee9a93a60f63af2a3"
+  },
+  "claim": "No whole-positive or defect-closure claim; actual final source will require new R suite and frozen full validation.",
+  "classifier_checks_of_retained_logs": [
+    {
+      "case": "native-type-error",
+      "checked_semantic_error": false,
+      "computed_false": false,
+      "retained_transcript": "target/m1-r-tree-budget-owners/aggregate-v2/native-release-lib.log",
+      "semantic_rejection": false,
+      "sha256": "ca9fa3ea93ac671b3fb6a77e4ff9a10397d86189df044623ba53212993687360",
+      "syntax_or_type_failure": true,
+      "tool_or_resource_failure": false
+    },
+    {
+      "case": "root-resource-limit",
+      "checked_semantic_error": false,
+      "computed_false": false,
+      "retained_transcript": "target/m1-r-tree-exec/root-branch/attempt1-root-resource.log",
+      "semantic_rejection": false,
+      "sha256": "618387e9d95dad057cc8a2552d5d16ea362dbc3d158d121c1133cba6e85f7887",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": true
+    },
+    {
+      "case": "positive-proof",
+      "checked_semantic_error": false,
+      "computed_false": false,
+      "retained_transcript": "target/m1-r-owners/check-tree03/plan_serialized_tree.log",
+      "semantic_rejection": false,
+      "sha256": "19cefe014c1b2593d5308a3cea9c0d3f776e3c79e39f813e8b453f9cf29e0b9f",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "case": "historical-control-only",
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "retained_transcript": "evidence/canary-brotli-m1-context-mode-plan-loses-consumption.log",
+      "semantic_rejection": true,
+      "sha256": "5666d3d465dca99a9f3879a3644998d05fdf1150310d1a31f7b0c9938a525114",
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": false
+    },
+    {
+      "case": "mixed-real-semantic-plus-type",
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "inputs": [
+        "evidence/canary-brotli-m1-context-mode-plan-loses-consumption.log",
+        "target/m1-r-tree-budget-owners/aggregate-v2/native-release-lib.log"
+      ],
+      "kind": "Classifier-only concatenation of retained transcripts, not an actual canary result",
+      "semantic_rejection": false,
+      "syntax_or_type_failure": true,
+      "tool_or_resource_failure": false
+    },
+    {
+      "case": "mixed-real-semantic-plus-resource",
+      "checked_semantic_error": true,
+      "computed_false": false,
+      "inputs": [
+        "evidence/canary-brotli-m1-context-mode-plan-loses-consumption.log",
+        "target/m1-r-tree-exec/root-branch/attempt1-root-resource.log"
+      ],
+      "kind": "Classifier-only concatenation of retained transcripts, not an actual canary result",
+      "semantic_rejection": false,
+      "syntax_or_type_failure": false,
+      "tool_or_resource_failure": true
+    }
+  ],
+  "driver_sha256": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+  "execution_count": 0,
+  "flags_unchanged": {
+    "control_concurrency": 3,
+    "runtime_commands": [
+      [
+        "runtime-library",
+        [
+          "cargo",
+          "test",
+          "--locked",
+          "--release",
+          "--lib"
+        ]
+      ],
+      [
+        "runtime-primitives",
+        [
+          "cargo",
+          "test",
+          "--locked",
+          "--release",
+          "--test",
+          "primitives"
+        ]
+      ],
+      [
+        "runtime-comparison",
+        [
+          "cargo",
+          "test",
+          "--locked",
+          "--release",
+          "--test",
+          "upstream_comparison"
+        ]
+      ],
+      [
+        "runtime-trust",
+        [
+          "cargo",
+          "test",
+          "--locked",
+          "--release",
+          "--test",
+          "proof_rejection",
+          "project_source_contains_no_proof_trust_bypasses",
+          "--",
+          "--exact"
+        ]
+      ]
+    ],
+    "whole_verifier_command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--no-cheating",
+      "--num-threads",
+      "8",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "300",
+      "--trace",
+      "--time",
+      "--output-json"
+    ]
+  },
+  "mandatory_union_before_new_R": 47,
+  "new_R_preflight": "New suite discovered; source/anchor/whole-proof readiness not claimed",
+  "new_suites_discovered": [
+    "the_prover_rejects_four_m1_actual_source_receipt_omissions"
+  ],
+  "positive_report_parser": "Same strict complete JSON parse as original gate; trailing text does not silently pass",
+  "prior_suites": 37,
+  "required_controls_sha256": "e1d7899bcf15047303fd0e387fd115f9cfebbc315779fa251cda8455d05bdf94",
+  "required_final_cases": 318,
+  "required_final_suites": 48,
+  "scope_authority_conclusion": "None; lineage audit is not human approval",
+  "scope_identities_recorded_separately": {
+    "actual_approved_baseline_matches_review05_files": 43,
+    "actual_preimplementation_input": "e10c61b1354c5b1debef9e76aa55b412d06e35de210cb8949a73ef33b912da23",
+    "both_prefix": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03",
+    "proposal_frozen_input": "f1a37362e128944c9c0ca49f00f30c172270677140e60027d3d655c46d831eef"
+  },
+  "status": "Static driver preparation only; no runtime, verifier or control commands executed",
+  "syntax_compiles": true
+}

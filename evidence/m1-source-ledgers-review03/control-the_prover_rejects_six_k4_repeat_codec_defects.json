@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_k4_repeat_codec_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T03:00:57.904659+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 103.99048916700121,
+  "finished_utc": "2026-11-17T03:02:41.894774+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_six_k4_repeat_codec_defects.log",
+  "log_sha256": "2a17e5af0e6827558dcb9bc9aa5fa9d0dc1aba6ce90f301d550a2c1b1e529c2e",
+  "suite": "the_prover_rejects_six_k4_repeat_codec_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-k4-repeat-store-overwrites-history",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k4-repeat-store-overwrites-history.log",
+      "sha256": "b02f9289e5eaf0f29c8f70da955c8c7d7eb3ec586ec441199b5ea448f401e460",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k4-repeat-load-current-from-history",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k4-repeat-load-current-from-history.log",
+      "sha256": "759f89628392b33bb3025977cc51e5d24ad65c05ffab02b5d83417bb69574b61",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k4-progress-stores-previous-code-in-history",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k4-progress-stores-previous-code-in-history.log",
+      "sha256": "fad6c362d19c86ea798b1a726ad875520d90e9a73cccedbf2da8ed9a447c0a1b",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k4-repeat-load-history-from-current",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k4-repeat-load-history-from-current.log",
+      "sha256": "759f89628392b33bb3025977cc51e5d24ad65c05ffab02b5d83417bb69574b61",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k4-repeat-width-uses-old-class",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k4-repeat-width-uses-old-class.log",
+      "sha256": "165fdc439633de1876b0aeaa28824a7e9654bf2ce7f9ebee4fc3e1c977ad0484",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-k4-repeat-rejects-valid-length-fifteen",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-k4-repeat-rejects-valid-length-fifteen.log",
+      "sha256": "1944df1cef29cfa8d94ef44db40084ec8b72da08c7009a77a6d83c1e6762df1c",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

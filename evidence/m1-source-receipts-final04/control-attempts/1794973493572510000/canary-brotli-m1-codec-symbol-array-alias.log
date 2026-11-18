@@ -1,0 +1,31 @@
+verification results:: 1 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:13718:5
+      |
+13718 |     while i < 4
+      |     ^^^^^^^^^^^
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:13677:1
+      |
+13677 | / fn write_simple_symbols(
+13678 | |     workspace: &mut [u8],
+13679 | |     window_bytes: u32,
+13680 | |     symbols: [u16; 4],
+13681 | | ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________^
+
+error: invariant not satisfied at end of loop body
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-general-codec-canary-55462/src/brotli_input.rs:13721:13
+      |
+13721 | /             forall|j: int| 0 <= j < i ==> #[trigger] symbols@[j] as nat
+13722 | |                 == b3b_scalar_u16_at(workspace@, window_bytes, (B3B_SIMPLE_SYMBOLS as int + 2 * j) as u16),
+      | |__________________________________________________________________________________________________________^
+
+error: aborting due to 1 previous error
+

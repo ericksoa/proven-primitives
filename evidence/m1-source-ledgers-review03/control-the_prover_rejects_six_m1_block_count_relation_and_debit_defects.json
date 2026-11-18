@@ -1,0 +1,62 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_six_m1_block_count_relation_and_debit_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T02:54:16.598129+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 136.1652495409944,
+  "finished_utc": "2026-11-17T02:56:32.762917+00:00",
+  "log": "evidence/m1-source-ledgers-review03/controls-the_prover_rejects_six_m1_block_count_relation_and_debit_defects.log",
+  "log_sha256": "fdc7f76154f78bc78e39e9005bff2d532fb97b0708f4833eb2fd181e848fbf14",
+  "suite": "the_prover_rejects_six_m1_block_count_relation_and_debit_defects",
+  "expected_mutants": 6,
+  "mutants": [
+    {
+      "name": "brotli-m1-block-count-prepass-omits-read-work",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-block-count-prepass-omits-read-work.log",
+      "sha256": "423888a571834e10a9468c4d73a6c9c1172f5f3232a174e6139a6b98882ad4e2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-block-count-plan-loses-need-input",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-block-count-plan-loses-need-input.log",
+      "sha256": "6610b8a04788218b0072da3e5e3a3d31825cb0e0bcd9517cf1bd416dd2c1369e",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-block-count-plan-loses-consumption",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-block-count-plan-loses-consumption.log",
+      "sha256": "d38d21925d6d2cf352fb128cf0cf7997e0bb52f6e3cdff7439078fc5d04ab985",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-block-count-executor-omits-input-debit",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-block-count-executor-omits-input-debit.log",
+      "sha256": "6c4c73955075ad3a1465ae3b2adbef40f2af520bca982d69b65ef678ee0e2cd3",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-block-count-limited-input-is-retryable",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-block-count-limited-input-is-retryable.log",
+      "sha256": "6f704c816e375a1e97e6f0e1645abc979e77f8d874d77b6386a686ee3dba6652",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-block-count-value-writes-padding",
+      "log": "evidence/m1-source-ledgers-review03/canary-brotli-m1-block-count-value-writes-padding.log",
+      "sha256": "ccd0f18d7ad2b4919b14d4d363a9da802ee611e664fc25294d0baff5d5bb4a03",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

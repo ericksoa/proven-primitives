@@ -1,0 +1,10 @@
+[
+  {
+    "baseline_attributes": [],
+    "candidate_attributes": [
+      "#[verifier::spinoff_prover]"
+    ],
+    "id": "brotli_input::install_completed_simple_tree",
+    "kind": "exec"
+  }
+]

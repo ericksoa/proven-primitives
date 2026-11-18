@@ -1,0 +1,12 @@
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: while loop has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-cross-call-canaries-48649/src/brotli_input.rs:28062:9
+      |
+28062 |         while transitions < 100_000
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+

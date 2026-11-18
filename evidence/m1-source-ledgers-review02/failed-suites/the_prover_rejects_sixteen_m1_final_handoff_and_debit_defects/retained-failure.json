@@ -1,0 +1,58 @@
+{
+  "suite": "the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects",
+  "exit_code": 101,
+  "fresh_case_logs": [
+    {
+      "name": "brotli-m1-handoff-loses-distance-parameter-rejection",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-handoff-loses-distance-parameter-rejection.log",
+      "sha256": "27c01071dd40003de7b09347acd35e5998517e9076049666650cc5072e4303b1"
+    },
+    {
+      "name": "brotli-m1-handoff-loses-final-count-validation",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-handoff-loses-final-count-validation.log",
+      "sha256": "3fdf467e5d62aff89e7761f0b04833063628e4b04111ce9d34ef6c62cda96e45"
+    },
+    {
+      "name": "brotli-m1-handoff-accepts-out-of-range-literal-context",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-handoff-accepts-out-of-range-literal-context.log",
+      "sha256": "810ea5c20248e4ceea387003025c34533515dfcf22c95a86c3444b546c2c3234"
+    },
+    {
+      "name": "brotli-m1-handoff-accepts-out-of-range-distance-context",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-handoff-accepts-out-of-range-distance-context.log",
+      "sha256": "33345d7666b1e6f799d273bf4ade0f1caed51f9c5ad8d5afa597a63625eafed9"
+    },
+    {
+      "name": "brotli-m1-handoff-accepts-zero-initial-length",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-handoff-accepts-zero-initial-length.log",
+      "sha256": "10061f2127a019fb5a54f1673a908093b10d89ef9055bedc4838ba44bd0139db"
+    },
+    {
+      "name": "brotli-m1-handoff-first-map-read-not-prepaid",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-handoff-first-map-read-not-prepaid.log",
+      "sha256": "f80a69b689bce7369da03dc6ed0f331bfae9f87e8f3e791692fa0beb155b7f87"
+    },
+    {
+      "name": "brotli-m1-handoff-second-map-read-not-prepaid",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-handoff-second-map-read-not-prepaid.log",
+      "sha256": "810ea5c20248e4ceea387003025c34533515dfcf22c95a86c3444b546c2c3234"
+    },
+    {
+      "name": "brotli-m1-handoff-ready-start-undercharge",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-handoff-ready-start-undercharge.log",
+      "sha256": "62fa3cb5b454d3cc9c788d6eb72ad2f93e69669ea0a8a68d0677a1d7e6a26af8"
+    },
+    {
+      "name": "brotli-m1-block-tree-execution-reservation-undercharge",
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/canary-brotli-m1-block-tree-execution-reservation-undercharge.log",
+      "sha256": "f7c451e16108023577be94ac864135ee3c6cfda7b4b194201414be3b15bd855e"
+    }
+  ],
+  "source_at_failure_bundles": [
+    {
+      "path": "evidence/m1-source-ledgers-review02/failed-suites/the_prover_rejects_sixteen_m1_final_handoff_and_debit_defects/source-at-failure-0.tar.gz",
+      "sha256": "2eec12b015fcd545166a4babae70722b0adbfbe758e78a52ba143007f4b92716"
+    }
+  ],
+  "not_semantic_closure": true
+}

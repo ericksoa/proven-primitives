@@ -1,0 +1,128 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_seventeen_b3c_context_bits_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T01:48:38.757011+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 369.7618949999887,
+  "finished_utc": "2026-11-17T01:54:48.524423+00:00",
+  "log": "evidence/m1-source-ledgers-review02/controls-the_prover_rejects_seventeen_b3c_context_bits_defects.log",
+  "log_sha256": "c73555cffa61b69f1c7b83771dd5b2a1e77671333bfd7263e9f63ab86293961a",
+  "suite": "the_prover_rejects_seventeen_b3c_context_bits_defects",
+  "expected_mutants": 17,
+  "mutants": [
+    {
+      "name": "brotli-b3c-context-bits-queue-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-queue-undercharge.log",
+      "sha256": "f353012c646eaeb6297ead8aa6c6551d802d181ce706c0ebf23e71cfad2dccf1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-start-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-start-undercharge.log",
+      "sha256": "f353012c646eaeb6297ead8aa6c6551d802d181ce706c0ebf23e71cfad2dccf1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-prefix-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-prefix-undercharge.log",
+      "sha256": "f353012c646eaeb6297ead8aa6c6551d802d181ce706c0ebf23e71cfad2dccf1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-map-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-map-undercharge.log",
+      "sha256": "f353012c646eaeb6297ead8aa6c6551d802d181ce706c0ebf23e71cfad2dccf1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-progress-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-progress-undercharge.log",
+      "sha256": "f353012c646eaeb6297ead8aa6c6551d802d181ce706c0ebf23e71cfad2dccf1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-reset-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-reset-undercharge.log",
+      "sha256": "f353012c646eaeb6297ead8aa6c6551d802d181ce706c0ebf23e71cfad2dccf1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-phase-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-phase-undercharge.log",
+      "sha256": "f353012c646eaeb6297ead8aa6c6551d802d181ce706c0ebf23e71cfad2dccf1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-terminal-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-terminal-undercharge.log",
+      "sha256": "b78ac384b8fd89af1085e5787a91548ef7d20b68c7b987fd13fa6b98033ef2d9",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-planning-debit-omitted",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-planning-debit-omitted.log",
+      "sha256": "505159a8d76aa6eb107cd6bbdde1c79c9b5835e75376122ceb8833fbc47af0cc",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-execution-debit-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-execution-debit-undercharge.log",
+      "sha256": "1b9bddb0d9cb858cf82233a87d86dfd1176497c631d431a6a21e5dece92b27cf",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-execution-reserved-after-writes",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-execution-reserved-after-writes.log",
+      "sha256": "5da08c1a26da3f7b1c8b8bff94a124647426e242e7f0007a7b8fa3bc99690a24",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-wrong-prefix",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-wrong-prefix.log",
+      "sha256": "3b64d17078eb5e3b7dbe3af447482bb9ef64dd12ba4b62db644eae74b202bc3e",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-wrong-zero",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-wrong-zero.log",
+      "sha256": "3315ac0b8ca1b79f75fa8f08674ebed4a1fe6b5773ec2ba8a17c7b0d82fe3790",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-start-writes-unrelated-byte",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-start-writes-unrelated-byte.log",
+      "sha256": "30cf0df922e7257de190b60b2d10775e0ede1391d1957eab68064bfd63adfcc2",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-overshoot-terminal-undercharge",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-overshoot-terminal-undercharge.log",
+      "sha256": "f353012c646eaeb6297ead8aa6c6551d802d181ce706c0ebf23e71cfad2dccf1",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-b3c-context-bits-skips-overshoot-check",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-skips-overshoot-check.log",
+      "sha256": "86bdb9d372cce2e2991d54d5ec3408ac06b2e1ddad7266d266645caa6d707bbe",
+      "semantic_rejection": false
+    },
+    {
+      "name": "brotli-b3c-context-bits-reads-wrong-width",
+      "log": "evidence/m1-source-ledgers-review02/canary-brotli-b3c-context-bits-reads-wrong-width.log",
+      "sha256": "207cd8edf2a159785dd55f521b060db11cf1f55881340f02410acb017c97ef73",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true
+}

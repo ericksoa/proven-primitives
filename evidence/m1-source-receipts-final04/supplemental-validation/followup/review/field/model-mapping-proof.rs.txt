@@ -1,0 +1,33 @@
+#[verifier::rlimit(500)]
+#[verifier::spinoff_prover]
+proof fn r_triage_field_truncation_model_mapping(
+    before: CodeDescriptionDecoder, after: CodeDescriptionDecoder, step: CodeDescriptionStep,
+)
+    requires
+        before.valid(),
+        before.phase == CodeDescriptionPhase::Selector,
+        before.queue.len == 0,
+    ensures
+        code_field_step_refines(before, Seq::empty(), true, after, step) ==> {
+            &&& step.consumed == 0
+            &&& step.status == CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated)
+        },
+        !code_field_step_refines(before, Seq::empty(), true, after,
+            CodeDescriptionStep { consumed: 0, status: CodeDescriptionStatus::NeedInput }),
+{
+    reveal(CodeDescriptionDecoder::valid);
+    reveal(BitQueue::valid);
+    reveal(BitQueue::bits);
+    reveal(code_phase_terminal);
+    reveal(code_phase_width);
+    reveal(code_field_step_refines);
+    let empty: Seq<u8> = Seq::empty();
+    bytes_bits_len(empty);
+    assert(before.queue.bits().len() == 0);
+    assert(empty.take(0) == empty);
+    if code_field_step_refines(before, empty, true, after, step) {
+        assert(step.consumed == 0);
+        assert((before.queue.bits() + bytes_bits(empty.take(step.consumed as int))).len() == 0);
+        assert(step.status == CodeDescriptionStatus::Failed(CodeDescriptionError::Truncated));
+    }
+}

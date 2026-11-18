@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "started_utc": "2026-11-17T05:01:43.087558+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 389.1909680000099,
+  "finished_utc": "2026-11-17T05:08:12.284074+00:00",
+  "log": "evidence/m1-source-ledgers-review05/controls-the_prover_rejects_four_m1_tree_action_bound_and_drain_defects.log",
+  "log_sha256": "e02e2c3b8a3531de1c07c47cf7f7a00cc516c658ae8afcfed93ee3a1786ddd5e",
+  "suite": "the_prover_rejects_four_m1_tree_action_bound_and_drain_defects",
+  "expected_mutants": 4,
+  "mutants": [
+    {
+      "name": "brotli-m1-parser-restores-too-small-cap",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-parser-restores-too-small-cap.log",
+      "sha256": "370f60f7c4ecf5ef56a213c928b78ab91760416d42d4b52c4ceefd18dd00459e",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-planner-restores-too-small-cap",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-planner-restores-too-small-cap.log",
+      "sha256": "28ca41e7a55d90ea981424c730f6ca0d4b04a73165bf8ee2d68bf55b8e107a8f",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-parser-skips-pending-span-drain",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-parser-skips-pending-span-drain.log",
+      "sha256": "70f6076c4a10e051fed978bb3e78c53a3993c31ee1bd55d2dafc9d8c6cc38f64",
+      "semantic_rejection": true
+    },
+    {
+      "name": "brotli-m1-planner-skips-pending-span-drain",
+      "log": "evidence/m1-source-ledgers-review05/canary-brotli-m1-planner-skips-pending-span-drain.log",
+      "sha256": "67dfea8460de892ec9cdaa05851704a0d52686c45847baac6535e04f08690445",
+      "semantic_rejection": true
+    }
+  ],
+  "source_unchanged": true,
+  "executed_once": true,
+  "validation_errors": []
+}

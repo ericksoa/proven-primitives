@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--test",
+    "proof_rejection",
+    "the_prover_rejects_thirteen_b3b_context_map_defects",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+  ],
+  "elapsed_seconds": 338.0315532089735,
+  "executed_once": false,
+  "exit_code": 101,
+  "expected_mutants": 13,
+  "finished_utc": "2026-11-17T22:24:58.977603+00:00",
+  "log": "controls-the_prover_rejects_thirteen_b3b_context_map_defects.log",
+  "log_sha256": "1a7057aeb707bb7947988c82496f19895e2c078f37bc34465924804607730189",
+  "mutants": [],
+  "source_and_tools_unchanged": true,
+  "started_ns": 1794953960942151000,
+  "started_utc": "2026-11-17T22:19:20.942160+00:00",
+  "suite": "the_prover_rejects_thirteen_b3b_context_map_defects",
+  "suite_source_sha256": "0b54c80c661db37d616eb51b35ff9976bd77009284f649cb05c72388c4ff11f7",
+  "validation_errors": []
+}

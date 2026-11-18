@@ -1,0 +1,48 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_prefix (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-48879/src/brotli_prefix.rs:2560:1
+     |
+2560 | / pub(crate) fn read_tree_metadata(
+2561 | |     workspace: &[u8],
+2562 | |     window_bytes: u32,
+2563 | |     region: TreeRegion,
+2564 | |     initialized_prefix: u16,
+2565 | |     tree: u16,
+2566 | | ) -> (r: (Result<TreeMetadata, MetadataReadError>, Ghost<nat>))
+     | |______________________________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-48879/src/brotli_prefix.rs:2571:9
+     |
+2571 | /         window_bytes <= 16_777_216
+2572 | |             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+2573 | |             && initialized_prefix <= tree_region_count(region)
+2574 | |             && tree < tree_region_count(region)
+...    |
+2577 | |                 WorkspaceError::UninitializedRecord,
+2578 | |             )),
+     | |______________^ failed this postcondition
+...
+2658 |               return (Err(MetadataReadError::InvalidEncoding), Ghost(r_source_units));
+     |               ----------------------------------------------------------------------- at this exit
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-map-canaries-48879/src/brotli_prefix.rs:2571:9
+     |
+2571 | /         window_bytes <= 16_777_216
+2572 | |             && workspace@.len() >= window_bytes as nat + FIXED_SCRATCH_BYTES as nat
+2573 | |             && initialized_prefix <= tree_region_count(region)
+2574 | |             && tree < tree_region_count(region)
+...    |
+2577 | |                 WorkspaceError::UninitializedRecord,
+2578 | |             )),
+     | |______________^ failed this postcondition
+...
+2662 |           return (Err(MetadataReadError::InvalidEncoding), Ghost(r_source_units));
+     |           ----------------------------------------------------------------------- at this exit
+
+error: aborting due to 2 previous errors
+

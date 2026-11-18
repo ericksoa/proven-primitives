@@ -1,0 +1,16 @@
+
+error[E0425]: cannot find value `r_source_units` in this scope
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-k1-k3-canary-39199/src/brotli_prefix.rs:89:99
+   |
+89 |         if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(r_source_units)); }
+   |                                                                                                   ^^^^^^^^^^^^^^
+   |
+help: a local variable with a similar name exists
+   |
+89 -         if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(r_source_units)); }
+89 +         if symbol == 0 && suffix == 0 { return (Err(PrefixError::InvalidBlockLengthSuffix), Ghost(source_units)); }
+   |
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0425`.

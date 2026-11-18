@@ -1,0 +1,27 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-52031/src/brotli_input.rs:15923:1
+      |
+15923 | / fn store_code_description_decoder(
+15924 | |     workspace: &mut [u8],
+15925 | |     window_bytes: u32,
+15926 | |     decoder: CodeDescriptionDecoder,
+15927 | | ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-tree-refinement-canary-52031/src/brotli_input.rs:15953:9
+      |
+15953 |         code_descriptor_store_frame(old(workspace)@, final(workspace)@, window_bytes),
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+16037 |         Err(error) => return (Err(error), Ghost(source_writes)),
+      |                       ----------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

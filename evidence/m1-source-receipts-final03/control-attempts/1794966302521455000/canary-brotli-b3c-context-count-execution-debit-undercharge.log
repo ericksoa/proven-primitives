@@ -1,0 +1,29 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-9675/src/brotli_input.rs:37804:1
+      |
+37804 | / fn execute_planned_context_tree_count(
+37805 | |     workspace: &mut [u8],
+37806 | |     window_bytes: u32,
+37807 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+37811 | |     plan: ContextTreeCountPlan,
+37812 | | ) -> (r: (Result<usize, CompressedStep>, Ghost<nat>))
+      | |____________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-context-count-canary-9675/src/brotli_input.rs:37824:9
+      |
+37824 |         r.1@ + final(budget).work_remaining as nat == old(budget).work_remaining as nat,
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+38001 |     (ordinary_result, Ghost(r_context_owner_source_units))
+      |     ------------------------------------------------------ at the end of the function body
+
+error: aborting due to 1 previous error
+

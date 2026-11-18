@@ -1,0 +1,650 @@
+{
+  "all_existing_specs_preserved_under_only_named_R_visibility_exception": true,
+  "authority_conclusion": "None. Distinct proposal f1a and actual preimplementation e10c identities remain separate; no human approval inferred.",
+  "candidate": "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next",
+  "candidate_counts": {
+    "exec": 323,
+    "proof": 353,
+    "spec": 444
+  },
+  "candidate_hashes": {
+    "brotli_input": "25c4718fb0f7debeecf6d1cf0f1de604c77e09ff30a344b8cbf662316bc511aa",
+    "brotli_prefix": "daf8ab85002cb576fd70446f4ffc76e15bf879edfc3d45ad7a5fe3c80cbb8c15"
+  },
+  "comparisons": {
+    "preimplementation_e10c": {
+      "added_declarations": [
+        {
+          "id": "brotli_input::CompressedMetaBlockDecoder::step_with_receipt",
+          "kind": "exec"
+        },
+        {
+          "id": "brotli_input::m1_r_block_count_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_bits_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_count_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_mode_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_symbol_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_symbol_receipt_intro",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_context_symbol_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_distance_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_guarded_tree_loader_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_initial_symbol_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_initial_symbol_receipt_intro",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_initial_symbol_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_receipt_sum",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_receipt_sum_push",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_tree_child_plan",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_tree_child_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_tree_child_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_tree_tail_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_var_field_width",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_wrapped_tree_plan",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_wrapped_tree_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_wrapped_tree_receipt_intro",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_wrapped_tree_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_canonical_index_sums_agree",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_canonical_models_same_prefix",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_canonical_scan_same_prefix",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_loaded_phase_validation_count_matches_workspace",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_block_count_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_context_mode_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_distance_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_fixed_cost_plan_valid",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_empty_total",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_parts_total",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_parts_total_append",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_prefix_append",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_prefix_empty",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_prefix_execution_fold",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_receipt_prefix",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_aux_start_has_stable_phase",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_aux_start_identity",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_canonical_invocation_units",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_canonical_reaches_scan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_canonical_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_canonical_receipt_units",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_empty_count_views",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_field_action_from_step",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_noninstall_units",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_parsing_receipt_fold",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_record_actual_parts_receipt",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_record_finished_receipt",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_region_tag_bound",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_result_has_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_simple_receipt_units",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_simple_status_from_guard",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_prefix_invalid_scan_matches",
+          "kind": "proof"
+        }
+      ],
+      "allowed_index_sum_openings": [
+        "brotli_prefix::m1_canonical_nonzero_index_sum"
+      ],
+      "attribute_changes": [],
+      "contract_violations": [],
+      "contracts_passed": true,
+      "counts": {
+        "exec": 322,
+        "proof": 317,
+        "spec": 424
+      },
+      "existing_spec_count": 424,
+      "paired_exec_count": 157,
+      "reference_hashes": {
+        "brotli_input": "e10c61b1354c5b1debef9e76aa55b412d06e35de210cb8949a73ef33b912da23",
+        "brotli_prefix": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03"
+      },
+      "spec_basenames_that_would_collide": {
+        "valid": [
+          "brotli_input::BitQueue::valid",
+          "brotli_input::MetaBlockHeader::valid",
+          "brotli_input::MetaBlockDecoder::valid",
+          "brotli_input::SimpleCodeDescription::valid",
+          "brotli_input::ComplexCodeLengthAlphabet::valid",
+          "brotli_input::ComplexSymbolProgress::valid",
+          "brotli_input::ComplexAfterSpan::valid",
+          "brotli_input::ComplexProgress::valid",
+          "brotli_input::CodeDescriptionDecoder::valid",
+          "brotli_input::VarUint8Phase::valid",
+          "brotli_input::InstalledPrefixState::valid"
+        ],
+        "valid_for": [
+          "brotli_prefix::PrefixCode::valid_for",
+          "brotli_prefix::TreeMetadata::valid_for"
+        ]
+      },
+      "spec_missing": [],
+      "spec_unexpected_changes": [],
+      "specs_passed": true
+    },
+    "proposal_f1a": {
+      "added_declarations": [
+        {
+          "id": "brotli_input::CompressedMetaBlockDecoder::step_with_receipt",
+          "kind": "exec"
+        },
+        {
+          "id": "brotli_input::m1_bad_initial_suffix",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_bad_initial_suffix_owner_effect",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_bad_initial_suffix_owner_from_execution",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_bad_initial_suffix_owner_without_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_bad_initial_suffix_plan",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_bad_initial_suffix_validation_reads",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_context_bad_saved_cursor",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_context_cursor_failure_plan",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_context_cursor_owner_effect",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_initial_suffix_domain_partition",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_block_count_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_bits_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_count_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_mode_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_symbol_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_context_symbol_receipt_intro",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_context_symbol_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_distance_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_guarded_tree_loader_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_initial_symbol_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_initial_symbol_receipt_intro",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_initial_symbol_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_receipt_sum",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_receipt_sum_push",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_tree_child_plan",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_tree_child_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_tree_child_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_tree_tail_units",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_var_field_width",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_wrapped_tree_plan",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_wrapped_tree_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_r_wrapped_tree_receipt_intro",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_r_wrapped_tree_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::m1_suffix_fallback_image",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::m1_suffix_fallback_image_is_admitted",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_canonical_index_sums_agree",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_canonical_models_same_prefix",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_canonical_scan_same_prefix",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_loaded_phase_validation_count_matches_workspace",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_block_count_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_context_mode_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_distance_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_fixed_cost_plan_valid",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_empty_total",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_parts_total",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_parts_total_append",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_prefix_append",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_prefix_empty",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_prefix_execution_fold",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_actual_receipt_prefix",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_aux_start_has_stable_phase",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_aux_start_identity",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_canonical_invocation_units",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_canonical_reaches_scan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_canonical_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_canonical_receipt_units",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_empty_count_views",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_field_action_from_step",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_noninstall_units",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_parsing_receipt_fold",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_receipt_matches_plan",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_record_actual_parts_receipt",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_record_finished_receipt",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_region_tag_bound",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_result_has_receipt",
+          "kind": "spec"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_simple_receipt_units",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_m1_tree_simple_status_from_guard",
+          "kind": "proof"
+        },
+        {
+          "id": "brotli_input::r_prefix_invalid_scan_matches",
+          "kind": "proof"
+        }
+      ],
+      "allowed_index_sum_openings": [
+        "brotli_prefix::m1_canonical_nonzero_index_sum"
+      ],
+      "attribute_changes": [
+        {
+          "baseline_attributes": [],
+          "candidate_attributes": [
+            "#[verifier::spinoff_prover]"
+          ],
+          "id": "brotli_input::install_completed_simple_tree",
+          "kind": "exec"
+        }
+      ],
+      "contract_violations": [],
+      "contracts_passed": true,
+      "counts": {
+        "exec": 322,
+        "proof": 313,
+        "spec": 416
+      },
+      "existing_spec_count": 416,
+      "paired_exec_count": 157,
+      "reference_hashes": {
+        "brotli_input": "f1a37362e128944c9c0ca49f00f30c172270677140e60027d3d655c46d831eef",
+        "brotli_prefix": "112d237139f6df4b6f3975b75c50543639b894fc733ddb024b6842471c265e03"
+      },
+      "spec_basenames_that_would_collide": {
+        "valid": [
+          "brotli_input::BitQueue::valid",
+          "brotli_input::MetaBlockHeader::valid",
+          "brotli_input::MetaBlockDecoder::valid",
+          "brotli_input::SimpleCodeDescription::valid",
+          "brotli_input::ComplexCodeLengthAlphabet::valid",
+          "brotli_input::ComplexSymbolProgress::valid",
+          "brotli_input::ComplexAfterSpan::valid",
+          "brotli_input::ComplexProgress::valid",
+          "brotli_input::CodeDescriptionDecoder::valid",
+          "brotli_input::VarUint8Phase::valid",
+          "brotli_input::InstalledPrefixState::valid"
+        ],
+        "valid_for": [
+          "brotli_prefix::PrefixCode::valid_for",
+          "brotli_prefix::TreeMetadata::valid_for"
+        ]
+      },
+      "spec_missing": [],
+      "spec_unexpected_changes": [],
+      "specs_passed": true
+    }
+  },
+  "final_attestation": true,
+  "gate_bundle_changed": false,
+  "gate_bundle_hashes_unchanged": {
+    "RESTORE_CANARIES.txt": "8831a895585d80cad8683fbf9b4260207cd23c4a08a4b9bacbf83e6f1436fbb5",
+    "USAGE.txt": "22cb7633be561e7232394bf7db38e5877ffae516f6c2cabf5dd261ed0dfbf058",
+    "affected-suites.json": "efae38fd5c404b959262b17723eee0471c2763fde736736a004b17cc90fea0ac",
+    "baseline-five-control-updates.json": "49376055684cd9d3a07cc7a2692ea693783fa942b2bffc0a93e4c6ed2078cbeb",
+    "discovered-current-required-controls.json": "a9902dcdbc71ca268cb555a562577899f6be6b1a4a5d380e61cf3a9bd6a59564",
+    "driver.py": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+    "frozen-scope-audit.json": "66a03d1a9bb02eef95a73666df8f53fd1d148e51879f42c8e7cb2fda334f7b03",
+    "manifest.json": "f6719512f8bb792985e2b1d9536d9c563c41c643131eb2771ad3bdd8102db872",
+    "original-driver.py.txt": "3f289ac7939cb128aff56c404f0e29ddaa7a50053c8bc108aafb412ebf78c5ab",
+    "original-suite-inventory.json": "06f48d0b9b4d8d8637981b9693184637a75d99a9f70883dff457e29952f4fc63",
+    "prior37-control-manifest.json": "0adc938c187b3671e7bc5e25c26f9bc1160168d157e8cbcee9a93a60f63af2a3",
+    "static-validation.json": "90111cb10de7495a4e6b6fe4bd6be30f6698a2ffcd9d1800b3d38f60ac05e033"
+  },
+  "limitations": [
+    "Static textual preservation is not a proof, compiler-erasure equivalence, whole-crate gate, or permission to change architecture.",
+    "Added declarations/attribute changes are inventoried, not approved by this audit."
+  ],
+  "mutant_runs": 0,
+  "old_args_requires_returns_and_guarantees_retained": true,
+  "parser_lineage": {
+    "declaration_parser": "target/m1-r-final-static-audit/audit_tools.py",
+    "declaration_parser_sha256": "d8712ec5b286a688ee6fbe63ff6cf0566c7afb52350888304c2c020e0f499a49",
+    "note": "Qualified module::impl::name IDs; ambiguous IDs fail rather than overwrite. Body-span logic follows group parser; parameter opening is anchored after fn name rather than pub(crate) visibility.",
+    "receipt_tools_sha256": "afdb2d159d1a0925a998a6808e99d58b40055cc577bef6fa378b66d2cbc2ee2d",
+    "span_reference": "target/m1-r-frozen-scope-audit/compare-scope.py::all_items",
+    "span_reference_sha256": "ede75b8099b5ad4e6d8293b15c217b6ed63bafe78c4a74a0d52115f02a239f35",
+    "status": "Parser preparation only; no final source attestation"
+  },
+  "source_mutations": 0,
+  "source_stable_for_read": true,
+  "status": "final qualified static preservation audit",
+  "tests_sha256": "43c8b7b0f641344e1c63d8de7f7cd6dc138fd6eac9e9349a2160ecfa51dd1da1"
+}

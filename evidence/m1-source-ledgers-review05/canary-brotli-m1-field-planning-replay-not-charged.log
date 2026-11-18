@@ -1,0 +1,36 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (59769,13): 'if' cannot be used in patterns.
+WARNING: (67556,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-32038/src/brotli_input.rs:32921:1
+      |
+32921 | / fn plan_code_description_field(decoder: &mut CodeDescriptionDecoder,
+32922 | |     budget: &mut crate::brotli::RequestBudget, input: &[u8], end_of_input: bool,
+32923 | | ) -> (r: Result<(CodeDescriptionStep, u64, u64), CoreFailure>)
+      | |_____________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-m1-saved-table-canary-32038/src/brotli_input.rs:32945:9
+      |
+32945 | /         r.is_ok() ==> {
+32946 | |             &&& r.unwrap().0.consumed <= input.len()
+32947 | |             &&& code_field_step_refines(*old(decoder), input@, end_of_input, *final(decoder), r.unwrap().0)
+32948 | |             &&& r.unwrap().2 as nat == code_field_total_read_units(*old(decoder), input@, r.unwrap().0.consumed)
+...     |
+32951 | |             &&& final(budget).work_remaining == old(budget).work_remaining - r.unwrap().1
+32952 | |         },
+      | |_________^ failed this postcondition
+32953 | / {
+32954 | |     let before_work = budget.work_remaining;
+32955 | |     let ghost start = *decoder;
+32956 | |     let width = code_description_phase_width_exec(decoder.phase, decoder.alphabet_max);
+...     |
+32999 | |     Ok((step, before_work - budget.work_remaining, replay_work))
+33000 | | }
+      | |_- at the end of the function body
+
+error: aborting due to 1 previous error
+

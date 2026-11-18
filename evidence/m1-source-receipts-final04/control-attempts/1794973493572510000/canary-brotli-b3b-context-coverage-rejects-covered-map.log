@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:19997:1
+      |
+19997 | / fn advance_context_coverage_phase(
+19998 | |     workspace: &mut [u8],
+19999 | |     window_bytes: u32,
+20000 | |     kind: crate::brotli_prefix::ContextMapKind,
+20001 | |     active_len: u16,
+20002 | | ) -> (r: (Result<(), CompressedHeaderError>, Ghost<nat>))
+      | |________________________________________________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3b-context-tree-count-canary-52590/src/brotli_input.rs:20123:16
+      |
+20123 |           assert(crate::brotli_prefix::context_tree_coverage(
+      |  ________________^
+20124 | |             crate::brotli_prefix::context_map_values(
+20125 | |                 before_coverage,
+20126 | |                 window_bytes,
+...     |
+20130 | |             num_trees,
+20131 | |         ));
+      | |_________^ assertion failed
+
+error: aborting due to 1 previous error
+
