@@ -167,6 +167,18 @@ pub enum InitError {
 }
 
 impl RequestBudget {
+    pub closed spec fn limits_view(&self) -> RequestLimits {
+        self.limits
+    }
+
+    pub closed spec fn remaining_work(&self) -> u64 {
+        self.work_remaining
+    }
+
+    pub closed spec fn remaining_initializations(&self) -> u32 {
+        self.initializations_remaining
+    }
+
     pub closed spec fn valid(&self) -> bool {
         &&& 10 <= self.limits.max_window_bits <= 24
         &&& self.input_remaining <= self.limits.max_input
@@ -214,6 +226,9 @@ impl RequestBudget {
                 let budget = r.unwrap();
                 &&& budget.valid()
                 &&& budget.matches_limits(limits)
+                &&& budget.limits_view() == limits
+                &&& budget.remaining_work() == limits.max_work
+                &&& budget.remaining_initializations() == limits.max_initializations
             },
             r.is_err() ==> r == Err(InitError::InvalidLimits),
     {
@@ -453,8 +468,52 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
         budget: &'b mut RequestBudget,
     ) -> (r: Result<Self, InitError>)
         requires old(budget).valid(),
-        ensures r.is_err() ==> final(workspace)@ == old(workspace)@,
+        ensures
+            r.is_err() ==> final(workspace)@ == old(workspace)@,
+            match r {
+                Ok(decoder) => {
+                    &&& decoder.valid()
+                    &&& old(workspace)@.len()
+                        >= (1u32 << old(budget).limits_view().max_window_bits) as nat + 1_176_560
+                    &&& old(budget).remaining_initializations() > 0
+                    &&& old(budget).remaining_work() >= 425
+                    &&& decoder.budget_view().limits_view() == old(budget).limits_view()
+                    &&& decoder.budget_view().remaining_work() as nat + 425
+                        == old(budget).remaining_work() as nat
+                    &&& decoder.budget_view().remaining_initializations() as nat + 1
+                        == old(budget).remaining_initializations() as nat
+                    &&& decoder.budget_view().reset_effect(*old(budget), Ok(()))
+                    &&& decoder.workspace_view().len() == old(workspace)@.len()
+                    &&& decoder.stored_terminal_result().is_none()
+                },
+                Err(InitError::WorkspaceTooSmall) => {
+                    &&& old(workspace)@.len()
+                        < (1u32 << old(budget).limits_view().max_window_bits) as nat + 1_176_560
+                    &&& *final(budget) == *old(budget)
+                },
+                Err(InitError::ResourceLimit) => {
+                    &&& old(workspace)@.len()
+                        >= (1u32 << old(budget).limits_view().max_window_bits) as nat + 1_176_560
+                    &&& (old(budget).remaining_initializations() == 0
+                        || old(budget).remaining_work() < 425)
+                    &&& final(budget).reset_effect(*old(budget), Err(InitError::ResourceLimit))
+                },
+                Err(InitError::InvalidLimits) => false,
+            },
     {
+        proof {
+            reveal(BrotliDecoder::valid);
+            reveal(BrotliDecoder::budget_view);
+            reveal(BrotliDecoder::workspace_view);
+            reveal(BrotliDecoder::stored_terminal_result);
+            reveal(RequestBudget::reset_effect);
+            reveal(RequestBudget::limits_view);
+            reveal(RequestBudget::remaining_work);
+            reveal(RequestBudget::remaining_initializations);
+            assert(crate::brotli_prefix::FIXED_SCRATCH_BYTES == 1_176_560) by (compute_only);
+            assert(B3C_INITIALIZATION_WORK == 425) by (compute_only);
+            approved_window_bytes(budget.limits.max_window_bits);
+        }
         let window_bytes = 1u32 << budget.limits.max_window_bits;
         let required = match (window_bytes as usize).checked_add(
             crate::brotli_prefix::FIXED_SCRATCH_BYTES as usize,
@@ -2211,6 +2270,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
     }
 
     #[verifier::rlimit(90)]
+    #[verifier::spinoff_prover]
     fn step_body_phase_distance_symbol(
         &mut self,
         input: &[u8],

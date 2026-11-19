@@ -5855,3 +5855,84 @@ fn the_prover_rejects_four_m1_actual_source_receipt_omissions() {
     }
     fs::remove_dir_all(temporary).unwrap();
 }
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_six_b3c_constructor_binding_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-constructor-canaries-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    let positive = check_brotli_function(&verus, &temporary, "BrotliDecoder::new");
+    assert!(positive.status.success(), "unchanged constructor failed: {}", transcript(&positive));
+    let start = original.find("    pub fn new(\n        workspace: &'w mut [u8],").unwrap();
+    let end = start + original[start..].find("    pub fn reset(").unwrap();
+    let selected = &original[start..end];
+    let body = selected.find("\n    {\n").unwrap();
+    for (name, old, new) in [
+        (
+            "brotli-b3c-constructor-skips-initialization-reservation",
+            "if !budget.reserve_initialization() {",
+            "if false {",
+        ),
+        (
+            "brotli-b3c-constructor-spurious-resource-failure",
+            "if !budget.reserve_initialization() {",
+            "if true {",
+        ),
+        (
+            "brotli-b3c-constructor-small-workspace-consumes-credit",
+            "        if workspace.len() < required {\n            return Err(InitError::WorkspaceTooSmall);\n        }",
+            "        if workspace.len() < required {\n            let _ = budget.reserve_initialization();\n            return Err(InitError::WorkspaceTooSmall);\n        }",
+        ),
+        (
+            "brotli-b3c-constructor-replenishes-work",
+            "            Ok(()) => Ok(Self { workspace, budget }),",
+            "            Ok(()) => {\n                budget.work_remaining = budget.limits.max_work;\n                Ok(Self { workspace, budget })\n            },",
+        ),
+        (
+            "brotli-b3c-constructor-returns-finished-state",
+            "            Ok(()) => Ok(Self { workspace, budget }),",
+            "            Ok(()) => {\n                let _ = crate::brotli_input::write_b3c_state_byte(\n                    workspace, window_bytes, crate::brotli_input::B3C_STREAM_PHASE, 8);\n                Ok(Self { workspace, budget })\n            },",
+        ),
+        (
+            "brotli-b3c-constructor-small-workspace-is-resource-error",
+            "        if workspace.len() < required {\n            return Err(InitError::WorkspaceTooSmall);\n        }",
+            "        if workspace.len() < required {\n            return Err(InitError::ResourceLimit);\n        }",
+        ),
+    ] {
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body anchor for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged constructor contract");
+        let mutated = format!("{}{}{}", &original[..start], replacement, &original[end..]);
+        fs::write(&path, mutated).unwrap();
+        let output = check_brotli_function(&verus, &temporary, "BrotliDecoder::new");
+        let log = transcript(&output);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!output.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("assertion failed"), "expected semantic rejection: {log}");
+        let lower = log.to_ascii_lowercase();
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count") && !lower.contains("unexpected smt output")
+            && !lower.contains("internal compiler error") && !lower.contains("error[e"),
+            "tool or resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate constructor defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}

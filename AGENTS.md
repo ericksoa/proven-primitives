@@ -289,3 +289,23 @@ workspace, dependencies, F2 and proof trust. Receipts must originate in reached
 counters/traces at every return, including partial input/errors; no reservation-
 formula substitutes. Approach S is unselected. Any boundary or policy outside
 that exact decision still needs direct human approval. The named M1 compressed-header source-receipt and plan/action refinement checkpoint is recorded in `BROTLI_M1_SOURCE_RECEIPTS_CHECKPOINT.md` and `evidence/brotli-b3c-m1-source-receipts.json`. Its completion is limited to the exact admitted domains and frozen source in that receipt; B3c/B3d/B4, the F2 native disagreement, independent human specification review and decoder/release gates remain separate. No new architectural authority follows.
+
+
+The human explicitly approved I2 as written in
+`BROTLI_B3C_CONSTRUCTOR_PROOF_BOUNDARY_DECISION.md` on 2026-11-19. Add only the
+three named public closed RequestBudget observations (`limits_view`,
+`remaining_work`, `remaining_initializations`), their existing-constructor
+success guarantees, and the complete public Brotli constructor guarantees.
+I1 remains unselected. Preserve all previous requirements/guarantees,
+executable statements, error priority, workspace, 425-unit charge, dependencies
+and proof trust. No other public observer or visibility change is approved.
+The named constructor checkpoint is recorded in
+`BROTLI_B3C_CONSTRUCTOR_CHECKPOINT.md` and
+`evidence/brotli-b3c-constructor-i2.json`: 1397 whole-crate checks with zero
+errors, 116 runtime tests and six semantic constructor defect rejections on
+the same frozen source. A proof-only solver-isolation annotation on the
+unchanged distance-symbol helper preserves its original allowance of 90;
+the preceding resource-failed whole attempt is retained separately. This
+completes only the constructor checkpoint. Remaining B3c work, B3d/B4, F2's
+native disagreement, independent human specification review and decoder/release
+obligations remain open. No additional architectural authority follows.

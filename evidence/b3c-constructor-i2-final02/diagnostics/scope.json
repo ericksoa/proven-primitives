@@ -1,0 +1,29 @@
+{
+  "constructor_selected_logs": "Earlier partial diagnostics before the final source-isolation annotation; not additional whole positives or controls",
+  "distance_isolation": {
+    "all_trial_src_hashes_match_final_source": true,
+    "command": [
+      "verus",
+      "target/b3c-constructor-i2/isolation-trial/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli",
+      "--verify-function",
+      "BrotliDecoder::step_body_phase_distance_symbol",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "300"
+    ],
+    "errors": 0,
+    "exit_code": 0,
+    "original_function_allowance": 90,
+    "partial_verification": true,
+    "verified": 1
+  },
+  "selected02": "Actual private-constant/public-contract visibility rejection before I2 approval; no visibility was opened"
+}

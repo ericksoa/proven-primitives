@@ -1,0 +1,3 @@
+note: verifying module brotli, function lib::brotli::BrotliDecoder::step_body_phase_distance_symbol (selected functions)
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

@@ -1,0 +1,45 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-constructor-canaries-15329/src/brotli.rs:466:5
+    |
+466 | /     pub fn new(
+467 | |         workspace: &'w mut [u8],
+468 | |         budget: &'b mut RequestBudget,
+469 | |     ) -> (r: Result<Self, InitError>)
+    | |____________________________________^
+
+note: function body check finished in 4 seconds
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-constructor-canaries-15329/src/brotli.rs:466:5
+    |
+466 | /     pub fn new(
+467 | |         workspace: &'w mut [u8],
+468 | |         budget: &'b mut RequestBudget,
+469 | |     ) -> (r: Result<Self, InitError>)
+    | |____________________________________^
+
+error: postcondition not satisfied
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-constructor-canaries-15329/src/brotli.rs:473:13
+    |
+473 | /             match r {
+474 | |                 Ok(decoder) => {
+475 | |                     &&& decoder.valid()
+476 | |                     &&& old(workspace)@.len()
+...   |
+501 | |                 Err(InitError::InvalidLimits) => false,
+502 | |             },
+    | |_____________^ failed this postcondition
+...
+538 | /         match crate::brotli_input::initialize_serialized_b3c(
+539 | |             workspace,
+540 | |             window_bytes,
+541 | |         ) {
+...   |
+547 | |         }
+    | |_________- at the end of the function body
+
+error: aborting due to 1 previous error
+

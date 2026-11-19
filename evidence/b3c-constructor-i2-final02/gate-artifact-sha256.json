@@ -1,0 +1,23 @@
+{
+  "canary-brotli-b3c-constructor-replenishes-work.log": "2da508d9d912703a0a71d15efea5f8070bb61d9011da54a74b39c3a7b2f70ae0",
+  "canary-brotli-b3c-constructor-returns-finished-state.log": "bafea16f8b9798de1c4efa6429b47eccab2b9b893ff1fddcefe47d1355a21c86",
+  "canary-brotli-b3c-constructor-skips-initialization-reservation.log": "309db97cd5e4dc7e269bcb8b23f8a0645b3d66bdb78bfb6e011df60e773d4b85",
+  "canary-brotli-b3c-constructor-small-workspace-consumes-credit.log": "0973d37622677021ed647dbd9aa0d713009c10e23a6c37efb2a5641409acaaef",
+  "canary-brotli-b3c-constructor-small-workspace-is-resource-error.log": "6f3c22d5f3b51d0008d9a4f6d75a5363efe8e2f36fc01820e672bf8523420b5b",
+  "canary-brotli-b3c-constructor-spurious-resource-failure.log": "31edb5fee9f568cc0220176b552b5bae17d13236e7a5649e44b174e56bb871c1",
+  "complete.json": "2486a22fc7041c520c137e78f78555b1f67e47ffe06f808bf033114151427477",
+  "constructor-controls.log": "ce7fc22fffd23a4f1e6ba0bbda321048f73d59b01a758cf1f51402a236e6d2e9",
+  "controls.json": "f52466e171df30374b574e742e54345e27e05fd3c9e9e88c52b3961b53027e1a",
+  "frozen-source.tar.gz": "b45db8884b5b2fdd72a360e50f0e83e33d1bbbee38e08e71e84985baa002a717",
+  "gate.py.txt": "89d6c1e698a8f1acd44fcd39c42a58b5741ad07c833efe9052f98a6243ccbc05",
+  "positive.json": "c8c03cf96f72f216f37e583c4a46759032745ed0fb9a3d938e146cf76e79f314",
+  "runtime-comparison.log": "bf181ca7fbad4c8928b51e9a35ab1736caf16c11ae53b915fd2c6572a83fc746",
+  "runtime-library.log": "19036aa8f6aa5a78dcd38698802b2e7cb06a57d5dae06d6c4f5bc26fcc59efd6",
+  "runtime-primitives.log": "c44efa929b2ef956e78e3ceec0d8112a52ae833b1d23918fef903596dc660184",
+  "runtime-results.json": "b132c2bc9f1e1eb6aa8cf03ecb4f30e0368341f8ebb30cb79e121340abafb27e",
+  "runtime-trust.log": "2a11144b09d857bb16f6d009e16118c6d84c9b56c1478879e11f2e1f15f39a3e",
+  "source-start.json": "d03559bc03437ef5a8759cde4cbb518e76ffb1f6127ccf38e4ea9e85d7480c75",
+  "steps.json": "9a68f767682d3d32202c2d3e3a48722c1c9840f6b16dd302daaeacc1c11d9337",
+  "verification.json": "9253d14a8f54e337520f0942cabea2efed9f199b79812142aed27c9edfef746f",
+  "whole-crate.log": "e05bb9ce93749d754e311e3ca385458c46eb2053181a2d30fdd4006c819e927c"
+}

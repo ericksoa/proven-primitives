@@ -1,0 +1,169 @@
+{
+  "approval": {
+    "date": "2026-11-19",
+    "decision": {
+      "path": "BROTLI_B3C_CONSTRUCTOR_PROOF_BOUNDARY_DECISION.md",
+      "sha256": "e305ccbaf59e82f9a898311ddd3a58da3fb70f447ec34bce9874d6193beb278d"
+    },
+    "human_answer": "Approve I2 as written",
+    "new_public_proof_observations": [
+      "RequestBudget::limits_view",
+      "RequestBudget::remaining_work",
+      "RequestBudget::remaining_initializations"
+    ],
+    "unselected": "I1"
+  },
+  "approval_ledger": {
+    "path": "AGENTS.md",
+    "sha256": "4c3d7cdeabd9fcf9fe9ff9f41525795de2d3123c7e447d784ce2607aa8da1d34"
+  },
+  "checkpoint": {
+    "path": "BROTLI_B3C_CONSTRUCTOR_CHECKPOINT.md",
+    "sha256": "73fc9e08de898a23556fb4a70acd1ea2270e45489dbfb2df58b6516d7367b537"
+  },
+  "gate": {
+    "artifact_manifest": {
+      "path": "evidence/b3c-constructor-i2-final02/artifact-sha256.json",
+      "sha256": "5ea90425055a5cb3f887251d719dbbcc93d34dfa0a879f4f894d146a6a0b4182"
+    },
+    "complete": {
+      "path": "evidence/b3c-constructor-i2-final02/complete.json",
+      "sha256": "2486a22fc7041c520c137e78f78555b1f67e47ffe06f808bf033114151427477"
+    },
+    "controls": [
+      {
+        "checked_semantic_error": true,
+        "computed_false": false,
+        "log": "canary-brotli-b3c-constructor-skips-initialization-reservation.log",
+        "name": "brotli-b3c-constructor-skips-initialization-reservation",
+        "semantic_rejection": true,
+        "sha256": "309db97cd5e4dc7e269bcb8b23f8a0645b3d66bdb78bfb6e011df60e773d4b85",
+        "syntax_or_type_failure": false,
+        "tool_or_resource_failure": false
+      },
+      {
+        "checked_semantic_error": true,
+        "computed_false": false,
+        "log": "canary-brotli-b3c-constructor-spurious-resource-failure.log",
+        "name": "brotli-b3c-constructor-spurious-resource-failure",
+        "semantic_rejection": true,
+        "sha256": "31edb5fee9f568cc0220176b552b5bae17d13236e7a5649e44b174e56bb871c1",
+        "syntax_or_type_failure": false,
+        "tool_or_resource_failure": false
+      },
+      {
+        "checked_semantic_error": true,
+        "computed_false": false,
+        "log": "canary-brotli-b3c-constructor-small-workspace-consumes-credit.log",
+        "name": "brotli-b3c-constructor-small-workspace-consumes-credit",
+        "semantic_rejection": true,
+        "sha256": "0973d37622677021ed647dbd9aa0d713009c10e23a6c37efb2a5641409acaaef",
+        "syntax_or_type_failure": false,
+        "tool_or_resource_failure": false
+      },
+      {
+        "checked_semantic_error": true,
+        "computed_false": false,
+        "log": "canary-brotli-b3c-constructor-replenishes-work.log",
+        "name": "brotli-b3c-constructor-replenishes-work",
+        "semantic_rejection": true,
+        "sha256": "2da508d9d912703a0a71d15efea5f8070bb61d9011da54a74b39c3a7b2f70ae0",
+        "syntax_or_type_failure": false,
+        "tool_or_resource_failure": false
+      },
+      {
+        "checked_semantic_error": true,
+        "computed_false": false,
+        "log": "canary-brotli-b3c-constructor-returns-finished-state.log",
+        "name": "brotli-b3c-constructor-returns-finished-state",
+        "semantic_rejection": true,
+        "sha256": "bafea16f8b9798de1c4efa6429b47eccab2b9b893ff1fddcefe47d1355a21c86",
+        "syntax_or_type_failure": false,
+        "tool_or_resource_failure": false
+      },
+      {
+        "checked_semantic_error": true,
+        "computed_false": false,
+        "log": "canary-brotli-b3c-constructor-small-workspace-is-resource-error.log",
+        "name": "brotli-b3c-constructor-small-workspace-is-resource-error",
+        "semantic_rejection": true,
+        "sha256": "6f3c22d5f3b51d0008d9a4f6d75a5363efe8e2f36fc01820e672bf8523420b5b",
+        "syntax_or_type_failure": false,
+        "tool_or_resource_failure": false
+      }
+    ],
+    "old_m1_318_controls_rerun_in_this_gate": false,
+    "original_gate_artifact_manifest": {
+      "path": "evidence/b3c-constructor-i2-final02/gate-artifact-sha256.json",
+      "sha256": "7ba56456dc8e2dfc55c3292bc86364ec598ba550adf3228e510e538c374efa28"
+    },
+    "required_suites": 1,
+    "runtime_passed": 116,
+    "semantic_rejections": 6,
+    "source_archive": {
+      "path": "evidence/b3c-constructor-i2-final02/frozen-source.tar.gz",
+      "sha256": "b45db8884b5b2fdd72a360e50f0e83e33d1bbbee38e08e71e84985baa002a717"
+    },
+    "source_start": {
+      "path": "evidence/b3c-constructor-i2-final02/source-start.json",
+      "sha256": "d03559bc03437ef5a8759cde4cbb518e76ffb1f6127ccf38e4ea9e85d7480c75"
+    },
+    "source_unchanged_during_gate": true,
+    "tag": "b3c-constructor-i2-final02",
+    "unchanged_whole_positive_precedes_controls": true,
+    "verification": {
+      "encountered-error": false,
+      "encountered-vir-error": false,
+      "errors": 0,
+      "is-verifying-entire-crate": true,
+      "success": true,
+      "verified": 1397
+    }
+  },
+  "historical_failed_attempt": {
+    "artifact_manifest": {
+      "path": "evidence/b3c-constructor-i2-final01/artifact-sha256.json",
+      "sha256": "c47f9d097d764d611ee08daee8d03e34c51637d673f974d85564e2642a92fea3"
+    },
+    "counts_as_positive_or_control": false,
+    "failure": {
+      "path": "evidence/b3c-constructor-i2-final01/failure.json",
+      "sha256": "22d70dfac36cdcd97ced82638b2a9351c1bb9e1d041799495b146f431f20b132"
+    },
+    "tag": "b3c-constructor-i2-final01"
+  },
+  "not_proved": [
+    "Whole decoder or supported release",
+    "Source-to-binary correctness or side-channel guarantees",
+    "Independent human approval of mathematical specification correctness"
+  ],
+  "parent_m1_commit": "6e9fb24bc38a659bab0d77bc05d7336374fdfbf0",
+  "preservation_audit": {
+    "path": "evidence/b3c-constructor-i2-final02/preservation-audit.json",
+    "sha256": "313cee56ff8cb44455ad6a33494b89d78b4e063973f30a0487f71e07389112c9"
+  },
+  "properties": [
+    "Successful constructor establishes existing public step entry predicate",
+    "Exact one-initialization and 425-work debit, unchanged other counters and limits",
+    "Complete admitted-domain workspace priority and resource error classification",
+    "All constructor errors preserve whole workspace; small-workspace errors preserve whole budget",
+    "Exactly three approved field-linked proof observations; runtime constructor bodies unchanged"
+  ],
+  "remaining": [
+    "Remaining B3c body/dictionary refinement and caller/output/history/resource/stream composition",
+    "B3d/B4 and arbitrary call-sequence obligations",
+    "F2 monkey sticky ContextMapRepeat/native disagreement",
+    "Independent human specification review and supported-decoder/release gates"
+  ],
+  "reproduction": {
+    "path": "evidence/b3c-constructor-i2-final02/REPRODUCE.md",
+    "sha256": "e99781be623020ae47acafe12d6c49c14ef1611edcffb4e8685fe516e331d516"
+  },
+  "schema": "brotli-b3c-constructor-i2-checkpoint-v1",
+  "status": "complete-named-public-constructor-proof-checkpoint",
+  "trusted_components": [
+    "Mathematical specifications",
+    "Pinned Verus/Z3/vstd and Rust/LLVM",
+    "Apple build tools and operating environment"
+  ]
+}

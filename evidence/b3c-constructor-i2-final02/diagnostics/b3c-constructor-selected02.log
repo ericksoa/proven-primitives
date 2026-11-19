@@ -1,0 +1,8 @@
+error: in 'ensures' clause of public function, cannot refer to private const item
+   --> src/brotli.rs:464:49
+    |
+464 |                     &&& forall|i: int| 0 <= i < crate::brotli_input::B3C_SCALAR_BYTES ==>
+    |                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

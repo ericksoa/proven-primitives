@@ -1,0 +1,17 @@
+{
+  "failure.json": "22d70dfac36cdcd97ced82638b2a9351c1bb9e1d041799495b146f431f20b132",
+  "frozen-source.tar.gz": "fa43ac17de1112a172fd9790ccc898afa3f3c43c9a0d1e381657a5bdd693a460",
+  "gate.py.txt": "58115f690b37220d96f363e5470b1ec4ad5a3fc2740d32ed572590fa41507fb6",
+  "m1-gate-helpers.py.txt": "1c983c9cc21b58af4031996a7bee94315a78b85be7e1ee43db1fda3c133e8c46",
+  "preservation-audit.json": "0487c9b5191d54b00895fb389b318e8afb4781a1a7a707efcec656b1de04c915",
+  "preservation-audit.py.txt": "8c4167b73705e1ccb2b5ad07ed27ab843cb36ea980f79dd089a96bd36c27c03d",
+  "runtime-comparison.log": "c15aa13b30adb728c6573cde4be348b72a582466c7170368a12433cd4377a8c5",
+  "runtime-library.log": "54dd96b2bb9bf1847ae9d13126ef081351a4dc76ab2039271b88314cb55bebe4",
+  "runtime-primitives.log": "04373478fa0b404d3bdf40cce3e83e2bcf48f27d8eefbe3c20dbeb18414299a2",
+  "runtime-results.json": "490874811f1c8c0cd2ef6e2622364beef5504ae513ac1cf912bebad59aada024",
+  "runtime-trust.log": "10b518cd16aa880de080a817ce168ad7942f6c364726ed7322921cd755127794",
+  "source-start.json": "19408a27c9dbd2399559db5c517d9ce24f5b69d6c1fedb10f0d002ec33e44a3c",
+  "steps.json": "0fc313b13d4304f8e0f12e2711e538a007fbbec57f0d1741298d80e378755b6c",
+  "verification.json": "b351fcdccee980ca63aaab37e0bb199972f11e0a6c85f13df8a3ed6bca37413c",
+  "whole-crate.log": "9a0405571af532aa1b6582d82d712a68eef9c146d19799dc823258fbc864efc3"
+}

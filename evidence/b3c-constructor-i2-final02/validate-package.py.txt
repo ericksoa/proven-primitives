@@ -1,0 +1,43 @@
+from pathlib import Path
+import hashlib,json,tarfile,re,subprocess
+R=Path.cwd();O=R/'evidence/b3c-constructor-i2-final02'
+def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def mapping(o,name):
+ m=json.loads((o/name).read_text())
+ for n,d in m.items():assert h(o/n)==d,n
+ return len(m)
+counts={}
+for tag in ['b3c-constructor-i2-final01','b3c-constructor-i2-final02']:
+ counts[tag]=mapping(R/'evidence'/tag,'artifact-sha256.json')
+mapping(O,'gate-artifact-sha256.json')
+c=json.loads((O/'complete.json').read_text());root=json.loads((R/'evidence/brotli-b3c-constructor-i2.json').read_text())
+def bindings(x):
+ if isinstance(x,dict):
+  if 'path' in x and 'sha256' in x:assert h(R/x['path'])==x['sha256'],x['path']
+  for v in x.values():bindings(v)
+ elif isinstance(x,list):
+  for v in x:bindings(v)
+bindings(root)
+with tarfile.open(O/'frozen-source.tar.gz','r:gz') as t:
+ assert set(t.getnames())==set(c['source_sha256'])
+ for n,d in c['source_sha256'].items():
+  assert h(R/n)==d,n
+  assert hashlib.sha256(t.extractfile(n).read()).hexdigest()==d,n
+v=json.loads((O/'verification.json').read_text())['verification-results']
+assert v==root['gate']['verification']==c['verification']
+assert v['success'] and v['errors']==0 and v['is-verifying-entire-crate']
+assert c['runtime_passed']==root['gate']['runtime_passed']
+log=(O/'constructor-controls.log').read_text()
+assert 'test result: ok. 1 passed; 0 failed' in log
+names=re.findall(r'^REJECTED (brotli-b3c-constructor-[a-z-]+):',log,re.M)
+assert len(names)==len(set(names))==6
+controls=json.loads((O/'controls.json').read_text())
+assert set(names)=={x['name'] for x in controls}
+for row in controls:
+ assert h(O/row['log'])==row['sha256']
+ assert row['semantic_rejection'] and not row['tool_or_resource_failure'] and not row['syntax_or_type_failure']
+log_before=json.loads((O/'positive.json').read_text())['whole']
+steps=json.loads((O/'steps.json').read_text())
+assert steps[-1]['started_ns']>log_before['started_ns']+int(log_before['seconds']*1e9)
+subprocess.run(['git','diff','--check'],check=True)
+print(json.dumps({'validated_artifact_file_counts':counts,'whole_verified':v['verified'],'whole_errors':v['errors'],'runtime_passed':c['runtime_passed'],'semantic_rejections':6,'all_root_bindings_and_frozen_source_match':True,'positive_precedes_controls':True},indent=2))

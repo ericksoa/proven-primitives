@@ -1,0 +1,60 @@
+from pathlib import Path
+import hashlib, json, subprocess, re
+ROOT=Path.cwd(); BASE='6e9fb24bc38a659bab0d77bc05d7336374fdfbf0'
+def old(name): return subprocess.check_output(['git','show',f'{BASE}:{name}'],text=True)
+def sha(s): return hashlib.sha256(s.encode()).hexdigest()
+def section(s,begin,end):
+    start=s.index(begin); stop=s.index(end,start)
+    return s[start:stop]
+def split_fn(s):
+    start=s.index('\n    {\n')
+    return s[:start],s[start:]
+a=old('src/brotli.rs'); b=(ROOT/'src/brotli.rs').read_text()
+observers='''    pub closed spec fn limits_view(&self) -> RequestLimits {
+        self.limits
+    }
+
+    pub closed spec fn remaining_work(&self) -> u64 {
+        self.work_remaining
+    }
+
+    pub closed spec fn remaining_initializations(&self) -> u32 {
+        self.initializations_remaining
+    }
+
+'''
+assert b.count(observers)==1
+budget_anchor='    pub fn new(limits: RequestLimits)'
+budget_end='    pub(crate) fn reserve_initialization('
+decoder_anchor="    pub fn new(\n        workspace: &'w mut [u8],"
+decoder_end='    pub fn reset('
+ba=section(a,budget_anchor,budget_end); bb=section(b,budget_anchor,budget_end)
+da=section(a,decoder_anchor,decoder_end); db=section(b,decoder_anchor,decoder_end)
+bah,bab=split_fn(ba); bbh,bbb=split_fn(bb)
+dah,dab=split_fn(da); dbh,dbb=split_fn(db)
+assert bab==bbb,'Budget executable body changed'
+extra_budget='''                &&& budget.limits_view() == limits
+                &&& budget.remaining_work() == limits.max_work
+                &&& budget.remaining_initializations() == limits.max_initializations
+'''
+assert bbh.count(extra_budget)==1 and bbh.replace(extra_budget,'')==bah
+proof_end=dbb.index('        let window_bytes')
+added_proof=dbb[len('\n    {\n'):proof_end]
+assert added_proof.startswith('        proof {\n') and added_proof.endswith('        }\n')
+assert dbb[:len('\n    {\n')]+dbb[proof_end:]==dab,'Constructor body changed beyond leading proof block'
+assert dah.split('        ensures')[0]==dbh.split('        ensures')[0],'Signature or requires changed'
+assert 'r.is_err() ==> final(workspace)@ == old(workspace)@,' in dbh
+reconstructed=b.replace(observers,'').replace(bb,ba).replace(db,da)
+assert reconstructed==a,'Unapproved source change outside named sections'
+test_before=old('tests/proof_rejection.rs'); test_after=(ROOT/'tests/proof_rejection.rs').read_text()
+assert test_after.startswith(test_before)
+assert test_after[len(test_before):].count('fn the_prover_rejects_')==1
+assert 'fn the_prover_rejects_six_b3c_constructor_binding_defects()' in test_after[len(test_before):]
+source_names=subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'src','tests','benches','Cargo.toml','Cargo.lock','rust-toolchain.toml','build.rs','.cargo'],text=True).splitlines()
+unchanged={}
+for name in source_names:
+    if name not in ['src/brotli.rs','tests/proof_rejection.rs']:
+        data=(ROOT/name).read_bytes(); baseline=subprocess.check_output(['git','show',f'{BASE}:{name}'])
+        assert data==baseline,name
+        unchanged[name]=hashlib.sha256(data).hexdigest()
+print(json.dumps({'schema':'b3c-i2-static-preservation-v1','base_commit':BASE,'source_before_sha256':sha(a),'source_after_sha256':sha(b),'test_before_sha256':sha(test_before),'test_after_sha256':sha(test_after),'approved_new_observers':['RequestBudget::limits_view','RequestBudget::remaining_work','RequestBudget::remaining_initializations'],'budget_new_body_byte_identical':True,'decoder_new_body_byte_identical_after_removing_only_added_leading_proof_block':True,'constructor_signature_and_requirement_byte_identical':True,'existing_constructor_workspace_atomicity_retained':True,'budget_new_old_contract_byte_identical_after_removing_only_three_approved_guarantees':True,'entire_brotli_source_byte_identical_after_removing_approved_observers_and_replacing_only_two_constructor_sections':True,'existing_test_source_byte_identical_prefix':True,'other_frozen_inputs_byte_identical':unchanged,'scope':'Static preservation audit, not a source-to-binary theorem or independent specification review'},indent=2,sort_keys=True))

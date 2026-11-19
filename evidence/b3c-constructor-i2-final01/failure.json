@@ -1,0 +1,41 @@
+{
+  "allowance_unchanged": 90,
+  "controls_started": false,
+  "failed_function": "BrotliDecoder::step_body_phase_distance_symbol",
+  "runtime_passed": 116,
+  "scope": "Failed I2 whole proof attempt; does not count as a positive or control pass",
+  "source_archive_sha256": "fa43ac17de1112a172fd9790ccc898afa3f3c43c9a0d1e381657a5bdd693a460",
+  "status": "failed-whole-positive-resource-limit",
+  "verification": {
+    "encountered-error": true,
+    "encountered-vir-error": false,
+    "errors": 1,
+    "is-verifying-entire-crate": true,
+    "success": false,
+    "verified": 1396
+  },
+  "whole": {
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--no-cheating",
+      "--num-threads",
+      "8",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "300",
+      "--trace",
+      "--time",
+      "--output-json"
+    ],
+    "exit_code": 1,
+    "log": "whole-crate.log",
+    "log_sha256": "9a0405571af532aa1b6582d82d712a68eef9c146d19799dc823258fbc864efc3",
+    "name": "whole-crate",
+    "seconds": 416.2910180000001,
+    "started_ns": 1795113263441497000
+  }
+}
