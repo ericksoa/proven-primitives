@@ -1,0 +1,41 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-46693/src/brotli.rs:1546:5
+     |
+1546 | /     fn emit_uncompressed_byte(
+1547 | |         &mut self,
+1548 | |         byte: u8,
+1549 | |         output: &mut [u8],
+1550 | |         produced: usize,
+1551 | |     ) -> (r: (Result<(), StreamError>, Ghost<nat>))
+     | |__________________________________________________^
+
+note: function body check finished in 4 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-46693/src/brotli.rs:1546:5
+     |
+1546 | /     fn emit_uncompressed_byte(
+1547 | |         &mut self,
+1548 | |         byte: u8,
+1549 | |         output: &mut [u8],
+1550 | |         produced: usize,
+1551 | |     ) -> (r: (Result<(), StreamError>, Ghost<nat>))
+     | |__________________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-46693/src/brotli.rs:1578:13
+     |
+1578 | /             r.0.is_err() ==> {
+1579 | |                 &&& *final(self).budget == *old(self).budget
+1580 | |                 &&& final(self).workspace@ == old(self).workspace@
+1581 | |             },
+     | |_____________^ failed this postcondition
+...
+1654 |           (result, Ghost(e3_source_writes))
+     |           --------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

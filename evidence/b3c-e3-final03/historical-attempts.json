@@ -1,0 +1,26 @@
+[
+  {
+    "artifact_manifest": {
+      "path": "evidence/b3c-e3-final01/artifact-sha256.json",
+      "sha256": "e7ec020924fe39e943541722db09cff92df536352f643db6cce80056776e0cc1"
+    },
+    "counts_as_complete_gate": false,
+    "status": {
+      "path": "evidence/b3c-e3-final01/retained-attempt.json",
+      "sha256": "37df623afe72f3e60d2f8c708cebfee31de2c948505cf22ccd08c66f0a93faa5"
+    },
+    "tag": "b3c-e3-final01"
+  },
+  {
+    "artifact_manifest": {
+      "path": "evidence/b3c-e3-final02/artifact-sha256.json",
+      "sha256": "42e84f83886c9ff7c2c6f1d03654dd85ce3637b7eece04f5a33a445d5b79fe11"
+    },
+    "counts_as_complete_gate": false,
+    "status": {
+      "path": "evidence/b3c-e3-final02/retained-attempt.json",
+      "sha256": "f46c3857ad073df83dd64357cf93645cc2725a43fa4cc9a85d87e1e42a726457"
+    },
+    "tag": "b3c-e3-final02"
+  }
+]

@@ -1,0 +1,17 @@
+from pathlib import Path
+import json,hashlib
+R=Path.cwd();p=R/'tests/proof_rejection.rs';s=p.read_text();fn='fn the_prover_rejects_twelve_e3_store_receipt_and_billing_defects()';at=s.index(fn);cut=s.rfind('\n#[test]',0,at);prefix=s[:cut]
+# Reverse only the two paired post-failure advisory-reporting options.
+for edit in reversed(json.loads((R/'target/b3c-e3/advisory-harness-update.json').read_text())):
+ name=edit['suite'];a=prefix.index('fn '+name+'()');n=prefix.find('\n#[test]',a);n=len(prefix) if n<0 else n;part=prefix[a:n];assert part.count(edit['new'])==1;prefix=prefix[:a]+part.replace(edit['new'],edit['old'],1)+prefix[n:]
+# Remove the local matched 300 checker in the retained ten-case suite.
+d=json.loads((R/'target/b3c-e3/retained-checker-effort.json').read_text());a=prefix.index('fn the_prover_rejects_ten_b3c_atomic_emission_defects()');part=prefix[a:];assert part.count(d['inserted_closure'])==1;part=part.replace(d['inserted_closure'],'',1);assert part.count('check(function)')==2;part=part.replace('check(function)','check_brotli_function(&verus, &temporary, function)');prefix=prefix[:a]+part
+# Reverse numerical and mechanical tuple/indentation selector adaptations.
+for edit in reversed(json.loads((R/'target/b3c-e3/legacy-control-adaptations.json').read_text())):
+ if 'ten-case emission suite only' in edit.get('scope',''):
+  a=prefix.index('fn the_prover_rejects_ten_b3c_atomic_emission_defects()');part=prefix[a:];assert part.count(edit['new'])==edit['count'],edit;prefix=prefix[:a]+part.replace(edit['new'],edit['old'])
+ else:
+  assert prefix.count(edit['new'])==edit['count'],(edit,prefix.count(edit['new']));prefix=prefix.replace(edit['new'],edit['old'])
+base=(R/'target/b3c-e3/baseline/tests/proof_rejection.rs').read_text();assert prefix==base,(len(prefix),len(base),repr(prefix[-20:]),repr(base[-20:]))
+result={'schema':'e3-harness-preservation-v1','baseline_sha256':hashlib.sha256(base.encode()).hexdigest(),'final_sha256':hashlib.sha256(s.encode()).hexdigest(),'old_test_source_byte_exact_after_reversing_only_recorded_edits':True,'all_original_assertions_cases_and_strict_classifiers_retained':True,'recorded_edits':['Approved numerical debit/priority mutation anchors','Mechanical ordinary tuple/error-propagation and indentation selector rebinding','Paired 300 selected-emission checker','Paired no-auto-recommends-check: advisory diagnostics after primary failure only'],'new_native_suite':'12 source receipt/billing/order body faults','new_native_suite_count':12,'scope':'Static test-harness/source assembly audit, not a semantic checker result'}
+(R/'target/b3c-e3/harness-preservation.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))

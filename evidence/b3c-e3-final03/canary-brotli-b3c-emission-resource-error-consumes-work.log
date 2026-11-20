@@ -1,0 +1,18 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli, function lib::brotli::BrotliDecoder::emit_byte (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-46693/src/brotli.rs:1271:13
+     |
+1271 | /             r.0.is_err() ==> {
+1272 | |                 &&& *final(self).budget == *old(self).budget
+1273 | |                 &&& final(self).workspace@ == old(self).workspace@
+1274 | |             },
+     | |_____________^ failed this postcondition
+...
+1353 |               return (Err(StreamError::ResourceLimit), Ghost(e3_source_writes));
+     |               ----------------------------------------------------------------- at this exit
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,39 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_data (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli_data.rs:1093:1
+     |
+1093 | pub(crate) fn distance_index_delta(symbol: u8) -> (r: u8)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check finished in 207 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli_data.rs:1093:1
+     |
+1093 | pub(crate) fn distance_index_delta(symbol: u8) -> (r: u8)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli_data.rs:1095:13
+     |
+1095 |       ensures r == match symbol {
+     |  _____________^
+1096 | |         0 => 3u8, 1 => 2u8, 2 => 1u8, 3 => 0u8,
+1097 | |         4 | 5 | 6 | 7 | 8 | 9 => 3u8,
+1098 | |         10 | 11 | 12 | 13 | 14 | 15 => 2u8,
+1099 | |         _ => 0u8,
+1100 | |     },
+     | |_____^ failed this postcondition
+1101 |   {
+1102 | /     match symbol {
+1103 | |         0 => 2, 1 => 2, 2 => 1, 3 => 0,
+1104 | |         4 | 5 | 6 | 7 | 8 | 9 => 3,
+1105 | |         10 | 11 | 12 | 13 | 14 | 15 => 2,
+1106 | |         _ => 0,
+1107 | |     }
+     | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,16 @@
+{
+  "schema": "e3-harness-preservation-v1",
+  "baseline_sha256": "fcf9dae2f5b359abd83d21bdd59263f372cdd9f75a153133afac2fb5f26cad23",
+  "final_sha256": "728235120a6c7afd37788dd4dc12cbd8d80e7fcda8c3498ebcbe68def92878ab",
+  "old_test_source_byte_exact_after_reversing_only_recorded_edits": true,
+  "all_original_assertions_cases_and_strict_classifiers_retained": true,
+  "recorded_edits": [
+    "Approved numerical debit/priority mutation anchors",
+    "Mechanical ordinary tuple/error-propagation and indentation selector rebinding",
+    "Paired 300 selected-emission checker",
+    "Paired no-auto-recommends-check: advisory diagnostics after primary failure only"
+  ],
+  "new_native_suite": "12 source receipt/billing/order body faults",
+  "new_native_suite_count": 12,
+  "scope": "Static test-harness/source assembly audit, not a semantic checker result"
+}

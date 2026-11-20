@@ -365,3 +365,47 @@ eight-work source finding is still open; its five-producer/33-caller graph is
 unchanged as recorded in the new scope qualification. No E3 or other
 architectural approval follows from these proofs, signatures or tests. Preserve
 F2, B3d/B4, independent human specification review and release boundaries.
+
+
+The human explicitly approved E3 as written in
+`BROTLI_B3C_EMISSION_WRITE_METERING_DECISION.md` on 2026-11-20 ("E3 approved,
+please continue"). Extend reached byte-store receipts through exactly the five
+named existing producers using `(T, Ghost<nat>)`, normal result first, and only
+the qualified 33 direct caller sites to propagate/discard them. Add the private
+`B3C_EMISSION_WRITE_WORK: u64 = 24`, correct only the emission write debit,
+success effects and minimum-work/output-block thresholds from eight to 24,
+and prove the debit against reached counters/child receipts on every return.
+Preserve the uncompressed wrapper's existing >=8 entry requirement and all
+other original arguments/requirements/functional guarantees. Internal compiled
+return changes are approved only in that exact graph. Preserve public/W1 APIs,
+algorithms, ordinary error/guard order, workspace, 425-unit initialization,
+four-unit escrow, all other formulas, dependencies, F2 and proof trust.
+Other source-read/caller costs and B3c/B3d/B4 remain separate; another boundary,
+representation, unit classification or policy choice returns to the human.
+
+
+The approved E3 write-only checkpoint is recorded in
+`BROTLI_B3C_E3_CHECKPOINT.md` and `evidence/brotli-b3c-e3.json`.
+Exactly five producers carry reached byte-store `(T, Ghost<nat>)` receipts;
+ordinary results stay on component zero and the qualified 33 caller sites are
+adapted. Raw stores count 1/4/8 on success and zero on address errors; shared
+and uncompressed emission count 24 on success and zero on error. Counts are
+constructed only from reached primitive increments and child receipts. The
+write debit/minimum is the approved private constant 24 and is bound to the
+returned count, with checked source-local receipt/prepayment assertions.
+The uncompressed wrapper's original >=8 entry requirement remains unchanged.
+The exact-source gate passed 1398 whole-crate checks with zero errors,
+118 runtime tests and 56 strict semantic rejections across four complete
+suites. Static origin/ordering guards and earlier failed/interrupted results
+are separate; no tool/resource/syntax failure is a rejection. Native checker
+effort is matched on positive/negative copies; production allowances remain.
+Arguments, old functional requirements/guarantees, ordinary algorithms and
+error/guard order remain, except for approved work effects and internal return
+types. Public/W1 interfaces, workspace, 425 reset/init, four escrow, other
+formulas, dependencies, F2 and mathematical visibility remain unchanged.
+The earlier eight-unit mismatch is corrected only for this write component.
+Read prepayment, additional caller writes/transitions, remaining body/B2/stream
+composition, B3d/B4, native disagreements, independent human specification
+review and supported-decoder/release gates remain open. Another architectural,
+API/boundary, representation or unit-policy decision requires direct human
+approval; E3 grants no authority outside its exact scope.

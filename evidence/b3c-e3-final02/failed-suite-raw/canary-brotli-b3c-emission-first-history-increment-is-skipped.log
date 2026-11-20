@@ -1,0 +1,27 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli, function lib::brotli::BrotliDecoder::emit_byte (selected functions)
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1408:20
+     |
+1408 |               assert(next_history as nat == if history < history_limit {
+     |  ____________________^
+1409 | |                 history as nat + 1
+1410 | |             } else { history as nat });
+     | |_____________________________________^ assertion failed
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1321:40
+     |
+1321 |                     .update(base + 24, t as u8)
+     |                                        ^
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1322:40
+     |
+1322 |                     .update(base + 25, (t >> 8) as u8)
+     |                                        ^^^^^^^^
+
+error: aborting due to 1 previous error
+

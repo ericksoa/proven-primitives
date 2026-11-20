@@ -1,0 +1,72 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "log": "runtime-library.log",
+    "log_sha256": "03263651cf244bca925298fc0c108563a1128a71e478142d1d3e3d5c5e1672eb",
+    "name": "runtime-library",
+    "passed": 107,
+    "seconds": 27.029408333008178,
+    "started_ns": 1795200499715695000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "primitives"
+    ],
+    "exit_code": 0,
+    "log": "runtime-primitives.log",
+    "log_sha256": "b033bd2df32ddbf643afd474d22bb077b908e19677e4e90af6d6df5940a27870",
+    "name": "runtime-primitives",
+    "passed": 9,
+    "seconds": 6.7572518329980085,
+    "started_ns": 1795200526761195000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "upstream_comparison"
+    ],
+    "exit_code": 0,
+    "log": "runtime-comparison.log",
+    "log_sha256": "c542b5506452ed6650282c6382ca8a937a8292feca4e82693069dd9e39964acb",
+    "name": "runtime-comparison",
+    "passed": 1,
+    "seconds": 1.0031642919930164,
+    "started_ns": 1795200533549103000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "project_source_contains_no_proof_trust_bypasses",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "log": "runtime-trust.log",
+    "log_sha256": "65f20481365fb55734ad1f4dceab7416142dd19ddebda7cba0fbca25a0810d00",
+    "name": "runtime-trust",
+    "passed": 1,
+    "seconds": 6.308204125001794,
+    "started_ns": 1795200534567990000
+  }
+]

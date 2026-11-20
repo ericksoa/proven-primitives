@@ -1,0 +1,12 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli, function lib::brotli::BrotliDecoder::emit_byte (selected functions)
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-e3-canaries-44097/src/brotli.rs:1472:24
+     |
+1472 | ...   proof { assert(e3_source_writes == 3); assert(crate::brotli_input::b3c_scalar_byte_at(self.workspace@, window_bytes, crate::...
+     |                      ^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

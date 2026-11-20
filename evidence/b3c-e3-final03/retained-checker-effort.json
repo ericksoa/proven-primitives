@@ -1,0 +1,7 @@
+{
+  "scope": "retained ten-case suite only",
+  "prior_limit": 60,
+  "matched_positive_negative_limit": 300,
+  "production_annotations_or_policy_changed": false,
+  "inserted_closure": "    let check = |function: &str| {\n        Command::new(&verus).arg(temporary.join(\"src/lib.rs\"))\n            .args([\"--crate-type\", \"lib\", \"--verify-only-module\", \"brotli\",\n                \"--verify-function\", function, \"--no-cheating\", \"--num-threads\", \"1\",\n                \"--triggers-mode\", \"silent\", \"--rlimit\", \"300\"])\n            .current_dir(&temporary).output().expect(\"run selected pinned Verus emission root\")\n    };\n"
+}

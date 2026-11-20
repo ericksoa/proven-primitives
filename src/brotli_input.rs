@@ -29252,7 +29252,7 @@ pub(crate) fn write_b3c_state_byte(
     window_bytes: u32,
     relative: u16,
     value: u8,
-) -> (r: Result<(), crate::brotli_prefix::WorkspaceError>)
+) -> (r: (Result<(), crate::brotli_prefix::WorkspaceError>, Ghost<nat>))
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
@@ -29268,7 +29268,7 @@ pub(crate) fn write_b3c_state_byte(
                 window_bytes,
                 B3C_STREAM_PHASE as int,
             ),
-        r.is_ok() ==> {
+        r.0.is_ok() ==> {
             &&& b3c_workspace_shape(final(workspace)@.len() as nat, window_bytes)
             &&& relative < B3C_SCALAR_BYTES
             &&& b3c_scalar_byte_at(final(workspace)@, window_bytes, relative as int) == value
@@ -29277,15 +29277,18 @@ pub(crate) fn write_b3c_state_byte(
                 ==> final(workspace)@[i] == old(workspace)@[i]
         },
         b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes)
-            && relative < B3C_SCALAR_BYTES ==> r.is_ok(),
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+            && relative < B3C_SCALAR_BYTES ==> r.0.is_ok(),
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.1@ == if r.0.is_ok() { 1nat } else { 0nat },
 {
+    let ghost mut e3_source_writes: nat = 0;
     let ghost original = workspace@;
     let at = match b3c_state_address(workspace.len(), window_bytes, relative, 1) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(e3_source_writes)),
     };
     workspace[at] = value;
+    proof { e3_source_writes = e3_source_writes + 1; }
     proof {
         assert(at as int >= b3c_scalar_base(window_bytes));
         assert forall|i: int| 0 <= i < b3c_scalar_base(window_bytes)
@@ -29298,7 +29301,7 @@ pub(crate) fn write_b3c_state_byte(
             );
         }
     }
-    Ok(())
+    (Ok(()), Ghost(e3_source_writes))
 }
 
 pub(crate) open spec fn b3c_scalar_u16_at(
@@ -29469,7 +29472,7 @@ pub(crate) fn write_b3c_state_u32(
     window_bytes: u32,
     relative: u16,
     value: u32,
-) -> (r: Result<(), crate::brotli_prefix::WorkspaceError>)
+) -> (r: (Result<(), crate::brotli_prefix::WorkspaceError>, Ghost<nat>))
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
@@ -29485,7 +29488,7 @@ pub(crate) fn write_b3c_state_u32(
                 window_bytes,
                 B3C_STREAM_PHASE as int,
             ),
-        r.is_ok() ==> {
+        r.0.is_ok() ==> {
             let at = b3c_scalar_base(window_bytes) + relative as int;
             &&& b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes)
             &&& relative as nat + 4 <= B3C_SCALAR_BYTES
@@ -29496,19 +29499,25 @@ pub(crate) fn write_b3c_state_u32(
                 .update(at + 3, (value / 16_777_216) as u8)
         },
         b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes)
-            && relative as nat + 4 <= B3C_SCALAR_BYTES ==> r.is_ok(),
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+            && relative as nat + 4 <= B3C_SCALAR_BYTES ==> r.0.is_ok(),
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.1@ == if r.0.is_ok() { 4nat } else { 0nat },
 {
+    let ghost mut e3_source_writes: nat = 0;
     let ghost original = workspace@;
     let at = match b3c_state_address(workspace.len(), window_bytes, relative, 4) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(e3_source_writes)),
     };
     proof { encode_b3c_u32_le(value); }
     workspace[at] = value as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 1] = (value >> 8) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 2] = (value >> 16) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 3] = (value >> 24) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     proof {
         assert(at as int >= b3c_scalar_base(window_bytes));
         assert forall|i: int| 0 <= i < b3c_scalar_base(window_bytes)
@@ -29521,7 +29530,7 @@ pub(crate) fn write_b3c_state_u32(
             );
         }
     }
-    Ok(())
+    (Ok(()), Ghost(e3_source_writes))
 }
 
 #[verifier::bit_vector]
@@ -29598,7 +29607,7 @@ pub(crate) fn write_b3c_state_u64(
     window_bytes: u32,
     relative: u16,
     value: u64,
-) -> (r: Result<(), crate::brotli_prefix::WorkspaceError>)
+) -> (r: (Result<(), crate::brotli_prefix::WorkspaceError>, Ghost<nat>))
     ensures
         final(workspace)@.len() == old(workspace)@.len(),
         compressed_decoder_state_ok(old(workspace)@, window_bytes)
@@ -29614,7 +29623,7 @@ pub(crate) fn write_b3c_state_u64(
                 window_bytes,
                 B3C_STREAM_PHASE as int,
             ),
-        r.is_ok() ==> {
+        r.0.is_ok() ==> {
             let at = b3c_scalar_base(window_bytes) + relative as int;
             &&& b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes)
             &&& relative as nat + 8 <= B3C_SCALAR_BYTES
@@ -29630,22 +29639,32 @@ pub(crate) fn write_b3c_state_u64(
                 && !(at <= i < at + 8) ==> final(workspace)@[i] == old(workspace)@[i]
         },
         b3c_workspace_shape(old(workspace)@.len() as nat, window_bytes)
-            && relative as nat + 8 <= B3C_SCALAR_BYTES ==> r.is_ok(),
-        r.is_err() ==> final(workspace)@ == old(workspace)@,
+            && relative as nat + 8 <= B3C_SCALAR_BYTES ==> r.0.is_ok(),
+        r.0.is_err() ==> final(workspace)@ == old(workspace)@,
+        r.1@ == if r.0.is_ok() { 8nat } else { 0nat },
 {
+    let ghost mut e3_source_writes: nat = 0;
     let ghost original = workspace@;
     let at = match b3c_state_address(workspace.len(), window_bytes, relative, 8) {
         Ok(value) => value,
-        Err(error) => return Err(error),
+        Err(error) => return (Err(error), Ghost(e3_source_writes)),
     };
     workspace[at] = value as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 1] = (value >> 8) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 2] = (value >> 16) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 3] = (value >> 24) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 4] = (value >> 32) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 5] = (value >> 40) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 6] = (value >> 48) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     workspace[at + 7] = (value >> 56) as u8;
+    proof { e3_source_writes = e3_source_writes + 1; }
     proof {
         assert(at as int >= b3c_scalar_base(window_bytes));
         assert forall|i: int| 0 <= i < b3c_scalar_base(window_bytes)
@@ -29658,7 +29677,7 @@ pub(crate) fn write_b3c_state_u64(
             );
         }
     }
-    Ok(())
+    (Ok(()), Ghost(e3_source_writes))
 }
 
 pub(crate) fn initialize_serialized_b3c(
@@ -29761,12 +29780,12 @@ fn store_meta_phase(
         }
         MetaBlockPhase::Failed(_) => return Err(core_state_failure()),
     };
-    if write_b3c_state_byte(workspace, window_bytes, B3C_META_PHASE, tag).is_err()
-        || write_b3c_state_byte(workspace, window_bytes, B3C_META_FLAGS, flags).is_err()
-        || write_b3c_state_byte(workspace, window_bytes, B3C_META_WIDTH, width).is_err()
-        || write_b3c_state_byte(workspace, window_bytes, B3C_META_INDEX, index).is_err()
-        || write_b3c_state_u32(workspace, window_bytes, B3C_META_VALUE, value).is_err()
-        || write_b3c_state_u32(workspace, window_bytes, B3C_META_REMAINING, remaining).is_err()
+    if write_b3c_state_byte(workspace, window_bytes, B3C_META_PHASE, tag).0.is_err()
+        || write_b3c_state_byte(workspace, window_bytes, B3C_META_FLAGS, flags).0.is_err()
+        || write_b3c_state_byte(workspace, window_bytes, B3C_META_WIDTH, width).0.is_err()
+        || write_b3c_state_byte(workspace, window_bytes, B3C_META_INDEX, index).0.is_err()
+        || write_b3c_state_u32(workspace, window_bytes, B3C_META_VALUE, value).0.is_err()
+        || write_b3c_state_u32(workspace, window_bytes, B3C_META_REMAINING, remaining).0.is_err()
     {
         return Err(core_state_failure());
     }
@@ -29990,8 +30009,8 @@ pub(crate) fn advance_serialized_window_header(
         HeaderStatus::Complete { window_bits, .. } => {
             if write_b3c_state_byte(
                 workspace, window_bytes, B3C_STREAM_WINDOW_BITS, window_bits,
-            ).is_err()
-                || write_b3c_state_byte(workspace, window_bytes, B3C_STREAM_PHASE, 1).is_err()
+            ).0.is_err()
+                || write_b3c_state_byte(workspace, window_bytes, B3C_STREAM_PHASE, 1).0.is_err()
                 || store_meta_phase(workspace, window_bytes, MetaBlockPhase::Last).is_err()
             {
                 WindowStatus::Failed(core_state_failure())
@@ -40803,7 +40822,7 @@ pub(crate) fn build_serialized_dictionary_word(
         window_bytes,
         B3C_DICTIONARY_WORD_LENGTH,
         length,
-    ).is_err() {
+    ).0.is_err() {
         return Err(core_state_failure());
     }
     if write_b3c_state_byte(
@@ -40811,7 +40830,7 @@ pub(crate) fn build_serialized_dictionary_word(
         window_bytes,
         B3C_DICTIONARY_TRANSFORM,
         transform_index,
-    ).is_err() {
+    ).0.is_err() {
         return Err(core_state_failure());
     }
     if write_b3c_state_u32(
@@ -40819,7 +40838,7 @@ pub(crate) fn build_serialized_dictionary_word(
         window_bytes,
         B3C_DICTIONARY_WORD_INDEX,
         word_index,
-    ).is_err() {
+    ).0.is_err() {
         return Err(core_state_failure());
     }
     if write_b3c_state_byte(
@@ -40827,7 +40846,7 @@ pub(crate) fn build_serialized_dictionary_word(
         window_bytes,
         B3C_DICTIONARY_OUTPUT_LENGTH,
         transformed.len,
-    ).is_err() {
+    ).0.is_err() {
         return Err(core_state_failure());
     }
     if write_b3c_state_byte(
@@ -40835,7 +40854,7 @@ pub(crate) fn build_serialized_dictionary_word(
         window_bytes,
         B3C_DICTIONARY_OUTPUT_CURSOR,
         0,
-    ).is_err() {
+    ).0.is_err() {
         return Err(core_state_failure());
     }
     if write_b3c_state_byte(
@@ -40843,7 +40862,7 @@ pub(crate) fn build_serialized_dictionary_word(
         window_bytes,
         B3C_DICTIONARY_STAGING_INITIALIZED,
         transformed.len,
-    ).is_err() {
+    ).0.is_err() {
         return Err(core_state_failure());
     }
     Ok(transformed.len)

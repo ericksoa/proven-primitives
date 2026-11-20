@@ -1,0 +1,23 @@
+{
+  "all_call_sites": {
+    "emit_byte": 4,
+    "write_b3c_state_u64": 1,
+    "write_b3c_state_u32": 8,
+    "emit_uncompressed_byte": 1,
+    "write_b3c_state_byte": 19
+  },
+  "ordinary_result_projections": {
+    "emit_byte": 3,
+    "write_b3c_state_u64": 0,
+    "write_b3c_state_u32": 5,
+    "emit_uncompressed_byte": 1,
+    "write_b3c_state_byte": 17
+  },
+  "producers": [
+    "emit_byte",
+    "emit_uncompressed_byte",
+    "write_b3c_state_byte",
+    "write_b3c_state_u32",
+    "write_b3c_state_u64"
+  ]
+}

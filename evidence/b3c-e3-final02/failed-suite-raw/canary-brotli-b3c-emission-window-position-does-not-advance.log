@@ -1,0 +1,94 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli, function lib::brotli::BrotliDecoder::emit_byte (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1240:5
+     |
+1240 | /     fn emit_byte(
+1241 | |         &mut self,
+1242 | |         byte: u8,
+1243 | |         output: &mut [u8],
+1244 | |         produced: usize,
+1245 | |         consumes_input: bool,
+1246 | |     ) -> (r: (Result<(), StreamError>, Ghost<nat>))
+     | |__________________________________________________^
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1500:55
+     |
+1500 | ...rt(crate::brotli_input::b3c_scalar_byte_at(self.workspace@, window_bytes, crate::brotli_input::B3C_WINDOW_POSITION as int) == (next_position % 256) as u8); }
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1275:13
+     |
+1275 | /             r.0.is_ok() ==> {
+1276 | |                 let w = (1u32 << old(self).budget.limits.max_window_bits) as u32;
+1277 | |                 let base = crate::brotli_input::b3c_scalar_base(w);
+1278 | |                 let before = old(self).workspace@;
+...    |
+1332 | |                     .update(base + 15, (m / 16_777_216) as u8)
+1333 | |             },
+     | |_____________^ failed this postcondition
+...
+1342 | /     {
+1343 | |         let ghost mut e3_source_writes: nat = 0;
+1344 | |         let ghost initial_workspace = self.workspace@;
+1345 | |         if produced >= output.len() {
+...    |
+1543 | |         (Ok(()), Ghost(e3_source_writes))
+1544 | |     }
+     | |_____- at the end of the function body
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1240:5
+     |
+1240 | /     fn emit_byte(
+1241 | |         &mut self,
+1242 | |         byte: u8,
+1243 | |         output: &mut [u8],
+1244 | |         produced: usize,
+1245 | |         consumes_input: bool,
+1246 | |     ) -> (r: (Result<(), StreamError>, Ghost<nat>))
+     | |__________________________________________________^
+
+note: function body check finished in 3 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1240:5
+     |
+1240 | /     fn emit_byte(
+1241 | |         &mut self,
+1242 | |         byte: u8,
+1243 | |         output: &mut [u8],
+1244 | |         produced: usize,
+1245 | |         consumes_input: bool,
+1246 | |     ) -> (r: (Result<(), StreamError>, Ghost<nat>))
+     | |__________________________________________________^
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1321:40
+     |
+1321 |                     .update(base + 24, t as u8)
+     |                                        ^
+
+note: function body check finished in 7 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1240:5
+     |
+1240 | /     fn emit_byte(
+1241 | |         &mut self,
+1242 | |         byte: u8,
+1243 | |         output: &mut [u8],
+1244 | |         produced: usize,
+1245 | |         consumes_input: bool,
+1246 | |     ) -> (r: (Result<(), StreamError>, Ghost<nat>))
+     | |__________________________________________________^
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-43675/src/brotli.rs:1323:40
+     |
+1323 |                     .update(base + 26, (t >> 16) as u8)
+     |                                        ^^^^^^^^^
+
+error: aborting due to 2 previous errors
+

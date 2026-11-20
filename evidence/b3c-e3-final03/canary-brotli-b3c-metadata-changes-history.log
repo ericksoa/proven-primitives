@@ -1,0 +1,34 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli.rs:1105:5
+     |
+1105 |     fn consume_metadata_byte(&mut self, remaining: u32) -> (r: Result<(), StreamError>)
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check finished in 5 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli.rs:1105:5
+     |
+1105 |     fn consume_metadata_byte(&mut self, remaining: u32) -> (r: Result<(), StreamError>)
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli.rs:1126:13
+     |
+1126 | /             r.is_ok() ==> {
+1127 | |                 let window_bytes =
+1128 | |                     (1u32 << old(self).budget.limits.max_window_bits) as u32;
+1129 | |                 let at = crate::brotli_input::b3c_scalar_base(window_bytes)
+...    |
+1136 | |                     .update(at + 3, (value / 16_777_216) as u8)
+1137 | |             },
+     | |_____________^ failed this postcondition
+...
+1147 |           result
+     |           ------ at the end of the function body
+
+error: aborting due to 1 previous error
+

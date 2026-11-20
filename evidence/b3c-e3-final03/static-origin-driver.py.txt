@@ -1,0 +1,25 @@
+from pathlib import Path
+import re,json,hashlib
+R=Path.cwd();s=(R/'src/brotli.rs').read_text();a=s.index('    fn emit_byte(');b=s.index('    fn emit_uncompressed_byte(',a);body=s[a:b].split('\n    {\n',1)[1]
+def origin(text):
+ assert text.count('let ghost mut e3_source_writes: nat = 0;')==1
+ for m in re.finditer(r'\be3_source_writes\s*=(?!=)\s*([^;]+);',text):assert m[1].strip() in ['e3_source_writes + 1','e3_source_writes + e3_child_writes']
+ assert not re.search(r'Ghost\((?:24|B3C_EMISSION_WRITE_WORK|.*budget\.)',text)
+ for store in ['output[produced] = byte;','self.workspace[position as usize] = byte;']:
+  assert text.count(store+'\n        proof { e3_source_writes = e3_source_writes + 1; }')==1
+ debit='assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));';assert text.count(debit)==1
+ sites=[text.index('output[produced] = byte;'),text.index('self.workspace[position as usize] = byte;')]+[m.start() for m in re.finditer(r'crate::brotli_input::write_b3c_state_(?:byte|u32|u64)\s*\(',text)]
+ assert len(sites)==8 and all(i>text.index(debit) for i in sites)
+origin(body)
+debit='        assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));\n'
+late=body.replace(debit,'',1).replace('        output[produced] = byte;','        output[produced] = byte;\n'+debit.rstrip(),1)
+formula=body.replace('Ghost(e3_source_writes)','Ghost(B3C_EMISSION_WRITE_WORK as nat)')
+missing=body.replace('output[produced] = byte;\n        proof { e3_source_writes = e3_source_writes + 1; }','output[produced] = byte;',1)
+rows=[]
+for name,bad in [('debit-after-first-store',late),('receipt-substituted-from-charge-formula',formula),('unattached-output-store-counter',missing)]:
+ rejected=False
+ try:origin(bad)
+ except AssertionError:rejected=True
+ assert rejected,name
+ rows.append({'name':name,'static_guard_rejected':True,'counts_as_verifier_semantic_rejection':False,'mutated_body_sha256':hashlib.sha256(bad.encode()).hexdigest()})
+(R/'target/b3c-e3/static-origin-guards.json').write_text(json.dumps({'positive_static_origin_passed':True,'guards':rows,'scope':'Static source binding/ordering guards only; not additional checker proofs or semantic defect counts'},indent=2)+'\n');print(json.dumps({'positive':True,'static_guard_rejections':len(rows),'verifier_case_count':0}))

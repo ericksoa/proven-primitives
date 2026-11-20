@@ -1,0 +1,10 @@
+{
+  "reason": "Required retained emission suite has a semantic failure followed by advisory-recommendation resource exhaustion. Stop only the long regression while checking matched post-failure diagnostic suppression; keep new E3 receipt controls running.",
+  "pid": 43680,
+  "children": [
+    45255,
+    45285
+  ],
+  "recorded_ns": 1795201308301393000,
+  "counts_as_complete_gate": false
+}

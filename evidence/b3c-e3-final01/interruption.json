@@ -1,0 +1,10 @@
+{
+  "reason": "Required retained-ten suite failed with a mixed semantic/resource result at its 60 allowance. Stop only the long legacy regression; let the new E3 receipt suite complete diagnostic coverage. A matched 300 allowance will be checked before rerunning.",
+  "pid": 40634,
+  "children": [
+    41678
+  ],
+  "recorded_ns": 1795200141064029000,
+  "whole_runtime_positive_passed": true,
+  "counts_as_complete_gate": false
+}

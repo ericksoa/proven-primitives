@@ -1,0 +1,66 @@
+from pathlib import Path
+import json,hashlib,subprocess,os,shutil,tarfile,io,re,importlib.util
+R=Path.cwd();O=R/'evidence/b3c-e3-final03';T=R/'target/b3c-e3'
+spec=importlib.util.spec_from_file_location('h',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def dump(p,v):Path(p).write_text(json.dumps(v,indent=2,sort_keys=True)+'\n')
+def bind(p):return {'path':str(Path(p).relative_to(R)),'sha256':h(p)}
+c=json.loads((O/'complete.json').read_text());v=c['verification'];controls=json.loads((O/'controls.json').read_text());assert v['success'] and v['errors']==0 and v['is-verifying-entire-crate'];assert len(controls)==c['semantic_rejections']==56
+for n,d in c['source_sha256'].items():assert h(R/n)==d,n
+for row in controls:assert row['semantic_rejection'] and not row['tool_or_resource_failure'] and not row['syntax_or_type_failure']
+assert not (O/'gate-artifact-sha256.json').exists();shutil.copyfile(O/'artifact-sha256.json',O/'gate-artifact-sha256.json')
+subprocess.run(['/opt/homebrew/bin/python3',str(T/'audit-preservation.py')],cwd=R,env=os.environ,check=True)
+shutil.copyfile(T/'preservation-audit.json',O/'preservation-audit.json')
+subprocess.run(['/opt/homebrew/bin/python3',str(T/'check-static-origin-guards.py')],cwd=R,env=os.environ,check=True)
+for src,dst in [('audit-harness.py','audit-harness.py.txt'),('harness-preservation.json','harness-preservation.json'),('audit-preservation.py','audit-preservation.py.txt'),('check-static-origin-guards.py','static-origin-driver.py.txt'),('static-origin-guards.json','static-origin-guards.json'),('REPRODUCE.md','REPRODUCE.md'),('baseline.json','baseline.json'),('transformation.json','transformation.json'),('legacy-control-adaptations.json','legacy-control-adaptations.json'),('retained-checker-effort.json','retained-checker-effort.json'),('local-proof-bindings.json','local-proof-bindings.json'),('advisory-harness-update.json','advisory-harness-update.json'),('selector-audit.json','selector-audit.json'),('implement.py','implementation-transform.py.txt'),('validate-evidence.py','validate-evidence.py.txt'),('update-legacy-controls.py','legacy-adaptation-driver.py.txt'),('add-controls.py','new-control-generator.py.txt')]:shutil.copyfile(T/src,O/dst)
+with tarfile.open(O/'baseline-source.tar.gz','w:gz') as archive:
+ for p in sorted((T/'baseline').rglob('*')):
+  if p.is_file():
+   data=p.read_bytes();info=tarfile.TarInfo(str(p.relative_to(T)));info.size=len(data);info.mode=0o644;archive.addfile(info,io.BytesIO(data))
+# Supplementary early selected/provisional/failed results remain raw diagnostics.
+files=[]
+for p in sorted(T.rglob('*')):
+ if not p.is_file() or p.is_relative_to(T/'baseline') or p.name in ['seal-evidence.py','checkpoint-template.md']:continue
+ if p.suffix in ['.log','.json','.txt','.py','.rs']:files.append(p)
+manifest={'schema':'e3-provisional-diagnostics-v1','scope':'Earlier raw selected checks, source/controller transformations and preflight fault results; actual failures/resources retained and not added to final whole/runtime/control totals','files_sha256':{str(p.relative_to(T)):h(p) for p in files}}
+dump(O/'diagnostic-manifest.json',manifest)
+with tarfile.open(O/'diagnostics.tar.gz','w:gz') as archive:
+ for p in files:
+  data=p.read_bytes();info=tarfile.TarInfo(str(p.relative_to(T)));info.size=len(data);info.mode=0o644;archive.addfile(info,io.BytesIO(data))
+history=[{'tag':'b3c-e3-final'+tag,'status':bind(R/('evidence/b3c-e3-final'+tag+'/retained-attempt.json')),'artifact_manifest':bind(R/('evidence/b3c-e3-final'+tag+'/artifact-sha256.json')),'counts_as_complete_gate':False} for tag in ['01','02']];dump(O/'historical-attempts.json',history)
+checkpoint=R/'BROTLI_B3C_E3_CHECKPOINT.md';text=(T/'checkpoint-template.md').read_text()
+for key,value in [('@TAG@',O.name),('@VERIFIED@',v['verified']),('@RUNTIME@',c['runtime_passed']),('@CASES@',len(controls))]:text=text.replace(key,str(value))
+assert not re.search(r'@[A-Z]+@',text);checkpoint.write_text(text)
+decision=R/'BROTLI_B3C_EMISSION_WRITE_METERING_DECISION.md';text=decision.read_text().replace('Status: **the human explicitly approved E3 on 2026-11-20; implementation and verification in progress**.','Status: **the human explicitly approved E3 on 2026-11-20; the named E3 write-only checkpoint is implemented and checked**.',1);text+='\n\n## Checked E3 implementation\n\nThe named write-only source-receipt and 24-unit billing result is recorded in\n`BROTLI_B3C_E3_CHECKPOINT.md` and `evidence/brotli-b3c-e3.json`. Earlier pending\nstatements and the static eight-unit mismatch are historical; their actual\nevidence remains. Source reads, further caller actions and full B3c/release\nobligations remain separate. No additional architectural authority follows.\n';decision.write_text(text)
+agents=R/'AGENTS.md';text=agents.read_text();assert 'BROTLI_B3C_E3_CHECKPOINT.md' not in text;text+='''
+
+The approved E3 write-only checkpoint is recorded in
+`BROTLI_B3C_E3_CHECKPOINT.md` and `evidence/brotli-b3c-e3.json`.
+Exactly five producers carry reached byte-store `(T, Ghost<nat>)` receipts;
+ordinary results stay on component zero and the qualified 33 caller sites are
+adapted. Raw stores count 1/4/8 on success and zero on address errors; shared
+and uncompressed emission count 24 on success and zero on error. Counts are
+constructed only from reached primitive increments and child receipts. The
+write debit/minimum is the approved private constant 24 and is bound to the
+returned count, with checked source-local receipt/prepayment assertions.
+The uncompressed wrapper's original >=8 entry requirement remains unchanged.
+The exact-source gate passed @VERIFIED@ whole-crate checks with zero errors,
+@RUNTIME@ runtime tests and 56 strict semantic rejections across four complete
+suites. Static origin/ordering guards and earlier failed/interrupted results
+are separate; no tool/resource/syntax failure is a rejection. Native checker
+effort is matched on positive/negative copies; production allowances remain.
+Arguments, old functional requirements/guarantees, ordinary algorithms and
+error/guard order remain, except for approved work effects and internal return
+types. Public/W1 interfaces, workspace, 425 reset/init, four escrow, other
+formulas, dependencies, F2 and mathematical visibility remain unchanged.
+The earlier eight-unit mismatch is corrected only for this write component.
+Read prepayment, additional caller writes/transitions, remaining body/B2/stream
+composition, B3d/B4, native disagreements, independent human specification
+review and supported-decoder/release gates remain open. Another architectural,
+API/boundary, representation or unit-policy decision requires direct human
+approval; E3 grants no authority outside its exact scope.
+'''.replace('@VERIFIED@',str(v['verified'])).replace('@RUNTIME@',str(c['runtime_passed']));agents.write_text(text)
+shutil.copyfile(__file__,O/'seal-evidence.py.txt')
+dump(O/'artifact-sha256.json',{str(p.relative_to(O)):h(p) for p in sorted(O.rglob('*')) if p.is_file() and p.name!='artifact-sha256.json'})
+dump(R/'evidence/brotli-b3c-e3.json',{'schema':'brotli-e3-write-receipt-checkpoint-v1','status':'complete-named-E3-write-only-receipts-and-billing','complete_B3c':False,'complete_body_resource_ledger':False,'approval':{'human_answer':'E3 approved, please continue','date':'2026-11-20','decision':bind(decision),'scope':'Five named producers, qualified 33 caller sites, private 24-unit write component only'},'baseline':json.loads((T/'baseline.json').read_text()),'gate':{'tag':O.name,'complete':bind(O/'complete.json'),'verification':v,'runtime_passed':c['runtime_passed'],'strict_semantic_rejections':len(controls),'suites':c['suites'],'source_start':bind(O/'source-start.json'),'source_archive':bind(O/'frozen-source.tar.gz'),'controls':bind(O/'controls.json'),'inventory':bind(O/'required-controls.json'),'original_artifact_map':bind(O/'gate-artifact-sha256.json'),'package_artifact_map':bind(O/'artifact-sha256.json'),'source_unchanged':True,'whole_positive_precedes_controls':True},'properties':['Reached 1/4/8 source-store receipts and zero-error receipts in three raw writers','Shared/wrapper success receipt 24 and error receipt zero from reached increments/children','Success debit equals receipt; original functional images, frames and non-work credit effects retained','Write prepayment before first store and 24/23 empty-output priority','Original >=8 wrapper admitted domain retained; 8..23 errors preserve complete state'],'preservation_and_source_origin_audit':bind(O/'preservation-audit.json'),'harness_preservation_audit':bind(O/'harness-preservation.json'),'static_guards':{'result':bind(O/'static-origin-guards.json'),'counts_as_semantic_rejections':False},'prior_attempts':history,'diagnostics':{'manifest':bind(O/'diagnostic-manifest.json'),'archive':bind(O/'diagnostics.tar.gz'),'counts_as_final_gate_cases':False},'checkpoint':bind(checkpoint),'scope_ledger':bind(agents),'reproduce':bind(O/'REPRODUCE.md'),'unchanged':['Public/W1 APIs and original arguments/requirements','All prior functional guarantees','Workspace/dependencies/visibility/trust','425 reset/init, four escrow and all other formulas','F2 fixture policy and strict tree coverage'],'remaining':['Input/window/dictionary source-read prepayment','Other caller writes/transitions and full body/B2/stream composition','B3d/B4, F2 monkey/native disagreement and other reference dispositions','Independent human specification review and supported-decoder/release gates'],'trusted_components':['Specifications, source-unit interpretation and counter placement','Pinned Verus/Z3/vstd and Rust/LLVM','Apple build tools and operating environment'],'not_proved':['Complete source-to-binary or side-channel correctness','Service availability for arbitrary external calls','A complete or supported Brotli decoder']})
+print(json.dumps({'verified':v['verified'],'errors':v['errors'],'runtime_passed':c['runtime_passed'],'strict_rejections':len(controls),'E3_complete':True},indent=2))

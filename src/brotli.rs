@@ -9,6 +9,7 @@ use vstd::prelude::*;
 verus! {
 
 pub const B3C_INITIALIZATION_WORK: u64 = 425;
+const B3C_EMISSION_WRITE_WORK: u64 = 24;
 
 #[verifier::bit_vector]
 proof fn approved_window_bytes(bits: u8)
@@ -104,11 +105,11 @@ fn output_block_reason(
     has_output_slot: bool,
 ) -> (r: u8)
     ensures
-        output_remaining == 0 || work_remaining < 8 ==> r == 1,
-        output_remaining > 0 && work_remaining >= 8 && !has_output_slot ==> r == 2,
-        output_remaining > 0 && work_remaining >= 8 && has_output_slot ==> r == 0,
+        output_remaining == 0 || work_remaining < B3C_EMISSION_WRITE_WORK ==> r == 1,
+        output_remaining > 0 && work_remaining >= B3C_EMISSION_WRITE_WORK && !has_output_slot ==> r == 2,
+        output_remaining > 0 && work_remaining >= B3C_EMISSION_WRITE_WORK && has_output_slot ==> r == 0,
 {
-    if output_remaining == 0 || work_remaining < 8 {
+    if output_remaining == 0 || work_remaining < B3C_EMISSION_WRITE_WORK {
         1
     } else if !has_output_slot {
         2
@@ -673,7 +674,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             window_bytes,
             crate::brotli_input::B3C_STREAM_PHASE,
             phase,
-        );
+        ).0;
         match result {
             Ok(()) => {
                 proof {
@@ -755,19 +756,19 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             window_bytes,
             crate::brotli_input::B3C_TERMINAL_FAMILY,
             family,
-        );
+        ).0;
         let detail_result = crate::brotli_input::write_b3c_state_byte(
             self.workspace,
             window_bytes,
             crate::brotli_input::B3C_TERMINAL_DETAIL,
             detail,
-        );
+        ).0;
         let phase_result = crate::brotli_input::write_b3c_state_byte(
             self.workspace,
             window_bytes,
             crate::brotli_input::B3C_STREAM_PHASE,
             9,
-        );
+        ).0;
         let stored = family_result.is_ok() && detail_result.is_ok() && phase_result.is_ok();
         proof {
             reveal(BrotliDecoder::invariant);
@@ -905,7 +906,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             window_bytes,
             relative,
             value,
-        );
+        ).0;
         match result {
             Ok(()) => {
                 proof {
@@ -976,7 +977,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             self.window_bytes(),
             relative,
             value,
-        )
+        ).0
         .map_err(|_| StreamError::InvalidFormat)
     }
 
@@ -1142,7 +1143,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             self.window_bytes(),
             crate::brotli_input::B3C_META_REMAINING,
             remaining - 1,
-        ).map_err(|_| StreamError::InvalidFormat);
+        ).0.map_err(|_| StreamError::InvalidFormat);
         result
     }
 
@@ -1182,7 +1183,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
                 window_bytes,
                 crate::brotli_input::B3C_EOF_COMMITTED,
                 1,
-            );
+            ).0;
         }
     }
 
@@ -1242,7 +1243,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
         output: &mut [u8],
         produced: usize,
         consumes_input: bool,
-    ) -> (r: Result<(), StreamError>)
+    ) -> (r: (Result<(), StreamError>, Ghost<nat>))
         requires
             old(self).invariant(),
             produced < old(output)@.len(),
@@ -1255,9 +1256,9 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             final(self).invariant(),
             final(self).budget.limits == old(self).budget.limits,
             final(self).budget.work_remaining <= old(self).budget.work_remaining,
-            r.is_ok() ==> {
+            r.0.is_ok() ==> {
                 &&& final(self).budget.work_remaining
-                    == old(self).budget.work_remaining - 8
+                    == old(self).budget.work_remaining - B3C_EMISSION_WRITE_WORK
                 &&& final(self).budget.output_remaining
                     == old(self).budget.output_remaining - 1
                 &&& final(self).budget.input_remaining
@@ -1267,11 +1268,11 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             final(self).budget.calls_remaining == old(self).budget.calls_remaining,
             final(self).budget.initializations_remaining
                 == old(self).budget.initializations_remaining,
-            r.is_err() ==> {
+            r.0.is_err() ==> {
                 &&& *final(self).budget == *old(self).budget
                 &&& final(self).workspace@ == old(self).workspace@
             },
-            r.is_ok() ==> {
+            r.0.is_ok() ==> {
                 let w = (1u32 << old(self).budget.limits.max_window_bits) as u32;
                 let base = crate::brotli_input::b3c_scalar_base(w);
                 let before = old(self).workspace@;
@@ -1331,68 +1332,105 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
                     .update(base + 15, (m / 16_777_216) as u8)
             },
             final(output)@.len() == old(output)@.len(),
-            r.is_ok() ==> final(output)@[produced as int] == byte,
-            r.is_err() ==> final(output)@ == old(output)@,
+            r.0.is_ok() ==> final(output)@[produced as int] == byte,
+            r.0.is_err() ==> final(output)@ == old(output)@,
             forall|i: int| 0 <= i < old(output)@.len() && i != produced ==>
                 final(output)@[i] == old(output)@[i],
+            r.1@ == if r.0.is_ok() { 24nat } else { 0nat },
+            r.0.is_ok() ==> final(self).budget.work_remaining as nat + r.1@
+                == old(self).budget.work_remaining as nat,
     {
+        let ghost mut e3_source_writes: nat = 0;
         let ghost initial_workspace = self.workspace@;
         if produced >= output.len() {
-            return Err(StreamError::InvalidFormat);
+            return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes));
         }
         if (consumes_input && self.budget.input_remaining == 0)
             || self.budget.output_remaining == 0
-            || self.budget.work_remaining < 8
+            || self.budget.work_remaining < B3C_EMISSION_WRITE_WORK
         {
-            return Err(StreamError::ResourceLimit);
+            return (Err(StreamError::ResourceLimit), Ghost(e3_source_writes));
         }
         let window_bytes = self.window_bytes();
-        let position = crate::brotli_input::read_b3c_state_u32(
+        let position = match crate::brotli_input::read_b3c_state_u32(
             self.workspace,
             window_bytes,
             crate::brotli_input::B3C_WINDOW_POSITION,
         )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        let history = crate::brotli_input::read_b3c_state_u32(
+        .map_err(|_| StreamError::InvalidFormat) {
+            Ok(value) => value,
+            Err(error) => return (Err(error), Ghost(e3_source_writes)),
+        };
+        let history = match crate::brotli_input::read_b3c_state_u32(
             self.workspace,
             window_bytes,
             crate::brotli_input::B3C_HISTORY_LENGTH,
         )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        let total = crate::brotli_input::read_b3c_state_u64(
+        .map_err(|_| StreamError::InvalidFormat) {
+            Ok(value) => value,
+            Err(error) => return (Err(error), Ghost(e3_source_writes)),
+        };
+        let total = match crate::brotli_input::read_b3c_state_u64(
             self.workspace,
             window_bytes,
             crate::brotli_input::B3C_TOTAL_PRODUCED,
         )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        let remaining = crate::brotli_input::read_b3c_state_u32(
+        .map_err(|_| StreamError::InvalidFormat) {
+            Ok(value) => value,
+            Err(error) => return (Err(error), Ghost(e3_source_writes)),
+        };
+        let remaining = match crate::brotli_input::read_b3c_state_u32(
             self.workspace,
             window_bytes,
             crate::brotli_input::B3C_META_REMAINING,
         )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        let stream_bits = crate::brotli_input::read_b3c_state_byte(
+        .map_err(|_| StreamError::InvalidFormat) {
+            Ok(value) => value,
+            Err(error) => return (Err(error), Ghost(e3_source_writes)),
+        };
+        let stream_bits = match crate::brotli_input::read_b3c_state_byte(
             self.workspace,
             window_bytes,
             crate::brotli_input::B3C_STREAM_WINDOW_BITS,
         )
-        .map_err(|_| StreamError::InvalidFormat)?;
+        .map_err(|_| StreamError::InvalidFormat) {
+            Ok(value) => value,
+            Err(error) => return (Err(error), Ghost(e3_source_writes)),
+        };
         if position >= window_bytes || remaining == 0 || !(10..=24).contains(&stream_bits) {
-            return Err(StreamError::InvalidFormat);
+            return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes));
         }
         proof { approved_window_bytes(stream_bits); }
         let history_limit = (1u32 << stream_bits) - 16;
         let next_position = if position + 1 == window_bytes { 0 } else { position + 1 };
         let next_history = if history < history_limit { history + 1 } else { history };
-        let next_total = total.checked_add(1).ok_or(StreamError::ResourceLimit)?;
+        proof {
+            assert(next_history as nat == if history < history_limit {
+                history as nat + 1
+            } else { history as nat });
+        }
+        let next_total = match total.checked_add(1).ok_or(StreamError::ResourceLimit) {
+            Ok(value) => value,
+            Err(error) => return (Err(error), Ghost(e3_source_writes)),
+        };
 
+        proof { assert(next_total as nat == total as nat + 1); }
         if consumes_input {
             assert!(self.budget.charge_input(1));
         }
         assert!(self.budget.charge_output(1));
-        assert!(self.budget.charge_work(8));
+        assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));
+        proof {
+            assert(e3_source_writes == 0);
+            assert(self.budget.work_remaining as nat + B3C_EMISSION_WRITE_WORK as nat
+                == old(self).budget.work_remaining as nat);
+        }
         output[produced] = byte;
+        proof { e3_source_writes = e3_source_writes + 1; }
+        proof { assert(e3_source_writes == 1); assert(output@[produced as int] == byte); }
         self.workspace[position as usize] = byte;
+        proof { e3_source_writes = e3_source_writes + 1; }
+        proof { assert(e3_source_writes == 2); assert(self.workspace@[position as int] == byte); }
         proof {
             reveal(BrotliDecoder::invariant);
             assert((position as int) < (window_bytes as int));
@@ -1409,55 +1447,100 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             ));
             assert(self.invariant());
         }
-        let previous = crate::brotli_input::read_b3c_state_byte(
+        let previous = match crate::brotli_input::read_b3c_state_byte(
             self.workspace,
             window_bytes,
             crate::brotli_input::B3C_PREVIOUS_BYTE,
         )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        crate::brotli_input::write_b3c_state_byte(
-            self.workspace,
-            window_bytes,
-            crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE,
-            previous,
-        )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        crate::brotli_input::write_b3c_state_byte(
-            self.workspace,
-            window_bytes,
-            crate::brotli_input::B3C_PREVIOUS_BYTE,
-            byte,
-        )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        crate::brotli_input::write_b3c_state_u32(
-            self.workspace,
-            window_bytes,
-            crate::brotli_input::B3C_WINDOW_POSITION,
-            next_position,
-        )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        crate::brotli_input::write_b3c_state_u32(
-            self.workspace,
-            window_bytes,
-            crate::brotli_input::B3C_HISTORY_LENGTH,
-            next_history,
-        )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        crate::brotli_input::write_b3c_state_u64(
-            self.workspace,
-            window_bytes,
-            crate::brotli_input::B3C_TOTAL_PRODUCED,
-            next_total,
-        )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        crate::brotli_input::write_b3c_state_u32(
-            self.workspace,
-            window_bytes,
-            crate::brotli_input::B3C_META_REMAINING,
-            remaining - 1,
-        )
-        .map_err(|_| StreamError::InvalidFormat)?;
-        Ok(())
+        .map_err(|_| StreamError::InvalidFormat) {
+            Ok(value) => value,
+            Err(error) => return (Err(error), Ghost(e3_source_writes)),
+        };
+        {
+            let (e3_result, Ghost(e3_child_writes)) = crate::brotli_input::write_b3c_state_byte(
+                self.workspace,
+                window_bytes,
+                crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE,
+                previous,
+            );
+            proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+            match e3_result {
+                Ok(()) => (),
+                Err(_) => return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes)),
+            }
+        }
+        proof { assert(e3_source_writes == 3); assert(crate::brotli_input::b3c_scalar_byte_at(self.workspace@, window_bytes, crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE as int) == previous); }
+        {
+            let (e3_result, Ghost(e3_child_writes)) = crate::brotli_input::write_b3c_state_byte(
+                self.workspace,
+                window_bytes,
+                crate::brotli_input::B3C_PREVIOUS_BYTE,
+                byte,
+            );
+            proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+            match e3_result {
+                Ok(()) => (),
+                Err(_) => return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes)),
+            }
+        }
+        proof { assert(e3_source_writes == 4); assert(crate::brotli_input::b3c_scalar_byte_at(self.workspace@, window_bytes, crate::brotli_input::B3C_PREVIOUS_BYTE as int) == byte); }
+        {
+            let (e3_result, Ghost(e3_child_writes)) = crate::brotli_input::write_b3c_state_u32(
+                self.workspace,
+                window_bytes,
+                crate::brotli_input::B3C_WINDOW_POSITION,
+                next_position,
+            );
+            proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+            match e3_result {
+                Ok(()) => (),
+                Err(_) => return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes)),
+            }
+        }
+        proof { assert(e3_source_writes == 8); assert(crate::brotli_input::b3c_scalar_byte_at(self.workspace@, window_bytes, crate::brotli_input::B3C_WINDOW_POSITION as int) == (next_position % 256) as u8); }
+        {
+            let (e3_result, Ghost(e3_child_writes)) = crate::brotli_input::write_b3c_state_u32(
+                self.workspace,
+                window_bytes,
+                crate::brotli_input::B3C_HISTORY_LENGTH,
+                next_history,
+            );
+            proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+            match e3_result {
+                Ok(()) => (),
+                Err(_) => return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes)),
+            }
+        }
+        proof { assert(e3_source_writes == 12);  }
+        {
+            let (e3_result, Ghost(e3_child_writes)) = crate::brotli_input::write_b3c_state_u64(
+                self.workspace,
+                window_bytes,
+                crate::brotli_input::B3C_TOTAL_PRODUCED,
+                next_total,
+            );
+            proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+            match e3_result {
+                Ok(()) => (),
+                Err(_) => return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes)),
+            }
+        }
+        proof { assert(e3_source_writes == 20);  }
+        {
+            let (e3_result, Ghost(e3_child_writes)) = crate::brotli_input::write_b3c_state_u32(
+                self.workspace,
+                window_bytes,
+                crate::brotli_input::B3C_META_REMAINING,
+                remaining - 1,
+            );
+            proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+            match e3_result {
+                Ok(()) => (),
+                Err(_) => return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes)),
+            }
+        }
+        proof { assert(e3_source_writes == 24); assert(crate::brotli_input::b3c_scalar_byte_at(self.workspace@, window_bytes, crate::brotli_input::B3C_META_REMAINING as int) == ((remaining - 1) % 256) as u8); }
+        (Ok(()), Ghost(e3_source_writes))
     }
 
     fn emit_uncompressed_byte(
@@ -1465,7 +1548,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
         byte: u8,
         output: &mut [u8],
         produced: usize,
-    ) -> (r: Result<(), StreamError>)
+    ) -> (r: (Result<(), StreamError>, Ghost<nat>))
         requires
             old(self).invariant(),
             produced < old(output)@.len(),
@@ -1481,22 +1564,22 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             final(self).invariant(),
             final(self).budget.limits == old(self).budget.limits,
             final(self).budget.work_remaining <= old(self).budget.work_remaining,
-            r.is_ok() ==> {
+            r.0.is_ok() ==> {
                 &&& final(self).budget.input_remaining
                     == old(self).budget.input_remaining - 1
                 &&& final(self).budget.output_remaining
                     == old(self).budget.output_remaining - 1
                 &&& final(self).budget.work_remaining
-                    == old(self).budget.work_remaining - 8
+                    == old(self).budget.work_remaining - B3C_EMISSION_WRITE_WORK
             },
             final(self).budget.calls_remaining == old(self).budget.calls_remaining,
             final(self).budget.initializations_remaining
                 == old(self).budget.initializations_remaining,
-            r.is_err() ==> {
+            r.0.is_err() ==> {
                 &&& *final(self).budget == *old(self).budget
                 &&& final(self).workspace@ == old(self).workspace@
             },
-            r.is_ok() ==> {
+            r.0.is_ok() ==> {
                 let w = (1u32 << old(self).budget.limits.max_window_bits) as u32;
                 let base = crate::brotli_input::b3c_scalar_base(w);
                 let before = old(self).workspace@;
@@ -1556,12 +1639,18 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
                     .update(base + 15, (m / 16_777_216) as u8)
             },
             final(output)@.len() == old(output)@.len(),
-            r.is_ok() ==> final(output)@[produced as int] == byte,
-            r.is_err() ==> final(output)@ == old(output)@,
+            r.0.is_ok() ==> final(output)@[produced as int] == byte,
+            r.0.is_err() ==> final(output)@ == old(output)@,
             forall|i: int| 0 <= i < old(output)@.len() && i != produced ==>
                 final(output)@[i] == old(output)@[i],
+            r.1@ == if r.0.is_ok() { 24nat } else { 0nat },
+            r.0.is_ok() ==> final(self).budget.work_remaining as nat + r.1@
+                == old(self).budget.work_remaining as nat,
     {
-        self.emit_byte(byte, output, produced, true)
+        let ghost mut e3_source_writes: nat = 0;
+        let (result, Ghost(e3_child_writes)) = self.emit_byte(byte, output, produced, true);
+        proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+        (result, Ghost(e3_source_writes))
     }
 
 
@@ -2296,7 +2385,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
             );
         }
         if let Err(error) =
-            self.emit_byte(literal, output, produced, false)
+            self.emit_byte(literal, output, produced, false).0
         {
             return self.fail_transition(error, consumed, produced);
         }
@@ -3110,7 +3199,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
                     }
                     let source = overlap_source_position(position, distance, window_bytes);
                     let byte = self.workspace[source as usize];
-                    if let Err(error) = self.emit_byte(byte, output, produced, false) {
+                    if let Err(error) = self.emit_byte(byte, output, produced, false).0 {
                         return self.fail_transition(error, consumed, produced);
                     }
                     produced += 1;
@@ -3346,7 +3435,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
                         );
                     }
                     if let Err(error) =
-                        self.emit_byte(byte, output, produced, false)
+                        self.emit_byte(byte, output, produced, false).0
                     {
                         return self.fail_transition(error, consumed, produced);
                     }
@@ -3799,7 +3888,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
                         );
                     }
                     let byte = input[consumed];
-                    match self.emit_uncompressed_byte(byte, output, produced) {
+                    match self.emit_uncompressed_byte(byte, output, produced).0 {
                         Ok(()) => {
                             consumed += 1;
                             produced += 1;
@@ -4838,4 +4927,74 @@ mod tests {
             assert_eq!(retry_output, [0xcc]);
         }
     }
+    #[test]
+    fn e3_emission_exact_write_budget_and_one_short_preserve_state() {
+        for (work, consumes_input, wrapper) in [
+            (24, false, false), (24, true, false), (24, true, true),
+            (23, false, false), (23, true, false), (23, true, true),
+            (8, true, true), (0, false, false),
+        ] {
+            let mut budget = RequestBudget::new(limits()).unwrap();
+            let required = crate::brotli_prefix::required_workspace_bytes(10).unwrap() as usize;
+            let mut workspace = vec![0xa5; required];
+            let mut decoder = BrotliDecoder::new(&mut workspace, &mut budget).unwrap();
+            decoder.write_phase(4).unwrap();
+            decoder.set_state_byte(crate::brotli_input::B3C_STREAM_WINDOW_BITS, 10).unwrap();
+            decoder.set_state_byte(crate::brotli_input::B3C_PREVIOUS_BYTE, 0x44).unwrap();
+            decoder.set_state_u32(crate::brotli_input::B3C_META_REMAINING, 1).unwrap();
+            decoder.set_state_u32(crate::brotli_input::B3C_WINDOW_POSITION, 1023).unwrap();
+            let history = if consumes_input { 0 } else { 1008 };
+            decoder.set_state_u32(crate::brotli_input::B3C_HISTORY_LENGTH, history).unwrap();
+            decoder.budget.work_remaining = work;
+            let before_budget = *decoder.budget;
+            let before_workspace = decoder.workspace.to_vec();
+            let mut output = [0xcc];
+            let (result, _) = if wrapper {
+                decoder.emit_uncompressed_byte(0x5a, &mut output, 0)
+            } else {
+                decoder.emit_byte(0x5a, &mut output, 0, consumes_input)
+            };
+            if work == 24 {
+                assert_eq!(result, Ok(()));
+                assert_eq!(decoder.budget.work_remaining, 0);
+                assert_eq!(decoder.budget.output_remaining + 1, before_budget.output_remaining);
+                assert_eq!(decoder.budget.input_remaining + u64::from(consumes_input), before_budget.input_remaining);
+                assert_eq!(decoder.budget.calls_remaining, before_budget.calls_remaining);
+                assert_eq!(decoder.budget.initializations_remaining, before_budget.initializations_remaining);
+                assert_eq!(output, [0x5a]);
+                assert_eq!(decoder.workspace[1023], output[0]);
+                assert_eq!(decoder.state_u32(crate::brotli_input::B3C_WINDOW_POSITION), Ok(0));
+                assert_eq!(decoder.state_u32(crate::brotli_input::B3C_HISTORY_LENGTH), Ok(if history == 0 { 1 } else { 1008 }));
+                assert_eq!(decoder.state_u32(crate::brotli_input::B3C_META_REMAINING), Ok(0));
+                assert_eq!(decoder.state_byte(crate::brotli_input::B3C_PREVIOUS_BYTE), Ok(0x5a));
+                assert_eq!(decoder.state_byte(crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE), Ok(0x44));
+                assert_eq!(crate::brotli_input::read_b3c_state_u64(
+                    decoder.workspace, 1024, crate::brotli_input::B3C_TOTAL_PRODUCED,
+                ), Ok(1));
+            } else {
+                assert_eq!(result, Err(StreamError::ResourceLimit));
+                assert_eq!(*decoder.budget, before_budget);
+                assert_eq!(decoder.workspace, before_workspace.as_slice());
+                assert_eq!(output, [0xcc]);
+            }
+        }
+        assert_eq!(output_block_reason(1, 23, false), 1);
+        assert_eq!(output_block_reason(1, 24, false), 2);
+        assert_eq!(output_block_reason(1, 24, true), 0);
+        assert_eq!(output_block_reason(0, 24, false), 1);
+    }
+
+    #[test]
+    fn e3_internal_store_receipts_have_no_runtime_storage() {
+        assert_eq!(std::mem::size_of::<Ghost<nat>>(), 0);
+        assert_eq!(std::mem::size_of::<(Result<(), StreamError>, Ghost<nat>)>(),
+            std::mem::size_of::<Result<(), StreamError>>());
+        assert_eq!(std::mem::align_of::<(Result<(), StreamError>, Ghost<nat>)>(),
+            std::mem::align_of::<Result<(), StreamError>>());
+        assert_eq!(std::mem::size_of::<(Result<(), crate::brotli_prefix::WorkspaceError>, Ghost<nat>)>(),
+            std::mem::size_of::<Result<(), crate::brotli_prefix::WorkspaceError>>());
+        assert_eq!(std::mem::align_of::<(Result<(), crate::brotli_prefix::WorkspaceError>, Ghost<nat>)>(),
+            std::mem::align_of::<Result<(), crate::brotli_prefix::WorkspaceError>>());
+    }
+
 }

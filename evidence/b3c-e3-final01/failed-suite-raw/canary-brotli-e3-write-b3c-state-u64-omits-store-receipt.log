@@ -1,0 +1,34 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-e3-canaries-40807/src/brotli_input.rs:29605:1
+      |
+29605 | / pub(crate) fn write_b3c_state_u64(
+29606 | |     workspace: &mut [u8],
+29607 | |     window_bytes: u32,
+29608 | |     relative: u16,
+29609 | |     value: u64,
+29610 | | ) -> (r: (Result<(), crate::brotli_prefix::WorkspaceError>, Ghost<nat>))
+      | |_______________________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-e3-canaries-40807/src/brotli_input.rs:29644:9
+      |
+29644 |         r.1@ == if r.0.is_ok() { 8nat } else { 0nat },
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+29679 |     (Ok(()), Ghost(e3_source_writes))
+      |     --------------------------------- at the end of the function body
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-e3-canaries-40807/src/brotli_input.rs:29652:21
+      |
+29652 |     workspace[at] = value as u8;
+      |                     ^^^^^
+
+error: aborting due to 1 previous error
+

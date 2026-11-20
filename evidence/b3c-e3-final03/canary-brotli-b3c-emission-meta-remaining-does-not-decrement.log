@@ -1,0 +1,37 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli, function lib::brotli::BrotliDecoder::emit_byte (selected functions)
+
+error: assertion failed
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-46693/src/brotli.rs:1542:56
+     |
+1542 | ...rt(crate::brotli_input::b3c_scalar_byte_at(self.workspace@, window_bytes, crate::brotli_input::B3C_META_REMAINING as int) == ((remaining - 1) % 256) as u8); }
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-46693/src/brotli.rs:1240:5
+     |
+1240 | /     fn emit_byte(
+1241 | |         &mut self,
+1242 | |         byte: u8,
+1243 | |         output: &mut [u8],
+1244 | |         produced: usize,
+1245 | |         consumes_input: bool,
+1246 | |     ) -> (r: (Result<(), StreamError>, Ghost<nat>))
+     | |__________________________________________________^
+
+note: function body check finished in 8 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-46693/src/brotli.rs:1240:5
+     |
+1240 | /     fn emit_byte(
+1241 | |         &mut self,
+1242 | |         byte: u8,
+1243 | |         output: &mut [u8],
+1244 | |         produced: usize,
+1245 | |         consumes_input: bool,
+1246 | |     ) -> (r: (Result<(), StreamError>, Ghost<nat>))
+     | |__________________________________________________^
+
+error: aborting due to 1 previous error
+

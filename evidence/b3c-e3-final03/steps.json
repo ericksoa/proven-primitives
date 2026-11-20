@@ -1,0 +1,180 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "log": "runtime-library.log",
+    "log_sha256": "c1361b962fc5c9443f74fda30e1694fdf85436e4905f69e33289076cf1973728",
+    "name": "runtime-library",
+    "passed": 107,
+    "seconds": 16.945984375008265,
+    "started_ns": 1795201405393841000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "primitives"
+    ],
+    "exit_code": 0,
+    "log": "runtime-primitives.log",
+    "log_sha256": "3d7012f720002fff9b237dd2591145d0679153af221ef5092a3a5f7401f3f4e5",
+    "name": "runtime-primitives",
+    "passed": 9,
+    "seconds": 0.17253179199178703,
+    "started_ns": 1795201422352638000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "upstream_comparison"
+    ],
+    "exit_code": 0,
+    "log": "runtime-comparison.log",
+    "log_sha256": "eeee576b3e823ad1b90e0948da9d8c9a8bccf9c647d56bb783ed06fc6ee1dc17",
+    "name": "runtime-comparison",
+    "passed": 1,
+    "seconds": 0.15823112499492709,
+    "started_ns": 1795201422538248000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "project_source_contains_no_proof_trust_bypasses",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "log": "runtime-trust.log",
+    "log_sha256": "ef4616fdf7c22ffdf0071aa0a9af7c999d03ea4a8566401a6a7be3aed2694adb",
+    "name": "runtime-trust",
+    "passed": 1,
+    "seconds": 6.774980374990264,
+    "started_ns": 1795201422714203000
+  },
+  {
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--no-cheating",
+      "--num-threads",
+      "8",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "300",
+      "--trace",
+      "--time",
+      "--output-json"
+    ],
+    "exit_code": 0,
+    "log": "whole-crate.log",
+    "log_sha256": "24b88712666f9213e0b8aa094aafb9bffb2f3da9adfe02cd0969b763796540c7",
+    "name": "whole-crate",
+    "seconds": 289.54817862500204,
+    "started_ns": 1795201429500843000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects",
+      "--",
+      "--ignored",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "log": "controls-the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects.log",
+    "log_sha256": "bd8c4cfaa6ea2045a0b570e417485be18d7ecb2595015b6a77bfe9dc2a97bf20",
+    "name": "controls-the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects",
+    "seconds": 1943.992124041004,
+    "started_ns": 1795201719113825000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "the_prover_rejects_six_b3c_constructor_binding_defects",
+      "--",
+      "--ignored",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "log": "controls-the_prover_rejects_six_b3c_constructor_binding_defects.log",
+    "log_sha256": "dc19b741c25f5b26513986f1f37d7b64e553c46e4d7c13b929a23b5a4dbd0ef2",
+    "name": "controls-the_prover_rejects_six_b3c_constructor_binding_defects",
+    "seconds": 144.2674936250114,
+    "started_ns": 1795201719113918000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "the_prover_rejects_ten_b3c_atomic_emission_defects",
+      "--",
+      "--ignored",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "log": "controls-the_prover_rejects_ten_b3c_atomic_emission_defects.log",
+    "log_sha256": "6043eac7cfb3df51603cbaa599a11067c9dd9ad873966c1697d1745332d5820f",
+    "name": "controls-the_prover_rejects_ten_b3c_atomic_emission_defects",
+    "seconds": 200.55616087499948,
+    "started_ns": 1795201719113992000
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--test",
+      "proof_rejection",
+      "the_prover_rejects_twelve_e3_store_receipt_and_billing_defects",
+      "--",
+      "--ignored",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "log": "controls-the_prover_rejects_twelve_e3_store_receipt_and_billing_defects.log",
+    "log_sha256": "41de189f70a03b4cc4a522d2e3d29227a67bc00f87da72550f5e40a3328102d8",
+    "name": "controls-the_prover_rejects_twelve_e3_store_receipt_and_billing_defects",
+    "seconds": 334.3490106250101,
+    "started_ns": 1795201863604758000
+  }
+]

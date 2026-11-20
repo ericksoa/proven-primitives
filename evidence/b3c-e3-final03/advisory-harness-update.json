@@ -1,0 +1,14 @@
+[
+  {
+    "suite": "the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects",
+    "old": "\"--triggers-mode\", \"silent\", \"--rlimit\",",
+    "new": "\"--triggers-mode\", \"silent\", \"--no-auto-recommends-check\", \"--rlimit\",",
+    "scope": "Matched positive/negative selected core checks only; omits advisory recommends pass after a primary failure. No verification, lifetime, erasure, source contract, assertion or classifier is disabled."
+  },
+  {
+    "suite": "the_prover_rejects_ten_b3c_atomic_emission_defects",
+    "old": "\"--triggers-mode\", \"silent\", \"--rlimit\",",
+    "new": "\"--triggers-mode\", \"silent\", \"--no-auto-recommends-check\", \"--rlimit\",",
+    "scope": "Matched positive/negative selected core checks only; omits advisory recommends pass after a primary failure. No verification, lifetime, erasure, source contract, assertion or classifier is disabled."
+  }
+]

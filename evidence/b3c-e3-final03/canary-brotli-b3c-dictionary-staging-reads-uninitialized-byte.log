@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli_input.rs:40727:1
+      |
+40727 | / fn validate_initialized_dictionary_index(
+40728 | |     index: u8,
+40729 | |     initialized: u8,
+40730 | | ) -> (r: Result<(), CoreFailure>)
+      | |________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli_input.rs:40733:9
+      |
+40733 | /         (initialized > 37 || index >= initialized) ==> r == Err(
+40734 | |             CoreFailure::InvalidFormat(CoreFormatDetail::StateEncoding),
+40735 | |         ),
+      | |_________^ failed this postcondition
+40736 |   {
+40737 | /     if initialized > 37 || index > initialized {
+40738 | |         Err(core_state_failure())
+40739 | |     } else {
+40740 | |         Ok(())
+40741 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

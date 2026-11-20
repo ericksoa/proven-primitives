@@ -1,0 +1,8 @@
+{
+  "commit": "306074cd8c9efe2b498a2a6d1e44d90b75b0c7cf",
+  "source_sha256": {
+    "src/brotli.rs": "dedfa06f2eb5aa11b874de8841e1aa6fe50fec8f61222949f3ff12e18b514dce",
+    "src/brotli_input.rs": "0cb2d206e60d75f4803b2ff1ae6f0697d0126cf49d3ec1b2a6f4dcb5a03e4992",
+    "tests/proof_rejection.rs": "fcf9dae2f5b359abd83d21bdd59263f372cdd9f75a153133afac2fb5f26cad23"
+  }
+}

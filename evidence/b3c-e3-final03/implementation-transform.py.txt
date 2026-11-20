@@ -1,0 +1,117 @@
+from pathlib import Path
+import re,json,importlib.util
+R=Path.cwd();spec=importlib.util.spec_from_file_location('h',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+producers={'write_b3c_state_byte','write_b3c_state_u32','write_b3c_state_u64','emit_byte','emit_uncompressed_byte'}
+def funcs(s):
+ mask=g.rust_mask(s);out=[]
+ pat=r'(?m)^([ \t]*)(?:pub(?:\([^)]*\))?\s+)?fn\s+(\w+)\s*\('
+ for m in re.finditer(pat,mask):
+  q=re.search(r'(?m)^'+re.escape(m.group(1))+r'\{',mask[m.end():])
+  if not q:continue
+  op=m.end()+q.end()-1;depth=0
+  for k in range(op,len(mask)):
+   if mask[k]=='{':depth+=1
+   elif mask[k]=='}':
+    depth-=1
+    if depth==0:out.append((m.group(2),m.start(),op,k+1,m.start(2)));break
+ return out
+# Mechanically keep all outside ordinary call results as component zero.
+counts={n:0 for n in producers};outside={n:0 for n in producers}
+for file in ['src/brotli.rs','src/brotli_input.rs']:
+ p=R/file;s=p.read_text();mask=g.rust_mask(s);fs=funcs(s);decls={x[4] for x in fs};edits=[]
+ for name in producers:
+  for m in re.finditer(r'\b'+name+r'\s*\(',mask):
+   if m.start() in decls:continue
+   owner=[f for f in fs if f[0] in producers and f[2]<m.start()<f[3]];assert len(owner)<=1,(file,name,m.start())
+   counts[name]+=1
+   if owner:continue
+   op=mask.index('(',m.start());depth=0
+   for k in range(op,len(mask)):
+    if mask[k]=='(':depth+=1
+    elif mask[k]==')':
+     depth-=1
+     if depth==0:break
+   assert s[k+1:k+3]!='.0';edits.append((k+1,'.0'));outside[name]+=1
+ for pos,text in sorted(edits,reverse=True):s=s[:pos]+text+s[pos:]
+ p.write_text(s)
+assert sum(counts.values())==33 and sum(outside.values())==26,(counts,outside)
+def edit_fn(file,name,transform):
+ p=R/file;s=p.read_text();hits=[f for f in funcs(s) if f[0]==name];assert len(hits)==1,name;_,a,op,end,_=hits[0];head=s[a:op];body=s[op+1:end-1];head,body=transform(head,body);p.write_text(s[:a]+head+'{'+body+'}'+s[end:])
+def pair_head(head,error):
+ old=') -> (r: Result<(), '+error+'>)';assert head.count(old)==1;at=head.index(old);tail=head[at+len(old):];tail=re.sub(r'\br\b','r.0',tail);return head[:at]+') -> (r: (Result<(), '+error+'>, Ghost<nat>))'+tail
+for name,width in [('write_b3c_state_byte',1),('write_b3c_state_u32',4),('write_b3c_state_u64',8)]:
+ def raw(head,body,width=width):
+  head=pair_head(head,'crate::brotli_prefix::WorkspaceError');head+='    '+f'r.1@ == if r.0.is_ok() {{ {width}nat }} else {{ 0nat }},\n'
+  body='\n    let ghost mut e3_source_writes: nat = 0;'+body
+  assert body.count('Err(error) => return Err(error),')==1;body=body.replace('Err(error) => return Err(error),','Err(error) => return (Err(error), Ghost(e3_source_writes)),')
+  body,n=re.subn(r'(?m)^(    workspace\[[^\n]+\] = [^\n]+;)$',r'\1\n    proof { e3_source_writes = e3_source_writes + 1; }',body);assert n==width,(width,n)
+  body,n=re.subn(r'Ok\(\(\)\)(\s*)$',r'(Ok(()), Ghost(e3_source_writes))\1',body);assert n==1
+  return head,body
+ edit_fn('src/brotli_input.rs',name,raw)
+# Only these approved private emission-work terms change.
+p=R/'src/brotli.rs';s=p.read_text();old='pub const B3C_INITIALIZATION_WORK: u64 = 425;';assert s.count(old)==1;s=s.replace(old,old+'\nconst B3C_EMISSION_WRITE_WORK: u64 = 24;',1);p.write_text(s)
+def reason(head,body):
+ head,n=re.subn(r'(work_remaining\s*[<>]=?\s*)8\b',r'\1B3C_EMISSION_WRITE_WORK',head);assert n==3
+ body,n=re.subn(r'(work_remaining\s*<\s*)8\b',r'\1B3C_EMISSION_WRITE_WORK',body);assert n==1;return head,body
+edit_fn('src/brotli.rs','output_block_reason',reason)
+def emit(head,body):
+ head=pair_head(head,'StreamError');assert head.count('work_remaining - 8')==1;head=head.replace('work_remaining - 8','work_remaining - B3C_EMISSION_WRITE_WORK')
+ head+='''        r.1@ == if r.0.is_ok() { 24nat } else { 0nat },
+        r.0.is_ok() ==> final(self).budget.work_remaining as nat + r.1@
+            == old(self).budget.work_remaining as nat,
+'''
+ body='\n        let ghost mut e3_source_writes: nat = 0;'+body
+ body,n=re.subn(r'return Err\((StreamError::\w+)\);',r'return (Err(\1), Ghost(e3_source_writes));',body);assert n==3,n
+ body,n=re.subn(r'let (position|history|total|remaining|stream_bits|previous) = ([\s\S]*?\.map_err\(\|_\| StreamError::InvalidFormat\))\?;',lambda m:'let '+m[1]+' = match '+m[2]+' {\n            Ok(value) => value,\n            Err(error) => return (Err(error), Ghost(e3_source_writes)),\n        };',body);assert n==6,n
+ old='let next_total = total.checked_add(1).ok_or(StreamError::ResourceLimit)?;';assert body.count(old)==1;body=body.replace(old,'''let next_total = match total.checked_add(1).ok_or(StreamError::ResourceLimit) {
+            Ok(value) => value,
+            Err(error) => return (Err(error), Ghost(e3_source_writes)),
+        };''')
+ # Merge each reached child receipt before propagating its ordinary error.
+ mask=g.rust_mask(body);edits=[]
+ for m in re.finditer(r'crate::brotli_input::write_b3c_state_(?:byte|u32|u64)\s*\(',mask):
+  op=mask.index('(',m.start());depth=0
+  for k in range(op,len(mask)):
+   if mask[k]=='(':depth+=1
+   elif mask[k]==')':
+    depth-=1
+    if depth==0:break
+  tail=re.match(r'\s*\.map_err\(\|_\| StreamError::InvalidFormat\)\?;',body[k+1:]);assert tail
+  call=body[m.start():k+1]
+  new='''{
+            let (e3_result, Ghost(e3_child_writes)) = '''+call+''';
+            proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+            match e3_result {
+                Ok(()) => (),
+                Err(_) => return (Err(StreamError::InvalidFormat), Ghost(e3_source_writes)),
+            }
+        }'''
+  edits.append((m.start(),k+1+tail.end(),new))
+ assert len(edits)==6
+ for a,b,t in reversed(edits):body=body[:a]+t+body[b:]
+ assert body.count('self.budget.work_remaining < 8')==1;body=body.replace('self.budget.work_remaining < 8','self.budget.work_remaining < B3C_EMISSION_WRITE_WORK')
+ assert body.count('assert!(self.budget.charge_work(8));')==1;body=body.replace('assert!(self.budget.charge_work(8));','assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));')
+ for line in ['output[produced] = byte;','self.workspace[position as usize] = byte;']:
+  assert body.count(line)==1;body=body.replace(line,line+'\n        proof { e3_source_writes = e3_source_writes + 1; }')
+ body,n=re.subn(r'Ok\(\(\)\)(\s*)$',r'(Ok(()), Ghost(e3_source_writes))\1',body);assert n==1
+ assert '?' not in g.rust_mask(body)
+ return head,body
+edit_fn('src/brotli.rs','emit_byte',emit)
+def wrapper(head,body):
+ head=pair_head(head,'StreamError');assert head.count('work_remaining - 8')==1;head=head.replace('work_remaining - 8','work_remaining - B3C_EMISSION_WRITE_WORK')
+ assert 'old(self).budget.work_remaining >= 8,' in head
+ head+='''        r.1@ == if r.0.is_ok() { 24nat } else { 0nat },
+        r.0.is_ok() ==> final(self).budget.work_remaining as nat + r.1@
+            == old(self).budget.work_remaining as nat,
+'''
+ assert body.strip()=='self.emit_byte(byte, output, produced, true)'
+ body='''
+        let ghost mut e3_source_writes: nat = 0;
+        let (result, Ghost(e3_child_writes)) = self.emit_byte(byte, output, produced, true);
+        proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+        (result, Ghost(e3_source_writes))
+    '''
+ return head,body
+edit_fn('src/brotli.rs','emit_uncompressed_byte',wrapper)
+(R/'target/b3c-e3/transformation.json').write_text(json.dumps({'all_call_sites':counts,'ordinary_result_projections':outside,'producers':sorted(producers)},indent=2)+'\n')
+print(json.dumps({'producers':5,'all_sites':sum(counts.values()),'outside_ordinary_projections':sum(outside.values())}))

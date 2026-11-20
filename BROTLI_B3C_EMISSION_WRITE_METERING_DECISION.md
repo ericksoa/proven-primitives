@@ -1,6 +1,6 @@
 # B3c emission write metering: E3 decision
 
-Status: **pending direct human approval; not implemented**.
+Status: **the human explicitly approved E3 on 2026-11-20; the named E3 write-only checkpoint is implemented and checked**.
 
 The broader B3c source audit found a concrete accounting mismatch. A successful
 `emit_byte` performs 24 source-level byte writes while its existing successful work
@@ -154,3 +154,20 @@ five proposed producers and 33 caller sites. The exact source reconstruction
 is in that checkpoint's `final-preservation-audit.json`. No ordinary code,
 return type, producer/caller graph, unit policy or E3 decision changed. E3
 remains pending direct human approval and is unimplemented.
+
+
+## Human approval
+
+On 2026-11-20 the human explicitly directed: "E3 approved, please continue".
+This selects E3 exactly within the five-producer, qualified 33-caller scope
+above. Earlier pending statements are historical; no other architectural
+decision, quota change or source-read classification is authorized.
+
+
+## Checked E3 implementation
+
+The named write-only source-receipt and 24-unit billing result is recorded in
+`BROTLI_B3C_E3_CHECKPOINT.md` and `evidence/brotli-b3c-e3.json`. Earlier pending
+statements and the static eight-unit mismatch are historical; their actual
+evidence remains. Source reads, further caller actions and full B3c/release
+obligations remain separate. No additional architectural authority follows.

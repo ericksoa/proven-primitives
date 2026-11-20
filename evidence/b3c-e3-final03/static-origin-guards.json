@@ -1,0 +1,24 @@
+{
+  "positive_static_origin_passed": true,
+  "guards": [
+    {
+      "name": "debit-after-first-store",
+      "static_guard_rejected": true,
+      "counts_as_verifier_semantic_rejection": false,
+      "mutated_body_sha256": "4646be77ad443ef294d37abc801d55a09566cff3d360e6e9a438c840ab522586"
+    },
+    {
+      "name": "receipt-substituted-from-charge-formula",
+      "static_guard_rejected": true,
+      "counts_as_verifier_semantic_rejection": false,
+      "mutated_body_sha256": "690862f0161b317759baacacde489c5213bebdd06099ba94ea9cc53329f54c30"
+    },
+    {
+      "name": "unattached-output-store-counter",
+      "static_guard_rejected": true,
+      "counts_as_verifier_semantic_rejection": false,
+      "mutated_body_sha256": "465a9a9f4ec089d573c10fb55381c3296eda4a0e94eb8f9524224657f3508130"
+    }
+  ],
+  "scope": "Static source binding/ordering guards only; not additional checker proofs or semantic defect counts"
+}

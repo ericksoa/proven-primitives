@@ -1,0 +1,166 @@
+{
+  "approval": {
+    "date": "2026-11-20",
+    "decision": {
+      "path": "BROTLI_B3C_EMISSION_WRITE_METERING_DECISION.md",
+      "sha256": "375dda46b2bc710f90c002cdf04e19a857282491b881882180df39aba2af235e"
+    },
+    "human_answer": "E3 approved, please continue",
+    "scope": "Five named producers, qualified 33 caller sites, private 24-unit write component only"
+  },
+  "baseline": {
+    "commit": "306074cd8c9efe2b498a2a6d1e44d90b75b0c7cf",
+    "source_sha256": {
+      "src/brotli.rs": "dedfa06f2eb5aa11b874de8841e1aa6fe50fec8f61222949f3ff12e18b514dce",
+      "src/brotli_input.rs": "0cb2d206e60d75f4803b2ff1ae6f0697d0126cf49d3ec1b2a6f4dcb5a03e4992",
+      "tests/proof_rejection.rs": "fcf9dae2f5b359abd83d21bdd59263f372cdd9f75a153133afac2fb5f26cad23"
+    }
+  },
+  "checkpoint": {
+    "path": "BROTLI_B3C_E3_CHECKPOINT.md",
+    "sha256": "1cff7fc51a2fbe999809ff81d2e182c6bdd079da55d2b5b7d46de6d20d80832b"
+  },
+  "complete_B3c": false,
+  "complete_body_resource_ledger": false,
+  "diagnostics": {
+    "archive": {
+      "path": "evidence/b3c-e3-final03/diagnostics.tar.gz",
+      "sha256": "adb6a222a1a309244b03e00f63504434494307518f14f463aabff1009834b6b8"
+    },
+    "counts_as_final_gate_cases": false,
+    "manifest": {
+      "path": "evidence/b3c-e3-final03/diagnostic-manifest.json",
+      "sha256": "988f4c90a9e6c115fee0fd91be90d356f737790835fcc661eb3a8e63e5cd1e05"
+    }
+  },
+  "gate": {
+    "complete": {
+      "path": "evidence/b3c-e3-final03/complete.json",
+      "sha256": "bebfef7f8a1e32bc6e244f18a88fc9d38eb4aa1cceb5324914fcb70537537688"
+    },
+    "controls": {
+      "path": "evidence/b3c-e3-final03/controls.json",
+      "sha256": "e5182db368bb06cd287c8f50b0a06b204ec227be60abdf72af3e2054c7cbd06a"
+    },
+    "inventory": {
+      "path": "evidence/b3c-e3-final03/required-controls.json",
+      "sha256": "b4902d51a33e5003e6f69383e1ee18822fec678f1705b1147d9dd44c4658fa34"
+    },
+    "original_artifact_map": {
+      "path": "evidence/b3c-e3-final03/gate-artifact-sha256.json",
+      "sha256": "44c0af41ec3a9e713d27e62450ff0da968ca23942f0d23c8f006527ad2f0118b"
+    },
+    "package_artifact_map": {
+      "path": "evidence/b3c-e3-final03/artifact-sha256.json",
+      "sha256": "0e42c70a0d78ddc8bea948e1ee6bbdc9d8dccf17c20c92174b585b1cff23a234"
+    },
+    "runtime_passed": 118,
+    "source_archive": {
+      "path": "evidence/b3c-e3-final03/frozen-source.tar.gz",
+      "sha256": "600911ff671f8771c804ea8825c6fa92b69ed5f7718a89e5ce9a5cd43c7aae91"
+    },
+    "source_start": {
+      "path": "evidence/b3c-e3-final03/source-start.json",
+      "sha256": "4c2fd695851811b13abc327e7700e99983250ab358c253f22e533dac98254745"
+    },
+    "source_unchanged": true,
+    "strict_semantic_rejections": 56,
+    "suites": [
+      "the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects",
+      "the_prover_rejects_six_b3c_constructor_binding_defects",
+      "the_prover_rejects_ten_b3c_atomic_emission_defects",
+      "the_prover_rejects_twelve_e3_store_receipt_and_billing_defects"
+    ],
+    "tag": "b3c-e3-final03",
+    "verification": {
+      "encountered-error": false,
+      "encountered-vir-error": false,
+      "errors": 0,
+      "is-verifying-entire-crate": true,
+      "success": true,
+      "verified": 1398
+    },
+    "whole_positive_precedes_controls": true
+  },
+  "harness_preservation_audit": {
+    "path": "evidence/b3c-e3-final03/harness-preservation.json",
+    "sha256": "3bc96f2dd8bae8bf02b45555379b926c1b03809ebf928340fc9a13f81bdd85da"
+  },
+  "not_proved": [
+    "Complete source-to-binary or side-channel correctness",
+    "Service availability for arbitrary external calls",
+    "A complete or supported Brotli decoder"
+  ],
+  "preservation_and_source_origin_audit": {
+    "path": "evidence/b3c-e3-final03/preservation-audit.json",
+    "sha256": "5152331c28293730f8d2cd81f22f647a804bbcb2d985ddf2285bfad22b98882b"
+  },
+  "prior_attempts": [
+    {
+      "artifact_manifest": {
+        "path": "evidence/b3c-e3-final01/artifact-sha256.json",
+        "sha256": "e7ec020924fe39e943541722db09cff92df536352f643db6cce80056776e0cc1"
+      },
+      "counts_as_complete_gate": false,
+      "status": {
+        "path": "evidence/b3c-e3-final01/retained-attempt.json",
+        "sha256": "37df623afe72f3e60d2f8c708cebfee31de2c948505cf22ccd08c66f0a93faa5"
+      },
+      "tag": "b3c-e3-final01"
+    },
+    {
+      "artifact_manifest": {
+        "path": "evidence/b3c-e3-final02/artifact-sha256.json",
+        "sha256": "42e84f83886c9ff7c2c6f1d03654dd85ce3637b7eece04f5a33a445d5b79fe11"
+      },
+      "counts_as_complete_gate": false,
+      "status": {
+        "path": "evidence/b3c-e3-final02/retained-attempt.json",
+        "sha256": "f46c3857ad073df83dd64357cf93645cc2725a43fa4cc9a85d87e1e42a726457"
+      },
+      "tag": "b3c-e3-final02"
+    }
+  ],
+  "properties": [
+    "Reached 1/4/8 source-store receipts and zero-error receipts in three raw writers",
+    "Shared/wrapper success receipt 24 and error receipt zero from reached increments/children",
+    "Success debit equals receipt; original functional images, frames and non-work credit effects retained",
+    "Write prepayment before first store and 24/23 empty-output priority",
+    "Original >=8 wrapper admitted domain retained; 8..23 errors preserve complete state"
+  ],
+  "remaining": [
+    "Input/window/dictionary source-read prepayment",
+    "Other caller writes/transitions and full body/B2/stream composition",
+    "B3d/B4, F2 monkey/native disagreement and other reference dispositions",
+    "Independent human specification review and supported-decoder/release gates"
+  ],
+  "reproduce": {
+    "path": "evidence/b3c-e3-final03/REPRODUCE.md",
+    "sha256": "9452796cc7b93a48f5b71cb26940f43ac988a04b4315b0f1a53f176922f25509"
+  },
+  "schema": "brotli-e3-write-receipt-checkpoint-v1",
+  "scope_ledger": {
+    "path": "AGENTS.md",
+    "sha256": "bb04dd19facfb608478fd102eb6d998813beac0fba11012c42ba718bcebc48fa"
+  },
+  "static_guards": {
+    "counts_as_semantic_rejections": false,
+    "result": {
+      "path": "evidence/b3c-e3-final03/static-origin-guards.json",
+      "sha256": "b2492bbb6824c1880a9399c338731460aba9363da0a5e3642d4e76c0a3213515"
+    }
+  },
+  "status": "complete-named-E3-write-only-receipts-and-billing",
+  "trusted_components": [
+    "Specifications, source-unit interpretation and counter placement",
+    "Pinned Verus/Z3/vstd and Rust/LLVM",
+    "Apple build tools and operating environment"
+  ],
+  "unchanged": [
+    "Public/W1 APIs and original arguments/requirements",
+    "All prior functional guarantees",
+    "Workspace/dependencies/visibility/trust",
+    "425 reset/init, four escrow and all other formulas",
+    "F2 fixture policy and strict tree coverage"
+  ]
+}

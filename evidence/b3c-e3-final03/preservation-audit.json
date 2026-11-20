@@ -1,0 +1,82 @@
+{
+  "baseline": {
+    "commit": "306074cd8c9efe2b498a2a6d1e44d90b75b0c7cf",
+    "source_sha256": {
+      "src/brotli.rs": "dedfa06f2eb5aa11b874de8841e1aa6fe50fec8f61222949f3ff12e18b514dce",
+      "src/brotli_input.rs": "0cb2d206e60d75f4803b2ff1ae6f0697d0126cf49d3ec1b2a6f4dcb5a03e4992",
+      "tests/proof_rejection.rs": "fcf9dae2f5b359abd83d21bdd59263f372cdd9f75a153133afac2fb5f26cad23"
+    }
+  },
+  "only_new_private_constant": "B3C_EMISSION_WRITE_WORK = 24",
+  "other_production_code": {
+    "src/brotli.rs": {
+      "ordinary_result_projections": 12,
+      "outside_scoped_changes_token_identical": true
+    },
+    "src/brotli_input.rs": {
+      "ordinary_result_projections": 14,
+      "outside_scoped_changes_token_identical": true
+    }
+  },
+  "producers": [
+    {
+      "function": "emit_byte",
+      "ordinary_body_equivalent_after_only_receipt_erasure_error_expansion_and_approved_work_change": true,
+      "original_arguments_requirements_and_functional_guarantees_preserved": true
+    },
+    {
+      "function": "emit_uncompressed_byte",
+      "ordinary_body_equivalent_after_only_receipt_erasure_error_expansion_and_approved_work_change": true,
+      "original_arguments_requirements_and_functional_guarantees_preserved": true
+    },
+    {
+      "function": "write_b3c_state_byte",
+      "ordinary_body_equivalent_after_only_receipt_erasure_error_expansion_and_approved_work_change": true,
+      "original_arguments_requirements_and_functional_guarantees_preserved": true
+    },
+    {
+      "function": "write_b3c_state_u32",
+      "ordinary_body_equivalent_after_only_receipt_erasure_error_expansion_and_approved_work_change": true,
+      "original_arguments_requirements_and_functional_guarantees_preserved": true
+    },
+    {
+      "function": "write_b3c_state_u64",
+      "ordinary_body_equivalent_after_only_receipt_erasure_error_expansion_and_approved_work_change": true,
+      "original_arguments_requirements_and_functional_guarantees_preserved": true
+    }
+  ],
+  "public_W1_interfaces_layout_dependencies_and_other_formulas_unchanged": true,
+  "schema": "brotli-e3-preservation-and-source-origin-v1",
+  "scope": "Static constrained-diff and counter-origin audit; checked receipts and source/debit equality require the actual verifier gate. Not a binary-identity theorem.",
+  "source_origin": [
+    {
+      "child_receipt_merges": 6,
+      "debit_coupling_postcondition_retained": true,
+      "direct_reached_store_increments": 2,
+      "function": "emit_byte",
+      "source_debit_precedes_all_eight_direct_or_child_store_sites": true,
+      "write_count_target": 24
+    },
+    {
+      "child_receipt_merges": 1,
+      "function": "emit_uncompressed_byte",
+      "original_eight_unit_entry_domain_retained": true,
+      "write_count_target": 24
+    },
+    {
+      "adjacent_reached_increments": 1,
+      "function": "write_b3c_state_byte",
+      "reached_primitive_stores": 1
+    },
+    {
+      "adjacent_reached_increments": 4,
+      "function": "write_b3c_state_u32",
+      "reached_primitive_stores": 4
+    },
+    {
+      "adjacent_reached_increments": 8,
+      "function": "write_b3c_state_u64",
+      "reached_primitive_stores": 8
+    }
+  ]
+}

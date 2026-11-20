@@ -1,0 +1,61 @@
+from pathlib import Path
+import concurrent.futures,importlib.util,os,json,hashlib,subprocess,time,re,tarfile,io,sys,traceback
+R=Path.cwd();O=R/'evidence/b3c-e3-final03';O.mkdir(exist_ok=False)
+helper=R/'target/m1-r-final-gate/driver.py'
+spec=importlib.util.spec_from_file_location('checked_gate_helpers',helper);g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1',VERUS_ROOT=str(g.TOOL))
+def dump(name,value):(O/name).write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
+def bind(p):return {'path':str(p.relative_to(O)),'sha256':g.file_hash(p)}
+frozen={'source_sha256':g.source_snapshot(R),'tools':g.tool_snapshot(env),'driver_sha256':g.file_hash(__file__),'m1_gate_helpers_sha256':g.file_hash(helper)}
+dump('source-start.json',frozen);(O/'gate.py.txt').write_bytes(Path(__file__).read_bytes());(O/'m1-gate-helpers.py.txt').write_bytes(helper.read_bytes())
+expected={'the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects':28,'the_prover_rejects_six_b3c_constructor_binding_defects':6,'the_prover_rejects_ten_b3c_atomic_emission_defects':10,'the_prover_rejects_twelve_e3_store_receipt_and_billing_defects':12}
+inventory=g.suite_inventory((R/'tests/proof_rejection.rs').read_text());required={name:inventory[name] for name in expected}
+assert all(len(required[n]['mutants'])==count for n,count in expected.items())
+all_names=[name for row in required.values() for name in row['mutants']];assert len(all_names)==len(set(all_names))==56
+dump('required-controls.json',required)
+rows=[]
+def run(name,command):
+ start=time.time_ns();t=time.monotonic();p=O/(name+'.log')
+ with p.open('w') as f:result=subprocess.run(command,cwd=R,env=env,stdout=f,stderr=subprocess.STDOUT)
+ text=p.read_text();row={'name':name,'command':command,'exit_code':result.returncode,'started_ns':start,'seconds':time.monotonic()-t,'log':p.name,'log_sha256':g.file_hash(p)}
+ assert g.source_snapshot(R)==frozen['source_sha256'],'Source changed during gate'
+ print(json.dumps({'step':name,'exit_code':result.returncode,'seconds':row['seconds']}),flush=True)
+ return row,text
+try:
+ for name,cmd in g.RUNTIME:
+  row,text=run(name,cmd);row['passed']=sum(map(int,re.findall(r'test result: ok\. (\d+) passed; 0 failed',text)));rows.append(row);dump('steps.json',rows)
+  assert row['exit_code']==0 and row['passed']>0,name
+ runtime=sum(row['passed'] for row in rows);dump('runtime-results.json',rows)
+ row,text=run('whole-crate',g.WHOLE);rows.append(row);dump('steps.json',rows);assert row['exit_code']==0,'Whole positive failed'
+ report=g.proof_report(text);dump('verification.json',report)
+ positive={**frozen,'verification':report['verification-results'],'whole':row,'runtime_passed':runtime,'source_unchanged':True};dump('positive.json',positive)
+ def suite_run(name):
+  return name,run('controls-'+name,['cargo','test','--locked','--release','--test','proof_rejection',name,'--','--ignored','--exact','--nocapture'])
+ # All four private-copy suites begin only after this same-source whole positive.
+ with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+  results=list(pool.map(suite_run,expected))
+ controls=[];failures=[]
+ for name,(row,text) in results:
+  rows.append(row);dump('steps.json',rows)
+  if row['exit_code']!=0 or 'test result: ok. 1 passed; 0 failed' not in text:
+   failures.append(name);continue
+  cases=re.findall(r'^REJECTED (brotli-[a-z0-9-]+):',text,re.M)
+  assert len(cases)==len(set(cases)) and set(cases)==set(required[name]['mutants']),name
+  for case in cases:
+   p=R/'evidence'/('canary-'+case+'.log');assert p.stat().st_mtime_ns>=row['started_ns'],case
+   data=p.read_bytes();(O/p.name).write_bytes(data);classification=g.semantic_rejection(data.decode())
+   assert classification['semantic_rejection'] and not classification['tool_or_resource_failure'] and not classification['syntax_or_type_failure'],case
+   controls.append({'name':case,'suite':name,'log':p.name,'sha256':hashlib.sha256(data).hexdigest(),**classification})
+ dump('controls.json',controls);assert not failures,failures;assert len(controls)==56
+ assert g.source_snapshot(R)==frozen['source_sha256'] and g.tool_snapshot(env)==frozen['tools']
+ with tarfile.open(O/'frozen-source.tar.gz','w:gz') as archive:
+  for name,digest in frozen['source_sha256'].items():
+   data=(R/name).read_bytes();assert hashlib.sha256(data).hexdigest()==digest
+   info=tarfile.TarInfo(name);info.size=len(data);info.mode=0o644;archive.addfile(info,io.BytesIO(data))
+ dump('complete.json',{**positive,'scope':'Approved E3 reached byte-store receipts and 24-unit write-only billing; not complete B3c or full body resource ledger','suites':list(expected),'semantic_rejections':len(controls),'steps':rows,'source_archive_sha256':g.file_hash(O/'frozen-source.tar.gz')})
+ print('COMPLETE: exact-source whole proof, runtime tests, 4 suites / 56 strict semantic rejections',flush=True)
+except BaseException as error:
+ dump('failure.json',{'status':'failed-or-interrupted','error_type':type(error).__name__,'message':str(error),'steps':rows,'traceback':traceback.format_exc(),'complete':False})
+ raise
+finally:
+ dump('artifact-sha256.json',{str(p.relative_to(O)):g.file_hash(p) for p in sorted(O.rglob('*')) if p.is_file() and p.name!='artifact-sha256.json'})

@@ -1,0 +1,39 @@
+{
+  "status": "whole-runtime-and-new12-constructor6-passed-retained-emission-advisory-resource-failure",
+  "whole_verified": 1398,
+  "runtime_tests": 118,
+  "new_E3_12_controls_passed": true,
+  "constructor_6_controls_passed": true,
+  "retained_10": "Four reported cases then primary semantic failure followed by advisory recommends resource result; not a suite pass",
+  "legacy_28": "interrupted after required suite failed",
+  "raw_failed_suite_logs": [
+    {
+      "name": "brotli-b3c-emission-window-byte-disagrees-with-output",
+      "sha256": "51a6b199bb2e67f1ac6e8c70a6816ee72c934c9a3f60763dfbcb634b47d2b3e0",
+      "counts_as_complete_suite": false
+    },
+    {
+      "name": "brotli-b3c-emission-window-position-does-not-advance",
+      "sha256": "c1b16395b0ee9b83488d734ea2e4b2fefbfe48db15ca9eee93dcef0c4691c45e",
+      "counts_as_complete_suite": false
+    },
+    {
+      "name": "brotli-b3c-emission-first-history-increment-is-skipped",
+      "sha256": "de88c50e6990edac613520ddf82036f02c47a35290e56b1b597084bf4c2e211a",
+      "counts_as_complete_suite": false
+    },
+    {
+      "name": "brotli-b3c-emission-first-total-increment-is-skipped",
+      "sha256": "1d6f9575fefe5e36b7fc59995de6a6a6d7ebc7847c09dc285f754fb00749b00d",
+      "counts_as_complete_suite": false
+    },
+    {
+      "name": "brotli-b3c-emission-second-previous-uses-current-byte",
+      "sha256": "0ef97183be40d5677da7e06938b9bfddd07469f6c206e883d51ceabdb70ec3ad",
+      "counts_as_complete_suite": false
+    }
+  ],
+  "counts_as_complete_gate": false,
+  "whole_errors": 0,
+  "count_source": "Actual positive.json verification-results, correcting an unsealed provisional count"
+}

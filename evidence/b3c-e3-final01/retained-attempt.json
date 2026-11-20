@@ -1,0 +1,36 @@
+{
+  "status": "whole-runtime-positive-passed-required-controls-failed-or-interrupted",
+  "whole_verified": 1398,
+  "runtime_tests": 118,
+  "scope": "Mixed resource outcomes excluded; only actual completed-suite rows retain pass status",
+  "raw_failed_suite_logs": [
+    {
+      "name": "brotli-b3c-emission-window-byte-disagrees-with-output",
+      "sha256": "5c0484a2c97b2e9b9814dcdc91e2f3b019947f0c3fa345fa85e8e01365058127",
+      "counts_as_complete_suite": false
+    },
+    {
+      "name": "brotli-e3-write-b3c-state-byte-omits-store-receipt",
+      "sha256": "2ee08c16bff6e3280c8f9502a5dd5ca618b196c1a9d2abbf4e8c18d77366bfb6",
+      "counts_as_complete_suite": false
+    },
+    {
+      "name": "brotli-e3-write-b3c-state-u32-omits-store-receipt",
+      "sha256": "c6e1df32529eef3ba2e8592410c702201878868fa92841634c81c24d1b6bfccc",
+      "counts_as_complete_suite": false
+    },
+    {
+      "name": "brotli-e3-write-b3c-state-u64-omits-store-receipt",
+      "sha256": "cdf5980c564997bfc427c46a6fd1fd63a2bced2628111b6ceb7a443afb4ce78a",
+      "counts_as_complete_suite": false
+    },
+    {
+      "name": "brotli-e3-output-store-receipt-omitted",
+      "sha256": "b17157795d656e8037a116be79d94dcc7728692833bae2b73b011f8269891695",
+      "counts_as_complete_suite": false
+    }
+  ],
+  "complete_gate": false,
+  "whole_errors": 0,
+  "count_source": "Actual positive.json verification-results, correcting an unsealed provisional count"
+}

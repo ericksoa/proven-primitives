@@ -1,0 +1,90 @@
+[
+  {
+    "old": "\"    if output_remaining == 0 || work_remaining < 8 {\\n        1\\n    } else if !has_output_slot {\\n        2\",",
+    "new": "\"    if output_remaining == 0 || work_remaining < B3C_EMISSION_WRITE_WORK {\\n        1\\n    } else if !has_output_slot {\\n        2\",",
+    "count": 1
+  },
+  {
+    "old": "\"    if !has_output_slot {\\n        2\\n    } else if output_remaining == 0 || work_remaining < 8 {\\n        1\",",
+    "new": "\"    if !has_output_slot {\\n        2\\n    } else if output_remaining == 0 || work_remaining < B3C_EMISSION_WRITE_WORK {\\n        1\",",
+    "count": 1
+  },
+  {
+    "old": "\"assert!(self.budget.charge_work(8));\",",
+    "new": "\"assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));\",",
+    "count": 1
+  },
+  {
+    "old": "\"assert!(self.budget.charge_work(7));\",",
+    "new": "\"assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK - 1));\",",
+    "count": 1
+  },
+  {
+    "old": "\"let next_total = total.checked_add(1).ok_or(StreamError::ResourceLimit)?;\",",
+    "new": "\"total.checked_add(1)\",",
+    "count": 1
+  },
+  {
+    "old": "\"let next_total = total.checked_add(if total == 0 { 0 } else { 1 }).ok_or(StreamError::ResourceLimit)?;\",",
+    "new": "\"total.checked_add(if total == 0 { 0 } else { 1 })\",",
+    "count": 1
+  },
+  {
+    "old": "return Err(StreamError::ResourceLimit);\\n        }\\n        let window_bytes = self.window_bytes();",
+    "new": "return (Err(StreamError::ResourceLimit), Ghost(e3_source_writes));\\n        }\\n        let window_bytes = self.window_bytes();",
+    "count": 4
+  },
+  {
+    "old": "            \"        self.emit_byte(byte, output, produced, true)\",\n            \"        let result = self.emit_byte(byte, output, produced, true);\\n        if result.is_err() { self.workspace[0] = byte; }\\n        result\",",
+    "new": "            \"        (result, Ghost(e3_source_writes))\",\n            \"        if result.is_err() { self.workspace[0] = byte; }\\n        (result, Ghost(e3_source_writes))\",",
+    "count": 1
+  },
+  {
+    "old": "\"        self.emit_byte(byte, output, produced, true)\",",
+    "new": "\"self.emit_byte(byte, output, produced, true)\",",
+    "count": 1,
+    "scope": "legacy uncompressed input-debit mutation selector only"
+  },
+  {
+    "old": "\"        self.emit_byte(byte, output, produced, false)\",",
+    "new": "\"self.emit_byte(byte, output, produced, false)\",",
+    "count": 1,
+    "scope": "legacy uncompressed input-debit mutation only"
+  },
+  {
+    "old": "crate::brotli_input::B3C_WINDOW_POSITION,\\n            next_position,",
+    "new": "crate::brotli_input::B3C_WINDOW_POSITION,\\n                next_position,",
+    "count": 1,
+    "scope": "ten-case emission suite only; indentation adaptation"
+  },
+  {
+    "old": "crate::brotli_input::B3C_WINDOW_POSITION,\\n            position,",
+    "new": "crate::brotli_input::B3C_WINDOW_POSITION,\\n                position,",
+    "count": 1,
+    "scope": "ten-case emission suite only; indentation adaptation"
+  },
+  {
+    "old": "crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE,\\n            previous,",
+    "new": "crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE,\\n                previous,",
+    "count": 1,
+    "scope": "ten-case emission suite only; indentation adaptation"
+  },
+  {
+    "old": "crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE,\\n            byte,",
+    "new": "crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE,\\n                byte,",
+    "count": 1,
+    "scope": "ten-case emission suite only; indentation adaptation"
+  },
+  {
+    "old": "crate::brotli_input::B3C_META_REMAINING,\\n            remaining - 1,",
+    "new": "crate::brotli_input::B3C_META_REMAINING,\\n                remaining - 1,",
+    "count": 1,
+    "scope": "ten-case emission suite only; indentation adaptation"
+  },
+  {
+    "old": "crate::brotli_input::B3C_META_REMAINING,\\n            remaining,",
+    "new": "crate::brotli_input::B3C_META_REMAINING,\\n                remaining,",
+    "count": 1,
+    "scope": "ten-case emission suite only; indentation adaptation"
+  }
+]

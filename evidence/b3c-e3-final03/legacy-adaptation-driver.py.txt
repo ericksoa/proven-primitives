@@ -1,0 +1,22 @@
+from pathlib import Path
+import json,re
+p=Path('tests/proof_rejection.rs');s=p.read_text();repairs=[]
+def change(old,new,count=1):
+ global s
+ assert s.count(old)==count,(old[:100],s.count(old));s=s.replace(old,new);repairs.append({'old':old,'new':new,'count':count})
+change('"    if output_remaining == 0 || work_remaining < 8 {\\n        1\\n    } else if !has_output_slot {\\n        2",','"    if output_remaining == 0 || work_remaining < B3C_EMISSION_WRITE_WORK {\\n        1\\n    } else if !has_output_slot {\\n        2",')
+change('"    if !has_output_slot {\\n        2\\n    } else if output_remaining == 0 || work_remaining < 8 {\\n        1",','"    if !has_output_slot {\\n        2\\n    } else if output_remaining == 0 || work_remaining < B3C_EMISSION_WRITE_WORK {\\n        1",')
+change('"assert!(self.budget.charge_work(8));",','"assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));",')
+change('"assert!(self.budget.charge_work(7));",','"assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK - 1));",')
+# Same total-increment fault, rebound to its unchanged checked_add operation
+# after the approved tuple-return conversion expands ordinary ? propagation.
+change('"let next_total = total.checked_add(1).ok_or(StreamError::ResourceLimit)?;",','"total.checked_add(1)",')
+change('"let next_total = total.checked_add(if total == 0 { 0 } else { 1 }).ok_or(StreamError::ResourceLimit)?;",','"total.checked_add(if total == 0 { 0 } else { 1 })",')
+# Error-propagation return values now contain the actual source receipt.
+change('return Err(StreamError::ResourceLimit);\\n        }\\n        let window_bytes = self.window_bytes();','return (Err(StreamError::ResourceLimit), Ghost(e3_source_writes));\\n        }\\n        let window_bytes = self.window_bytes();',4)
+old='''            "        self.emit_byte(byte, output, produced, true)",
+            "        let result = self.emit_byte(byte, output, produced, true);\\n        if result.is_err() { self.workspace[0] = byte; }\\n        result",'''
+new='''            "        (result, Ghost(e3_source_writes))",
+            "        if result.is_err() { self.workspace[0] = byte; }\\n        (result, Ghost(e3_source_writes))",'''
+change(old,new)
+p.write_text(s);Path('target/b3c-e3/legacy-control-adaptations.json').write_text(json.dumps(repairs,indent=2)+'\n')

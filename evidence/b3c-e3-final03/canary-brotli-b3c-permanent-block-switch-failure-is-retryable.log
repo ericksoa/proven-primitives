@@ -1,0 +1,38 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli_input.rs:41678:1
+      |
+41678 | / fn reject_permanent_single_type_switch(
+41679 | |     state: crate::brotli_block::B3bSwitchState,
+41680 | |     kind: u8,
+41681 | | ) -> (r: BodySwitchStep)
+      | |_______________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-46694/src/brotli_input.rs:41689:9
+      |
+41689 | /         state.phase == crate::brotli_block::B3bSwitchPhase::Ready
+41690 | |         && state.num_types@[kind as int] <= 1 ==> r == (BodySwitchStep {
+41691 | |             consumed: 0,
+41692 | |             status: BodySwitchStatus::Failed(
+41693 | |                 CoreFailure::InvalidFormat(CoreFormatDetail::BlockSwitch),
+41694 | |             ),
+41695 | |         }),
+      | |__________^ failed this postcondition
+...
+41707 | /     BodySwitchStep {
+41708 | |         consumed: 0,
+41709 | |         status: match result.outcome {
+41710 | |             crate::brotli_block::B3bSwitchOutcome::Failed(error) => {
+...     |
+41714 | |         },
+41715 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

@@ -1,0 +1,32 @@
+[
+  {
+    "old": "        assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));\n        output[produced] = byte;",
+    "new": "        assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));\n        proof {\n            assert(e3_source_writes == 0);\n            assert(self.budget.work_remaining as nat + B3C_EMISSION_WRITE_WORK as nat\n                == old(self).budget.work_remaining as nat);\n        }\n        output[produced] = byte;"
+  },
+  {
+    "old": "output[produced] = byte;\n        proof { e3_source_writes = e3_source_writes + 1; }",
+    "new": "output[produced] = byte;\n        proof { e3_source_writes = e3_source_writes + 1; }\n        proof { assert(e3_source_writes == 1); assert(output@[produced as int] == byte); }"
+  },
+  {
+    "old": "self.workspace[position as usize] = byte;\n        proof { e3_source_writes = e3_source_writes + 1; }",
+    "new": "self.workspace[position as usize] = byte;\n        proof { e3_source_writes = e3_source_writes + 1; }\n        proof { assert(e3_source_writes == 2); assert(self.workspace@[position as int] == byte); }"
+  },
+  {
+    "old": "        let next_total = match total.checked_add(1).ok_or(StreamError::ResourceLimit) {",
+    "new": "        proof {\n            assert(next_history as nat == if history < history_limit {\n                history as nat + 1\n            } else { history as nat });\n        }\n        let next_total = match total.checked_add(1).ok_or(StreamError::ResourceLimit) {"
+  },
+  {
+    "old": "        if consumes_input {\n            assert!(self.budget.charge_input(1));",
+    "new": "        proof { assert(next_total as nat == total as nat + 1); }\n        if consumes_input {\n            assert!(self.budget.charge_input(1));"
+  },
+  {
+    "child_prefix_receipt_assertions": [
+      3,
+      4,
+      8,
+      12,
+      20,
+      24
+    ]
+  }
+]

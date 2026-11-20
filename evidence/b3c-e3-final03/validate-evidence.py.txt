@@ -1,0 +1,35 @@
+from pathlib import Path
+import json,hashlib,tarfile,re,subprocess,importlib.util
+R=Path.cwd();O=R/'evidence/b3c-e3-final03'
+def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+root=json.loads((R/'evidence/brotli-b3c-e3.json').read_text())
+def bindings(x):
+ if isinstance(x,dict):
+  if 'path' in x and 'sha256' in x:assert h(R/x['path'])==x['sha256'],x['path']
+  for v in x.values():bindings(v)
+ elif isinstance(x,list):
+  for v in x:bindings(v)
+bindings(root)
+assert root['harness_preservation_audit']['path']==str((O/'harness-preservation.json').relative_to(R))
+assert (O/'audit-harness.py.txt').read_bytes()==(R/'target/b3c-e3/audit-harness.py').read_bytes()
+for folder in [R/'evidence/b3c-e3-final01',R/'evidence/b3c-e3-final02',O]:
+ for n,d in json.loads((folder/'artifact-sha256.json').read_text()).items():assert h(folder/n)==d,n
+c=json.loads((O/'complete.json').read_text());assert c['verification']==root['gate']['verification'];assert c['verification']['success'] and c['verification']['errors']==0 and c['verification']['is-verifying-entire-crate']
+with tarfile.open(O/'frozen-source.tar.gz','r:gz') as t:
+ assert set(t.getnames())==set(c['source_sha256'])
+ for n,d in c['source_sha256'].items():assert h(R/n)==d==hashlib.sha256(t.extractfile(n).read()).hexdigest(),n
+spec=importlib.util.spec_from_file_location('h',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+rows=json.loads((O/'controls.json').read_text());required=json.loads((O/'required-controls.json').read_text());assert len(rows)==len({x['name'] for x in rows})==56 and len(required)==4
+for row in rows:
+ text=(O/row['log']).read_text();assert h(O/row['log'])==row['sha256'];cls=g.semantic_rejection(text);assert cls['semantic_rejection'] and not cls['tool_or_resource_failure'] and not cls['syntax_or_type_failure'];assert all(row[k]==v for k,v in cls.items())
+positive=json.loads((O/'positive.json').read_text());steps=json.loads((O/'steps.json').read_text())
+for row in steps:
+ if row['name'].startswith('controls-'):
+  suite=row['name'].removeprefix('controls-');text=(O/row['log']).read_text();names=re.findall(r'^REJECTED (brotli-[a-z0-9-]+):',text,re.M)
+  assert row['exit_code']==0 and 'test result: ok. 1 passed; 0 failed' in text;assert set(names)==set(required[suite]['mutants']) and len(names)==len(set(names))
+  assert row['started_ns']>positive['whole']['started_ns']+int(positive['whole']['seconds']*1e9)
+assert sum(x['passed'] for x in json.loads((O/'runtime-results.json').read_text()))==c['runtime_passed']
+audit=json.loads((O/'preservation-audit.json').read_text());assert len(audit['producers'])==5 and sum(x['ordinary_result_projections'] for x in audit['other_production_code'].values())==26
+assert len(json.loads((O/'static-origin-guards.json').read_text())['guards'])==3
+subprocess.run(['git','diff','--check'],check=True)
+print(json.dumps({'verified':c['verification']['verified'],'errors':0,'runtime_tests':c['runtime_passed'],'strict_semantic_rejections':len(rows),'suites':len(required),'all_hashes_and_frozen_inputs_match':True,'whole_positive_precedes_all_defects':True,'E3_write_component_complete':True},indent=2))

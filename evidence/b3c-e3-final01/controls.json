@@ -1,0 +1,68 @@
+[
+  {
+    "checked_semantic_error": true,
+    "computed_false": false,
+    "log": "canary-brotli-b3c-constructor-skips-initialization-reservation.log",
+    "name": "brotli-b3c-constructor-skips-initialization-reservation",
+    "semantic_rejection": true,
+    "sha256": "33f252f944564a9c67e90958a08a62584c70dd4bc154d16cdb5e1b2fba938f11",
+    "suite": "the_prover_rejects_six_b3c_constructor_binding_defects",
+    "syntax_or_type_failure": false,
+    "tool_or_resource_failure": false
+  },
+  {
+    "checked_semantic_error": true,
+    "computed_false": false,
+    "log": "canary-brotli-b3c-constructor-spurious-resource-failure.log",
+    "name": "brotli-b3c-constructor-spurious-resource-failure",
+    "semantic_rejection": true,
+    "sha256": "4b06ab0dee55acf6085c1315fbc51332d0db01937649df8b1f8579c2122261ed",
+    "suite": "the_prover_rejects_six_b3c_constructor_binding_defects",
+    "syntax_or_type_failure": false,
+    "tool_or_resource_failure": false
+  },
+  {
+    "checked_semantic_error": true,
+    "computed_false": false,
+    "log": "canary-brotli-b3c-constructor-small-workspace-consumes-credit.log",
+    "name": "brotli-b3c-constructor-small-workspace-consumes-credit",
+    "semantic_rejection": true,
+    "sha256": "c11a7546fc24ff7e444e897d806161e45ad6481d81b34f230f0431d9052150a1",
+    "suite": "the_prover_rejects_six_b3c_constructor_binding_defects",
+    "syntax_or_type_failure": false,
+    "tool_or_resource_failure": false
+  },
+  {
+    "checked_semantic_error": true,
+    "computed_false": false,
+    "log": "canary-brotli-b3c-constructor-replenishes-work.log",
+    "name": "brotli-b3c-constructor-replenishes-work",
+    "semantic_rejection": true,
+    "sha256": "ef83d135b9a6e76c67191cd79461ce4bd19bae949ecbe0c739e5268d70779e4e",
+    "suite": "the_prover_rejects_six_b3c_constructor_binding_defects",
+    "syntax_or_type_failure": false,
+    "tool_or_resource_failure": false
+  },
+  {
+    "checked_semantic_error": true,
+    "computed_false": false,
+    "log": "canary-brotli-b3c-constructor-returns-finished-state.log",
+    "name": "brotli-b3c-constructor-returns-finished-state",
+    "semantic_rejection": true,
+    "sha256": "4a8788ee6ba86df34029891b90a8d98ec2dbe840fdd085259a524e7b4f668438",
+    "suite": "the_prover_rejects_six_b3c_constructor_binding_defects",
+    "syntax_or_type_failure": false,
+    "tool_or_resource_failure": false
+  },
+  {
+    "checked_semantic_error": true,
+    "computed_false": false,
+    "log": "canary-brotli-b3c-constructor-small-workspace-is-resource-error.log",
+    "name": "brotli-b3c-constructor-small-workspace-is-resource-error",
+    "semantic_rejection": true,
+    "sha256": "3df7a4bac42ccfefc70b8adbf72794b9f04bf30082dbe0245728969e6037b9e8",
+    "suite": "the_prover_rejects_six_b3c_constructor_binding_defects",
+    "syntax_or_type_failure": false,
+    "tool_or_resource_failure": false
+  }
+]

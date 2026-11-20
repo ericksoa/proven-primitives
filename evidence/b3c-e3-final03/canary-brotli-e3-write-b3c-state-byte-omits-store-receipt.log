@@ -1,0 +1,28 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-e3-canaries-48193/src/brotli_input.rs:29250:1
+      |
+29250 | / pub(crate) fn write_b3c_state_byte(
+29251 | |     workspace: &mut [u8],
+29252 | |     window_bytes: u32,
+29253 | |     relative: u16,
+29254 | |     value: u8,
+29255 | | ) -> (r: (Result<(), crate::brotli_prefix::WorkspaceError>, Ghost<nat>))
+      | |_______________________________________________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-e3-canaries-48193/src/brotli_input.rs:29282:9
+      |
+29282 |         r.1@ == if r.0.is_ok() { 1nat } else { 0nat },
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+29303 |     (Ok(()), Ghost(e3_source_writes))
+      |     --------------------------------- at the end of the function body
+
+error: aborting due to 1 previous error
+

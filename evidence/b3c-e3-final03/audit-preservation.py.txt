@@ -1,0 +1,110 @@
+from pathlib import Path
+import json,re,hashlib,subprocess,importlib.util
+R=Path.cwd();B=R/'target/b3c-e3/baseline';spec=importlib.util.spec_from_file_location('h',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+widths={'write_b3c_state_byte':1,'write_b3c_state_u32':4,'write_b3c_state_u64':8};allnames=set(widths)|{'emit_byte','emit_uncompressed_byte'}
+def tokens(s):return re.sub(r'\s+','',g.rust_mask(s))
+def function(s,name):
+ mask=g.rust_mask(s);m=re.search(r'(?m)^([ \t]*)(?:pub(?:\([^)]*\))?\s+)?fn\s+'+re.escape(name)+r'\(',mask);assert m,name
+ q=re.search(r'(?m)^'+re.escape(m[1])+r'\{',mask[m.end():]);assert q,name;op=m.end()+q.end()-1;depth=0
+ for i in range(op,len(mask)):
+  if mask[i]=='{':depth+=1
+  elif mask[i]=='}':
+   depth-=1
+   if depth==0:return m.start(),op,i+1,s[m.start():op],s[op+1:i]
+ raise AssertionError(name)
+def strip_counter(body):
+ body,n=re.subn(r'\s*let ghost mut e3_source_writes: nat = 0;', '',body);assert n==1
+ body=re.sub(r'\s*proof \{ e3_source_writes = e3_source_writes \+ (?:1|e3_child_writes); \}', '',body)
+ body=re.sub(r'\((Err\([^()\n]*\)), Ghost\(e3_source_writes\)\)',r'\1',body)
+ return re.sub(r'\(Ok\(\(\)\), Ghost\(e3_source_writes\)\)', 'Ok(())',body)
+def normal_head(head,name):
+ # Remove only added receipt/debit binding postconditions before reversing r.0.
+ head,n=re.subn(r'\s*r\.1@ == if r\.0\.is_ok\(\) \{ (?:1|4|8|24)nat \} else \{ 0nat \},','',head);assert n==1,name
+ if name not in widths:
+  head,n=re.subn(r'\s*r\.0\.is_ok\(\) ==> final\(self\)\.budget\.work_remaining as nat \+ r\.1@\s*== old\(self\)\.budget\.work_remaining as nat,','',head);assert n==1
+ head=head.replace('r.0','r').replace('B3C_EMISSION_WRITE_WORK','8')
+ head,n=re.subn(r'\(r: \(Result<\(\), ([^\n]+?)>, Ghost<nat>\)\)',r'(r: Result<(), \1>)',head);assert n==1,name
+ return head
+rows=[];counter_rows=[];reconstructed={}
+for file in ['src/brotli.rs','src/brotli_input.rs']:
+ old=(B/file).read_text();new=(R/file).read_text();recon=new
+ for name in sorted(allnames):
+  if not re.search(r'\bfn '+name+r'\(',g.rust_mask(old)):continue
+  a,op,end,nh,nb=function(new,name);oa,oop,oe,oh,ob=function(old,name)
+  assert tokens(normal_head(nh,name))==tokens(oh),name+' signature/requirements/prior guarantees'
+  # Receipt construction is constrained to reached writes and child receipts.
+  assert nb.count('let ghost mut e3_source_writes: nat = 0;')==1
+  for match in re.finditer(r'\be3_source_writes\s*=(?!=)\s*([^;]+);',nb):
+   assert match[1].strip() in ['e3_source_writes + 1','e3_source_writes + e3_child_writes'],(name,match[1])
+  assert not re.search(r'Ghost\((?:24|B3C_EMISSION_WRITE_WORK|.*budget\.)',nb)
+  if name=='emit_byte':
+   # Reverse only the specifically recorded added proof hints. No original
+   # proof statement is erased from the semantic-preservation comparison.
+   normalized_nb=nb
+   normalized_nb,n=re.subn(r'\n        proof \{ assert\(e3_source_writes == (?:3|4|8|12|20|24)\); [^\n]* \}', '', normalized_nb)
+   assert n==6,n
+   for binding in reversed(json.loads((R/'target/b3c-e3/local-proof-bindings.json').read_text())):
+    if 'new' in binding:
+     assert normalized_nb.count(binding['new'])==1
+     normalized_nb=normalized_nb.replace(binding['new'],binding['old'],1)
+  else:normalized_nb=nb
+  if name in widths:
+   assignments=list(re.finditer(r'(?m)^    workspace\[[^\n]+\] = [^\n]+;\n    proof \{ e3_source_writes = e3_source_writes \+ 1; \}',nb));assert len(assignments)==widths[name],name
+   normalized=strip_counter(nb)
+   assert tokens(normalized)==tokens(ob),name+' ordinary/proof body'
+   counter_rows.append({'function':name,'reached_primitive_stores':widths[name],'adjacent_reached_increments':len(assignments)})
+  elif name=='emit_byte':
+   # All workspace/output store sites are source-later than the one debit.
+   # No loop or buffer-writing call precedes it; normal statement equivalence
+   # below retains the original guarded, straight-line action ordering.
+   debit='assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));'
+   assert nb.count(debit)==1
+   debit_at=nb.index(debit)
+   store_sites=[nb.index('output[produced] = byte;'),nb.index('self.workspace[position as usize] = byte;')]
+   store_sites += [m.start() for m in re.finditer(r'crate::brotli_input::write_b3c_state_(?:byte|u32|u64)\s*\(',nb)]
+   assert len(store_sites)==8 and all(i>debit_at for i in store_sites)
+   body=normalized_nb
+   # Each of the six typed-store calls is merged immediately, without a formula.
+   pattern=r'\{\s*let \(e3_result, Ghost\(e3_child_writes\)\) = (crate::brotli_input::write_b3c_state_(?:byte|u32|u64)\([\s\S]*?\));\s*proof \{ e3_source_writes = e3_source_writes \+ e3_child_writes; \}\s*match e3_result \{\s*Ok\(\(\)\) => \(\),\s*Err\(_\) => return \(Err\(StreamError::InvalidFormat\), Ghost\(e3_source_writes\)\),\s*\}\s*\}'
+   body,n=re.subn(pattern,lambda m:m[1]+'.map_err(|_| StreamError::InvalidFormat)?;',body);assert n==6,n
+   pattern=r'let (position|history|total|remaining|stream_bits|previous|next_total) = match ([\s\S]*?) \{\s*Ok\(value\) => value,\s*Err\(error\) => return \(Err\(error\), Ghost\(e3_source_writes\)\),\s*\};'
+   body,n=re.subn(pattern,lambda m:'let '+m[1]+' = '+m[2]+'?;',body);assert n==7,n
+   for statement in ['output[produced] = byte;','self.workspace[position as usize] = byte;']:
+    assert nb.count(statement+'\n        proof { e3_source_writes = e3_source_writes + 1; }')==1,statement
+   body=strip_counter(body).replace('B3C_EMISSION_WRITE_WORK','8')
+   assert tokens(body)==tokens(ob),name+' ordinary guard/error/operation ordering'
+   counter_rows.append({'function':name,'direct_reached_store_increments':2,'child_receipt_merges':6,'write_count_target':24,'debit_coupling_postcondition_retained':True,'source_debit_precedes_all_eight_direct_or_child_store_sites':True})
+  else:
+   expected='''let ghost mut e3_source_writes: nat = 0;
+        let (result, Ghost(e3_child_writes)) = self.emit_byte(byte, output, produced, true);
+        proof { e3_source_writes = e3_source_writes + e3_child_writes; }
+        (result, Ghost(e3_source_writes))'''
+   assert tokens(nb)==tokens(expected)
+   assert tokens(ob)==tokens('self.emit_byte(byte, output, produced, true)')
+   counter_rows.append({'function':name,'child_receipt_merges':1,'write_count_target':24,'original_eight_unit_entry_domain_retained':True})
+  recon=recon.replace(new[a:end],old[oa:oe],1);rows.append({'function':name,'original_arguments_requirements_and_functional_guarantees_preserved':True,'ordinary_body_equivalent_after_only_receipt_erasure_error_expansion_and_approved_work_change':True})
+ # All remaining production code changes are the approved result projections,
+ # output-work reason constant, and its private declaration.
+ cutoff=recon.index('#[cfg(test)]');rprod=recon[:cutoff];oprod=old[:old.index('#[cfg(test)]')]
+ if file.endswith('/brotli.rs'):
+  a,b,end,hdr,body=function(rprod,'output_block_reason');oa,ob,oe,oh,oldbody=function(oprod,'output_block_reason');assert tokens((hdr+'{'+body+'}').replace('B3C_EMISSION_WRITE_WORK','8'))==tokens(oh+'{'+oldbody+'}');rprod=rprod[:a]+oprod[oa:oe]+rprod[end:]
+  assert rprod.count('const B3C_EMISSION_WRITE_WORK: u64 = 24;')==1;rprod=rprod.replace('const B3C_EMISSION_WRITE_WORK: u64 = 24;','',1)
+ mask=g.rust_mask(rprod);edits=[]
+ for name in allnames:
+  for match in re.finditer(r'\b'+name+r'\s*\(',mask):
+   if re.search(r'\bfn\s*$',mask[max(0,match.start()-6):match.start()]):continue
+   op=mask.index('(',match.start());depth=0
+   for k in range(op,len(mask)):
+    if mask[k]=='(':depth+=1
+    elif mask[k]==')':
+     depth-=1
+     if depth==0:break
+   if rprod[k+1:k+3]=='.0':edits.append((k+1,k+3))
+ for a,b in sorted(set(edits),reverse=True):rprod=rprod[:a]+rprod[b:]
+ assert tokens(rprod)==tokens(oprod),file+' remaining production code'
+ reconstructed[file]={'ordinary_result_projections':len(set(edits)),'outside_scoped_changes_token_identical':True}
+assert sum(x['ordinary_result_projections'] for x in reconstructed.values())==26
+for file in ['src/lib.rs','src/brotli_prefix.rs','src/brotli_block.rs','src/brotli_data.rs','Cargo.toml','Cargo.lock','rust-toolchain.toml']:
+ base=subprocess.check_output(['git','show',json.loads((R/'target/b3c-e3/baseline.json').read_text())['commit']+':'+file]);assert (R/file).read_bytes()==base,file
+result={'schema':'brotli-e3-preservation-and-source-origin-v1','baseline':json.loads((R/'target/b3c-e3/baseline.json').read_text()),'producers':rows,'source_origin':counter_rows,'other_production_code':reconstructed,'only_new_private_constant':'B3C_EMISSION_WRITE_WORK = 24','public_W1_interfaces_layout_dependencies_and_other_formulas_unchanged':True,'scope':'Static constrained-diff and counter-origin audit; checked receipts and source/debit equality require the actual verifier gate. Not a binary-identity theorem.'}
+(R/'target/b3c-e3/preservation-audit.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n');print(json.dumps({'audited_producers':len(rows),'outside_projections':26,'source_counter_origins_valid':True,'requirements_and_old_functional_guarantees_retained':True}))

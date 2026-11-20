@@ -1,0 +1,98 @@
+from pathlib import Path
+import json
+cases=[]
+def case(name,module,fn,old,new):cases.append(('brotli-e3-'+name,module,fn,old,new))
+inc='proof { e3_source_writes = e3_source_writes + 1; }'
+for fn,statement in [('write_b3c_state_byte','workspace[at] = value;'),('write_b3c_state_u32','workspace[at + 3] = (value >> 24) as u8;'),('write_b3c_state_u64','workspace[at + 7] = (value >> 56) as u8;')]:
+ case(fn+'-omits-store-receipt','input',fn,statement+'\n    '+inc,statement)
+for label,statement in [('output','output[produced] = byte;'),('window','self.workspace[position as usize] = byte;')]:case(label+'-store-receipt-omitted','brotli','BrotliDecoder::emit_byte',statement+'\n        '+inc,statement)
+for label,field,value in [('byte','B3C_SECOND_PREVIOUS_BYTE','previous'),('u32','B3C_WINDOW_POSITION','next_position'),('u64','B3C_TOTAL_PRODUCED','next_total')]:
+ old='crate::brotli_input::'+field+',\n                '+value+',\n            );\n            proof { e3_source_writes = e3_source_writes + e3_child_writes; }';new=old.replace('proof { e3_source_writes = e3_source_writes + e3_child_writes; }','proof { }');case(label+'-child-store-receipt-omitted','brotli','BrotliDecoder::emit_byte',old,new)
+case('uncompressed-discards-child-receipt','brotli','BrotliDecoder::emit_uncompressed_byte','proof { e3_source_writes = e3_source_writes + e3_child_writes; }','proof { }')
+case('emission-restores-eight-work-debit','brotli','BrotliDecoder::emit_byte','assert!(self.budget.charge_work(B3C_EMISSION_WRITE_WORK));','assert!(self.budget.charge_work(8));')
+case('output-block-check-restores-eight-unit-minimum','brotli','output_block_reason','if output_remaining == 0 || work_remaining < B3C_EMISSION_WRITE_WORK {','if output_remaining == 0 || work_remaining < 8 {')
+assert len(cases)==11
+text='''
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_eleven_e3_store_receipt_and_billing_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!("proven-primitives-e3-canaries-{}", std::process::id()));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let check = |module: &str, function: &str| {
+        if module == "input" {
+            check_brotli_input_function(&verus, &temporary, function)
+        } else {
+            Command::new(&verus).arg(temporary.join("src/lib.rs"))
+                .args(["--crate-type", "lib", "--verify-only-module", "brotli",
+                    "--verify-function", function, "--no-cheating", "--num-threads", "1",
+                    "--triggers-mode", "silent", "--rlimit", "300"])
+                .current_dir(&temporary).output().expect("run selected pinned Verus emission root")
+        }
+    };
+    for (module, function) in [
+        ("input", "write_b3c_state_byte"), ("input", "write_b3c_state_u32"),
+        ("input", "write_b3c_state_u64"), ("brotli", "BrotliDecoder::emit_byte"),
+        ("brotli", "BrotliDecoder::emit_uncompressed_byte"), ("brotli", "output_block_reason"),
+    ] {
+        let positive = check(module, function);
+        assert!(positive.status.success(), "unchanged E3 root failed: {}", transcript(&positive));
+    }
+    for (name, module, function, old, new) in [
+'''
+for row in cases:text+='        ('+', '.join(json.dumps(x) for x in row)+'),\n'
+text+='''    ] {
+        let (file, begin, following, marker) = if module == "input" {
+            match function {
+                "write_b3c_state_byte" => ("brotli_input.rs", "pub(crate) fn write_b3c_state_byte(", "pub(crate) open spec fn b3c_scalar_u16_at", "\\n{\\n"),
+                "write_b3c_state_u32" => ("brotli_input.rs", "pub(crate) fn write_b3c_state_u32(", "proof fn decode_b3c_u64_le", "\\n{\\n"),
+                "write_b3c_state_u64" => ("brotli_input.rs", "pub(crate) fn write_b3c_state_u64(", "pub(crate) fn initialize_serialized_b3c(", "\\n{\\n"),
+                _ => unreachable!(),
+            }
+        } else {
+            match function {
+                "BrotliDecoder::emit_byte" => ("brotli.rs", "    fn emit_byte(", "    fn emit_uncompressed_byte(", "\\n    {\\n"),
+                "BrotliDecoder::emit_uncompressed_byte" => ("brotli.rs", "    fn emit_uncompressed_byte(", "    fn fail_transition(", "\\n    {\\n"),
+                "output_block_reason" => ("brotli.rs", "fn output_block_reason(", "pub struct RequestLimits", "\\n{\\n"),
+                _ => unreachable!(),
+            }
+        };
+        let path = temporary.join("src").join(file);
+        let original = fs::read_to_string(project.join("src").join(file)).unwrap();
+        let start = original.find(begin).unwrap();
+        let end = start + original[start..].find(following).unwrap();
+        let selected = &original[start..end];
+        let body = selected.find(marker).unwrap();
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique E3 body anchor for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged E3 contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let output = check(module, function);
+        let log = transcript(&output);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!output.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied") || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied") || log.contains("assertion failed"),
+            "expected semantic rejection: {log}");
+        let lower = log.to_ascii_lowercase();
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count") && !lower.contains("unexpected smt output")
+            && !lower.contains("internal compiler error") && !lower.contains("error[e"),
+            "tool or resource failure is not semantic rejection: {log}");
+        println!("REJECTED {name}: actual reached-store receipt or debit defect, unchanged specification");
+        fs::write(&path, original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+'''
+p=Path('tests/proof_rejection.rs');p.write_text(p.read_text()+text)
+Path('target/b3c-e3/new-control-cases.json').write_text(json.dumps(cases,indent=2)+'\n')
