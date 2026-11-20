@@ -1,0 +1,60 @@
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+   --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-permanent-proof03/controls/budget-constructor-accepts-invalid-window/src/brotli.rs:224:5
+    |
+224 |     pub fn new(limits: RequestLimits) -> (r: Result<Self, InitError>)
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check finished in 5 seconds
+   --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-permanent-proof03/controls/budget-constructor-accepts-invalid-window/src/brotli.rs:224:5
+    |
+224 |     pub fn new(limits: RequestLimits) -> (r: Result<Self, InitError>)
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+   --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-permanent-proof03/controls/budget-constructor-accepts-invalid-window/src/brotli.rs:226:13
+    |
+226 |               r.is_ok() == (10 <= limits.max_window_bits <= 24),
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+240 | /         Ok(Self {
+241 | |             limits,
+242 | |             input_remaining: limits.max_input,
+243 | |             output_remaining: limits.max_output,
+...   |
+246 | |             initializations_remaining: limits.max_initializations,
+247 | |         })
+    | |__________- at the end of the function body
+
+error: postcondition not satisfied
+   --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-permanent-proof03/controls/budget-constructor-accepts-invalid-window/src/brotli.rs:227:13
+    |
+227 | /             r.is_ok() ==> {
+228 | |                 let budget = r.unwrap();
+229 | |                 &&& budget.valid()
+230 | |                 &&& budget.matches_limits(limits)
+...   |
+233 | |                 &&& budget.remaining_initializations() == limits.max_initializations
+234 | |             },
+    | |_____________^ failed this postcondition
+...
+240 | /         Ok(Self {
+241 | |             limits,
+242 | |             input_remaining: limits.max_input,
+243 | |             output_remaining: limits.max_output,
+...   |
+246 | |             initializations_remaining: limits.max_initializations,
+247 | |         })
+    | |__________- at the end of the function body
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+   --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-permanent-proof03/controls/budget-constructor-accepts-invalid-window/src/brotli.rs:224:5
+    |
+224 |     pub fn new(limits: RequestLimits) -> (r: Result<Self, InitError>)
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 2 previous errors
+

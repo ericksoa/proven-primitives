@@ -26610,6 +26610,7 @@ impl<'w> CompressedMetaBlockDecoder<'w> {
 
     }
 
+    #[verifier::spinoff_prover]
     fn advance_initial_block_length_phase(
         &mut self,
         phase: CompressedOuterPhase,
@@ -41402,18 +41403,44 @@ pub(crate) fn advance_serialized_body_bits(
     BodyBitsStep { consumed: read.consumed, status }
 }
 
+#[verifier::spinoff_prover]
 fn load_body_switch_state(
     workspace: &[u8],
     window_bytes: u32,
 ) -> (r: Result<crate::brotli_block::B3bSwitchState, CoreFailure>)
-    ensures r.is_ok() ==> r.unwrap().valid(),
+    ensures
+        r.is_ok() ==> r.unwrap().valid(),
+        r.is_ok() ==> {
+            let decoded = r.unwrap();
+            &&& b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+            &&& forall|j: int| 0 <= j < 3 ==> {
+                &&& decoded.num_types@[j] as nat == b3b_scalar_u16_at(
+                    workspace@, window_bytes, (16 + 2 * j) as u16,
+                )
+                &&& decoded.remaining@[j] as nat == b3b_scalar_u32_at(
+                    workspace@, window_bytes, (146 + 4 * j) as u16,
+                )
+            }
+            &&& ((decoded.phase == crate::brotli_block::B3bSwitchPhase::Ready)
+                == (b3b_scalar_byte_at(workspace@, window_bytes, 129) == 0))
+        },
 {
     let mut num_types = [0u16; 3];
     let mut remaining = [0u32; 3];
     let mut ring = [0u16; 6];
     let mut i = 0usize;
     while i < 3
-        invariant i <= 3,
+        invariant
+            i <= 3,
+            i > 0 ==> b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+            forall|j: int| 0 <= j < i ==> {
+                &&& num_types@[j] as nat == b3b_scalar_u16_at(
+                    workspace@, window_bytes, (16 + 2 * j) as u16,
+                )
+                &&& remaining@[j] as nat == b3b_scalar_u32_at(
+                    workspace@, window_bytes, (146 + 4 * j) as u16,
+                )
+            },
         decreases 3 - i,
     {
         num_types[i] = match state_u16(
@@ -41436,7 +41463,17 @@ fn load_body_switch_state(
     }
     i = 0;
     while i < 6
-        invariant i <= 6,
+        invariant
+            i <= 6,
+            b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+            forall|j: int| 0 <= j < 3 ==> {
+                &&& num_types@[j] as nat == b3b_scalar_u16_at(
+                    workspace@, window_bytes, (16 + 2 * j) as u16,
+                )
+                &&& remaining@[j] as nat == b3b_scalar_u32_at(
+                    workspace@, window_bytes, (146 + 4 * j) as u16,
+                )
+            },
         decreases 6 - i,
     {
         ring[i] = match state_u16(
@@ -41453,6 +41490,15 @@ fn load_body_switch_state(
     while i < 3
         invariant
             i <= 3,
+            b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+            forall|j: int| 0 <= j < 3 ==> {
+                &&& num_types@[j] as nat == b3b_scalar_u16_at(
+                    workspace@, window_bytes, (16 + 2 * j) as u16,
+                )
+                &&& remaining@[j] as nat == b3b_scalar_u32_at(
+                    workspace@, window_bytes, (146 + 4 * j) as u16,
+                )
+            },
             forall|j: int| 0 <= j < i ==> {
                 &&& 1 <= num_types@[j] <= 256
                 &&& ring@[2 * j + 1] < num_types@[j]
@@ -41650,6 +41696,7 @@ fn reject_permanent_single_type_switch(
     }
 }
 
+#[verifier::spinoff_prover]
 pub(crate) fn advance_serialized_body_block_switch(
     workspace: &mut [u8],
     window_bytes: u32,
@@ -41676,6 +41723,14 @@ pub(crate) fn advance_serialized_body_block_switch(
             window_bytes,
             B3C_STREAM_PHASE as int,
         ),
+        kind < 3
+            && b3b_scalar_byte_at(old(workspace)@, window_bytes, 129) == 0
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, (16 + 2 * kind as int) as u16) <= 1
+            && b3b_scalar_u32_at(old(workspace)@, window_bytes, (146 + 4 * kind as int) as u16) == 0
+            ==> {
+                &&& r.consumed == 0
+                &&& matches!(r.status, BodySwitchStatus::Failed(_))
+            },
 {
     if kind >= 3 {
         return BodySwitchStep {

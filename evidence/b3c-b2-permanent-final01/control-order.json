@@ -1,0 +1,5 @@
+{
+  "whole_positive_log_completed_ns": 1795143651717029303,
+  "all_six_negative_logs_newer_than_positive": true,
+  "controller_requires_full_success_before_case_generation": true
+}

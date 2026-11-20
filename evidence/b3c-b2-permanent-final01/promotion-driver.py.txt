@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,hashlib,subprocess,os,shutil,time,re,importlib.util
+R=Path.cwd();C=R/'target/b3c-b2-permanent-proof03';O=R/'evidence/b3c-b2-permanent-final01';O.mkdir(exist_ok=False)
+spec=importlib.util.spec_from_file_location('helpers',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+env=dict(os.environ,DEVELOPER_DIR='/Library/Developer/CommandLineTools',RUSTUP_TOOLCHAIN='1.99.1',VERUS_ROOT=str(g.TOOL))
+def dump(name,value):(O/name).write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
+report=g.proof_report((C/'whole-crate.log').read_text());controls=json.loads((C/'controls.json').read_text());assert len(controls)==6 and all(x['semantic_rejection'] and not x['tool_or_resource_failure'] and not x['syntax_or_type_failure'] for x in controls)
+assert subprocess.check_output(['git','rev-parse','HEAD'],text=True,env=env).strip()=='ce87a2555a1c11813b8d5b57c9ccd830c16583b4'
+assert not subprocess.check_output(['git','diff','--name-only'],text=True,env=env)
+core=json.loads((C/'whole-source-start.json').read_text())
+for n,d in core.items():assert g.file_hash(C/n)==d,n
+for name in ['brotli.rs','brotli_input.rs']:shutil.copyfile(C/'src'/name,R/'src'/name)
+for n,d in core.items():assert g.file_hash(R/n)==d,n
+dump('source-start.json',{'source_sha256':g.source_snapshot(R),'verified_core_sha256':core,'tools':g.tool_snapshot(env),'parent':'ce87a2555a1c11813b8d5b57c9ccd830c16583b4','proof_promotion':'All core files byte-identical to the actual entire-crate no-cheating positive and six strict controls, executed at the recorded private source path. No source edits during promotion; runtime lanes below use this exact promoted source.'})
+(O/'whole-crate.log').write_bytes((C/'whole-crate.log').read_bytes());dump('verification.json',report);dump('controls.json',controls)
+for row in controls:shutil.copyfile(C/'controls'/row['name']/'negative.log',O/(row['name']+'.log'))
+shutil.copyfile(R/'target/b3c-emission/check-b2-candidate-controls03.py',O/'control-driver.py.txt');shutil.copyfile(R/'target/b3c-emission/audit-b2-candidate03.py',O/'preservation-audit.py.txt');shutil.copyfile(C/'preservation-audit.json',O/'preservation-audit.json')
+rows=[];frozen=g.source_snapshot(R)
+for name,cmd in g.RUNTIME:
+ start=time.time_ns();begin=time.monotonic();p=O/(name+'.log')
+ with p.open('w') as f:result=subprocess.run(cmd,cwd=R,env=env,stdout=f,stderr=subprocess.STDOUT)
+ text=p.read_text();passed=sum(map(int,re.findall(r'test result: ok\. (\d+) passed; 0 failed',text)));row={'name':name,'command':cmd,'exit_code':result.returncode,'passed':passed,'started_ns':start,'seconds':time.monotonic()-begin,'log':p.name,'sha256':g.file_hash(p)};rows.append(row);dump('runtime-results.json',rows);print(json.dumps(row),flush=True);assert result.returncode==0 and passed>0,name;assert g.source_snapshot(R)==frozen
+assert g.tool_snapshot(env)==json.loads((O/'source-start.json').read_text())['tools'];dump('runtime-complete.json',{'passed':sum(x['passed'] for x in rows),'source_unchanged':True,'verified':report['verification-results'],'semantic_rejections':6})

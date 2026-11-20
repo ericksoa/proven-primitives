@@ -223,6 +223,7 @@ impl RequestBudget {
 
     pub fn new(limits: RequestLimits) -> (r: Result<Self, InitError>)
         ensures
+            r.is_ok() == (10 <= limits.max_window_bits <= 24),
             r.is_ok() ==> {
                 let budget = r.unwrap();
                 &&& budget.valid()

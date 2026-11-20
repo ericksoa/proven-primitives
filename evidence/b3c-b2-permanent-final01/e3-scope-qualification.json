@@ -1,0 +1,128 @@
+{
+  "E3_status": "pending direct human approval; unimplemented",
+  "all_five_receipt_producers_and_33_caller_sites_unchanged": true,
+  "approval_inferred": false,
+  "current_production_source_sha256": {
+    "src/brotli.rs": "dedfa06f2eb5aa11b874de8841e1aa6fe50fec8f61222949f3ff12e18b514dce",
+    "src/brotli_input.rs": "0cb2d206e60d75f4803b2ff1ae6f0697d0126cf49d3ec1b2a6f4dcb5a03e4992",
+    "tests/proof_rejection.rs": "fcf9dae2f5b359abd83d21bdd59263f372cdd9f75a153133afac2fb5f26cad23"
+  },
+  "only_other_changes": "C1 proof guarantees/invariants, window-only budget validation completeness, and three existing-tool isolation annotations; no ordinary code/interface/unit policy changes",
+  "proposal_production_source_sha256": {
+    "src/brotli.rs": "6472034d30705cd1627fb846de1370e5e1d65da01682d78ca858e2a1bd51e4a9",
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "tests/proof_rejection.rs": "986bfed687b75841673093146ea71a2c1b23a140a457ab6cc675e186e1d0390a"
+  },
+  "qualified_producer_and_direct_caller_definitions": [
+    {
+      "byte_identical": true,
+      "definition_sha256": "9d6f383f7be6ee2e4960d2e26d829290a15ae71d67b4a4e78067e4a2e6d2d9a0",
+      "file": "src/brotli.rs",
+      "function": "commit_eof_if_complete"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "8573ab0922ef9de3fe76b9bfe7e2efeebf179e5e658ae350131df8aab5e6cf5e",
+      "file": "src/brotli.rs",
+      "function": "consume_metadata_byte"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "4888963017dc111113edd16173a7e50fa3ce535f3a6dbd822ffa9f6824c531f8",
+      "file": "src/brotli.rs",
+      "function": "emit_byte"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "6f7e4ec56cb0d43fcbaeca7c92e382a3c1d31a7782e0096b6b8d9bd5c43631b3",
+      "file": "src/brotli.rs",
+      "function": "emit_uncompressed_byte"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "c40f476f023597306da6c7108e3ea44b74274ddab40ed6916f8ed0e1375c29ec",
+      "file": "src/brotli.rs",
+      "function": "fail"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "7d56e7faaebd7526e3c2c7c15b0c14767807077dc0cde910af594a4c55cdaa97",
+      "file": "src/brotli.rs",
+      "function": "set_state_byte"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "b0e75027bec5dba84efed346eb5ddf11ca5a0cb0bab2db55e89ec3bb0bf08181",
+      "file": "src/brotli.rs",
+      "function": "set_state_u32"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "fc2d9268cfea32dade2b4a532d79948b78cb27f7d96fe696309e98bc73cf0125",
+      "file": "src/brotli.rs",
+      "function": "step_body_emit_literal"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "b618d6dcdcb862add784914ad5855aed6450926a071f1b9d0f768f6dc1775090",
+      "file": "src/brotli.rs",
+      "function": "step_body_phase_copy_emit"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "f7a238cc4b8ef7a8ba381a4d0da7cb8fb4e46862b5f04e64adcf02cad1291c8b",
+      "file": "src/brotli.rs",
+      "function": "step_body_phase_copy_setup"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "51ca350a1b8db330d8888ca56b25f52553fdd711163a452edc4624c209b1001f",
+      "file": "src/brotli.rs",
+      "function": "step_stream_transition"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "3c860ac80b5767f6eb2e8e2f964e0c6f8c09def64e13e759e6171c3ac8efefb2",
+      "file": "src/brotli.rs",
+      "function": "write_phase"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "ffd64c31fc39cda943d368fe31592020f2e4c568253bace44e603d0255dae0ae",
+      "file": "src/brotli_input.rs",
+      "function": "advance_serialized_window_header"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "cc4448961e0f077417cffee9bc9e8bf903e340f44bd8fcb85bd179d057fb6c31",
+      "file": "src/brotli_input.rs",
+      "function": "build_serialized_dictionary_word"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "86ef7ed5aaae4e28e38e30e6126ed4e03cd17815f5c57de12e893c20a4ccdc80",
+      "file": "src/brotli_input.rs",
+      "function": "store_meta_phase"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "6e3589da9474a208f7ebf27e45548b615be8c0a9767775516696f878b61a8896",
+      "file": "src/brotli_input.rs",
+      "function": "write_b3c_state_byte"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "0c7c33e7dfced701c79f97e77118e8af71b52ca1989e310ccdbc52e07ebf3955",
+      "file": "src/brotli_input.rs",
+      "function": "write_b3c_state_u32"
+    },
+    {
+      "byte_identical": true,
+      "definition_sha256": "f464e322ca87c9a1c5828f1a8a6cd8e6b6d96ea12e8c5c2d543bc71f061c36d6",
+      "file": "src/brotli_input.rs",
+      "function": "write_b3c_state_u64"
+    }
+  ],
+  "schema": "e3-proof-only-source-qualification-after-b2-v1",
+  "source_delta_audit": "final-preservation-audit.json"
+}

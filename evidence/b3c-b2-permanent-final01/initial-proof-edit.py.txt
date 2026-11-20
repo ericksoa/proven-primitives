@@ -1,0 +1,70 @@
+from pathlib import Path
+import shutil
+R=Path.cwd();O=R/'target/b3c-b2-permanent-proof01';O.mkdir(exist_ok=False);shutil.copytree(R/'src',O/'src');p=O/'src/brotli_input.rs';s=p.read_text();a=s.index('fn load_body_switch_state(');b=s.index('fn store_body_switch_state(',a);part=s[a:b]
+map3='''            forall|j: int| 0 <= j < 3 ==> {
+                &&& num_types@[j] as nat == b3b_scalar_u16_at(
+                    workspace@, window_bytes, (16 + 2 * j) as u16,
+                )
+                &&& remaining@[j] as nat == b3b_scalar_u32_at(
+                    workspace@, window_bytes, (146 + 4 * j) as u16,
+                )
+            },
+'''
+partial=map3.replace('j < 3','j < i')
+extra='''    ensures
+        r.is_ok() ==> r.unwrap().valid(),
+        r.is_ok() ==> {
+            let decoded = r.unwrap();
+            &&& b3b_workspace_shape(workspace@.len() as nat, window_bytes)
+            &&& forall|j: int| 0 <= j < 3 ==> {
+                &&& decoded.num_types@[j] as nat == b3b_scalar_u16_at(
+                    workspace@, window_bytes, (16 + 2 * j) as u16,
+                )
+                &&& decoded.remaining@[j] as nat == b3b_scalar_u32_at(
+                    workspace@, window_bytes, (146 + 4 * j) as u16,
+                )
+            }
+            &&& ((decoded.phase == crate::brotli_block::B3bSwitchPhase::Ready)
+                == (b3b_scalar_byte_at(workspace@, window_bytes, 129) == 0))
+        },
+'''
+old='    ensures r.is_ok() ==> r.unwrap().valid(),\n';assert part.count(old)==1;part=part.replace(old,extra,1)
+old='''    while i < 3
+        invariant i <= 3,
+        decreases 3 - i,
+''';new='''    while i < 3
+        invariant
+            i <= 3,
+            i > 0 ==> b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+'''+partial+'''        decreases 3 - i,
+''';assert part.count(old)==1;part=part.replace(old,new,1)
+old='''    while i < 6
+        invariant i <= 6,
+        decreases 6 - i,
+''';new='''    while i < 6
+        invariant
+            i <= 6,
+            b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+'''+map3+'''        decreases 6 - i,
+''';assert part.count(old)==1;part=part.replace(old,new,1)
+old='''    while i < 3
+        invariant
+            i <= 3,
+            forall|j: int| 0 <= j < i ==> {
+''';new='''    while i < 3
+        invariant
+            i <= 3,
+            b3b_workspace_shape(workspace@.len() as nat, window_bytes),
+'''+map3+'''            forall|j: int| 0 <= j < i ==> {
+''';assert part.count(old)==1;part=part.replace(old,new,1);s=s[:a]+part+s[b:]
+a=s.index('pub(crate) fn advance_serialized_body_block_switch(');b=s.index('proof fn valid_bits_ignore_unused_storage',a);part=s[a:b];body=part.index('\n{\n')
+post='''
+        kind < 3
+            && b3b_scalar_byte_at(old(workspace)@, window_bytes, 129) == 0
+            && b3b_scalar_u16_at(old(workspace)@, window_bytes, (16 + 2 * kind as int) as u16) <= 1
+            && b3b_scalar_u32_at(old(workspace)@, window_bytes, (146 + 4 * kind as int) as u16) == 0
+            ==> {
+                &&& r.consumed == 0
+                &&& matches!(r.status, BodySwitchStatus::Failed(_))
+            },'''
+part=part[:body]+post+part[body:];p.write_text(s[:a]+part+s[b:])

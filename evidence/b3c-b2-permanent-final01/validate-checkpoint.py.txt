@@ -1,0 +1,40 @@
+from pathlib import Path
+import json,hashlib,tarfile,subprocess,re,importlib.util
+R=Path.cwd();O=R/'evidence/b3c-b2-permanent-final01'
+def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+root=json.loads((R/'evidence/brotli-b3c-b2-permanent.json').read_text())
+def bindings(x):
+ if isinstance(x,dict):
+  if 'path' in x and 'sha256' in x:assert h(R/x['path'])==x['sha256'],x['path']
+  for v in x.values():bindings(v)
+ elif isinstance(x,list):
+  for v in x:bindings(v)
+bindings(root)
+for n,d in json.loads((O/'artifact-sha256.json').read_text()).items():assert h(O/n)==d,n
+start=json.loads((O/'source-start.json').read_text())
+for n,d in start['source_sha256'].items():assert h(R/n)==d,n
+with tarfile.open(O/'verified-core-source.tar.gz','r:gz') as archive:
+ assert set(archive.getnames())==set(start['verified_core_sha256'])
+ base={n:archive.extractfile(n).read() for n in archive.getnames()}
+ for n,data in base.items():assert hashlib.sha256(data).hexdigest()==h(R/n)==start['verified_core_sha256'][n]
+mapping=json.loads((O/'control-source-sha256.json').read_text());rows=json.loads((O/'controls.json').read_text());assert len(mapping)==len(rows)==6
+spec=importlib.util.spec_from_file_location('h',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+with tarfile.open(O/'control-source.tar.gz','r:gz') as archive:
+ for row in rows:
+  name=row['name'];assert g.semantic_rejection((O/(name+'.log')).read_text())['semantic_rejection'];assert h(O/(name+'.log'))==row['log_sha256']
+  changed=[];data_map={}
+  for n,d in mapping[name].items():
+   data=archive.extractfile(name+'/'+n).read();assert hashlib.sha256(data).hexdigest()==d;data_map[n]=data
+   if data!=base[n]:changed.append(n)
+  assert len(changed)==1,(name,changed)
+  file=changed[0];old=base[file].decode();new=data_map[file].decode()
+  if row['function']=='RequestBudget::new':begin='    pub fn new(limits: RequestLimits)';following='    pub(crate) fn reserve_initialization(';marker='\n    {\n'
+  else:begin='pub(crate) fn advance_serialized_body_block_switch(';following='proof fn valid_bits_ignore_unused_storage';marker='\n{\n'
+  a=old.index(begin);b=old.index(following,a);c=new.index(begin);d=new.index(following,c)
+  assert old[:a]==new[:c] and old[b:]==new[d:]
+  assert old[a:b].split(marker,1)[0]==new[c:d].split(marker,1)[0]
+v=json.loads((O/'verification.json').read_text())['verification-results'];assert v['success'] and v['errors']==0 and v['is-verifying-entire-crate']
+assert sum(row['passed'] for row in json.loads((O/'runtime-results.json').read_text()))==116
+assert json.loads((O/'e3-scope-qualification.json').read_text())['all_five_receipt_producers_and_33_caller_sites_unchanged']
+subprocess.run(['git','diff','--check'],check=True)
+print(json.dumps({'verified':v['verified'],'errors':v['errors'],'runtime_passed':116,'strict_semantic_rejections':6,'all_mutants_body_only_with_original_headers':True,'all_hashes_and_promotion_content_match':True,'E3':'pending, unimplemented'},indent=2))

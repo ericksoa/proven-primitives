@@ -129,8 +129,8 @@ billing change will be implemented without the human's exact approval.
 
 ## Preimplementation harness qualification
 
-The two production source hashes and the five-producer/33-caller graph above
-remain exact. The legacy B3c control harness subsequently required a stale
+At the byte-effect checkpoint `ce87a25`, the two production source hashes
+and the five-producer/33-caller graph above remained exact. The legacy B3c control harness subsequently required a stale
 M1-refactor mutation selector repair and a matched selected-emission checker
 allowance of 300, already used by whole-crate checking. The terminal-retry
 control also uses an identical allowance of 300 in each temporary source copy,
@@ -140,3 +140,17 @@ classifiers, contracts, production allowances and runtime inputs remain.
 old/current test hashes and verifies reconstruction by reversing only those
 host-harness repairs. This is not an E3 implementation or an additional
 architectural approval.
+
+
+## Later C1 proof-only source qualification
+
+The subsequent permanent-outcome/budget-validation proof checkpoint changes
+only contracts, loop invariants and existing-tool isolation annotations outside
+E3's five producers and their direct callers. Whole-file source hashes therefore
+differ from the proposal snapshot. Its
+`evidence/b3c-b2-permanent-final01/e3-scope-qualification.json` verifies all 18
+producer/direct-caller definitions are byte-identical to `ce87a25`, covering all
+five proposed producers and 33 caller sites. The exact source reconstruction
+is in that checkpoint's `final-preservation-audit.json`. No ordinary code,
+return type, producer/caller graph, unit policy or E3 decision changed. E3
+remains pending direct human approval and is unimplemented.

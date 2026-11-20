@@ -1,0 +1,21 @@
+from pathlib import Path
+import hashlib,json,re,subprocess,importlib.util
+R=Path.cwd();O=R/'evidence/b3c-b2-permanent-final01';base='ce87a2555a1c11813b8d5b57c9ccd830c16583b4'
+spec=importlib.util.spec_from_file_location('h',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+def fntext(s,name):
+ mask=g.rust_mask(s);m=re.search(r'(?m)^([ \t]*)(?:pub(?:\([^)]*\))?\s+)?fn\s+'+re.escape(name)+r'\(',mask);assert m,name
+ q=re.search(r'(?m)^'+re.escape(m.group(1))+r'\{',mask[m.end():]);assert q,name
+ start=m.end()+q.end()-1;depth=0
+ for i in range(start,len(mask)):
+  if mask[i]=='{':depth+=1
+  elif mask[i]=='}':
+   depth-=1
+   if depth==0:return s[m.start():i+1]
+ raise AssertionError(name)
+audit=json.loads((R/'evidence/b3c-emission-write-audit/source-audit.json').read_text());names={('src/brotli_input.rs',n) for n in audit['proposed_receipt_producers'] if n.startswith('write_')};names|={('src/brotli.rs',n) for n in audit['proposed_receipt_producers'] if not n.startswith('write_')}
+for rows in audit['direct_caller_sites'].values():names|={(x['file'],x['function']) for x in rows}
+proof=[]
+for file,name in sorted(names):
+ old=subprocess.check_output(['git','show',base+':'+file],text=True);new=(R/file).read_text();a=fntext(old,name);b=fntext(new,name);assert a==b,(file,name);proof.append({'file':file,'function':name,'definition_sha256':hashlib.sha256(a.encode()).hexdigest(),'byte_identical':True})
+result={'schema':'e3-proof-only-source-qualification-after-b2-v1','proposal_production_source_sha256':audit['source_sha256'],'current_production_source_sha256':{n:g.file_hash(R/n) for n in ['src/brotli.rs','src/brotli_input.rs','tests/proof_rejection.rs']},'qualified_producer_and_direct_caller_definitions':proof,'all_five_receipt_producers_and_33_caller_sites_unchanged':True,'only_other_changes':'C1 proof guarantees/invariants, window-only budget validation completeness, and three existing-tool isolation annotations; no ordinary code/interface/unit policy changes','source_delta_audit':'final-preservation-audit.json','E3_status':'pending direct human approval; unimplemented','approval_inferred':False}
+(O/'e3-scope-qualification.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n');print(json.dumps({'definitions':len(proof),'all_byte_identical':True,'E3_implemented':False}))

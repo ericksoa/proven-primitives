@@ -1,0 +1,142 @@
+{
+  "E3": {
+    "current_emission_work_debit": 8,
+    "decision": {
+      "path": "BROTLI_B3C_EMISSION_WRITE_METERING_DECISION.md",
+      "sha256": "29e5a91289e72a6ef68b385f7b24cb2f673f6d376ef903a1609381a774436dba"
+    },
+    "implemented": false,
+    "known_static_write_count": 24,
+    "scope_qualification": {
+      "path": "evidence/b3c-b2-permanent-final01/e3-scope-qualification.json",
+      "sha256": "d33f2821b2a1129c4c74d747e7add714f8dda61b9c96b05b2943f94c3cb8fabe"
+    },
+    "source_count_not_yet_an_invocation_receipt": true,
+    "status": "pending-direct-human-approval"
+  },
+  "approved_basis": {
+    "A1": {
+      "path": "BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md",
+      "sha256": "f084bbeb2d1d2432bb6e2c55d6d090bd900259b6432a14cfb25203eb3d456827"
+    },
+    "C1": {
+      "path": "BROTLI_B3C_PROPOSAL.md",
+      "sha256": "2ee3344863a50465bcd1d820468537f1dce391c2bf26af67ee29e9566537974a"
+    },
+    "new_functions_types_visibility_or_compiled_interfaces": false,
+    "ordinary_code_or_quota_changes": false
+  },
+  "artifact_manifest": {
+    "path": "evidence/b3c-b2-permanent-final01/artifact-sha256.json",
+    "sha256": "5462e7ce22fa2e3883093d1aedf15c0bb619a7d654d63eeea54c6377055e0a58"
+  },
+  "checkpoint": {
+    "path": "BROTLI_B3C_B2_PERMANENT_CHECKPOINT.md",
+    "sha256": "08d3a755ccb94519fcb998ce18ea8a7de88b1e93064d3defbfce95e07bd0009b"
+  },
+  "complete_B2_state_codec_or_stream_composition": false,
+  "complete_B3c": false,
+  "complete_resource_ledger": false,
+  "controls": {
+    "count": 6,
+    "positive_precedes_all_controls": {
+      "path": "evidence/b3c-b2-permanent-final01/control-order.json",
+      "sha256": "beca69e7fe1e202b4180afaeb3d4cb05b6961dfdd51a76899ec15d01fffd419b"
+    },
+    "previous_44_rerun_or_counted_here": false,
+    "results": {
+      "path": "evidence/b3c-b2-permanent-final01/controls.json",
+      "sha256": "6f857e25ac91152807549efa7f8e6adba99cb9bf13d60913b969c8c183d0aafc"
+    },
+    "source_closures": {
+      "path": "evidence/b3c-b2-permanent-final01/control-source.tar.gz",
+      "sha256": "f67c75c617f429bc5c5e9415595812d8dabffb54bf58b6a37a5968c13d61d4f9"
+    },
+    "source_hashes": {
+      "path": "evidence/b3c-b2-permanent-final01/control-source-sha256.json",
+      "sha256": "40fac3e49d9ed882d63633b0fbf9465d836d5cab80cd59131affe9172da04867"
+    }
+  },
+  "earlier_candidates": {
+    "archive": {
+      "path": "evidence/b3c-b2-permanent-final01/earlier-candidates.tar.gz",
+      "sha256": "ff5fe3ac9bbb5c6cbe81e71730fd7aa68b78b6f1a4cd457ef791c0693c7e578b"
+    },
+    "counts_as_complete_whole_or_controls": false,
+    "manifest": {
+      "path": "evidence/b3c-b2-permanent-final01/earlier-candidates.json",
+      "sha256": "61acaa70e5d7b3dc08214aa654764dc8afb74f93af92dcce847174785ad51706"
+    }
+  },
+  "not_proved": [
+    "A supported or complete Brotli decoder",
+    "A complete resource or availability theorem",
+    "Source-to-binary or side-channel correctness"
+  ],
+  "parent_commit": "ce87a2555a1c11813b8d5b57c9ccd830c16583b4",
+  "preservation_audit": {
+    "path": "evidence/b3c-b2-permanent-final01/final-preservation-audit.json",
+    "sha256": "25f927b761bff462fa5b23c459725ad7d6a60ac8eeae1ae4d1030d758fad1cff"
+  },
+  "remaining": [
+    "Exact B2 load/store/call/snapshot and multi-type grammar refinement",
+    "Public stream propagation and body/dictionary/LZ77/source-ledger composition",
+    "E3 approval and write/source-read billing corrections",
+    "B3d/B4, F2 monkey/native disagreement, independent human specification review and supported-decoder/release gates"
+  ],
+  "reproduce": {
+    "path": "evidence/b3c-b2-permanent-final01/REPRODUCE.md",
+    "sha256": "23116de6f48ac5c84b49848b3fbe1b20596e5df57df46e7e9b5ed671bb42fbbe"
+  },
+  "runtime": {
+    "passed": 116,
+    "results": {
+      "path": "evidence/b3c-b2-permanent-final01/runtime-results.json",
+      "sha256": "e7e69f9cb5a287f5e9aace07a4c0755f626c7048dc7a81cdc4b3a94ea7b8c27d"
+    },
+    "source_unchanged": true
+  },
+  "schema": "brotli-b3c-b2-permanent-outcome-v1",
+  "scope_ledger": {
+    "path": "AGENTS.md",
+    "sha256": "3d3b8b0bfc9f11d7acacf1d1e63e3dac2bdc6ce30d62d8f1ad6517b78cbf9daf"
+  },
+  "status": "complete-named-conditional-permanent-outcome-and-budget-validation",
+  "trusted_components": [
+    "Specifications and interpretations",
+    "Pinned Verus/Z3/vstd and Rust/LLVM",
+    "Apple build tools and operating environment"
+  ],
+  "whole": {
+    "all_core_bytes_promoted_without_edits": true,
+    "log": {
+      "path": "evidence/b3c-b2-permanent-final01/whole-crate.log",
+      "sha256": "f8d8f95ded260b44e121b762326583856d317661698fb1a09a55e0dafc43dc2f"
+    },
+    "promotion_qualification": {
+      "path": "evidence/b3c-b2-permanent-final01/promotion-qualification.json",
+      "sha256": "8c06696339a92640f6c17afac29706f58f5cd496cb2c8bb794d68983fa0936c0"
+    },
+    "report": {
+      "path": "evidence/b3c-b2-permanent-final01/verification.json",
+      "sha256": "8262f52975ab5519432e8d7bf9720a4d7451caf682c935753cfb80a39cae0a1b"
+    },
+    "source_path_is_recorded_private_candidate": true,
+    "source_start": {
+      "path": "evidence/b3c-b2-permanent-final01/source-start.json",
+      "sha256": "ff5f7b63f011066bf4997fdbde3f61a52ba27e51f8bf8bb6688d86b86fd8aa1e"
+    },
+    "verification": {
+      "encountered-error": false,
+      "encountered-vir-error": false,
+      "errors": 0,
+      "is-verifying-entire-crate": true,
+      "success": true,
+      "verified": 1397
+    },
+    "verified_core_source": {
+      "path": "evidence/b3c-b2-permanent-final01/verified-core-source.tar.gz",
+      "sha256": "0cbfd27bb59fc4bcaec4f00f8e54237fb2e296475b43eb52c9bfb94cc4965429"
+    }
+  }
+}

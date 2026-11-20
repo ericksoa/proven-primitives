@@ -1,0 +1,35 @@
+from pathlib import Path
+import json,hashlib,subprocess,os,shutil,tarfile,io,re,importlib.util
+R=Path.cwd();C=R/'target/b3c-b2-permanent-proof03';O=R/'evidence/b3c-b2-permanent-final01'
+spec=importlib.util.spec_from_file_location('helpers',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def dump(p,v):Path(p).write_text(json.dumps(v,indent=2,sort_keys=True)+'\n')
+def bind(p):return {'path':str(Path(p).relative_to(R)),'sha256':h(p)}
+start=json.loads((O/'source-start.json').read_text());runtime=json.loads((O/'runtime-complete.json').read_text());report=json.loads((O/'verification.json').read_text());controls=json.loads((O/'controls.json').read_text())
+assert runtime['passed']==116 and runtime['semantic_rejections']==6 and report['verification-results']['success']
+assert g.source_snapshot(R)==start['source_sha256']
+parent_tools=json.loads((R/'evidence/b3c-atomic-emission-final04/source-start.json').read_text())['tools'];assert parent_tools==start['tools']
+core=json.loads((C/'whole-source-start.json').read_text());assert core==start['verified_core_sha256']
+for name,d in core.items():assert h(C/name)==h(R/name)==d,name
+for row in controls:
+ p=O/(row['name']+'.log');assert h(p)==row['log_sha256'];classification=g.semantic_rejection(p.read_text());assert classification['semantic_rejection'] and not classification['tool_or_resource_failure'] and not classification['syntax_or_type_failure']
+shutil.copyfile(R/'target/b3c-emission/audit-b2-promoted.py',O/'final-preservation-audit.py.txt');shutil.copyfile(R/'target/b3c-emission/promote-b2-proof.py',O/'promotion-driver.py.txt');shutil.copyfile(R/'target/m1-r-final-gate/driver.py',O/'m1-gate-helpers.py.txt');shutil.copyfile(C/'whole-source-start.json',O/'whole-source-start.json');shutil.copyfile(R/'target/b3c-emission/prove-b2-permanent.py',O/'initial-proof-edit.py.txt')
+# Retain the source and actual statuses of the two earlier candidate attempts.
+diagnostics=[];files=[]
+for n in ['01','02']:
+ base=R/('target/b3c-b2-permanent-proof'+n)
+ paths=[p for p in base.rglob('*') if p.is_file() and (p.is_relative_to(base/'src') or p.parent==base)]
+ files += [(p,str(Path('attempt'+n)/p.relative_to(base))) for p in paths]
+ diagnostics.append({'attempt':n,'source_sha256':json.loads((base/'whole-source-start.json').read_text()),'status':'interrupted without complete whole result' if n=='01' else 'whole failed: 1396 verified / one M1 helper resource limit','counts_as_whole_positive_or_controls':False})
+with tarfile.open(O/'earlier-candidates.tar.gz','w:gz') as archive:
+ for p,name in sorted(files,key=lambda x:x[1]):
+  data=p.read_bytes();info=tarfile.TarInfo(name);info.size=len(data);info.mode=0o644;archive.addfile(info,io.BytesIO(data))
+dump(O/'earlier-candidates.json',diagnostics)
+with tarfile.open(O/'verified-core-source.tar.gz','w:gz') as archive:
+ for name,d in core.items():
+  data=(R/name).read_bytes();assert hashlib.sha256(data).hexdigest()==d;info=tarfile.TarInfo(name);info.size=len(data);info.mode=0o644;archive.addfile(info,io.BytesIO(data))
+with tarfile.open(O/'final-build-inputs.tar.gz','w:gz') as archive:
+ for name,d in start['source_sha256'].items():
+  data=(R/name).read_bytes();assert hashlib.sha256(data).hexdigest()==d;info=tarfile.TarInfo(name);info.size=len(data);info.mode=0o644;archive.addfile(info,io.BytesIO(data))
+dump(O/'promotion-qualification.json',{'same_all_core_file_bytes':True,'verified_core_sha256':core,'same_tools_before_parent_gate_and_after_promotion':True,'proof_command':['verus','target/b3c-b2-permanent-proof03/src/lib.rs','--crate-type','lib','--no-cheating','--num-threads','8','--triggers-mode','silent','--rlimit','300','--trace','--time','--output-json'],'scope':'The actual entire-crate result and six fault checks were obtained on these identical source bytes at the recorded private path, then promoted without edits. Runtime lanes execute the promoted workspace source. This is a byte/content qualification, not a source-to-binary theorem.','parent_44_controls_rerun_here':False,'new_semantic_controls':6,'new_interfaces_or_architectural_decisions':False})
+print(json.dumps({'verified':report['verification-results'],'runtime_passed':runtime['passed'],'semantic_controls':len(controls),'source_unchanged':True},indent=2))

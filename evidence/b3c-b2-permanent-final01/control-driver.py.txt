@@ -1,0 +1,30 @@
+from pathlib import Path
+import json,hashlib,re,shutil,subprocess,concurrent.futures,importlib.util
+R=Path.cwd();O=R/'target/b3c-b2-permanent-proof03';spec=importlib.util.spec_from_file_location('helpers',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+text=(O/'whole-crate.log').read_text();report=g.proof_report(text);assert report['verification-results']['success']
+frozen=json.loads((O/'whole-source-start.json').read_text())
+for name,digest in frozen.items():assert g.file_hash(O/name)==digest,name
+(O/'whole-verification.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+base=O/'controls';base.mkdir(exist_ok=False)
+return_old='return reject_permanent_single_type_switch(state, kind);'
+cases=[
+ ('actual-b2-permanent-failure-is-retryable','input','advance_serialized_body_block_switch',return_old,'return BodySwitchStep { consumed: 0, status: BodySwitchStatus::NeedInput };'),
+ ('actual-b2-permanent-failure-is-complete','input','advance_serialized_body_block_switch',return_old,'return BodySwitchStep { consumed: 0, status: BodySwitchStatus::Complete { kind, block_type: 0, block_length: 1 } };'),
+ ('actual-b2-permanent-failure-claims-input','input','advance_serialized_body_block_switch',return_old,'return BodySwitchStep { consumed: if input.len() > 0 { 1 } else { 0 }, status: BodySwitchStatus::Failed(CoreFailure::InvalidFormat(CoreFormatDetail::BlockSwitch)) };'),
+ ('budget-constructor-spurious-valid-window-error','brotli','RequestBudget::new','if limits.max_window_bits < 10 || limits.max_window_bits > 24 {','if true {'),
+ ('budget-constructor-accepts-invalid-window','brotli','RequestBudget::new','if limits.max_window_bits < 10 || limits.max_window_bits > 24 {','if false {'),
+ ('budget-constructor-rejects-zero-work','brotli','RequestBudget::new','if limits.max_window_bits < 10 || limits.max_window_bits > 24 {','if limits.max_work == 0 { return Err(InitError::InvalidLimits); }\n        if limits.max_window_bits < 10 || limits.max_window_bits > 24 {'),
+]
+for name,module,function,old,new in cases:
+ folder=base/name;shutil.copytree(O/'src',folder/'src');file='brotli_input.rs' if module=='input' else 'brotli.rs';p=folder/'src'/file;s=p.read_text()
+ begin='pub(crate) fn advance_serialized_body_block_switch(' if module=='input' else '    pub fn new(limits: RequestLimits)';following='proof fn valid_bits_ignore_unused_storage' if module=='input' else '    pub(crate) fn reserve_initialization('
+ a=s.index(begin);b=s.index(following,a);part=s[a:b];marker='\n{\n' if module=='input' else '\n    {\n';body=part.index(marker);assert part[body:].count(old)==1,name
+ changed=part[:body]+part[body:].replace(old,new,1);assert changed[:body]==part[:body];p.write_text(s[:a]+changed+s[b:])
+def check(case):
+ name,module,function,old,new=case;folder=base/name;mod='brotli_input' if module=='input' else 'brotli';cmd=[str(g.TOOL/'verus'),str(folder/'src/lib.rs'),'--crate-type','lib','--verify-only-module',mod,'--verify-function',function,'--no-cheating','--num-threads','1','--triggers-mode','silent','--rlimit','1000' if module=='input' else '60']
+ if module=='input':cmd+=['--multiple-errors','0']
+ with (folder/'negative.log').open('w') as f:p=subprocess.run(cmd,cwd=R,stdout=f,stderr=subprocess.STDOUT)
+ classification=g.semantic_rejection((folder/'negative.log').read_text());row={'name':name,'function':function,'command':cmd,'exit_code':p.returncode,'log_sha256':g.file_hash(folder/'negative.log'),**classification};(folder/'result.json').write_text(json.dumps(row,indent=2,sort_keys=True)+'\n');print(json.dumps(row),flush=True);return row
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(check,cases))
+(O/'controls.json').write_text(json.dumps(rows,indent=2,sort_keys=True)+'\n');assert all(x['exit_code']!=0 and x['semantic_rejection'] and not x['tool_or_resource_failure'] and not x['syntax_or_type_failure'] for x in rows)
+print('SIX PRIVATE-CANDIDATE SEMANTIC REJECTIONS; not yet a production checkpoint',flush=True)

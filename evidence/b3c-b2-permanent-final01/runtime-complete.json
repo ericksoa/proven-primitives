@@ -1,0 +1,13 @@
+{
+  "passed": 116,
+  "semantic_rejections": 6,
+  "source_unchanged": true,
+  "verified": {
+    "encountered-error": false,
+    "encountered-vir-error": false,
+    "errors": 0,
+    "is-verifying-entire-crate": true,
+    "success": true,
+    "verified": 1397
+  }
+}

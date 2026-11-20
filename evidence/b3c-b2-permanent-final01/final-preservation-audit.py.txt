@@ -1,0 +1,23 @@
+from pathlib import Path
+import hashlib,json,re,subprocess
+R=Path.cwd();O=R/'target/b3c-b2-permanent-proof03'
+def h(s):return hashlib.sha256(s.encode()).hexdigest()
+def part(s,begin,end):
+ a=s.index(begin);b=s.index(end,a);return s[a:b]
+a=subprocess.check_output(['git','show','ce87a2555a1c11813b8d5b57c9ccd830c16583b4:src/brotli_input.rs'],text=True);b=(R/'src/brotli_input.rs').read_text();reconstructed=b;rows=[]
+for begin,end in [('fn load_body_switch_state(','fn store_body_switch_state('),('pub(crate) fn advance_serialized_body_block_switch(','proof fn valid_bits_ignore_unused_storage')]:
+ old=part(a,begin,end);new=part(b,begin,end);oh,ob=old.split('\n{\n',1);nh,nb=new.split('\n{\n',1)
+ assert oh.split('    ensures')[0]==nh.split('    ensures')[0]
+ strip=lambda x:re.sub(r'(?ms)^        invariant\b.*?^        decreases','        decreases',x)
+ assert strip(ob)==strip(nb),begin
+ if begin.startswith('fn load'):assert 'r.is_ok() ==> r.unwrap().valid(),' in nh
+ else:assert nh.startswith(oh)
+ reconstructed=reconstructed.replace(new,old);rows.append({'function':begin,'signature_and_requirements_retained':True,'ordinary_and_proof_statements_identical_after_removing_only_loop_invariant_annotations':True,'original_guarantees_retained':True})
+for name in ['fn load_body_switch_state(','pub(crate) fn advance_serialized_body_block_switch(']:reconstructed=reconstructed.replace('#[verifier::spinoff_prover]\n'+name,name,1)
+reconstructed=reconstructed.replace('    #[verifier::spinoff_prover]\n    fn advance_initial_block_length_phase(', '    fn advance_initial_block_length_phase(',1)
+assert reconstructed==a
+x=subprocess.check_output(['git','show','ce87a2555a1c11813b8d5b57c9ccd830c16583b4:src/brotli.rs'],text=True);y=(R/'src/brotli.rs').read_text();addition='            r.is_ok() == (10 <= limits.max_window_bits <= 24),\n';assert y.count(addition)==1 and y.replace(addition,'',1)==x
+for p in (O/'src').glob('*'):
+ if p.is_file() and p.name not in ['brotli.rs','brotli_input.rs']:assert (R/'src'/p.name).read_bytes()==subprocess.check_output(['git','show','ce87a2555a1c11813b8d5b57c9ccd830c16583b4:src/'+p.name]),p
+result={'schema':'b3c-b2-private-candidate-preservation-v1','source_parent':'ce87a2555a1c11813b8d5b57c9ccd830c16583b4','functions':rows,'input_parent_sha256':h(a),'input_candidate_sha256':h(b),'brotli_parent_sha256':h(x),'brotli_candidate_sha256':h(y),'budget_constructor_only_change':'Existing C1 window-only validation completeness postcondition; no arguments/requirements/body changed','other_core_bytes_identical':True,'new_public_or_private_functions':False,'new_visibility_or_compiled_interface':False,'source_operation_or_quota_changes':False,'unchanged_M1_helper_isolation':'advance_initial_block_length_phase only; body, signature, requirements, guarantees and allowance unchanged','E3_implemented':False,'scope':'Static qualified audit of an unpublished proof-only candidate. Not a whole-verification or release result.'}
+(R/'evidence/b3c-b2-permanent-final01/final-preservation-audit.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n');print(json.dumps(result,indent=2))

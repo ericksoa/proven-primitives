@@ -1,0 +1,30 @@
+{
+  "E3_implemented": false,
+  "brotli_candidate_sha256": "dedfa06f2eb5aa11b874de8841e1aa6fe50fec8f61222949f3ff12e18b514dce",
+  "brotli_parent_sha256": "6472034d30705cd1627fb846de1370e5e1d65da01682d78ca858e2a1bd51e4a9",
+  "budget_constructor_only_change": "Existing C1 window-only validation completeness postcondition; no arguments/requirements/body changed",
+  "functions": [
+    {
+      "function": "fn load_body_switch_state(",
+      "ordinary_and_proof_statements_identical_after_removing_only_loop_invariant_annotations": true,
+      "original_guarantees_retained": true,
+      "signature_and_requirements_retained": true
+    },
+    {
+      "function": "pub(crate) fn advance_serialized_body_block_switch(",
+      "ordinary_and_proof_statements_identical_after_removing_only_loop_invariant_annotations": true,
+      "original_guarantees_retained": true,
+      "signature_and_requirements_retained": true
+    }
+  ],
+  "input_candidate_sha256": "0cb2d206e60d75f4803b2ff1ae6f0697d0126cf49d3ec1b2a6f4dcb5a03e4992",
+  "input_parent_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+  "new_public_or_private_functions": false,
+  "new_visibility_or_compiled_interface": false,
+  "other_core_bytes_identical": true,
+  "schema": "b3c-b2-private-candidate-preservation-v1",
+  "scope": "Static qualified audit of an unpublished proof-only candidate. Not a whole-verification or release result.",
+  "source_operation_or_quota_changes": false,
+  "source_parent": "ce87a2555a1c11813b8d5b57c9ccd830c16583b4",
+  "unchanged_M1_helper_isolation": "advance_initial_block_length_phase only; body, signature, requirements, guarantees and allowance unchanged"
+}

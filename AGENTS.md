@@ -339,3 +339,29 @@ origin, complete error classification/progress, actual B2 saved-state handoff,
 phase/stream composition, later source ledgers, B3d/B4, F2's native disagreement,
 independent human specification review and supported-decoder/release gates
 remain open. No additional architectural decision or approval follows.
+
+
+The subsequent C1 permanent-outcome/budget-validation checkpoint is recorded in
+`BROTLI_B3C_B2_PERMANENT_CHECKPOINT.md` and
+`evidence/brotli-b3c-b2-permanent.json`. The actual body-switch adapter now
+promises zero consumption and a permanent `Failed(_)` outcome when requested
+kind < 3, stored switch tag is Ready/zero, that kind's declared type count is
+at most one and its remaining count is zero. Its existing loader's success
+contract binds type counts, remaining counts and Ready phase to the existing
+state views. `RequestBudget::new` now succeeds exactly for window limit 10..24;
+all other zero quotas remain accepted. No function/type/visibility/interface,
+argument, requirement, executable statement or resource policy changed.
+The actual unfiltered whole positive checked 1,397 obligations with zero errors,
+then six strict body-fault rejections ran on identical core source. Those source
+bytes were promoted unchanged and passed 116 runtime tests; the explicit
+content/location qualification and complete source/tool/log hashes are retained.
+The preceding 44-case byte-effect gate remains historical and is not counted
+as rerun on this snapshot. Three existing-tool isolation annotations preserve
+all original allowances, including the unchanged M1 initial-length helper.
+This closes only that conditional outcome and window-validation completeness.
+Full B2 restore/store/call/snapshot and public-stream composition remain open.
+E3 remains pending direct human approval and is unimplemented. The 24-write /
+eight-work source finding is still open; its five-producer/33-caller graph is
+unchanged as recorded in the new scope qualification. No E3 or other
+architectural approval follows from these proofs, signatures or tests. Preserve
+F2, B3d/B4, independent human specification review and release boundaries.

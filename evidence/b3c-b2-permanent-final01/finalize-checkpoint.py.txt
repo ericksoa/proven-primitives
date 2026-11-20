@@ -1,0 +1,47 @@
+from pathlib import Path
+import json,hashlib,subprocess,os,shutil,importlib.util
+R=Path.cwd();O=R/'evidence/b3c-b2-permanent-final01'
+spec=importlib.util.spec_from_file_location('helpers',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def dump(p,v):Path(p).write_text(json.dumps(v,indent=2,sort_keys=True)+'\n')
+def bind(p):return {'path':str(Path(p).relative_to(R)),'sha256':h(p)}
+start=json.loads((O/'source-start.json').read_text());assert g.source_snapshot(R)==start['source_sha256']
+v=json.loads((O/'verification.json').read_text())['verification-results'];runtime=json.loads((O/'runtime-complete.json').read_text());assert v['success'] and v['errors']==0 and v['is-verifying-entire-crate'] and runtime['passed']==116
+controls=json.loads((O/'controls.json').read_text());assert len(controls)==6
+for row in controls:
+ p=O/(row['name']+'.log');assert h(p)==row['log_sha256'];x=g.semantic_rejection(p.read_text());assert x['semantic_rejection'] and not x['tool_or_resource_failure'] and not x['syntax_or_type_failure']
+shutil.copyfile(R/'target/b3c-emission/qualify-e3-after-b2.py',O/'e3-scope-qualification.py.txt');shutil.copyfile(R/'target/b3c-emission/seal-b2-proof.py',O/'seal-evidence.py.txt')
+agents=R/'AGENTS.md';s=agents.read_text();assert 'BROTLI_B3C_B2_PERMANENT_CHECKPOINT.md' not in s
+s+='''
+
+The subsequent C1 permanent-outcome/budget-validation checkpoint is recorded in
+`BROTLI_B3C_B2_PERMANENT_CHECKPOINT.md` and
+`evidence/brotli-b3c-b2-permanent.json`. The actual body-switch adapter now
+promises zero consumption and a permanent `Failed(_)` outcome when requested
+kind < 3, stored switch tag is Ready/zero, that kind's declared type count is
+at most one and its remaining count is zero. Its existing loader's success
+contract binds type counts, remaining counts and Ready phase to the existing
+state views. `RequestBudget::new` now succeeds exactly for window limit 10..24;
+all other zero quotas remain accepted. No function/type/visibility/interface,
+argument, requirement, executable statement or resource policy changed.
+The actual unfiltered whole positive checked 1,397 obligations with zero errors,
+then six strict body-fault rejections ran on identical core source. Those source
+bytes were promoted unchanged and passed 116 runtime tests; the explicit
+content/location qualification and complete source/tool/log hashes are retained.
+The preceding 44-case byte-effect gate remains historical and is not counted
+as rerun on this snapshot. Three existing-tool isolation annotations preserve
+all original allowances, including the unchanged M1 initial-length helper.
+This closes only that conditional outcome and window-validation completeness.
+Full B2 restore/store/call/snapshot and public-stream composition remain open.
+E3 remains pending direct human approval and is unimplemented. The 24-write /
+eight-work source finding is still open; its five-producer/33-caller graph is
+unchanged as recorded in the new scope qualification. No E3 or other
+architectural approval follows from these proofs, signatures or tests. Preserve
+F2, B3d/B4, independent human specification review and release boundaries.
+'''
+agents.write_text(s)
+checkpoint=R/'BROTLI_B3C_B2_PERMANENT_CHECKPOINT.md';decision=R/'BROTLI_B3C_EMISSION_WRITE_METERING_DECISION.md'
+shutil.copyfile(__file__,O/'finalize-checkpoint.py.txt')
+dump(O/'artifact-sha256.json',{str(p.relative_to(O)):h(p) for p in sorted(O.rglob('*')) if p.is_file() and p.name!='artifact-sha256.json'})
+dump(R/'evidence/brotli-b3c-b2-permanent.json',{'schema':'brotli-b3c-b2-permanent-outcome-v1','status':'complete-named-conditional-permanent-outcome-and-budget-validation','complete_B3c':False,'complete_B2_state_codec_or_stream_composition':False,'complete_resource_ledger':False,'parent_commit':'ce87a2555a1c11813b8d5b57c9ccd830c16583b4','approved_basis':{'C1':bind(R/'BROTLI_B3C_PROPOSAL.md'),'A1':bind(R/'BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md'),'new_functions_types_visibility_or_compiled_interfaces':False,'ordinary_code_or_quota_changes':False},'whole':{'verification':v,'log':bind(O/'whole-crate.log'),'report':bind(O/'verification.json'),'source_start':bind(O/'source-start.json'),'verified_core_source':bind(O/'verified-core-source.tar.gz'),'promotion_qualification':bind(O/'promotion-qualification.json'),'all_core_bytes_promoted_without_edits':True,'source_path_is_recorded_private_candidate':True},'runtime':{'passed':runtime['passed'],'results':bind(O/'runtime-results.json'),'source_unchanged':True},'controls':{'count':len(controls),'results':bind(O/'controls.json'),'source_closures':bind(O/'control-source.tar.gz'),'source_hashes':bind(O/'control-source-sha256.json'),'positive_precedes_all_controls':bind(O/'control-order.json'),'previous_44_rerun_or_counted_here':False},'preservation_audit':bind(O/'final-preservation-audit.json'),'earlier_candidates':{'manifest':bind(O/'earlier-candidates.json'),'archive':bind(O/'earlier-candidates.tar.gz'),'counts_as_complete_whole_or_controls':False},'E3':{'status':'pending-direct-human-approval','implemented':False,'decision':bind(decision),'scope_qualification':bind(O/'e3-scope-qualification.json'),'known_static_write_count':24,'current_emission_work_debit':8,'source_count_not_yet_an_invocation_receipt':True},'checkpoint':bind(checkpoint),'scope_ledger':bind(agents),'artifact_manifest':bind(O/'artifact-sha256.json'),'reproduce':bind(O/'REPRODUCE.md'),'remaining':['Exact B2 load/store/call/snapshot and multi-type grammar refinement','Public stream propagation and body/dictionary/LZ77/source-ledger composition','E3 approval and write/source-read billing corrections','B3d/B4, F2 monkey/native disagreement, independent human specification review and supported-decoder/release gates'],'trusted_components':['Specifications and interpretations','Pinned Verus/Z3/vstd and Rust/LLVM','Apple build tools and operating environment'],'not_proved':['A supported or complete Brotli decoder','A complete resource or availability theorem','Source-to-binary or side-channel correctness']})
+print(json.dumps({'verified':v['verified'],'errors':v['errors'],'runtime_passed':runtime['passed'],'new_semantic_rejections':len(controls),'E3':'pending, unimplemented'},indent=2))

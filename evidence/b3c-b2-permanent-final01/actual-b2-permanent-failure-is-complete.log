@@ -1,0 +1,32 @@
+note: verifying module brotli_input, function lib::brotli_input::advance_serialized_body_block_switch (selected functions)
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-permanent-proof03/controls/actual-b2-permanent-failure-is-complete/src/brotli_input.rs:41700:1
+      |
+41700 | / pub(crate) fn advance_serialized_body_block_switch(
+41701 | |     workspace: &mut [u8],
+41702 | |     window_bytes: u32,
+41703 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+41706 | |     end_of_input: bool,
+41707 | | ) -> (r: BodySwitchStep)
+      | |_______________________^
+
+error: postcondition not satisfied
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-permanent-proof03/controls/actual-b2-permanent-failure-is-complete/src/brotli_input.rs:41726:9
+      |
+41726 | /         kind < 3
+41727 | |             && b3b_scalar_byte_at(old(workspace)@, window_bytes, 129) == 0
+41728 | |             && b3b_scalar_u16_at(old(workspace)@, window_bytes, (16 + 2 * kind as int) as u16) <= 1
+41729 | |             && b3b_scalar_u32_at(old(workspace)@, window_bytes, (146 + 4 * kind as int) as u16) == 0
+...     |
+41732 | |                 &&& matches!(r.status, BodySwitchStatus::Failed(_))
+41733 | |             },
+      | |_____________^ failed this postcondition
+...
+41756 |               return BodySwitchStep { consumed: 0, status: BodySwitchStatus::Complete { kind, block_type: 0, block_length: 1 } };
+      |               ------------------------------------------------------------------------------------------------------------------ at this exit
+
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+error: aborting due to 1 previous error
+
