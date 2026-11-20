@@ -1,0 +1,64 @@
+{
+  "the_prover_rejects_six_b3c_constructor_binding_defects": {
+    "mutants": [
+      "brotli-b3c-constructor-skips-initialization-reservation",
+      "brotli-b3c-constructor-spurious-resource-failure",
+      "brotli-b3c-constructor-small-workspace-consumes-credit",
+      "brotli-b3c-constructor-replenishes-work",
+      "brotli-b3c-constructor-returns-finished-state",
+      "brotli-b3c-constructor-small-workspace-is-resource-error"
+    ],
+    "suite": "the_prover_rejects_six_b3c_constructor_binding_defects",
+    "suite_source_sha256": "ecf772f6925055ddc728da3229191fb6efea30a53ff7fc5e26ff1bc77eecec9e"
+  },
+  "the_prover_rejects_ten_b3c_atomic_emission_defects": {
+    "mutants": [
+      "brotli-b3c-emission-window-byte-disagrees-with-output",
+      "brotli-b3c-emission-window-position-does-not-advance",
+      "brotli-b3c-emission-first-history-increment-is-skipped",
+      "brotli-b3c-emission-first-total-increment-is-skipped",
+      "brotli-b3c-emission-second-previous-uses-current-byte",
+      "brotli-b3c-emission-meta-remaining-does-not-decrement",
+      "brotli-b3c-emission-writes-unrelated-scratch",
+      "brotli-b3c-emission-resource-error-consumes-work",
+      "brotli-b3c-emission-resource-error-writes-window",
+      "brotli-b3c-emission-uncompressed-error-writes-window"
+    ],
+    "suite": "the_prover_rejects_ten_b3c_atomic_emission_defects",
+    "suite_source_sha256": "6a0f0f68f9829d09ac42d2fe4b38929f836af5341feb479249a979b92070c226"
+  },
+  "the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects": {
+    "mutants": [
+      "brotli-b3c-region-boundary-shifts",
+      "brotli-b3c-initial-recent-distance-is-wrong",
+      "brotli-b3c-terminal-escrow-marker-is-wrong",
+      "brotli-b3c-distance-lut-offset-is-wrong",
+      "brotli-b3c-nonzero-padding-is-accepted",
+      "brotli-b3c-dictionary-output-equal-to-meta-limit-is-rejected",
+      "brotli-b3c-dictionary-staging-reads-uninitialized-byte",
+      "brotli-b3c-permanent-block-switch-failure-is-retryable",
+      "brotli-b3c-command-remaining-does-not-decrement",
+      "brotli-b3c-literal-context-previous-bytes-are-swapped",
+      "brotli-b3c-copy-length-context-is-wrong",
+      "brotli-b3c-eof-is-committed-before-slice-consumption",
+      "brotli-b3c-copy-runs-after-insert-reaches-meta-length",
+      "brotli-b3c-recent-distance-ring-does-not-advance",
+      "brotli-b3c-beyond-history-distance-is-treated-as-lz77",
+      "brotli-b3c-overlap-copy-uses-wrong-source",
+      "brotli-b3c-metadata-changes-history",
+      "brotli-b3c-uncompressed-byte-does-not-debit-input",
+      "brotli-b3c-need-output-masks-resource-limit",
+      "brotli-b3c-reset-replenishes-work",
+      "brotli-b3c-terminal-retry-debits-a-call",
+      "brotli-b3c-recent-distance-index-is-wrong",
+      "brotli-b3c-recent-distance-signed-delta-is-wrong",
+      "brotli-b3c-dictionary-length-guard-is-weakened",
+      "brotli-b3c-valid-zero-length-transform-is-rejected",
+      "brotli-b3c-failure-is-stored-as-finished",
+      "brotli-b3c-byte-emission-undercharges-work",
+      "brotli-b3c-byte-emission-publishes-wrong-value"
+    ],
+    "suite": "the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects",
+    "suite_source_sha256": "3c80a9a9a2333d450298294704819cb55b921f1696b5e74e13932360511efbfd"
+  }
+}

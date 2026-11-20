@@ -1,0 +1,166 @@
+{
+  "complete": false,
+  "error_type": "AssertionError",
+  "message": "['the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects', 'the_prover_rejects_ten_b3c_atomic_emission_defects']",
+  "status": "failed-or-interrupted",
+  "steps": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "log": "runtime-library.log",
+      "log_sha256": "b28ccd96ffb93d9909c4d9dcf877a33297535ef7a64e887f76f016395d152d50",
+      "name": "runtime-library",
+      "passed": 105,
+      "seconds": 26.293481624998094,
+      "started_ns": 1795134638953415000
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "primitives"
+      ],
+      "exit_code": 0,
+      "log": "runtime-primitives.log",
+      "log_sha256": "b433089e4cb18fd7ff7496d27457f5ae8bb0793d5677c4c940a6c9fbacbd2e74",
+      "name": "runtime-primitives",
+      "passed": 9,
+      "seconds": 6.961861208998016,
+      "started_ns": 1795134665262345000
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "upstream_comparison"
+      ],
+      "exit_code": 0,
+      "log": "runtime-comparison.log",
+      "log_sha256": "a20794aa3e932f8d5e9e1602e0ff9c89a544beedbd2719ebee8b66d6fe94b01d",
+      "name": "runtime-comparison",
+      "passed": 1,
+      "seconds": 0.9240727500000503,
+      "started_ns": 1795134672234957000
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "project_source_contains_no_proof_trust_bypasses",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 0,
+      "log": "runtime-trust.log",
+      "log_sha256": "cd6c68b293176b089e06804c4b6e290606cd1c1161a432572127a033869ce095",
+      "name": "runtime-trust",
+      "passed": 1,
+      "seconds": 5.936219292001624,
+      "started_ns": 1795134673169130000
+    },
+    {
+      "command": [
+        "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+        "src/lib.rs",
+        "--crate-type",
+        "lib",
+        "--no-cheating",
+        "--num-threads",
+        "8",
+        "--triggers-mode",
+        "silent",
+        "--rlimit",
+        "300",
+        "--trace",
+        "--time",
+        "--output-json"
+      ],
+      "exit_code": 0,
+      "log": "whole-crate.log",
+      "log_sha256": "098eea624dddff18b18eca6470e5dcbdc335774e7acc7a5823f4a0b9013f4e83",
+      "name": "whole-crate",
+      "seconds": 330.2079427079989,
+      "started_ns": 1795134679116455000
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "log": "controls-the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects.log",
+      "log_sha256": "30f7f38a0184741a112cde5633844650e2b621f04890e5f3b988ceb5f357a5fc",
+      "name": "controls-the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects",
+      "seconds": 539.216939832997,
+      "started_ns": 1795135009381959000
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_six_b3c_constructor_binding_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "log": "controls-the_prover_rejects_six_b3c_constructor_binding_defects.log",
+      "log_sha256": "5136ca708d1a0b8141355819927d9008f0ed7f5ab1a39da220d4b562c1ed3260",
+      "name": "controls-the_prover_rejects_six_b3c_constructor_binding_defects",
+      "seconds": 144.71319029200095,
+      "started_ns": 1795135009382111000
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "proof_rejection",
+        "the_prover_rejects_ten_b3c_atomic_emission_defects",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "log": "controls-the_prover_rejects_ten_b3c_atomic_emission_defects.log",
+      "log_sha256": "3257fe55819d0d6ac43933759795399753b93cd099db0bc11cff50d156340da3",
+      "name": "controls-the_prover_rejects_ten_b3c_atomic_emission_defects",
+      "seconds": 91.4970447500018,
+      "started_ns": 1795135009382233000
+    }
+  ],
+  "traceback": "Traceback (most recent call last):\n  File \"/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-emission/gate.py\", line 49, in <module>\n    dump('controls.json',controls);assert not failures,failures;assert len(controls)==44\n                                          ^^^^^^^^^^^^\nAssertionError: ['the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects', 'the_prover_rejects_ten_b3c_atomic_emission_defects']\n"
+}

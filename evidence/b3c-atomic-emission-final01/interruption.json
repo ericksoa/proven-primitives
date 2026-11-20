@@ -1,0 +1,9 @@
+{
+  "status": "intentionally-interrupted-after-required-new-suite-failed",
+  "reason": "History undercharge control had a mixed semantic/resource result; no gate completion claim. A history-zero-only fault is strictly rejected under the original checker settings. Restarting a fresh same-source-input gate after changing only that new control.",
+  "native_suite_pid": 92645,
+  "terminated_descendants": [
+    94254
+  ],
+  "recorded_ns": 1795135548596018000
+}

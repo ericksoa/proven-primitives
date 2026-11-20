@@ -1,0 +1,38 @@
+from pathlib import Path
+import subprocess,hashlib,json
+R=Path.cwd();BASE='961fe5f2656abd9462bd5620ba2fc03e9b760fa2'
+def old(n):return subprocess.check_output(['git','show',BASE+':'+n])
+def sha(b):return hashlib.sha256(b).hexdigest()
+a=old('src/brotli.rs').decode();b=(R/'src/brotli.rs').read_text();reconstructed=b;functions=[]
+for begin,end in [('    fn emit_byte(','    fn emit_uncompressed_byte('),('    fn emit_uncompressed_byte(','    fn fail_transition(')]:
+ x=a[a.index(begin):a.index(end,a.index(begin))];y=b[b.index(begin):b.index(end,b.index(begin))]
+ xh,xb=x.split('\n    {\n',1);yh,yb=y.split('\n    {\n',1);assert xb==yb,begin
+ assert xh.split('        ensures')[0]==yh.split('        ensures')[0],begin
+ start=yh.index('            final(self).budget.calls_remaining == old(self).budget.calls_remaining,')
+ stop=yh.index('            final(output)@.len() == old(output)@.len(),',start)
+ assert yh[:start]+yh[stop:]==xh,begin
+ reconstructed=reconstructed.replace(y,x)
+ functions.append({'function':begin.strip()[3:-1],'executable_and_proof_body_byte_identical':True,'signature_and_requires_byte_identical':True,'all_original_guarantees_byte_identical_after_removing_only_new_effects':True})
+annotation='    #[verifier::spinoff_prover]\n    fn emit_byte(';assert reconstructed.count(annotation)==1
+reconstructed=reconstructed.replace(annotation,'    fn emit_byte(')
+new_comment='//! M1 compressed-header metering is checked; broader B3c refinement and release\n//! obligations remain open.'
+old_comment='//! M1 metering and the full B3c refinement and release obligations remain open.'
+assert reconstructed.count(new_comment)==1
+reconstructed=reconstructed.replace(new_comment,old_comment);assert reconstructed==a
+before_test=old('tests/proof_rejection.rs');after_test=(R/'tests/proof_rejection.rs').read_bytes()
+repair=json.loads((R/'target/b3c-emission/legacy-repair.json').read_text())
+restored_test=after_test.decode()
+assert restored_test.count(repair['inserted_closure'])==1
+restored_test=restored_test.replace(repair['inserted_closure'],'',1)
+assert restored_test.count(repair['selector_new'])==1
+restored_test=restored_test.replace(repair['selector_new'],repair['selector_old'],1)
+assert restored_test.count(repair['call_new'])==2
+restored_test=restored_test.replace(repair['call_new'],repair['call_old'])
+assert restored_test.encode().startswith(before_test)
+assert restored_test.encode()[len(before_test):].decode().count('fn the_prover_rejects_')==1
+assert 'fn the_prover_rejects_ten_b3c_atomic_emission_defects()' in restored_test.encode()[len(before_test):].decode()
+unchanged={}
+for name in subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'src','tests','benches','Cargo.toml','Cargo.lock','rust-toolchain.toml','build.rs','.cargo'],text=True).splitlines():
+ if name not in ['src/brotli.rs','tests/proof_rejection.rs']:
+  data=(R/name).read_bytes();assert data==old(name),name;unchanged[name]=sha(data)
+print(json.dumps({'schema':'b3c-atomic-emission-preservation-v1','base_commit':BASE,'source_before_sha256':sha(a.encode()),'source_after_sha256':sha(b.encode()),'test_before_sha256':sha(before_test),'test_after_sha256':sha(after_test),'functions':functions,'whole_original_source_reconstructed':True,'additional_source_changes':['One existing-tool solver-isolation annotation on emit_byte; no allowance change','Module comment reflects completed named M1 scope'],'old_tests_unchanged_after_reversing_only_documented_legacy_selector_and_scoped_effort_repairs':True,'legacy_harness_repairs':repair,'other_frozen_inputs_byte_identical':unchanged,'scope':'Static source/contract preservation audit; not a binary-identity theorem or independent specification review'},indent=2,sort_keys=True))

@@ -1,0 +1,41 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:43:1
+   |
+43 | fn command_copy_length_context(copy_offset: u16) -> (r: u8)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check finished in 4 seconds
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:43:1
+   |
+43 | fn command_copy_length_context(copy_offset: u16) -> (r: u8)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:44:13
+   |
+44 |       ensures r == if copy_offset < 2 {
+   |  _____________^
+45 | |         0u8
+46 | |     } else if copy_offset <= 4 {
+47 | |         (copy_offset - 2) as u8
+48 | |     } else {
+49 | |         3u8
+50 | |     },
+   | |_____^ failed this postcondition
+51 |   {
+52 | /     if copy_offset < 2 {
+53 | |         0
+54 | |     } else if copy_offset <= 4 {
+55 | |         (copy_offset - 1) as u8
+56 | |     } else {
+57 | |         3
+58 | |     }
+   | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

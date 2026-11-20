@@ -1,0 +1,17 @@
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-review01/src/brotli_input.rs:41653:1
+      |
+41653 | / pub(crate) fn advance_serialized_body_block_switch(
+41654 | |     workspace: &mut [u8],
+41655 | |     window_bytes: u32,
+41656 | |     budget: &mut crate::brotli::RequestBudget,
+...     |
+41659 | |     end_of_input: bool,
+41660 | | ) -> (r: BodySwitchStep)
+      | |_______________________^
+
+verification results:: 1 verified, 0 errors (partial verification with `--verify-*`)

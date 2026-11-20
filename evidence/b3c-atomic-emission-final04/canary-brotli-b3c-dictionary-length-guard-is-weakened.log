@@ -1,0 +1,66 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_data (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_data.rs:1444:1
+     |
+1444 | / fn validate_dictionary_transform_shape(
+1445 | |     length: u8,
+1446 | |     transform_index: u8,
+1447 | | ) -> (r: Result<(), DictionaryTransformError>)
+     | |_____________________________________________^
+
+note: function body check finished in 200 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_data.rs:1444:1
+     |
+1444 | / fn validate_dictionary_transform_shape(
+1445 | |     length: u8,
+1446 | |     transform_index: u8,
+1447 | | ) -> (r: Result<(), DictionaryTransformError>)
+     | |_____________________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_data.rs:1449:9
+     |
+1449 | /         r.is_ok() ==> 4 <= length <= 24
+1450 | |             && (transform_index as usize) < TRANSFORM_COUNT,
+     | |___________________________________________________________^ failed this postcondition
+...
+1458 | /     if length < 3 || length > 24 {
+1459 | |         Err(DictionaryTransformError::InvalidLength)
+1460 | |     } else if transform_index as usize >= TRANSFORM_COUNT {
+1461 | |         Err(DictionaryTransformError::InvalidTransform)
+1462 | |     } else {
+1463 | |         Ok(())
+1464 | |     }
+     | |_____- at the end of the function body
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_data.rs:1451:9
+     |
+1451 | /         (length < 4 || length > 24)
+1452 | |             ==> r == Err(DictionaryTransformError::InvalidLength),
+     | |_________________________________________________________________^ failed this postcondition
+...
+1458 | /     if length < 3 || length > 24 {
+1459 | |         Err(DictionaryTransformError::InvalidLength)
+1460 | |     } else if transform_index as usize >= TRANSFORM_COUNT {
+1461 | |         Err(DictionaryTransformError::InvalidTransform)
+1462 | |     } else {
+1463 | |         Ok(())
+1464 | |     }
+     | |_____- at the end of the function body
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_data.rs:1444:1
+     |
+1444 | / fn validate_dictionary_transform_shape(
+1445 | |     length: u8,
+1446 | |     transform_index: u8,
+1447 | | ) -> (r: Result<(), DictionaryTransformError>)
+     | |_____________________________________________^
+
+error: aborting due to 2 previous errors
+

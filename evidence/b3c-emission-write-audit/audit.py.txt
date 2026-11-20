@@ -1,0 +1,36 @@
+from pathlib import Path
+import re,json,hashlib,importlib.util
+R=Path.cwd();O=R/'evidence/b3c-emission-write-audit';O.mkdir(exist_ok=False)
+spec=importlib.util.spec_from_file_location('helpers',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def body(file,name):
+ s=(R/file).read_text();mask=g.rust_mask(s);m=re.search(r'(?m)^([ \t]*)(?:pub(?:\([^)]*\))?\s+)?(?:(?:open|closed)\s+)?(?:(?:proof|spec)\s+)?fn\s+'+re.escape(name)+r'\(',mask);assert m,name
+ q=re.search(r'(?m)^'+re.escape(m.group(1))+r'\{',mask[m.end():]);assert q,name
+ start=m.end()+q.end()-1;depth=0
+ for i in range(start,len(mask)):
+  if mask[i]=='{':depth+=1
+  elif mask[i]=='}':
+   depth-=1
+   if depth==0:return s,mask[start:i+1],start
+ raise AssertionError(name)
+widths={};primitives=[]
+for name in ['write_b3c_state_byte','write_b3c_state_u32','write_b3c_state_u64']:
+ s,b,a=body('src/brotli_input.rs',name);writes=list(re.finditer(r'\bworkspace\[[^\n]*?\]\s*=(?!=)',b));widths[name]=len(writes)
+ primitives.append({'name':name,'file':'src/brotli_input.rs','stores':len(writes),'lines':[s.count('\n',0,a+m.start())+1 for m in writes],'body_sha256':hashlib.sha256(b.encode()).hexdigest()})
+assert list(widths.values())==[1,4,8]
+s,b,a=body('src/brotli.rs','emit_byte');direct=list(re.finditer(r'\b(?:self\.)?(?:workspace|output)\[[^\n]*?\]\s*=(?!=)',b));assert len(direct)==2
+calls={name:len(re.findall(r'\b'+name+r'\s*\(',b)) for name in widths};assert list(calls.values())==[2,3,1]
+debit=re.findall(r'charge_work\((\d+)\)',b);assert debit==['8']
+rows=[{'action':'caller-output byte store','occurrences':1,'writes_each':1,'total':1},{'action':'physical-window byte store','occurrences':1,'writes_each':1,'total':1}]+[{'action':name,'occurrences':calls[name],'writes_each':widths[name],'total':calls[name]*widths[name]} for name in widths]
+total=sum(x['total'] for x in rows);assert total==24
+names=list(widths)+['emit_byte','emit_uncompressed_byte'];callers={name:[] for name in names}
+for file in sorted((R/'src').glob('*.rs')):
+ s=file.read_text();mask=g.rust_mask(s);defs=list(re.finditer(r'(?m)^[ \t]*(?:pub(?:\([^)]*\))?\s+)?(?:(?:open|closed)\s+)?(?:(?:proof|spec)\s+)?fn\s+(\w+)\s*\(',mask));defined={d.start(1) for d in defs}
+ for name in names:
+  for m in re.finditer(r'\b'+name+r'\s*\(',mask):
+   if m.start() in defined:continue
+   enclosing=[d for d in defs if d.start()<m.start()];assert enclosing,(file,name)
+   callers[name].append({'file':str(file.relative_to(R)),'function':enclosing[-1].group(1),'line':s.count('\n',0,m.start())+1})
+result={'schema':'b3c-emission-write-source-audit-v1','classification':'Source-derived static success-path store inventory; not a checked per-invocation source-count receipt','basis':{'policy':'BROTLI_B3C_PROPOSAL.md exact resource policy: each workspace/window/caller-output byte write is charged','ordinary_scalar_reads':'This audit counts writes only and introduces no read-unit classification'},'source_sha256':{n:sha(R/n) for n in ['src/brotli.rs','src/brotli_input.rs','tests/proof_rejection.rs']},'primitive_store_inventory':primitives,'successful_emit_byte_store_terms':rows,'successful_byte_stores':total,'current_work_debit':8,'minimum_write_only_shortfall':total-8,'notes':['On successful emit_byte all six typed-write calls have returned Ok; each primitive returns Ok after the listed fixed stores','Other input/window/dictionary source reads and caller transitions are outside this write-only lower bound','A frame or changed-cell count is not being substituted for a reached-operation receipt','Existing 425-unit construction/reset charge and M1 closure are unaffected'],'proposed_receipt_producers':names,'direct_caller_sites':callers}
+(O/'source-audit.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n');(O/'audit.py.txt').write_bytes(Path(__file__).read_bytes());(O/'artifact-sha256.json').write_text(json.dumps({p.name:sha(p) for p in sorted(O.iterdir()) if p.is_file()},indent=2,sort_keys=True)+'\n')
+print(json.dumps({'stores':total,'debit':8,'shortfall':16,'caller_site_counts':{n:len(v) for n,v in callers.items()}},indent=2))

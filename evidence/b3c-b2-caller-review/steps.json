@@ -1,0 +1,52 @@
+[
+  {
+    "name": "positive",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-review01/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "advance_serialized_body_block_switch",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "exit_code": 0,
+    "input_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "log_sha256": "ba66e3581bf16cfc6d5b7f769f1e512e5bfd238290ca9ee07942508f14bbfe72"
+  },
+  {
+    "name": "permanent-failure-bypass",
+    "command": [
+      "/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus",
+      "/Users/aerickson/Documents/NemoDev/proven-primitives-m1-ledger-next/target/b3c-b2-review01/src/lib.rs",
+      "--crate-type",
+      "lib",
+      "--verify-only-module",
+      "brotli_input",
+      "--verify-function",
+      "advance_serialized_body_block_switch",
+      "--no-cheating",
+      "--num-threads",
+      "1",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "1000",
+      "--multiple-errors",
+      "0"
+    ],
+    "exit_code": 0,
+    "input_sha256": "ac5d33199762f9ce0688f26dc79851fabfd38d76d5067b8473aa8413d843ff24",
+    "log_sha256": "ba66e3581bf16cfc6d5b7f769f1e512e5bfd238290ca9ee07942508f14bbfe72"
+  }
+]

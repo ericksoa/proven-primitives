@@ -1,0 +1,39 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli, function lib::brotli::BrotliDecoder::emit_byte (selected functions)
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:1257:13
+     |
+1257 | /             r.is_ok() ==> {
+1258 | |                 &&& final(self).budget.work_remaining
+1259 | |                     == old(self).budget.work_remaining - 8
+1260 | |                 &&& final(self).budget.output_remaining
+...    |
+1264 | |                         - if consumes_input { 1u64 } else { 0u64 }
+1265 | |             },
+     | |_____________^ failed this postcondition
+...
+1337 | /     {
+1338 | |         let ghost initial_workspace = self.workspace@;
+1339 | |         if produced >= output.len() {
+1340 | |             return Err(StreamError::InvalidFormat);
+...    |
+1459 | |         Ok(())
+1460 | |     }
+     | |_____- at the end of the function body
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:1319:40
+     |
+1319 |                     .update(base + 24, t as u8)
+     |                                        ^
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:1320:40
+     |
+1320 |                     .update(base + 25, (t >> 8) as u8)
+     |                                        ^^^^^^^^
+
+error: aborting due to 1 previous error
+

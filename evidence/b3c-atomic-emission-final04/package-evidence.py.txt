@@ -1,0 +1,81 @@
+from pathlib import Path
+import hashlib,json,subprocess,os,shutil,tarfile,re,io
+R=Path.cwd();O=R/'evidence/b3c-atomic-emission-final04';T=R/'target/b3c-emission'
+def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def dump(p,v):Path(p).write_text(json.dumps(v,indent=2,sort_keys=True)+'\n')
+def bind(p):return {'path':str(Path(p).relative_to(R)),'sha256':h(p)}
+c=json.loads((O/'complete.json').read_text());v=c['verification'];controls=json.loads((O/'controls.json').read_text())
+assert v['success'] and v['errors']==0 and v['is-verifying-entire-crate']
+assert len(c['suites'])==3 and len(controls)==c['semantic_rejections']==44
+assert all(x['semantic_rejection'] and not x['tool_or_resource_failure'] and not x['syntax_or_type_failure'] for x in controls)
+for n,d in c['source_sha256'].items():assert h(R/n)==d,n
+assert not (O/'gate-artifact-sha256.json').exists();shutil.copyfile(O/'artifact-sha256.json',O/'gate-artifact-sha256.json')
+for src,dst in [('preservation-audit.py','preservation-audit.py.txt'),('REPRODUCE.md','REPRODUCE.md'),('validate-package.py','validate-package.py.txt'),('legacy-repair.json','legacy-repair.json')]:shutil.copyfile(T/src,O/dst)
+(O/'preservation-audit.json').write_bytes(subprocess.check_output(['/opt/homebrew/bin/python3',str(T/'preservation-audit.py')],cwd=R,env=os.environ))
+entries=[];diagnostic_files=set()
+for i in range(1,8):
+ log=T/f'selected{i:02d}.log';source=T/f'selected{(2 if i==3 else i):02d}-source.rs';assert log.is_file() and source.is_file()
+ text=log.read_text();resource='Resource limit (rlimit) exceeded' in text
+ result=re.findall(r'verification results:: (\d+) verified, (\d+) errors',text);assert len(result)==1
+ counts=tuple(map(int,result[0]));assert (resource and counts[1]>0) or (not resource and counts==(1,0))
+ entries.append({'id':f'selected{i:02d}','source':source.name,'source_sha256':h(source),'log':log.name,'log_sha256':h(log),'function':'BrotliDecoder::emit_uncompressed_byte' if i==7 else 'BrotliDecoder::emit_byte','rlimit_flag':300 if i==3 else 60,'verified':counts[0],'errors':counts[1],'status':'resource-failed' if resource else 'selected-positive','counts_as_gate_or_control':False})
+ diagnostic_files.update([log,source])
+for folder in sorted(T.glob('diagnostic-*')):
+ if not folder.is_dir():continue
+ files=[p for p in folder.rglob('*') if p.is_file()];diagnostic_files.update(files)
+ text=(folder/'selected.log').read_text();result=re.findall(r'verification results:: (\d+) verified, (\d+) errors',text);assert len(result)==1
+ counts=tuple(map(int,result[0]));resource='Resource limit (rlimit) exceeded' in text
+ entries.append({'id':folder.name,'function':'BrotliDecoder::emit_byte','rlimit_flag':60,'verified':counts[0],'errors':counts[1],'status':'resource-failed' if resource else 'selected-positive','files_sha256':{str(p.relative_to(T)):h(p) for p in sorted(files)},'scope':'Subset of new effect goals; original contract/runtime retained. Not a full final-contract or whole positive.','counts_as_gate_or_control':False})
+for name in ['single-error-pair','conditional-history','first-byte-history','conditional-total','error-window-flip','preflight-controls01','legacy-preflight','legacy-rest-preflight','terminal-effort-pair','terminal-effort-pair02','terminal-guarded-fault','terminal-direct-fault']:
+ folder=T/name
+ if not folder.exists():continue
+ files=[p for p in folder.rglob('*') if p.is_file()];diagnostic_files.update(files)
+ entries.append({'id':name,'files_sha256':{str(p.relative_to(T)):h(p) for p in sorted(files)},'scope':'Diagnostic only. Actual positive/negative/failed statuses are retained in its raw logs and steps/results. Not additional full gate results or rejection counts.','counts_as_gate_or_control':False})
+for name in ['preflight-controls.py','preflight-legacy-rest.py','terminal-effort-pair.py','terminal-effort-pair02.py','legacy-anchor-audit.json','first-eight-classification.json','compile-legacy-repair.log']:
+ if (T/name).is_file():diagnostic_files.add(T/name)
+manifest={'schema':'b3c-emission-partial-diagnostics-v1','parent_commit':'961fe5f2656abd9462bd5620ba2fc03e9b760fa2','reconstruction':'Selected snapshots replace src/brotli.rs at the parent; every other core source file is unchanged. The selected03 query uses the selected02 source. Variant directories include their actual src closure. All queries use pinned Verus --no-cheating --verify-only-module brotli --verify-function as named, --num-threads 1 --triggers-mode silent and the recorded rlimit.','entries':entries,'scope':'Earlier partial proof/fault diagnostics only. Raw logs preserve source paths, commands, actual successes, wrapper failures, mixed resource failures and corrected pairs; no additional gate positives or deliberate-defect counts'}
+dump(O/'diagnostic-manifest.json',manifest)
+with tarfile.open(O/'diagnostics.tar.gz','w:gz') as archive:
+ for p in sorted(diagnostic_files):
+  data=p.read_bytes();info=tarfile.TarInfo(str(p.relative_to(T)));info.size=len(data);info.mode=0o644;archive.addfile(info,io.BytesIO(data))
+checkpoint=R/'BROTLI_B3C_ATOMIC_EMISSION_CHECKPOINT.md';s=(T/'checkpoint-template.md').read_text()
+for name,value in [('@VERIFIED@',v['verified']),('@RUNTIME@',c['runtime_passed']),('@CONTROLS@',len(controls))]:s=s.replace(name,str(value))
+assert not re.search(r'@[A-Z]+@',s);checkpoint.write_text(s)
+agents=R/'AGENTS.md';s=agents.read_text();assert 'BROTLI_B3C_ATOMIC_EMISSION_CHECKPOINT.md' not in s
+s+='''
+
+The broader B3c atomic-emission checkpoint is recorded in
+`BROTLI_B3C_ATOMIC_EMISSION_CHECKPOINT.md` and
+`evidence/brotli-b3c-atomic-emission.json`. Within C1's already-approved atomic
+output/state-effect scope, the existing owner-private `emit_byte` and
+`emit_uncompressed_byte` contracts now bind success to the complete serialized
+workspace image and every error to an unchanged workspace/budget/output.
+Their complete bodies, signatures, original requirements and guarantees remain;
+there is no new public or cross-module proof API. The source retains the exact
+8-work/1-output/optional-1-input debit and the 425-unit initialization policy.
+The same-source gate checked @VERIFIED@ whole-crate obligations with zero errors,
+@RUNTIME@ runtime tests and 44 semantic rejections across the prior 28 B3c, six
+constructor and ten new emission cases. Earlier partial resource failures are
+retained and are not positive/control evidence. One proof-only solver-isolation
+annotation uses the existing tool without changing any production allowance.
+The legacy test-only selector repair and matched temporary emission/terminal
+solver allowances are recorded separately; all original assertions/classifiers
+remain. Source billing is still open: the static audit finds 24 byte writes
+against the eight-unit emission debit. E3 is pending direct human approval in
+`BROTLI_B3C_EMISSION_WRITE_METERING_DECISION.md`; do not implement its five
+return-type/24-unit changes without that approval. The actual B2 caller's
+retry-bypass fault is accepted by its current weak contract, independently of
+the checked rejection helper; this is a recorded proof gap, not a passing
+negative control.
+This is a local exact-effect/error-frame checkpoint, not complete B3c. Byte
+origin, complete error classification/progress, actual B2 saved-state handoff,
+phase/stream composition, later source ledgers, B3d/B4, F2's native disagreement,
+independent human specification review and supported-decoder/release gates
+remain open. No additional architectural decision or approval follows.
+'''.replace('@VERIFIED@',str(v['verified'])).replace('@RUNTIME@',str(c['runtime_passed']))
+agents.write_text(s)
+shutil.copyfile(__file__,O/'package-evidence.py.txt')
+dump(O/'artifact-sha256.json',{str(p.relative_to(O)):h(p) for p in sorted(O.rglob('*')) if p.is_file() and p.name!='artifact-sha256.json'})
+root=R/'evidence/brotli-b3c-atomic-emission.json'
+dump(root,{'schema':'brotli-b3c-atomic-emission-checkpoint-v1','status':'complete-named-atomic-emission-effects-and-error-frames','complete_B3c':False,'complete_resource_ledger':False,'approved_basis':{'C1':bind(R/'BROTLI_B3C_PROPOSAL.md'),'A1':bind(R/'BROTLI_B3C_INTERNAL_BOUNDARY_ADDENDUM.md'),'new_public_or_cross_module_proof_interfaces':False,'new_architectural_decisions':False},'parent_commit':'961fe5f2656abd9462bd5620ba2fc03e9b760fa2','gate':{'tag':O.name,'complete':bind(O/'complete.json'),'source_start':bind(O/'source-start.json'),'frozen_source':bind(O/'frozen-source.tar.gz'),'artifact_manifest':bind(O/'artifact-sha256.json'),'original_gate_artifact_manifest':bind(O/'gate-artifact-sha256.json'),'verification':v,'runtime_passed':c['runtime_passed'],'semantic_rejections':len(controls),'required_suites':c['suites'],'required_controls':bind(O/'required-controls.json'),'controls':controls,'whole_positive_precedes_all_defects':True,'source_unchanged_during_gate':c['source_unchanged'],'M1_318_case_gate_rerun_here':False},'checked_properties':['Exact complete serialized workspace image on successful shared byte emission and actual uncompressed wrapper','Caller output byte equals physical-window byte; position/previous/history/total/meta updates and complete workspace frame','All errors preserve entire workspace, budget and caller output in the original admitted domain','Original exact 8-work/1-output/optional-1-input debit, immutable limits/call/init credit and output frame'],'known_write_billing_gap':{'classification':'source-derived static inventory; not an invocation-count theorem','source_level_byte_writes':24,'current_work_debit':8,'audit':bind(R/'evidence/b3c-emission-write-audit/source-audit.json'),'audit_artifacts':bind(R/'evidence/b3c-emission-write-audit/artifact-sha256.json'),'decision':bind(R/'BROTLI_B3C_EMISSION_WRITE_METERING_DECISION.md'),'decision_status':'pending-direct-human-approval','implemented':False},'actual_b2_caller_review':{'review':bind(R/'evidence/b3c-b2-caller-review/review.json'),'artifact_manifest':bind(R/'evidence/b3c-b2-caller-review/artifact-sha256.json'),'deliberate_retry_bypass_accepted':True,'counts_as_rejection':False},'historical_attempts':[{'tag':'b3c-atomic-emission-final'+tag,'status':bind(R/('evidence/b3c-atomic-emission-final'+tag)/'retained-attempt.json'),'artifact_manifest':bind(R/('evidence/b3c-atomic-emission-final'+tag)/'artifact-sha256.json'),'counts_as_complete_gate':False} for tag in ['01','02','03']],'preservation_audit':bind(O/'preservation-audit.json'),'partial_diagnostics':{'manifest':bind(O/'diagnostic-manifest.json'),'archive':bind(O/'diagnostics.tar.gz'),'counts_as_gate_or_defect_cases':False},'checkpoint':bind(checkpoint),'approval_and_scope_ledger':bind(agents),'reproduction':bind(O/'REPRODUCE.md'),'remaining':['Complete B3c and byte-origin/caller/phase/stream composition','Complete error classification and absence of spurious failures','Actual B2 serialized state restoration/snapshot correspondence and body handoff','Full LZ77 overlap/history induction and dictionary integration','Source-operation accounting outside completed M1 scope','B3d/B4, F2 monkey disagreement, independent human specification review and supported-decoder/release gates'],'trusted_components':['Mathematical specifications and interpretations','Pinned Verus/Z3/vstd and Rust/LLVM','Apple build tools and operating environment'],'not_proved':['Whole decoder or supported release','Arbitrary call-sequence or service-availability theorem','Source-to-binary or side-channel correctness','Independent human review of mathematical specification correctness']})
+print(json.dumps({'checkpoint':str(checkpoint.relative_to(R)),'verified':v['verified'],'errors':v['errors'],'runtime_passed':c['runtime_passed'],'semantic_rejections':len(controls)},indent=2))

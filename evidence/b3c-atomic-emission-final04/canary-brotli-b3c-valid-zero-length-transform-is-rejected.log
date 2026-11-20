@@ -1,0 +1,41 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_data (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_data.rs:1616:1
+     |
+1616 | fn zero_length_dictionary_transform_plan() -> (r: DictionaryTransformPlan)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check finished in 204 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_data.rs:1616:1
+     |
+1616 | fn zero_length_dictionary_transform_plan() -> (r: DictionaryTransformPlan)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_data.rs:1617:13
+     |
+1617 |       ensures r == (DictionaryTransformPlan {
+     |  _____________^
+1618 | |         prefix_at: 216,
+1619 | |         prefix_len: 0,
+1620 | |         body_start: 0,
+...    |
+1624 | |         transform: 4,
+1625 | |     }),
+     | |______^ failed this postcondition
+1626 |   {
+1627 | /     DictionaryTransformPlan {
+1628 | |         prefix_at: 216,
+1629 | |         prefix_len: 0,
+1630 | |         body_start: 0,
+...    |
+1634 | |         transform: 4,
+1635 | |     }
+     | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

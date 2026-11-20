@@ -1,0 +1,13 @@
+{
+  "contract_header_unchanged": true,
+  "counts_as_semantic_rejection": false,
+  "interpretation": "The production branch still invokes the checked rejection helper. Its existing caller contract does not protect this required C1 permanent-failure behavior. Full actual-caller/state-codec composition remains open.",
+  "mutated_source_sha256": "ac5d33199762f9ce0688f26dc79851fabfd38d76d5067b8473aa8413d843ff24",
+  "mutation": "In the actual advance_serialized_body_block_switch caller, replace return reject_permanent_single_type_switch(state, kind) with NeedInput and zero consumption",
+  "original_and_bypassed_selected_root_both_accepted": true,
+  "original_source_sha256": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+  "original_whole_source_matches_atomic_checkpoint": true,
+  "production_bug_introduced": false,
+  "schema": "b3c-actual-b2-caller-proof-gap-v1",
+  "status": "accepted-deliberate-fault-confirms-missing-result-binding"
+}

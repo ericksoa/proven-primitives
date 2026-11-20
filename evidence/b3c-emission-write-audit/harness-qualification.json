@@ -1,0 +1,28 @@
+{
+  "E3_return_type_or_billing_change_implemented": false,
+  "current_test_sha256": "fcf9dae2f5b359abd83d21bdd59263f372cdd9f75a153133afac2fb5f26cad23",
+  "only_changes_since_proposal": {
+    "call_new": "\"brotli\" => check_core(function),",
+    "call_old": "\"brotli\" => check_brotli_function(&verus, &temporary, function),",
+    "call_sites": 2,
+    "inserted_closure": "    let check_core = |function: &str| {\n        // Use the same allowance on each selected positive/negative pair.\n        // Production source and its original allowances remain unchanged.\n        let step_source = if function == \"BrotliDecoder::step\" {\n            let path = temporary.join(\"src/brotli.rs\");\n            let source = fs::read_to_string(&path).unwrap();\n            let declaration = \"    #[verifier::rlimit(60)]\\n    pub fn step(\";\n            let checked = \"    #[verifier::rlimit(300)]\\n    pub fn step(\";\n            assert_eq!(source.matches(declaration).count(), 1, \"unique temporary step allowance\");\n            fs::write(&path, source.replacen(declaration, checked, 1)).unwrap();\n            Some(source)\n        } else {\n            None\n        };\n        let output = Command::new(&verus)\n            .arg(temporary.join(\"src/lib.rs\"))\n            .args([\n                \"--crate-type\", \"lib\", \"--verify-only-module\", \"brotli\",\n                \"--verify-function\", function, \"--no-cheating\", \"--num-threads\", \"1\",\n                \"--triggers-mode\", \"silent\", \"--rlimit\",\n                if function == \"BrotliDecoder::emit_byte\" || function == \"BrotliDecoder::step\" {\n                    \"300\"\n                } else {\n                    \"60\"\n                },\n            ])\n            .current_dir(&temporary)\n            .output()\n            .expect(\"run selected pinned Verus core root\");\n        if let Some(source) = step_source {\n            fs::write(temporary.join(\"src/brotli.rs\"), source).unwrap();\n        }\n        output\n    };\n\n",
+    "native_emission_root_allowance_after": 300,
+    "native_emission_root_allowance_before": 60,
+    "production_source_or_allowance_change": false,
+    "scope": "Only legacy-28 mutation selector and scoped checker effort; every assertion and classifier retained",
+    "selector_new": "            \"match put_state_u32(workspace, window_bytes, relative, remaining - 1).0 {\",\n            \"match put_state_u32(workspace, window_bytes, relative, remaining).0 {\",",
+    "selector_old": "            \"remaining - 1,\\n    )\\n    .map_err(map_compressed_error)\",\n            \"remaining,\\n    )\\n    .map_err(map_compressed_error)\",",
+    "temporary_step_allowance": {
+      "negative": 300,
+      "original_contract_and_executable_statements_unchanged": true,
+      "positive": 300,
+      "production": 60
+    },
+    "whole_crate_allowance": 300
+  },
+  "production_source_hashes_match_frozen_proposal": true,
+  "proposal_test_sha256": "986bfed687b75841673093146ea71a2c1b23a140a457ab6cc675e186e1d0390a",
+  "receipt_producer_graph_and_all_33_caller_sites_unchanged": true,
+  "reversing_only_these_changes_reconstructs_exact_proposal_test": true,
+  "schema": "b3c-emission-proposal-harness-qualification-v1"
+}

@@ -1,0 +1,13 @@
+from pathlib import Path
+import subprocess,shutil,json,hashlib
+R=Path.cwd();O=R/'target/b3c-b2-review01';O.mkdir(exist_ok=False);shutil.copytree(R/'src',O/'src');p=O/'src/brotli_input.rs';original=p.read_text();(O/'original-brotli_input.rs').write_text(original)
+tool=Path('/Users/aerickson/Documents/NemoDev/formal-verification-pilot-2026-10-23/tools/verus-arm64-macos/verus');cmd=[str(tool),str(O/'src/lib.rs'),'--crate-type','lib','--verify-only-module','brotli_input','--verify-function','advance_serialized_body_block_switch','--no-cheating','--num-threads','1','--triggers-mode','silent','--rlimit','1000','--multiple-errors','0']
+rows=[]
+for name in ['positive','permanent-failure-bypass']:
+ if name!='positive':
+  start=original.index('pub(crate) fn advance_serialized_body_block_switch(');end=original.index('proof fn valid_bits_ignore_unused_storage',start);part=original[start:end];body=part.index('\n{\n')
+  old='return reject_permanent_single_type_switch(state, kind);';new='return BodySwitchStep { consumed: 0, status: BodySwitchStatus::NeedInput };';assert part[body:].count(old)==1
+  changed=part[:body]+part[body:].replace(old,new,1);assert changed[:body]==part[:body];p.write_text(original[:start]+changed+original[end:])
+ with (O/(name+'.log')).open('w') as f:r=subprocess.run(cmd,cwd=R,stdout=f,stderr=subprocess.STDOUT)
+ row={'name':name,'command':cmd,'exit_code':r.returncode,'input_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'log_sha256':hashlib.sha256((O/(name+'.log')).read_bytes()).hexdigest()};rows.append(row);(O/'steps.json').write_text(json.dumps(rows,indent=2)+'\n');assert r.returncode==0,(name,(O/(name+'.log')).read_text())
+print('CONFIRMED GAP: original and actual-caller permanent-failure bypass both satisfy the existing weak contract; not a negative-control pass.')

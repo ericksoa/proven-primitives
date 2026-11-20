@@ -2345,6 +2345,41 @@ fn the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects(
     }
     fs::create_dir_all(project.join("evidence")).unwrap();
 
+    let check_core = |function: &str| {
+        // Use the same allowance on each selected positive/negative pair.
+        // Production source and its original allowances remain unchanged.
+        let step_source = if function == "BrotliDecoder::step" {
+            let path = temporary.join("src/brotli.rs");
+            let source = fs::read_to_string(&path).unwrap();
+            let declaration = "    #[verifier::rlimit(60)]\n    pub fn step(";
+            let checked = "    #[verifier::rlimit(300)]\n    pub fn step(";
+            assert_eq!(source.matches(declaration).count(), 1, "unique temporary step allowance");
+            fs::write(&path, source.replacen(declaration, checked, 1)).unwrap();
+            Some(source)
+        } else {
+            None
+        };
+        let output = Command::new(&verus)
+            .arg(temporary.join("src/lib.rs"))
+            .args([
+                "--crate-type", "lib", "--verify-only-module", "brotli",
+                "--verify-function", function, "--no-cheating", "--num-threads", "1",
+                "--triggers-mode", "silent", "--rlimit",
+                if function == "BrotliDecoder::emit_byte" || function == "BrotliDecoder::step" {
+                    "300"
+                } else {
+                    "60"
+                },
+            ])
+            .current_dir(&temporary)
+            .output()
+            .expect("run selected pinned Verus core root");
+        if let Some(source) = step_source {
+            fs::write(temporary.join("src/brotli.rs"), source).unwrap();
+        }
+        output
+    };
+
     for (module, function) in [
         ("input", "b3c_layout_is_exact"),
         ("input", "initialize_serialized_b3c"),
@@ -2375,7 +2410,7 @@ fn the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects(
     ] {
         let positive = match module {
             "input" => check_brotli_input_function(&verus, &temporary, function),
-            "brotli" => check_brotli_function(&verus, &temporary, function),
+            "brotli" => check_core(function),
             "data" => check_brotli_data_function(&verus, &temporary, function),
             _ => unreachable!(),
         };
@@ -2456,8 +2491,8 @@ fn the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects(
             "input",
             "brotli_input.rs",
             "body_decrement_block_remaining",
-            "remaining - 1,\n    )\n    .map_err(map_compressed_error)",
-            "remaining,\n    )\n    .map_err(map_compressed_error)",
+            "match put_state_u32(workspace, window_bytes, relative, remaining - 1).0 {",
+            "match put_state_u32(workspace, window_bytes, relative, remaining).0 {",
         ),
         (
             "brotli-b3c-literal-context-previous-bytes-are-swapped",
@@ -2623,7 +2658,7 @@ fn the_prover_rejects_twenty_eight_b3c_layout_state_resource_and_output_defects(
         fs::write(&temporary_path, original.replacen(old, new, 1)).unwrap();
         let result = match module {
             "input" => check_brotli_input_function(&verus, &temporary, function),
-            "brotli" => check_brotli_function(&verus, &temporary, function),
+            "brotli" => check_core(function),
             "data" => check_brotli_data_function(&verus, &temporary, function),
             _ => unreachable!(),
         };
@@ -5932,6 +5967,123 @@ fn the_prover_rejects_six_b3c_constructor_binding_defects() {
             && !lower.contains("internal compiler error") && !lower.contains("error[e"),
             "tool or resource failure is not a semantic rejection: {log}");
         println!("REJECTED {name}: deliberate constructor defect, unchanged specification");
+        fs::write(&path, &original).unwrap();
+    }
+    fs::remove_dir_all(temporary).unwrap();
+}
+
+#[test]
+#[ignore = "requires VERUS_ROOT pointing at the pinned Verus distribution"]
+fn the_prover_rejects_ten_b3c_atomic_emission_defects() {
+    let verus_root = PathBuf::from(std::env::var_os("VERUS_ROOT").expect("set VERUS_ROOT"));
+    let verus = verus_root.join(if cfg!(windows) { "verus.exe" } else { "verus" });
+    let project = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let temporary = std::env::temp_dir().join(format!(
+        "proven-primitives-b3c-emission-canaries-{}", std::process::id(),
+    ));
+    fs::create_dir(&temporary).expect("fresh private temporary directory");
+    fs::create_dir(temporary.join("src")).unwrap();
+    for entry in fs::read_dir(project.join("src")).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), temporary.join("src").join(entry.file_name())).unwrap();
+        }
+    }
+    let path = temporary.join("src/brotli.rs");
+    let original = fs::read_to_string(&path).unwrap();
+    for function in ["BrotliDecoder::emit_byte", "BrotliDecoder::emit_uncompressed_byte"] {
+        let positive = check_brotli_function(&verus, &temporary, function);
+        assert!(positive.status.success(), "unchanged emission root failed: {}", transcript(&positive));
+    }
+    for (name, function, old, new) in [
+        (
+            "brotli-b3c-emission-window-byte-disagrees-with-output",
+            "BrotliDecoder::emit_byte",
+            "        self.workspace[position as usize] = byte;",
+            "        self.workspace[position as usize] = byte.wrapping_add(1);",
+        ),
+        (
+            "brotli-b3c-emission-window-position-does-not-advance",
+            "BrotliDecoder::emit_byte",
+            "            crate::brotli_input::B3C_WINDOW_POSITION,\n            next_position,",
+            "            crate::brotli_input::B3C_WINDOW_POSITION,\n            position,",
+        ),
+        (
+            "brotli-b3c-emission-first-history-increment-is-skipped",
+            "BrotliDecoder::emit_byte",
+            "let next_history = if history < history_limit { history + 1 } else { history };",
+            "let next_history = if history == 0 { 0 } else if history < history_limit { history + 1 } else { history };",
+        ),
+        (
+            "brotli-b3c-emission-first-total-increment-is-skipped",
+            "BrotliDecoder::emit_byte",
+            "let next_total = total.checked_add(1).ok_or(StreamError::ResourceLimit)?;",
+            "let next_total = total.checked_add(if total == 0 { 0 } else { 1 }).ok_or(StreamError::ResourceLimit)?;",
+        ),
+        (
+            "brotli-b3c-emission-second-previous-uses-current-byte",
+            "BrotliDecoder::emit_byte",
+            "            crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE,\n            previous,",
+            "            crate::brotli_input::B3C_SECOND_PREVIOUS_BYTE,\n            byte,",
+        ),
+        (
+            "brotli-b3c-emission-meta-remaining-does-not-decrement",
+            "BrotliDecoder::emit_byte",
+            "            crate::brotli_input::B3C_META_REMAINING,\n            remaining - 1,",
+            "            crate::brotli_input::B3C_META_REMAINING,\n            remaining,",
+        ),
+        (
+            "brotli-b3c-emission-writes-unrelated-scratch",
+            "BrotliDecoder::emit_byte",
+            "        self.workspace[position as usize] = byte;",
+            "        self.workspace[position as usize] = byte;\n        self.workspace[window_bytes as usize] = byte;",
+        ),
+        (
+            "brotli-b3c-emission-resource-error-consumes-work",
+            "BrotliDecoder::emit_byte",
+            "        {\n            return Err(StreamError::ResourceLimit);\n        }\n        let window_bytes = self.window_bytes();",
+            "        {\n            let _ = self.budget.charge_work(1);\n            return Err(StreamError::ResourceLimit);\n        }\n        let window_bytes = self.window_bytes();",
+        ),
+        (
+            "brotli-b3c-emission-resource-error-writes-window",
+            "BrotliDecoder::emit_byte",
+            "        {\n            return Err(StreamError::ResourceLimit);\n        }\n        let window_bytes = self.window_bytes();",
+            "        {\n            self.workspace[0] = self.workspace[0].wrapping_add(1);\n            return Err(StreamError::ResourceLimit);\n        }\n        let window_bytes = self.window_bytes();",
+        ),
+        (
+            "brotli-b3c-emission-uncompressed-error-writes-window",
+            "BrotliDecoder::emit_uncompressed_byte",
+            "        self.emit_byte(byte, output, produced, true)",
+            "        let result = self.emit_byte(byte, output, produced, true);\n        if result.is_err() { self.workspace[0] = byte; }\n        result",
+        ),
+    ] {
+        let (begin, following) = if function == "BrotliDecoder::emit_byte" {
+            ("    fn emit_byte(", "    fn emit_uncompressed_byte(")
+        } else {
+            ("    fn emit_uncompressed_byte(", "    fn fail_transition(")
+        };
+        let start = original.find(begin).unwrap();
+        let end = start + original[start..].find(following).unwrap();
+        let selected = &original[start..end];
+        let body = selected.find("\n    {\n").unwrap();
+        assert_eq!(selected[body..].matches(old).count(), 1, "unique body anchor for {name}");
+        let replacement = format!("{}{}", &selected[..body], selected[body..].replacen(old, new, 1));
+        assert_eq!(&replacement[..body], &selected[..body], "unchanged emission contract");
+        fs::write(&path, format!("{}{}{}", &original[..start], replacement, &original[end..])).unwrap();
+        let result = check_brotli_function(&verus, &temporary, function);
+        let log = transcript(&result);
+        fs::write(project.join("evidence").join(format!("canary-{name}.log")), &log).unwrap();
+        assert!(!result.status.success(), "prover accepted {name}");
+        assert!(log.contains("postcondition not satisfied")
+            || log.contains("precondition not satisfied")
+            || log.contains("invariant not satisfied")
+            || log.contains("assertion failed"), "expected semantic rejection: {log}");
+        let lower = log.to_ascii_lowercase();
+        assert!(!lower.contains("resource limit") && !lower.contains("panicked")
+            && !lower.contains("expected rlimit-count") && !lower.contains("unexpected smt output")
+            && !lower.contains("internal compiler error") && !lower.contains("error[e"),
+            "tool or resource failure is not a semantic rejection: {log}");
+        println!("REJECTED {name}: deliberate emission defect, unchanged specification");
         fs::write(&path, &original).unwrap();
     }
     fs::remove_dir_all(temporary).unwrap();

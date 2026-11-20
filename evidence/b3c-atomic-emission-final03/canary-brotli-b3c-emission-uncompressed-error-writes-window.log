@@ -1,0 +1,64 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-97592/src/brotli.rs:1462:5
+     |
+1462 | /     fn emit_uncompressed_byte(
+1463 | |         &mut self,
+1464 | |         byte: u8,
+1465 | |         output: &mut [u8],
+1466 | |         produced: usize,
+1467 | |     ) -> (r: Result<(), StreamError>)
+     | |____________________________________^
+
+note: function body check finished in 5 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-97592/src/brotli.rs:1462:5
+     |
+1462 | /     fn emit_uncompressed_byte(
+1463 | |         &mut self,
+1464 | |         byte: u8,
+1465 | |         output: &mut [u8],
+1466 | |         produced: usize,
+1467 | |     ) -> (r: Result<(), StreamError>)
+     | |____________________________________^
+
+error: postcondition not satisfied
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-97592/src/brotli.rs:1494:13
+     |
+1494 | /             r.is_err() ==> {
+1495 | |                 &&& *final(self).budget == *old(self).budget
+1496 | |                 &&& final(self).workspace@ == old(self).workspace@
+1497 | |             },
+     | |_____________^ failed this postcondition
+...
+1565 |           result
+     |           ------ at the end of the function body
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-97592/src/brotli.rs:1544:40
+     |
+1544 |                     .update(base + 24, t as u8)
+     |                                        ^
+
+note: function body check finished in 2 seconds
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-97592/src/brotli.rs:1462:5
+     |
+1462 | /     fn emit_uncompressed_byte(
+1463 | |         &mut self,
+1464 | |         byte: u8,
+1465 | |         output: &mut [u8],
+1466 | |         produced: usize,
+1467 | |     ) -> (r: Result<(), StreamError>)
+     | |____________________________________^
+
+note: recommendation not met: value may be out of range of the target type (use `#[verifier::truncate]` on the cast to silence this warning)
+    --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-emission-canaries-97592/src/brotli.rs:1545:40
+     |
+1545 |                     .update(base + 25, (t >> 8) as u8)
+     |                                        ^^^^^^^^
+
+error: aborting due to 1 previous error
+

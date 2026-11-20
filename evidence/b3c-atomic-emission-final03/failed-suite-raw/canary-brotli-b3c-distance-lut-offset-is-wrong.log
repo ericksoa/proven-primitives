@@ -1,0 +1,48 @@
+verification results:: 4 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-97588/src/brotli_input.rs:30394:13
+      |
+30394 |             assert((48u32 << 0) == 48u32 * 1u32) by (bit_vector);
+      |             ^^^^^^
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-97588/src/brotli_input.rs:30398:13
+      |
+30398 |             assert((48u32 << 1) == 48u32 * 2u32) by (bit_vector);
+      |             ^^^^^^
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-97588/src/brotli_input.rs:30402:13
+      |
+30402 |             assert((48u32 << 2) == 48u32 * 4u32) by (bit_vector);
+      |             ^^^^^^
+
+note: bitvector assertion not satisfied: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-97588/src/brotli_input.rs:30407:13
+      |
+30407 |             assert((48u32 << 3) == 48u32 * 8u32) by (bit_vector);
+      |             ^^^^^^
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-97588/src/brotli_input.rs:30357:1
+      |
+30357 | / pub(crate) fn distance_lut_value(
+30358 | |     postfix_bits: u8,
+30359 | |     direct: u16,
+30360 | |     symbol: u16,
+30361 | | ) -> (r: (u8, u32))
+      | |__________________^
+
+error: assertion failed
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-97588/src/brotli_input.rs:30436:16
+      |
+30436 |         assert(shifted_wide <= 402_653_273);
+      |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: aborting due to 1 previous error
+

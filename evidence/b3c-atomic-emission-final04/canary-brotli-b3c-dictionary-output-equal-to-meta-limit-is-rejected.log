@@ -1,0 +1,32 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli_input (selected functions)
+
+WARNING: (60562,13): 'if' cannot be used in patterns.
+WARNING: (68386,5): 'if' cannot be used in patterns.
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_input.rs:40686:1
+      |
+40686 | / fn validate_dictionary_staging_length(
+40687 | |     output_length: u8,
+40688 | |     meta_remaining: u32,
+40689 | | ) -> (r: Result<(), CoreFailure>)
+      | |________________________________^
+
+error: postcondition not satisfied
+     --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli_input.rs:40696:9
+      |
+40696 |           output_length <= 37 && output_length as u32 <= meta_remaining ==> r.is_ok(),
+      |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+40697 |   {
+40698 | /     if output_length > 37 {
+40699 | |         Err(core_state_failure())
+40700 | |     } else if output_length as u32 >= meta_remaining {
+40701 | |         Err(CoreFailure::InvalidFormat(CoreFormatDetail::Dictionary))
+40702 | |     } else {
+40703 | |         Ok(())
+40704 | |     }
+      | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

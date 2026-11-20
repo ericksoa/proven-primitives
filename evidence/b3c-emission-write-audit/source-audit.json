@@ -1,0 +1,277 @@
+{
+  "basis": {
+    "ordinary_scalar_reads": "This audit counts writes only and introduces no read-unit classification",
+    "policy": "BROTLI_B3C_PROPOSAL.md exact resource policy: each workspace/window/caller-output byte write is charged"
+  },
+  "classification": "Source-derived static success-path store inventory; not a checked per-invocation source-count receipt",
+  "current_work_debit": 8,
+  "direct_caller_sites": {
+    "emit_byte": [
+      {
+        "file": "src/brotli.rs",
+        "function": "emit_uncompressed_byte",
+        "line": 1563
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "step_body_emit_literal",
+        "line": 2298
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "step_body_phase_copy_setup",
+        "line": 3112
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "step_body_phase_copy_emit",
+        "line": 3348
+      }
+    ],
+    "emit_uncompressed_byte": [
+      {
+        "file": "src/brotli.rs",
+        "function": "step_stream_transition",
+        "line": 3801
+      }
+    ],
+    "write_b3c_state_byte": [
+      {
+        "file": "src/brotli.rs",
+        "function": "write_phase",
+        "line": 670
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "fail",
+        "line": 752
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "fail",
+        "line": 758
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "fail",
+        "line": 764
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "set_state_byte",
+        "line": 902
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "commit_eof_if_complete",
+        "line": 1179
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "emit_byte",
+        "line": 1417
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "emit_byte",
+        "line": 1424
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "store_meta_phase",
+        "line": 29763
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "store_meta_phase",
+        "line": 29764
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "store_meta_phase",
+        "line": 29765
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "store_meta_phase",
+        "line": 29766
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "advance_serialized_window_header",
+        "line": 29990
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "advance_serialized_window_header",
+        "line": 29993
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "build_serialized_dictionary_word",
+        "line": 40800
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "build_serialized_dictionary_word",
+        "line": 40808
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "build_serialized_dictionary_word",
+        "line": 40824
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "build_serialized_dictionary_word",
+        "line": 40832
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "build_serialized_dictionary_word",
+        "line": 40840
+      }
+    ],
+    "write_b3c_state_u32": [
+      {
+        "file": "src/brotli.rs",
+        "function": "set_state_u32",
+        "line": 973
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "consume_metadata_byte",
+        "line": 1139
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "emit_byte",
+        "line": 1431
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "emit_byte",
+        "line": 1438
+      },
+      {
+        "file": "src/brotli.rs",
+        "function": "emit_byte",
+        "line": 1452
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "store_meta_phase",
+        "line": 29767
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "store_meta_phase",
+        "line": 29768
+      },
+      {
+        "file": "src/brotli_input.rs",
+        "function": "build_serialized_dictionary_word",
+        "line": 40816
+      }
+    ],
+    "write_b3c_state_u64": [
+      {
+        "file": "src/brotli.rs",
+        "function": "emit_byte",
+        "line": 1445
+      }
+    ]
+  },
+  "minimum_write_only_shortfall": 16,
+  "notes": [
+    "On successful emit_byte all six typed-write calls have returned Ok; each primitive returns Ok after the listed fixed stores",
+    "Other input/window/dictionary source reads and caller transitions are outside this write-only lower bound",
+    "A frame or changed-cell count is not being substituted for a reached-operation receipt",
+    "Existing 425-unit construction/reset charge and M1 closure are unaffected"
+  ],
+  "primitive_store_inventory": [
+    {
+      "body_sha256": "330086f42e4b2df895d867c90d82f3e48f1d62a6304f0b132a92c3c9139b2fd0",
+      "file": "src/brotli_input.rs",
+      "lines": [
+        29287
+      ],
+      "name": "write_b3c_state_byte",
+      "stores": 1
+    },
+    {
+      "body_sha256": "3ad70008b9b976876c0333cc261bb3042bdec654e1eef3785373229f6912ac7c",
+      "file": "src/brotli_input.rs",
+      "lines": [
+        29507,
+        29508,
+        29509,
+        29510
+      ],
+      "name": "write_b3c_state_u32",
+      "stores": 4
+    },
+    {
+      "body_sha256": "e7d4890ca906f78f753825e975e9a2501f20267987992c6675e51c23726d1da4",
+      "file": "src/brotli_input.rs",
+      "lines": [
+        29640,
+        29641,
+        29642,
+        29643,
+        29644,
+        29645,
+        29646,
+        29647
+      ],
+      "name": "write_b3c_state_u64",
+      "stores": 8
+    }
+  ],
+  "proposed_receipt_producers": [
+    "write_b3c_state_byte",
+    "write_b3c_state_u32",
+    "write_b3c_state_u64",
+    "emit_byte",
+    "emit_uncompressed_byte"
+  ],
+  "schema": "b3c-emission-write-source-audit-v1",
+  "source_sha256": {
+    "src/brotli.rs": "6472034d30705cd1627fb846de1370e5e1d65da01682d78ca858e2a1bd51e4a9",
+    "src/brotli_input.rs": "3e2f1bb6f4535920666f2cf1c838f5db4d23f8ed2dbd4545f49194bfd940789e",
+    "tests/proof_rejection.rs": "986bfed687b75841673093146ea71a2c1b23a140a457ab6cc675e186e1d0390a"
+  },
+  "successful_byte_stores": 24,
+  "successful_emit_byte_store_terms": [
+    {
+      "action": "caller-output byte store",
+      "occurrences": 1,
+      "total": 1,
+      "writes_each": 1
+    },
+    {
+      "action": "physical-window byte store",
+      "occurrences": 1,
+      "total": 1,
+      "writes_each": 1
+    },
+    {
+      "action": "write_b3c_state_byte",
+      "occurrences": 2,
+      "total": 2,
+      "writes_each": 1
+    },
+    {
+      "action": "write_b3c_state_u32",
+      "occurrences": 3,
+      "total": 12,
+      "writes_each": 4
+    },
+    {
+      "action": "write_b3c_state_u64",
+      "occurrences": 1,
+      "total": 8,
+      "writes_each": 8
+    }
+  ]
+}

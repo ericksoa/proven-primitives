@@ -1,0 +1,65 @@
+{
+  "counts_as_complete_gate": false,
+  "errors_in_positive": 0,
+  "failed_suite_raw_logs": [
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-constructor-skips-initialization-reservation.log",
+      "name": "brotli-b3c-constructor-skips-initialization-reservation",
+      "sha256": "dd000870779c4815c25d240e78342bcce8773ffa430985a9d1a4aa8a206b94b3"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-constructor-spurious-resource-failure.log",
+      "name": "brotli-b3c-constructor-spurious-resource-failure",
+      "sha256": "fee33e5f7e083beb637b6c1ce7fcd7e3c85c88a799a9ad3251bdf3d1eaeec6d9"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-constructor-small-workspace-consumes-credit.log",
+      "name": "brotli-b3c-constructor-small-workspace-consumes-credit",
+      "sha256": "a61b961eeffd702472e09f4a53e2f63bcfb60e7b5bcd941da6e0d8d765c8d85e"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-constructor-replenishes-work.log",
+      "name": "brotli-b3c-constructor-replenishes-work",
+      "sha256": "ecd18c0d2a49d574f3e473dcd867df09d275d5fd0c4644d78230a6ff9d7bfcc2"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-emission-window-byte-disagrees-with-output.log",
+      "name": "brotli-b3c-emission-window-byte-disagrees-with-output",
+      "sha256": "c9e5f713975ac417722563cc67c36d5fb9a721c611bbb4796bec1e6282953e12"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-emission-window-position-does-not-advance.log",
+      "name": "brotli-b3c-emission-window-position-does-not-advance",
+      "sha256": "e2efd7d924bcd001e1856150314383a8640eb9c1dc960eb90745724dbbf71d1a"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-emission-first-history-increment-is-skipped.log",
+      "name": "brotli-b3c-emission-first-history-increment-is-skipped",
+      "sha256": "fe90e072b990f9b18b9b4685b6716d499532858376386a757d889dfffb725ab8"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-emission-total-does-not-increment.log",
+      "name": "brotli-b3c-emission-total-does-not-increment",
+      "sha256": "12572ad96d31b1fa7a8370336266ac7b0249d76d13c6ff9b34f5f73816e3f3ee"
+    }
+  ],
+  "frozen_source_sha256": "ec39f49e9665e2479546a123ba1abee739ca5a43fb56567b2e1e7ac6ed2024b9",
+  "new_emission_suite": "failed on mixed total postcondition/resource result after three reported cases",
+  "other_two_suites": "interrupted after focused preflight identified the remaining new mixed fault definitions; no completion claims",
+  "reported_new_partial_cases": [
+    "brotli-b3c-emission-window-byte-disagrees-with-output",
+    "brotli-b3c-emission-window-position-does-not-advance",
+    "brotli-b3c-emission-first-history-increment-is-skipped"
+  ],
+  "runtime_passed": 116,
+  "status": "whole-runtime-positive-passed-required-control-attempt-not-complete",
+  "verified": 1397
+}

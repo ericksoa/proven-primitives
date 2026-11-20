@@ -1,0 +1,42 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:101:1
+    |
+101 | / fn output_block_reason(
+102 | |     output_remaining: u64,
+103 | |     work_remaining: u64,
+104 | |     has_output_slot: bool,
+105 | | ) -> (r: u8)
+    | |___________^
+
+note: function body check finished in 4 seconds
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:101:1
+    |
+101 | / fn output_block_reason(
+102 | |     output_remaining: u64,
+103 | |     work_remaining: u64,
+104 | |     has_output_slot: bool,
+105 | | ) -> (r: u8)
+    | |___________^
+
+error: postcondition not satisfied
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:107:9
+    |
+107 |           output_remaining == 0 || work_remaining < 8 ==> r == 1,
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+111 | /     if !has_output_slot {
+112 | |         2
+113 | |     } else if output_remaining == 0 || work_remaining < 8 {
+114 | |         1
+115 | |     } else {
+116 | |         0
+117 | |     }
+    | |_____- at the end of the function body
+
+error: aborting due to 1 previous error
+

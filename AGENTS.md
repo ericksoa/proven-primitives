@@ -309,3 +309,33 @@ the preceding resource-failed whole attempt is retained separately. This
 completes only the constructor checkpoint. Remaining B3c work, B3d/B4, F2's
 native disagreement, independent human specification review and decoder/release
 obligations remain open. No additional architectural authority follows.
+
+
+The broader B3c atomic-emission checkpoint is recorded in
+`BROTLI_B3C_ATOMIC_EMISSION_CHECKPOINT.md` and
+`evidence/brotli-b3c-atomic-emission.json`. Within C1's already-approved atomic
+output/state-effect scope, the existing owner-private `emit_byte` and
+`emit_uncompressed_byte` contracts now bind success to the complete serialized
+workspace image and every error to an unchanged workspace/budget/output.
+Their complete bodies, signatures, original requirements and guarantees remain;
+there is no new public or cross-module proof API. The source retains the exact
+8-work/1-output/optional-1-input debit and the 425-unit initialization policy.
+The same-source gate checked 1397 whole-crate obligations with zero errors,
+116 runtime tests and 44 semantic rejections across the prior 28 B3c, six
+constructor and ten new emission cases. Earlier partial resource failures are
+retained and are not positive/control evidence. One proof-only solver-isolation
+annotation uses the existing tool without changing any production allowance.
+The legacy test-only selector repair and matched temporary emission/terminal
+solver allowances are recorded separately; all original assertions/classifiers
+remain. Source billing is still open: the static audit finds 24 byte writes
+against the eight-unit emission debit. E3 is pending direct human approval in
+`BROTLI_B3C_EMISSION_WRITE_METERING_DECISION.md`; do not implement its five
+return-type/24-unit changes without that approval. The actual B2 caller's
+retry-bypass fault is accepted by its current weak contract, independently of
+the checked rejection helper; this is a recorded proof gap, not a passing
+negative control.
+This is a local exact-effect/error-frame checkpoint, not complete B3c. Byte
+origin, complete error classification/progress, actual B2 saved-state handoff,
+phase/stream composition, later source ledgers, B3d/B4, F2's native disagreement,
+independent human specification review and supported-decoder/release gates
+remain open. No additional architectural decision or approval follows.

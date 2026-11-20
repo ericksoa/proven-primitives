@@ -1,0 +1,28 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:74:1
+   |
+74 | fn copy_setup_phase(distance: u32, history: u32) -> (r: u8)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note: function body check finished in 4 seconds
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:74:1
+   |
+74 | fn copy_setup_phase(distance: u32, history: u32) -> (r: u8)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: postcondition not satisfied
+  --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:78:9
+   |
+78 |         distance > history ==> r == 13,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+79 | {
+80 |     12
+   |     -- at the end of the function body
+
+error: aborting due to 1 previous error
+

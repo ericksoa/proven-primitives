@@ -1,6 +1,7 @@
 //! Brotli B3c implementation candidate under the approved normal-window profile.
 //!
-//! M1 metering and the full B3c refinement and release obligations remain open.
+//! M1 compressed-header metering is checked; broader B3c refinement and release
+//! obligations remain open.
 //! This module is not a supported or completely verified Brotli decoder.
 
 use vstd::prelude::*;
@@ -1233,6 +1234,7 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
         }
     }
 
+    #[verifier::spinoff_prover]
     fn emit_byte(
         &mut self,
         byte: u8,
@@ -1260,6 +1262,72 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
                 &&& final(self).budget.input_remaining
                     == old(self).budget.input_remaining
                         - if consumes_input { 1u64 } else { 0u64 }
+            },
+            final(self).budget.calls_remaining == old(self).budget.calls_remaining,
+            final(self).budget.initializations_remaining
+                == old(self).budget.initializations_remaining,
+            r.is_err() ==> {
+                &&& *final(self).budget == *old(self).budget
+                &&& final(self).workspace@ == old(self).workspace@
+            },
+            r.is_ok() ==> {
+                let w = (1u32 << old(self).budget.limits.max_window_bits) as u32;
+                let base = crate::brotli_input::b3c_scalar_base(w);
+                let before = old(self).workspace@;
+                let position = crate::brotli_input::b3c_scalar_u32_at(
+                    before, w, crate::brotli_input::B3C_WINDOW_POSITION as int,
+                );
+                let history = crate::brotli_input::b3c_scalar_u32_at(
+                    before, w, crate::brotli_input::B3C_HISTORY_LENGTH as int,
+                );
+                let remaining = crate::brotli_input::b3c_scalar_u32_at(
+                    before, w, crate::brotli_input::B3C_META_REMAINING as int,
+                );
+                let bits = crate::brotli_input::b3c_scalar_byte_at(
+                    before, w, crate::brotli_input::B3C_STREAM_WINDOW_BITS as int,
+                );
+                let limit = (1u32 << bits) as nat - 16;
+                let p = (if position + 1 == w { 0nat } else { position + 1 }) as u32;
+                let h = (if history < limit { history + 1 } else { history }) as u32;
+                let m = (remaining - 1) as u32;
+                let total = before[base + 24] as nat
+                    + 256 * before[base + 25] as nat
+                    + 65_536 * before[base + 26] as nat
+                    + 16_777_216 * before[base + 27] as nat
+                    + 4_294_967_296 * before[base + 28] as nat
+                    + 1_099_511_627_776 * before[base + 29] as nat
+                    + 281_474_976_710_656 * before[base + 30] as nat
+                    + 72_057_594_037_927_936 * before[base + 31] as nat;
+                let t = (total + 1) as u64;
+                &&& position < w
+                &&& remaining > 0
+                &&& 10 <= bits <= 24
+                &&& total < 18_446_744_073_709_551_615nat
+                &&& (history <= limit ==> h as nat <= limit)
+                &&& final(self).workspace@ == before
+                    .update(position as int, byte)
+                    .update(base + 33, before[base + 32])
+                    .update(base + 32, byte)
+                    .update(base + 16, (p % 256) as u8)
+                    .update(base + 17, ((p / 256) % 256) as u8)
+                    .update(base + 18, ((p / 65_536) % 256) as u8)
+                    .update(base + 19, (p / 16_777_216) as u8)
+                    .update(base + 20, (h % 256) as u8)
+                    .update(base + 21, ((h / 256) % 256) as u8)
+                    .update(base + 22, ((h / 65_536) % 256) as u8)
+                    .update(base + 23, (h / 16_777_216) as u8)
+                    .update(base + 24, t as u8)
+                    .update(base + 25, (t >> 8) as u8)
+                    .update(base + 26, (t >> 16) as u8)
+                    .update(base + 27, (t >> 24) as u8)
+                    .update(base + 28, (t >> 32) as u8)
+                    .update(base + 29, (t >> 40) as u8)
+                    .update(base + 30, (t >> 48) as u8)
+                    .update(base + 31, (t >> 56) as u8)
+                    .update(base + 12, (m % 256) as u8)
+                    .update(base + 13, ((m / 256) % 256) as u8)
+                    .update(base + 14, ((m / 65_536) % 256) as u8)
+                    .update(base + 15, (m / 16_777_216) as u8)
             },
             final(output)@.len() == old(output)@.len(),
             r.is_ok() ==> final(output)@[produced as int] == byte,
@@ -1419,6 +1487,72 @@ impl<'w, 'b> BrotliDecoder<'w, 'b> {
                     == old(self).budget.output_remaining - 1
                 &&& final(self).budget.work_remaining
                     == old(self).budget.work_remaining - 8
+            },
+            final(self).budget.calls_remaining == old(self).budget.calls_remaining,
+            final(self).budget.initializations_remaining
+                == old(self).budget.initializations_remaining,
+            r.is_err() ==> {
+                &&& *final(self).budget == *old(self).budget
+                &&& final(self).workspace@ == old(self).workspace@
+            },
+            r.is_ok() ==> {
+                let w = (1u32 << old(self).budget.limits.max_window_bits) as u32;
+                let base = crate::brotli_input::b3c_scalar_base(w);
+                let before = old(self).workspace@;
+                let position = crate::brotli_input::b3c_scalar_u32_at(
+                    before, w, crate::brotli_input::B3C_WINDOW_POSITION as int,
+                );
+                let history = crate::brotli_input::b3c_scalar_u32_at(
+                    before, w, crate::brotli_input::B3C_HISTORY_LENGTH as int,
+                );
+                let remaining = crate::brotli_input::b3c_scalar_u32_at(
+                    before, w, crate::brotli_input::B3C_META_REMAINING as int,
+                );
+                let bits = crate::brotli_input::b3c_scalar_byte_at(
+                    before, w, crate::brotli_input::B3C_STREAM_WINDOW_BITS as int,
+                );
+                let limit = (1u32 << bits) as nat - 16;
+                let p = (if position + 1 == w { 0nat } else { position + 1 }) as u32;
+                let h = (if history < limit { history + 1 } else { history }) as u32;
+                let m = (remaining - 1) as u32;
+                let total = before[base + 24] as nat
+                    + 256 * before[base + 25] as nat
+                    + 65_536 * before[base + 26] as nat
+                    + 16_777_216 * before[base + 27] as nat
+                    + 4_294_967_296 * before[base + 28] as nat
+                    + 1_099_511_627_776 * before[base + 29] as nat
+                    + 281_474_976_710_656 * before[base + 30] as nat
+                    + 72_057_594_037_927_936 * before[base + 31] as nat;
+                let t = (total + 1) as u64;
+                &&& position < w
+                &&& remaining > 0
+                &&& 10 <= bits <= 24
+                &&& total < 18_446_744_073_709_551_615nat
+                &&& (history <= limit ==> h as nat <= limit)
+                &&& final(self).workspace@ == before
+                    .update(position as int, byte)
+                    .update(base + 33, before[base + 32])
+                    .update(base + 32, byte)
+                    .update(base + 16, (p % 256) as u8)
+                    .update(base + 17, ((p / 256) % 256) as u8)
+                    .update(base + 18, ((p / 65_536) % 256) as u8)
+                    .update(base + 19, (p / 16_777_216) as u8)
+                    .update(base + 20, (h % 256) as u8)
+                    .update(base + 21, ((h / 256) % 256) as u8)
+                    .update(base + 22, ((h / 65_536) % 256) as u8)
+                    .update(base + 23, (h / 16_777_216) as u8)
+                    .update(base + 24, t as u8)
+                    .update(base + 25, (t >> 8) as u8)
+                    .update(base + 26, (t >> 16) as u8)
+                    .update(base + 27, (t >> 24) as u8)
+                    .update(base + 28, (t >> 32) as u8)
+                    .update(base + 29, (t >> 40) as u8)
+                    .update(base + 30, (t >> 48) as u8)
+                    .update(base + 31, (t >> 56) as u8)
+                    .update(base + 12, (m % 256) as u8)
+                    .update(base + 13, ((m / 256) % 256) as u8)
+                    .update(base + 14, ((m / 65_536) % 256) as u8)
+                    .update(base + 15, (m / 16_777_216) as u8)
             },
             final(output)@.len() == old(output)@.len(),
             r.is_ok() ==> final(output)@[produced as int] == byte,

@@ -1,0 +1,43 @@
+from pathlib import Path
+import hashlib,json,tarfile,re,subprocess,importlib.util
+R=Path.cwd();O=R/'evidence/b3c-atomic-emission-final04'
+def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def mapping(folder,name):
+ data=json.loads((folder/name).read_text())
+ for n,d in data.items():assert h(folder/n)==d,n
+ return len(data)
+counts={}
+for tag in ['b3c-atomic-emission-final01','b3c-atomic-emission-final02','b3c-atomic-emission-final03','b3c-atomic-emission-final04']:
+ folder=R/'evidence'/tag;counts[tag]=mapping(folder,'artifact-sha256.json')
+mapping(O,'gate-artifact-sha256.json')
+root=json.loads((R/'evidence/brotli-b3c-atomic-emission.json').read_text());c=json.loads((O/'complete.json').read_text())
+def bindings(x):
+ if isinstance(x,dict):
+  if 'path' in x and 'sha256' in x:assert h(R/x['path'])==x['sha256'],x['path']
+  for v in x.values():bindings(v)
+ elif isinstance(x,list):
+  for v in x:bindings(v)
+bindings(root)
+with tarfile.open(O/'frozen-source.tar.gz','r:gz') as archive:
+ assert set(archive.getnames())==set(c['source_sha256'])
+ for n,d in c['source_sha256'].items():
+  assert h(R/n)==d,n
+  assert hashlib.sha256(archive.extractfile(n).read()).hexdigest()==d,n
+v=json.loads((O/'verification.json').read_text())['verification-results'];assert v==root['gate']['verification']==c['verification']
+assert v['success'] and v['errors']==0 and v['is-verifying-entire-crate']
+assert c['runtime_passed']==root['gate']['runtime_passed']
+required=json.loads((O/'required-controls.json').read_text());controls=json.loads((O/'controls.json').read_text());assert len(controls)==44
+spec=importlib.util.spec_from_file_location('gate_helpers',R/'target/m1-r-final-gate/driver.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+for row in controls:
+ assert h(O/row['log'])==row['sha256'];classification=g.semantic_rejection((O/row['log']).read_text());assert classification['semantic_rejection'] and not classification['tool_or_resource_failure'] and not classification['syntax_or_type_failure']
+ assert all(row[k]==value for k,value in classification.items())
+steps=json.loads((O/'steps.json').read_text());positive=json.loads((O/'positive.json').read_text())
+for row in steps:
+ if row['name'].startswith('controls-'):
+  suite=row['name'].removeprefix('controls-');text=(O/row['log']).read_text();names=re.findall(r'^REJECTED (brotli-[a-z0-9-]+):',text,re.M)
+  assert 'test result: ok. 1 passed; 0 failed' in text and row['exit_code']==0
+  assert len(names)==len(set(names)) and set(names)==set(required[suite]['mutants'])
+  assert row['started_ns']>positive['whole']['started_ns']+int(positive['whole']['seconds']*1e9)
+assert len({row['name'] for row in controls})==44
+subprocess.run(['git','diff','--check','--','src','tests','AGENTS.md','BROTLI_B3C_ATOMIC_EMISSION_CHECKPOINT.md'],check=True)
+print(json.dumps({'artifact_counts':counts,'whole_verified':v['verified'],'whole_errors':v['errors'],'runtime_passed':c['runtime_passed'],'semantic_rejections':len(controls),'suites':len(required),'all_root_bindings_and_frozen_source_match':True,'positive_precedes_all_defects':True},indent=2))

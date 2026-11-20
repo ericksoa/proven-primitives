@@ -1,0 +1,31 @@
+{
+  "constructor_suite_passed": true,
+  "counts_as_complete_gate": false,
+  "errors_in_positive": 0,
+  "failed_suite_raw_logs": [
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-emission-window-byte-disagrees-with-output.log",
+      "name": "brotli-b3c-emission-window-byte-disagrees-with-output",
+      "sha256": "7c24c74c67880e42a5baf5eb2a1b9b642831a70ee558e0753abc184d116ba9f8"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-emission-window-position-does-not-advance.log",
+      "name": "brotli-b3c-emission-window-position-does-not-advance",
+      "sha256": "dc680f724766810d8ba02ab9d71f41cc268494f234a08cd1130a0e5ca2d2f2bc"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-emission-history-does-not-advance.log",
+      "name": "brotli-b3c-emission-history-does-not-advance",
+      "sha256": "1284036ae0ae700de3152f1dbb352bcf86b59455def7682d6d0aba45cf67c000"
+    }
+  ],
+  "frozen_source_sha256": "fb7554aa4b0ee9693475b6aabdf17e26ddd3e43ec6d2b381cd6515dfef6d18a3",
+  "new_emission_suite": "failed on mixed history postcondition/resource result after two reported cases",
+  "old_28_suite": "intentionally interrupted after required new suite failed; no completion claim",
+  "runtime_passed": 116,
+  "status": "whole-runtime-positive-passed-required-control-attempt-failed",
+  "verified": 1397
+}

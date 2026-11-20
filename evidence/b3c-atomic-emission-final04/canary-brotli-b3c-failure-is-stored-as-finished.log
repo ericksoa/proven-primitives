@@ -1,0 +1,40 @@
+verification results:: 0 verified, 1 errors (partial verification with `--verify-*`)
+
+note: verifying module brotli (selected functions)
+
+note: function body check has been running for 2 seconds
+      reporting errors as they are discovered (they may not be in source order)
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:725:5
+    |
+725 | /     fn fail(
+726 | |         &mut self,
+727 | |         error: StreamError,
+728 | |         consumed: usize,
+729 | |         produced: usize,
+730 | |     ) -> (r: Step)
+    | |_________________^
+
+note: function body check finished in 6 seconds
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:725:5
+    |
+725 | /     fn fail(
+726 | |         &mut self,
+727 | |         error: StreamError,
+728 | |         consumed: usize,
+729 | |         produced: usize,
+730 | |     ) -> (r: Step)
+    | |_________________^
+
+error: assertion failed
+   --> /var/folders/w3/n8mr0lln07n_mc7k11fjqn800000gp/T/proven-primitives-b3c-canaries-8694/src/brotli.rs:774:20
+    |
+774 |               assert(crate::brotli_input::b3c_scalar_byte_at(
+    |  ____________________^
+775 | |                 self.workspace@,
+776 | |                 window_bytes,
+777 | |                 crate::brotli_input::B3C_STREAM_PHASE as int,
+778 | |             ) == 9);
+    | |__________________^ assertion failed
+
+error: aborting due to 1 previous error
+

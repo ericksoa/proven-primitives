@@ -1,0 +1,63 @@
+{
+  "completed_suites": [
+    "six constructor controls",
+    "ten new emission controls"
+  ],
+  "counts_as_complete_gate": false,
+  "errors_in_positive": 0,
+  "failed_suite_raw_logs": [
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-region-boundary-shifts.log",
+      "name": "brotli-b3c-region-boundary-shifts",
+      "sha256": "33d1136bf13593dcdb6a99ae6cecaad608aa1fff1a1ec5bab179652b5741eaba"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-initial-recent-distance-is-wrong.log",
+      "name": "brotli-b3c-initial-recent-distance-is-wrong",
+      "sha256": "52e2a0348809fb9b862f35634c831958bde0e4cce30b6a84e209bd7f488f194c"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-terminal-escrow-marker-is-wrong.log",
+      "name": "brotli-b3c-terminal-escrow-marker-is-wrong",
+      "sha256": "52e2a0348809fb9b862f35634c831958bde0e4cce30b6a84e209bd7f488f194c"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-distance-lut-offset-is-wrong.log",
+      "name": "brotli-b3c-distance-lut-offset-is-wrong",
+      "sha256": "b072f22b5d66137608f9d7f5da20e5295aa8ce021c5ad5532e02d6cf3fad44f8"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-nonzero-padding-is-accepted.log",
+      "name": "brotli-b3c-nonzero-padding-is-accepted",
+      "sha256": "0f32fce0d760bccc1364c358bb985e474df8a22b0e20c2c41033a5be2f185e4a"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-dictionary-output-equal-to-meta-limit-is-rejected.log",
+      "name": "brotli-b3c-dictionary-output-equal-to-meta-limit-is-rejected",
+      "sha256": "f893c63161978b45f9f6c0bf958fb72db90c90700994512f4e421d3334d64b15"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-dictionary-staging-reads-uninitialized-byte.log",
+      "name": "brotli-b3c-dictionary-staging-reads-uninitialized-byte",
+      "sha256": "6b024b8170bfb672b23458e8afd0fd439596c3878aa9e23945593cc64d16cda6"
+    },
+    {
+      "counts_as_passed_suite": false,
+      "log": "failed-suite-raw/canary-brotli-b3c-permanent-block-switch-failure-is-retryable.log",
+      "name": "brotli-b3c-permanent-block-switch-failure-is-retryable",
+      "sha256": "2fc980af3bae81dc2413bf580a67b467533e8d2e734a3035cb6bc451a6cd6bea"
+    }
+  ],
+  "frozen_source_sha256": "affc285b474773bbdfde8e51b65835399a021a491a7be1124b2990e1432a1719",
+  "legacy_28_suite": "stopped at stale command-decrement selector after eight reported cases; no complete suite claim",
+  "runtime_passed": 116,
+  "status": "whole-runtime-positive-and-two-suites-passed-legacy-suite-selector-failed",
+  "verified": 1397
+}

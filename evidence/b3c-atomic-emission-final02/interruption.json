@@ -1,0 +1,15 @@
+{
+  "status": "whole-runtime-positive-passed-controls-intentionally-interrupted",
+  "reason": "Separate same-core preflight found mixed postcondition/resource results for the new broad total and resource-error window faults. Focused first-total and guaranteed window-corruption faults are strictly rejected under unchanged checker settings. Retrying with only those new test fault definitions changed.",
+  "source_or_contract_changes": false,
+  "stopped_task_descendants": [
+    95721,
+    95723,
+    95726,
+    95730,
+    96030,
+    96048,
+    96073
+  ],
+  "recorded_ns": 1795136095769241000
+}
